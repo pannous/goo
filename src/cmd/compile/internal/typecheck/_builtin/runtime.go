@@ -132,6 +132,9 @@ func deferrangefunc() interface{}
 func rand() uint64
 func rand32() uint32
 
+// truthiness conversion for if statements
+func truthy(interface{}) bool
+
 // *byte is really *runtime.Type
 func makemap64(mapType *byte, hint int64, mapbuf *any) (hmap map[any]any)
 func makemap(mapType *byte, hint int, mapbuf *any) (hmap map[any]any)

@@ -592,8 +592,9 @@ func (check *Checker) stmt(ctxt stmtContext, s syntax.Stmt) {
 		check.simpleStmt(s.Init)
 		var x operand
 		check.expr(nil, &x, s.Cond)
-		if x.mode != invalid && !allBoolean(x.typ) {
-			check.error(s.Cond, InvalidCond, "non-boolean condition in if statement")
+		// Allow any type in if conditions - truthy conversion handled in typecheck
+		if x.mode == invalid {
+			return
 		}
 		check.stmt(inner, s.Then)
 		// The parser produces a correct AST but if it was modified
@@ -694,8 +695,9 @@ func (check *Checker) stmt(ctxt stmtContext, s syntax.Stmt) {
 		if s.Cond != nil {
 			var x operand
 			check.expr(nil, &x, s.Cond)
-			if x.mode != invalid && !allBoolean(x.typ) {
-				check.error(s.Cond, InvalidCond, "non-boolean condition in for statement")
+			// Allow any type in for conditions - truthy conversion handled in typecheck
+			if x.mode == invalid {
+				return
 			}
 		}
 		check.simpleStmt(s.Post)

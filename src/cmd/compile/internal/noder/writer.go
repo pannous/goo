@@ -2832,11 +2832,45 @@ func (w *writer) pkgObjs(names ...*syntax.Name) {
 // possible.
 func (pw *pkgWriter) staticBool(ep *syntax.Expr) int {
 	if val := pw.typeAndValue(*ep).Value; val != nil {
-		if constant.BoolVal(val) {
-			return +1
-		} else {
-			return -1
+		// Handle boolean constants normally
+		if val.Kind() == constant.Bool {
+			if constant.BoolVal(val) {
+				return +1
+			} else {
+				return -1
+			}
 		}
+		// For non-boolean constants, implement truthiness
+		switch val.Kind() {
+		case constant.Int:
+			if sign := constant.Sign(val); sign != 0 {
+				return +1
+			} else {
+				return -1
+			}
+		case constant.Float:
+			if sign := constant.Sign(val); sign != 0 {
+				return +1
+			} else {
+				return -1
+			}
+		case constant.Complex:
+			re := constant.Real(val)
+			im := constant.Imag(val)
+			if constant.Sign(re) != 0 || constant.Sign(im) != 0 {
+				return +1
+			} else {
+				return -1
+			}
+		case constant.String:
+			if constant.StringVal(val) != "" {
+				return +1
+			} else {
+				return -1
+			}
+		}
+		// For unknown constant types, assume unknown
+		return 0
 	}
 
 	if e, ok := (*ep).(*syntax.Operation); ok {

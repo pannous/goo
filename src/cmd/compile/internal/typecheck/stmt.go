@@ -190,7 +190,9 @@ func tcFor(n *ir.ForStmt) ir.Node {
 	if n.Cond != nil {
 		t := n.Cond.Type()
 		if t != nil && !t.IsBoolean() {
-			base.Errorf("non-bool %L used as for condition", n.Cond)
+			// Generate runtime.truthy(condition) call for non-boolean types
+			truthyFn := LookupRuntime("truthy")
+			n.Cond = Call(n.Cond.Pos(), truthyFn, []ir.Node{n.Cond}, false)
 		}
 	}
 	n.Post = Stmt(n.Post)
@@ -388,7 +390,9 @@ func tcIf(n *ir.IfStmt) ir.Node {
 	if n.Cond != nil {
 		t := n.Cond.Type()
 		if t != nil && !t.IsBoolean() {
-			base.Errorf("non-bool %L used as if condition", n.Cond)
+			// Generate runtime.truthy(condition) call for non-boolean types
+			truthyFn := LookupRuntime("truthy")
+			n.Cond = Call(n.Cond.Pos(), truthyFn, []ir.Node{n.Cond}, false)
 		}
 	}
 	Stmts(n.Body)
