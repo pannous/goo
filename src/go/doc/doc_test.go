@@ -70,7 +70,8 @@ func isGoFile(fi fs.FileInfo) bool {
 	name := fi.Name()
 	return !fi.IsDir() &&
 		len(name) > 0 && name[0] != '.' && // ignore .files
-		filepath.Ext(name) == ".go"
+		filepath.Ext(name) == ".go" ||
+		filepath.Ext(name) == ".goo"
 }
 
 type bundle struct {

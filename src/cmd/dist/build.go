@@ -664,6 +664,7 @@ func mustLinkExternal(goos, goarch string, cgoEnabled bool) bool {
 var depsuffix = []string{
 	".s",
 	".go",
+	".goo",
 }
 
 // gentab records how to generate some trivial files.
@@ -816,7 +817,7 @@ func runInstall(pkg string, ch chan struct{}) {
 		if !t.IsZero() && !strings.HasSuffix(p, ".a") && !shouldbuild(p, pkg) {
 			return false
 		}
-		if strings.HasSuffix(p, ".go") {
+		if strings.HasSuffix(p, ".go") || strings.HasSuffix(p, ".goo") {
 			gofiles = append(gofiles, p)
 		} else if strings.HasSuffix(p, ".s") {
 			sfiles = append(sfiles, p)
