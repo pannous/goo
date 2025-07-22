@@ -1,3 +1,4 @@
 # git config merge.ours.driver true
 README.md merge=ours
 .gitattributes merge=ours
+.github merge=ours
