@@ -328,7 +328,9 @@ func main() {
 	// that are options to pass to gcc.
 	var i int
 	for i = len(args); i > 0; i-- {
-		if !strings.HasSuffix(args[i-1], ".go") {
+		isGoFile := strings.HasSuffix(args[i-1], ".go")
+		isGoFile = isGoFile || strings.HasSuffix(args[i-1], ".goo")
+		if !isGoFile {
 			break
 		}
 	}
