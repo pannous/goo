@@ -2,9 +2,12 @@
 
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.
 
-Goo is an up to date fork of Go with the following modifications:
+Goo is an up-to-date fork of Go with the following modifications:
 
-🗹 truthy/falsey if  
+🗹 truthy/falsey if
+🗹 # comment and shebang support
+☐ assert
+☐ return void
 ☐ silent/implicit error propagation  
 ☐ print alias for fmt.Println  
 ☐ for loops  
