@@ -2355,7 +2355,7 @@ func ldobj(ctxt *Link, f *bio.Reader, lib *sym.Library, length int64, pn string,
 	}
 
 	if !strings.HasPrefix(line, "go object ") {
-		if strings.HasSuffix(pn, ".go") {
+		if strings.HasSuffix(pn, ".go") || strings.HasSuffix(pn, ".goo") {
 			Exitf("%s: uncompiled .go source file", pn)
 			return nil
 		}

@@ -40,7 +40,7 @@ var html_h = regexp.MustCompile(`<h3 id="[^"]*">`)
 const html_endh = "</h3>\n"
 
 func isGoFile(fi fs.FileInfo) bool {
-	return (strings.HasSuffix(fi.Name(), ".go") || strings.HasSuffix(fi.Name(), ".go")) && !strings.HasSuffix(fi.Name(), "_test.go")
+	return (strings.HasSuffix(fi.Name(), ".go") || strings.HasSuffix(fi.Name(), ".goo")) && !strings.HasSuffix(fi.Name(), "_test.go")
 }
 
 func appendHeadings(list []string, comment string) []string {

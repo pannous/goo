@@ -664,6 +664,7 @@ func (p *Package) writeDefsFunc(fgo2 io.Writer, n *Name, callsMalloc *bool) {
 func (p *Package) writeOutput(f *File, srcfile string) {
 	base := srcfile
 	base = strings.TrimSuffix(base, ".go")
+	base = strings.TrimSuffix(base, ".goo")
 	base = filepath.Base(base)
 	fgo1 := creat(*objDir + base + ".cgo1.go")
 	fgcc := creat(*objDir + base + ".cgo2.c")

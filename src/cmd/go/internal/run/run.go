@@ -93,7 +93,7 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 	}()
 
 	i := 0
-	for i < len(args) && strings.HasSuffix(args[i], ".go") {
+	for i < len(args) && (strings.HasSuffix(args[i], ".go") || strings.HasSuffix(args[i], ".goo")) {
 		i++
 	}
 	pkgOpts := load.PackageOpts{MainOnly: true}
@@ -187,6 +187,7 @@ func shouldUseOutsideModuleMode(args []string) bool {
 	// NOTE: "@" not allowed in import paths, but it is allowed in non-canonical
 	// versions.
 	return len(args) > 0 &&
+		!strings.HasSuffix(args[0], ".goo") &&
 		!strings.HasSuffix(args[0], ".go") &&
 		!strings.HasPrefix(args[0], "-") &&
 		strings.Contains(args[0], "@") &&

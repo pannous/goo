@@ -239,7 +239,7 @@ func NewFromFiles(fset *token.FileSet, files []*ast.File, importPath string, opt
 		switch filename := f.Name(); {
 		case strings.HasSuffix(filename, "_test.go"):
 			testGoFiles = append(testGoFiles, file)
-		case strings.HasSuffix(filename, ".go"):
+		case strings.HasSuffix(filename, ".go") || strings.HasSuffix(filename, ".goo"):
 			pkgName = file.Name.Name
 			goFiles[filename] = file
 		default:

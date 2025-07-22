@@ -158,7 +158,7 @@ func ParseDir(fset *token.FileSet, path string, filter func(fs.FileInfo) bool, m
 
 	pkgs = make(map[string]*ast.Package)
 	for _, d := range list {
-		if d.IsDir() || !strings.HasSuffix(d.Name(), ".go") {
+		if d.IsDir() || !strings.HasSuffix(d.Name(), ".go") && !strings.HasSuffix(d.Name(), ".goo") {
 			continue
 		}
 		if filter != nil {

@@ -281,7 +281,9 @@ func isUnneededSSARewriteFile(srcFile, goArch string) (archCaps string, unneeded
 	if !strings.Contains(srcFile, ssaRewriteFileSubstring) {
 		return "", false
 	}
-	fileArch := strings.TrimSuffix(strings.TrimPrefix(filepath.Base(srcFile), "rewrite"), ".go")
+	trimmed := strings.TrimPrefix(filepath.Base(srcFile), "rewrite")
+	trimmed = strings.TrimSuffix(trimmed, ".goo")
+	fileArch := strings.TrimSuffix(trimmed, ".go")
 	if fileArch == "" {
 		return "", false
 	}

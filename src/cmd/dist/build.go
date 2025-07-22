@@ -784,7 +784,8 @@ func runInstall(pkg string, ch chan struct{}) {
 	// There do exist real C files beginning with _,
 	// so limit that check to just Go files.
 	files = filter(files, func(p string) bool {
-		return !strings.HasPrefix(p, ".") && (!strings.HasPrefix(p, "_") || !strings.HasSuffix(p, ".go"))
+		return !strings.HasPrefix(p, ".") && (!strings.HasPrefix(p, "_") ||
+			!strings.HasSuffix(p, ".go") || !strings.HasSuffix(p, ".goo"))
 	})
 
 	// Add generated files for this package.

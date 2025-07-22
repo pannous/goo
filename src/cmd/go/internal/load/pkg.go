@@ -1421,7 +1421,7 @@ HaveGoMod:
 func hasGoFiles(dir string) bool {
 	files, _ := os.ReadDir(dir)
 	for _, f := range files {
-		if !f.IsDir() && strings.HasSuffix(f.Name(), ".go") {
+		if !f.IsDir() && (strings.HasSuffix(f.Name(), ".go") || strings.HasSuffix(f.Name(), ".goo")) {
 			return true
 		}
 	}
@@ -1757,7 +1757,7 @@ func (p *Package) exeFromFiles() string {
 		return ""
 	}
 	_, elem := filepath.Split(src)
-	return elem[:len(elem)-len(".go")]
+	return elem[:len(elem)-len(".go")] // or .goo suffix
 }
 
 // DefaultExecName returns the default executable name for a package
@@ -2907,7 +2907,7 @@ func PackagesAndErrors(ctx context.Context, opts PackageOpts, patterns []string)
 		// Listing is only supported with all patterns referring to either:
 		// - Files that are part of the same directory.
 		// - Explicit package paths or patterns.
-		if strings.HasSuffix(p, ".go") {
+		if strings.HasSuffix(p, ".go") || strings.HasSuffix(p, ".goo") {
 			// We need to test whether the path is an actual Go file and not a
 			// package path or pattern ending in '.go' (see golang.org/issue/34653).
 			if fi, err := fsys.Stat(p); err == nil && !fi.IsDir() {
@@ -3247,7 +3247,7 @@ func GoFilesPackage(ctx context.Context, opts PackageOpts, gofiles []string) *Pa
 	modload.Init()
 
 	for _, f := range gofiles {
-		if !strings.HasSuffix(f, ".go") {
+		if !strings.HasSuffix(f, ".go") && !strings.HasSuffix(f, ".goo") {
 			pkg := new(Package)
 			pkg.Internal.Local = true
 			pkg.Internal.CmdlineFiles = true

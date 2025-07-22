@@ -492,7 +492,7 @@ func parseArgs(ctx context.Context, rawArgs []string) (dropToolchain bool, queri
 		// Guard against 'go get x.go', a common mistake.
 		// Note that package and module paths may end with '.go', so only print an error
 		// if the argument has no version and either has no slash or refers to an existing file.
-		if strings.HasSuffix(q.raw, ".go") && q.rawVersion == "" {
+		if (strings.HasSuffix(q.raw, ".go") || strings.HasSuffix(q.raw, ".goo")) && q.rawVersion == "" {
 			if !strings.Contains(q.raw, "/") {
 				base.Errorf("go: %s: arguments must be package or module paths", q.raw)
 				continue

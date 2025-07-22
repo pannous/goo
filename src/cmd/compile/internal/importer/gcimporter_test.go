@@ -35,6 +35,9 @@ func compile(t *testing.T, dirname, filename, outdirname string, packagefiles ma
 	// filename must end with ".go"
 	basename, ok := strings.CutSuffix(filepath.Base(filename), ".go")
 	if !ok {
+		basename, ok = strings.CutSuffix(basename, ".goo") // allow .goo files too
+	}
+	if !ok {
 		t.Helper()
 		t.Fatalf("filename doesn't end in .go: %s", filename)
 	}
