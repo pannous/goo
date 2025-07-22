@@ -5,23 +5,22 @@ import "fmt"
 func main() {
 	a := true
 	b := false
+
+	// Test basic not operator
+	result := not a
+	fmt.Println("not true =", result)
 	
-	// Test traditional ! operator
-	fmt.Println("!a =", !a)
-	fmt.Println("!b =", !b)
-	
-	// Test new not keyword
-	fmt.Println("not a =", negate a)
-	fmt.Println("not b =", negate b)
+	result2 := not b
+	fmt.Println("not false =", result2)
 	
 	// Test in conditional
-	if negate a {
+	if not a {
 		fmt.Println("not a is true")
 	} else {
 		fmt.Println("not a is false")
 	}
 	
-	if negate b {
+	if not b {
 		fmt.Println("not b is true")
 	} else {
 		fmt.Println("not b is false")

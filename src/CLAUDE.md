@@ -40,8 +40,8 @@ GOOS=darwin GOARCH=arm64 ./bootstrap.bash
 - Error handling via `errorf()`, position tracking
 
 # Testing Guidelines
-- Always create a new go file to test the new feature and store it in the <root>/goo/ folder; not src/goo, rather ../goo/ ! don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
-- Before committing quickly run these new tests
+- Always create exactly one new go file <git_root>/goo/test_{feature}.go to test the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
+- Before committing quickly run these new tests with the freshly built ../bin/go 
 - After committing, run the following command in src/ to test the compatibility with the whole system:
 
 ```bash
