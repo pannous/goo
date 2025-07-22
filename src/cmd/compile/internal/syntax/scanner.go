@@ -393,6 +393,13 @@ func (s *scanner) ident() {
 		}
 	}
 
+	// special case for 'not' operator
+	if string(lit) == "not" {
+		s.op, s.prec = Not, 0
+		s.tok = _Operator
+		return
+	}
+
 	s.nlsemi = true
 	s.lit = string(lit)
 	s.tok = _Name

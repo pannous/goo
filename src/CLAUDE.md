@@ -40,7 +40,7 @@ GOOS=darwin GOARCH=arm64 ./bootstrap.bash
 - Error handling via `errorf()`, position tracking
 
 # Testing Guidelines
-- Always create a new go file to test the new feature and store it in the ./goo/ folder
+- Always create a new go file to test the new feature and store it in the <root>/goo/ folder; not src/goo, rather ../goo/ ! don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
 - Before committing quickly run these new tests
 - After committing, run the following command in src/ to test the compatibility with the whole system:
 
@@ -49,3 +49,7 @@ GOROOT=$(pwd)/.. ./run.bash --no-rebuild 2>&1 | grep -Ev '^\?|^ok ' | tee /dev/t
 ```
 - This command runs the tests, filters out the output to show only failures, and exits with an error code if any tests fail.
 - if we encounter a FAIL, ponder whether our changes might be related to it and if so try once to fix it or tell me to look at it.
+
+# Compiler Build Notes
+- `go tool dist install` is unreliable and may do nothing
+- Recommendation: Use `./make.bash` directly for compiler installation

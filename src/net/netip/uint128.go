@@ -44,7 +44,7 @@ func (u uint128) or(m uint128) uint128 {
 }
 
 // not returns the bitwise NOT of u.
-func (u uint128) not() uint128 {
+func (u uint128) negate() uint128 {
 	return uint128{^u.hi, ^u.lo}
 }
 
@@ -71,7 +71,7 @@ func (u *uint128) halves() [2]*uint64 {
 // bitsSetFrom returns a copy of u with the given bit
 // and all subsequent ones set.
 func (u uint128) bitsSetFrom(bit uint8) uint128 {
-	return u.or(mask6(int(bit)).not())
+	return u.or(mask6(int(bit)).negate())
 }
 
 // bitsClearedFrom returns a copy of u with the given bit

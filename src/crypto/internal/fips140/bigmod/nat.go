@@ -32,7 +32,7 @@ const (
 // constant time by turning it into a mask.
 type choice uint
 
-func not(c choice) choice { return 1 ^ c }
+func negate(c choice) choice { return 1 ^ c }
 
 const yes = choice(1)
 const no = choice(0)
@@ -46,7 +46,7 @@ func ctEq(x, y uint) choice {
 	// If x != y, then either x - y or y - x will generate a carry.
 	_, c1 := bits.Sub(x, y, 0)
 	_, c2 := bits.Sub(y, x, 0)
-	return not(choice(c1 | c2))
+	return negate(choice(c1 | c2))
 }
 
 // Nat represents an arbitrary natural number
@@ -341,7 +341,7 @@ func (x *Nat) cmpGeq(y *Nat) choice {
 	}
 	// If there was a carry, then subtracting y underflowed, so
 	// x is not greater than or equal to y.
-	return not(choice(c))
+	return negate(choice(c))
 }
 
 // assign sets x <- y if on == 1, and does nothing otherwise.
@@ -633,7 +633,7 @@ func (x *Nat) shiftIn(y uint, m *Modulus) *Nat {
 		// Like in maybeSubtractModulus, we need the subtraction if either it
 		// didn't underflow (meaning 2x + b > m) or if computing 2x + b
 		// overflowed (meaning 2x + b > 2^_W*n > m).
-		needSubtraction = not(choice(borrow)) | choice(carry)
+		needSubtraction = negate(choice(borrow)) | choice(carry)
 	}
 	return x.assign(needSubtraction, d)
 }
@@ -701,7 +701,7 @@ func (x *Nat) maybeSubtractModulus(always choice, m *Modulus) {
 	underflow := t.sub(m.nat)
 	// We keep the result if x - m didn't underflow (meaning x >= m)
 	// or if always was set.
-	keep := not(choice(underflow)) | choice(always)
+	keep := negate(choice(underflow)) | choice(always)
 	x.assign(keep, t)
 }
 
@@ -1026,7 +1026,7 @@ func (out *Nat) Exp(x *Nat, e []byte, m *Modulus) *Nat {
 
 			// Multiply by x^k, discarding the result if k = 0.
 			tmp.montgomeryMul(out, tmp, m)
-			out.assign(not(ctEq(k, 0)), tmp)
+			out.assign(negate(ctEq(k, 0)), tmp)
 		}
 	}
 

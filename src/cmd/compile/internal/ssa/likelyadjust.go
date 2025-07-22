@@ -93,9 +93,9 @@ func describePredictionAgrees(b *Block, prediction BranchPrediction) string {
 	return s
 }
 
-func describeBranchPrediction(f *Func, b *Block, likely, not int8, prediction BranchPrediction) {
+func describeBranchPrediction(f *Func, b *Block, likely, _not int8, prediction BranchPrediction) {
 	f.Warnl(b.Pos, "Branch prediction rule %s < %s%s",
-		bllikelies[likely-blMin], bllikelies[not-blMin], describePredictionAgrees(b, prediction))
+		bllikelies[likely-blMin], bllikelies[_not-blMin], describePredictionAgrees(b, prediction))
 }
 
 func likelyadjust(f *Func) {

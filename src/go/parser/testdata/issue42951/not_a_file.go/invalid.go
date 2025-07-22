@@ -1,1 +1,1 @@
-This file should not be parsed by ParseDir.
+This file should negate be parsed by ParseDir.

@@ -156,27 +156,27 @@ func TestLico(t *testing.T) {
 func TestIsStmt(t *testing.T) {
 	def := fmt.Sprintf(":%d", PosDefaultStmt)
 	is := fmt.Sprintf(":%d", PosIsStmt)
-	not := fmt.Sprintf(":%d", PosNotStmt)
+	negate := fmt.Sprintf(":%d", PosNotStmt)
 
 	for _, test := range []struct {
 		x         lico
 		string    string
 		line, col uint
 	}{
-		{0, ":0" + not, 0, 0},
-		{makeLico(0, 0), ":0" + not, 0, 0},
+		{0, ":0" + negate, 0, 0},
+		{makeLico(0, 0), ":0" + negate, 0, 0},
 		{makeLico(0, 1), ":0:1" + def, 0, 1},
 		{makeLico(1, 0), ":1" + def, 1, 0},
 		{makeLico(1, 1), ":1:1" + def, 1, 1},
 		{makeLico(1, 1).withIsStmt(), ":1:1" + is, 1, 1},
-		{makeLico(1, 1).withNotStmt(), ":1:1" + not, 1, 1},
+		{makeLico(1, 1).withNotStmt(), ":1:1" + negate, 1, 1},
 		{makeLico(lineMax, 1), fmt.Sprintf(":%d", lineMax) + def, lineMax, 1},
 		{makeLico(lineMax+1, 1), fmt.Sprintf(":%d", lineMax) + def, lineMax, 1}, // line too large, stick with max. line
 		{makeLico(1, colMax), ":1" + def, 1, colMax},
 		{makeLico(1, colMax+1), ":1" + def, 1, 0}, // column too large
 		{makeLico(lineMax+1, colMax+1), fmt.Sprintf(":%d", lineMax) + def, lineMax, 0},
 		{makeLico(lineMax+1, colMax+1).withIsStmt(), fmt.Sprintf(":%d", lineMax) + is, lineMax, 0},
-		{makeLico(lineMax+1, colMax+1).withNotStmt(), fmt.Sprintf(":%d", lineMax) + not, lineMax, 0},
+		{makeLico(lineMax+1, colMax+1).withNotStmt(), fmt.Sprintf(":%d", lineMax) + negate, lineMax, 0},
 	} {
 		x := test.x
 		if got := formatstr("", x.Line(), x.Col(), true) + fmt.Sprintf(":%d", x.IsStmt()); got != test.string {
@@ -191,16 +191,16 @@ func TestLogue(t *testing.T) {
 	epi := fmt.Sprintf(":%d", PosEpilogueBegin)
 
 	defs := fmt.Sprintf(":%d", PosDefaultStmt)
-	not := fmt.Sprintf(":%d", PosNotStmt)
+	negate := fmt.Sprintf(":%d", PosNotStmt)
 
 	for i, test := range []struct {
 		x         lico
 		string    string
 		line, col uint
 	}{
-		{makeLico(0, 0).withXlogue(PosDefaultLogue), ":0" + not + defp, 0, 0},
-		{makeLico(0, 0).withXlogue(PosPrologueEnd), ":0" + not + pro, 0, 0},
-		{makeLico(0, 0).withXlogue(PosEpilogueBegin), ":0" + not + epi, 0, 0},
+		{makeLico(0, 0).withXlogue(PosDefaultLogue), ":0" + negate + defp, 0, 0},
+		{makeLico(0, 0).withXlogue(PosPrologueEnd), ":0" + negate + pro, 0, 0},
+		{makeLico(0, 0).withXlogue(PosEpilogueBegin), ":0" + negate + epi, 0, 0},
 
 		{makeLico(0, 1).withXlogue(PosDefaultLogue), ":0:1" + defs + defp, 0, 1},
 		{makeLico(0, 1).withXlogue(PosPrologueEnd), ":0:1" + defs + pro, 0, 1},

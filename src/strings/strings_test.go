@@ -1012,7 +1012,7 @@ var isValidRune = predicate{
 	"IsValidRune",
 }
 
-func not(p predicate) predicate {
+func negate(p predicate) predicate {
 	return predicate{
 		func(r rune) bool {
 			return !p.f(r)
@@ -1040,11 +1040,11 @@ var trimFuncTests = []struct {
 		"hello",
 		"helloEF\u2C6F\u2C6FGH\u2C6F\u2C6F",
 		"\u2C6F\u2C6F\u2C6F\u2C6FABCDhello"},
-	{not(isSpace), "hello" + space + "hello",
+	{negate(isSpace), "hello" + space + "hello",
 		space,
 		space + "hello",
 		"hello" + space},
-	{not(isDigit), "hello\u0e50\u0e521234\u0e50\u0e51helo",
+	{negate(isDigit), "hello\u0e50\u0e521234\u0e50\u0e51helo",
 		"\u0e50\u0e521234\u0e50\u0e51",
 		"\u0e50\u0e521234\u0e50\u0e51helo",
 		"hello\u0e50\u0e521234\u0e50\u0e51"},
@@ -1052,7 +1052,7 @@ var trimFuncTests = []struct {
 		"\xc0a\xc0",
 		"\xc0a\xc0cd",
 		"ab\xc0a\xc0"},
-	{not(isValidRune), "\xc0a\xc0",
+	{negate(isValidRune), "\xc0a\xc0",
 		"a",
 		"a\xc0",
 		"\xc0a"},
@@ -1098,18 +1098,18 @@ var indexFuncTests = []struct {
 	{space, isSpace, 0, len(space) - 3}, // last rune in space is 3 bytes
 	{"\u0e50\u0e5212hello34\u0e50\u0e51", isDigit, 0, 18},
 	{"\u2C6F\u2C6F\u2C6F\u2C6FABCDhelloEF\u2C6F\u2C6FGH\u2C6F\u2C6F", isUpper, 0, 34},
-	{"12\u0e50\u0e52hello34\u0e50\u0e51", not(isDigit), 8, 12},
+	{"12\u0e50\u0e52hello34\u0e50\u0e51", negate(isDigit), 8, 12},
 
 	// tests of invalid UTF-8
 	{"\x801", isDigit, 1, 1},
 	{"\x80abc", isDigit, -1, -1},
 	{"\xc0a\xc0", isValidRune, 1, 1},
-	{"\xc0a\xc0", not(isValidRune), 0, 2},
-	{"\xc0☺\xc0", not(isValidRune), 0, 4},
-	{"\xc0☺\xc0\xc0", not(isValidRune), 0, 5},
-	{"ab\xc0a\xc0cd", not(isValidRune), 2, 4},
-	{"a\xe0\x80cd", not(isValidRune), 1, 2},
-	{"\x80\x80\x80\x80", not(isValidRune), 0, 3},
+	{"\xc0a\xc0", negate(isValidRune), 0, 2},
+	{"\xc0☺\xc0", negate(isValidRune), 0, 4},
+	{"\xc0☺\xc0\xc0", negate(isValidRune), 0, 5},
+	{"ab\xc0a\xc0cd", negate(isValidRune), 2, 4},
+	{"a\xe0\x80cd", negate(isValidRune), 1, 2},
+	{"\x80\x80\x80\x80", negate(isValidRune), 0, 3},
 }
 
 func TestIndexFunc(t *testing.T) {

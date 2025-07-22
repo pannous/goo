@@ -39,7 +39,10 @@ func init() { // init to break init cycle
 	exprTokens = []exprToken{
 		{tok: "&&", prec: 1, infix: func(x, y val) val { return x && y }},
 		{tok: "||", prec: 2, infix: func(x, y val) val { return x || y }},
-		{tok: "!", prec: 3, prefix: (*exprParser).not},
+		//{tok: "and", prec: 1, infix: func(x, y val) val { return x && y }},
+		//{tok: "or", prec: 2, infix: func(x, y val) val { return x || y }},
+		{tok: "not", prec: 3, prefix: (*exprParser).negate},
+		{tok: "!", prec: 3, prefix: (*exprParser).negate},
 		{tok: "(", prec: 3, prefix: (*exprParser).paren},
 		{tok: ")"},
 	}
@@ -78,7 +81,7 @@ func (p *exprParser) parse(prec int) val {
 }
 
 // not is the prefix parser for a ! token.
-func (p *exprParser) not() val {
+func (p *exprParser) negate() val {
 	p.next()
 	return !p.parse(100)
 }
