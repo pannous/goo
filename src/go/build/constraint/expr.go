@@ -74,7 +74,7 @@ func (x *NotExpr) String() string {
 	return "!" + s
 }
 
-func not(x Expr) Expr { return &NotExpr{x} }
+func negation(x Expr) Expr { return &NotExpr{x} }
 
 // An AndExpr represents the expression X && Y.
 type AndExpr struct {
@@ -244,17 +244,17 @@ func (p *exprParser) or() Expr {
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
 func (p *exprParser) and() Expr {
-	x := p.not()
+	x := p.negationExpr()
 	for p.tok == "&&" {
-		x = and(x, p.not())
+		x = and(x, p.negationExpr())
 	}
 	return x
 }
 
-// not parses a ! expression.
+// negationExpr parses a ! expression.
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
-func (p *exprParser) not() Expr {
+func (p *exprParser) negationExpr() Expr {
 	p.size++
 	if p.size > maxSize {
 		panic(&SyntaxError{Offset: p.pos, Err: "build expression too large"})
@@ -265,7 +265,7 @@ func (p *exprParser) not() Expr {
 		if p.tok == "!" {
 			panic(&SyntaxError{Offset: p.pos, Err: "double negation not allowed"})
 		}
-		return not(p.atom())
+		return negation(p.atom())
 	}
 	return p.atom()
 }
@@ -424,7 +424,7 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 					z = tag("ignore")
 				}
 				if neg {
-					z = not(z)
+					z = negation(z)
 				}
 			}
 			if y == nil {
@@ -535,25 +535,25 @@ func PlusBuildLines(x Expr) ([]string, error) {
 // pushNot applies DeMorgan's law to push negations down the expression,
 // so that only tags are negated in the result.
 // (It applies the rewrites !(X && Y) => (!X || !Y) and !(X || Y) => (!X && !Y).)
-func pushNot(x Expr, not bool) Expr {
+func pushNot(x Expr, negate bool) Expr {
 	switch x := x.(type) {
 	default:
 		// unreachable
 		return x
 	case *NotExpr:
-		if _, ok := x.X.(*TagExpr); ok && !not {
+		if _, ok := x.X.(*TagExpr); ok && !negate {
 			return x
 		}
-		return pushNot(x.X, !not)
+		return pushNot(x.X, !negate)
 	case *TagExpr:
-		if not {
+		if negate {
 			return &NotExpr{X: x}
 		}
 		return x
 	case *AndExpr:
-		x1 := pushNot(x.X, not)
-		y1 := pushNot(x.Y, not)
-		if not {
+		x1 := pushNot(x.X, negate)
+		y1 := pushNot(x.Y, negate)
+		if negate {
 			return or(x1, y1)
 		}
 		if x1 == x.X && y1 == x.Y {
@@ -561,9 +561,9 @@ func pushNot(x Expr, not bool) Expr {
 		}
 		return and(x1, y1)
 	case *OrExpr:
-		x1 := pushNot(x.X, not)
-		y1 := pushNot(x.Y, not)
-		if not {
+		x1 := pushNot(x.X, negate)
+		y1 := pushNot(x.Y, negate)
+		if negate {
 			return and(x1, y1)
 		}
 		if x1 == x.X && y1 == x.Y {

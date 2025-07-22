@@ -221,9 +221,9 @@ func parseNSSConf(f *file) *nssConf {
 // parses "foo=bar !foo=bar"
 func parseCriteria(x string) (c []nssCriterion, err error) {
 	err = foreachField(x, func(f string) error {
-		not := false
+		negate := false
 		if len(f) > 0 && f[0] == '!' {
-			not = true
+			negate = true
 			f = f[1:]
 		}
 		if len(f) < 3 {
@@ -239,7 +239,7 @@ func parseCriteria(x string) (c []nssCriterion, err error) {
 			f = string(lower)
 		}
 		c = append(c, nssCriterion{
-			negate: not,
+			negate: negate,
 			status: f[:eq],
 			action: f[eq+1:],
 		})

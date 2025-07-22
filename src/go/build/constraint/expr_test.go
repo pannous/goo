@@ -22,11 +22,11 @@ var exprStringTests = []struct {
 		out: "abc",
 	},
 	{
-		x:   not(tag("abc")),
+		x:   negate(tag("abc")),
 		out: "!abc",
 	},
 	{
-		x:   not(and(tag("abc"), tag("def"))),
+		x:   negate(and(tag("abc"), tag("def"))),
 		out: "!(abc && def)",
 	},
 	{
@@ -123,7 +123,7 @@ var parseExprTests = []struct {
 	{"x&&y||z", or(and(tag("x"), tag("y")), tag("z"))},
 	{"x&&(y||z)", and(tag("x"), or(tag("y"), tag("z")))},
 	{"(x||y)&&z", and(or(tag("x"), tag("y")), tag("z"))},
-	{"!(x&&y)", not(and(tag("x"), tag("y")))},
+	{"!(x&&y)", negate(and(tag("x"), tag("y")))},
 }
 
 func TestParseExpr(t *testing.T) {
@@ -213,10 +213,10 @@ var parsePlusBuildExprTests = []struct {
 	{"x y", or(tag("x"), tag("y"))},
 	{"x y,z", or(tag("x"), and(tag("y"), tag("z")))},
 	{"x,y z", or(and(tag("x"), tag("y")), tag("z"))},
-	{"x,!y !z", or(and(tag("x"), not(tag("y"))), not(tag("z")))},
+	{"x,!y !z", or(and(tag("x"), negate(tag("y"))), negate(tag("z")))},
 	{"!! x", or(tag("ignore"), tag("x"))},
 	{"!!x", tag("ignore")},
-	{"!x", not(tag("x"))},
+	{"!x", negate(tag("x"))},
 	{"!", tag("ignore")},
 	{"", tag("ignore")},
 }

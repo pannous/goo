@@ -45,7 +45,7 @@ func builtins() FuncMap {
 		"slice":    slice,
 		"js":       JSEscaper,
 		"len":      length,
-		"not":      not,
+		"not":      negate,
 		"or":       or,
 		"print":    fmt.Sprint,
 		"printf":   fmt.Sprintf,
@@ -399,7 +399,7 @@ func or(arg0 reflect.Value, args ...reflect.Value) reflect.Value {
 }
 
 // not returns the Boolean negation of its argument.
-func not(arg reflect.Value) bool {
+func negate(arg reflect.Value) bool {
 	return !truth(arg)
 }
 
