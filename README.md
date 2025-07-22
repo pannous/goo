@@ -4,12 +4,12 @@ Goo is an open source programming language that makes it easy to build simple, r
 
 Goo is an up to date fork of Go with the following modifications:
 
-🗹 truthy/falsey if
-☐ silent/implicit error propagation 
-☐ print alias for fmt.Println
-☐ for loops
-☐ enums
-☐ any other pain points you and I might have
+🗹 truthy/falsey if  
+☐ silent/implicit error propagation  
+☐ print alias for fmt.Println  
+☐ for loops  
+☐ enums  
+☐ any other pain points you and I might have  
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*
