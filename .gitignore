@@ -54,11 +54,8 @@ _testmain.go
 cheats.go
 src/bak
 *.wasm
-
 bak/
-
 src/test.go
-
 src/test
-
 main.wasm
+

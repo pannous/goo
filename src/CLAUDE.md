@@ -40,4 +40,12 @@ GOOS=darwin GOARCH=arm64 ./bootstrap.bash
 - Error handling via `errorf()`, position tracking
 
 # Testing Guidelines
-- Always create new tests for new features and store them in the ./goo/ folder
+- Always create a new go file to test the new feature and store it in the ./goo/ folder
+- Before committing quickly run these new tests
+- After committing, run the following command in src/ to test the compatibility with the whole system:
+
+```bash
+GOROOT=$(pwd)/.. ./run.bash --no-rebuild 2>&1 | grep -Ev '^\?|^ok ' | tee /dev/tty | grep -m1 FAIL && exit 1
+```
+- This command runs the tests, filters out the output to show only failures, and exits with an error code if any tests fail.
+- if we encounter a FAIL, ponder whether our changes might be related to it and if so try once to fix it or tell me to look at it.
