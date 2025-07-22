@@ -9,10 +9,10 @@ so does adding a little o to Go[o] make it a little more beautiful
 -->
 🗹 truthy/falsey if  
 🗹 # comment and shebang support  
-☐ not operator keyword for `!`
+🗹 goo file extension
+🗹 not operator keyword for `!`
 ☐ and or not operators for && || !
 ☐ print alias for fmt.Println    
-☐ goo file extension
 ☐ assert  
 ☐ return void, e.g. return print("ok")  
 ☐ silent/implicit error propagation    
