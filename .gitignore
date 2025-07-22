@@ -60,3 +60,5 @@ bak/
 src/test.go
 
 src/test
+
+main.wasm

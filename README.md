@@ -3,14 +3,14 @@
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.
 
 Goo is an up-to-date fork of Go with the following modifications:
-
-[//]: # (just like most ugliness in the world appears when you add a five to json(5) 
-[//]: # (so does adding a little o to Go[o] make it a little more beautiful)
-
+<!--
+just like most ugliness in the world appears when you add a five to json(5) 
+so does adding a little o to Go[o] make it a little more beautiful
+-->
 🗹 truthy/falsey if  
 🗹 # comment and shebang support  
 ☐ assert  
-☐ return void  
+☐ return void, e.g. return print("ok")
 ☐ silent/implicit error propagation    
 ☐ print alias for fmt.Println    
 ☐ for loops    
