@@ -950,6 +950,21 @@ scanAgain:
 			tok = s.switch3(token.OR, token.OR_ASSIGN, '|', token.LOR)
 		case '~':
 			tok = token.TILDE
+		case '#':
+			// line comment starting with #
+			offs := s.offset - 1 // position of initial '#'
+			for s.ch != '\n' && s.ch >= 0 {
+				s.next()
+			}
+			if s.insertSemi {
+				insertSemi = s.insertSemi // preserve insertSemi info
+			}
+			if s.mode&ScanComments == 0 {
+				// skip comment
+				goto scanAgain
+			}
+			tok = token.COMMENT
+			lit = string(s.src[offs:s.offset])
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {
