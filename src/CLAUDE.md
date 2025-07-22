@@ -6,20 +6,18 @@ Do NOT explore the whole codebase structure and architecture
 We are trying to achieve small modifications to the compiler only and nothing else thus we only want to recompile the compiler and not the whole toolchain.
 
 
-# To compile the go compiler only, use the following command:
-
-go tool dist install -v cmd/compile
-../bin/go tool dist install -v cmd/compile
-
-After we are satisfied with the compiler of from time to time we may try to compile the whole thing:
-
-# To compile the go toolchain, use the following command:
+# To compile go, use the following command:
 
 cd /opt/other/go/src
-./make.bash
+./make.bash >/dev/null 2>&1
 
 or maybe
-GOOS=darwin GOARCH=arm64 ./bootstrap.bash
+GOOS=darwin GOARCH=arm64 ./bootstrap.bash ?
+
+So far incremental building does not work like this :(
+
+../bin/go tool dist install -v cmd/compile
+
 
 # Go Compiler Lexer/Scanner Summary
 
@@ -40,7 +38,9 @@ GOOS=darwin GOARCH=arm64 ./bootstrap.bash
 - Error handling via `errorf()`, position tracking
 
 # Testing Guidelines
+- recompile bin/go before testing!
 - Always create exactly one new go file <git_root>/goo/test_{feature}.go to test the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
+- IF you end up with multiple test / debug files (which you shouldn't) make sure to delete all but one before committing
 - Before committing quickly run these new tests with the freshly built ../bin/go 
 - After committing, run the following command in src/ to test the compatibility with the whole system:
 
