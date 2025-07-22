@@ -4,13 +4,16 @@ Goo is an open source programming language that makes it easy to build simple, r
 
 Goo is an up-to-date fork of Go with the following modifications:
 
-🗹 truthy/falsey if
-🗹 # comment and shebang support
-☐ assert
-☐ return void
-☐ silent/implicit error propagation  
-☐ print alias for fmt.Println  
-☐ for loops  
+[//]: # (just like most ugliness in the world appears when you add a five to json(5) 
+[//]: # (so does adding a little o to Go[o] make it a little more beautiful)
+
+🗹 truthy/falsey if  
+🗹 # comment and shebang support  
+☐ assert  
+☐ return void  
+☐ silent/implicit error propagation    
+☐ print alias for fmt.Println    
+☐ for loops    
 ☐ enums  
 ☐ any other pain points you and I might have  
 
