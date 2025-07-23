@@ -88,7 +88,7 @@ Rule: If you see DO NOT EDIT in the header, never modify it directly. Find the s
 # Testing Guidelines
 recompile bin/go before testing!
 Always create exactly one new go file <git_root>/goo/test_{feature}.go to test the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
-IF you end up with multiple test / debug files (which you shouldn't) make sure to delete all but one before committing
+Only create ONE new test per feature and reuse existing tests for very similar features.
 Before committing quickly run these new tests with the freshly built ../bin/go 
 After committing, run the following command in src/ to test the compatibility with the whole system:
 

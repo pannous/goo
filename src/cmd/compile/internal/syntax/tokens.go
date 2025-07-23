@@ -46,7 +46,6 @@ const (
 	_Break       // break
 	_Case        // case
 	_Chan        // chan
-	_Check       // check
 	_Const       // const
 	_Continue    // continue
 	_Default     // default
@@ -122,8 +121,7 @@ var TokenNames = [...]string{
 	_DotDotDot:   "...",
 	_Break:       "break",
 	_Case:        "case",
-	_Chan:        "chan", 
-	_Check:       "check",
+	_Chan:        "chan",
 	_Const:       "const",
 	_Continue:    "continue",
 	_Default:     "default",
@@ -149,13 +147,6 @@ var TokenNames = [...]string{
 }
 
 // String returns the string representation of the token.
-// This replaces the stringer-generated String() method.
-func (tok token) String() string {
-	if int(tok) < len(TokenNames) && TokenNames[tok] != "" {
-		return TokenNames[tok]
-	}
-	return "token(" + strconv.FormatInt(int64(tok), 10) + ")"
-}
 
 type LitKind uint8
 
