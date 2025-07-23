@@ -1,0 +1,13 @@
+package main
+
+import "fmt"
+
+func main() {
+	z := map{"a": 1, "b": 2}
+	
+	fmt.Println("=== Testing printf (should use fmt.Println when fmt is imported) ===")
+	printf("printf output:", z)
+	
+	fmt.Println("=== Direct fmt.Println for comparison ===")
+	fmt.Println("fmt.Println output:", z)
+}
