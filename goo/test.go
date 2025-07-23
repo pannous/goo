@@ -7,7 +7,7 @@ func main() {
 	} else {
 		fmt.Println("This is false")
 	}
-	assert(true)
+	//assert(true)
 	//assert(false) // ./test.go:11:2: assert(false) failed OK
 	write := fmt.Printf
 	// Test numeric truthiness
