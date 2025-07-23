@@ -26,15 +26,15 @@ var exprStringTests = []struct {
 		out: "!abc",
 	},
 	{
-		x:   negate(and(tag("abc"), tag("def"))),
+		x:   negate(und(tag("abc"), tag("def"))),
 		out: "!(abc && def)",
 	},
 	{
-		x:   and(tag("abc"), or(tag("def"), tag("ghi"))),
+		x:   und(tag("abc"), or(tag("def"), tag("ghi"))),
 		out: "abc && (def || ghi)",
 	},
 	{
-		x:   or(and(tag("abc"), tag("def")), tag("ghi")),
+		x:   or(und(tag("abc"), tag("def")), tag("ghi")),
 		out: "(abc && def) || ghi",
 	},
 }
@@ -116,14 +116,14 @@ var parseExprTests = []struct {
 	x  Expr
 }{
 	{"x", tag("x")},
-	{"x&&y", and(tag("x"), tag("y"))},
+	{"x&&y", und(tag("x"), tag("y"))},
 	{"x||y", or(tag("x"), tag("y"))},
 	{"(x)", tag("x")},
-	{"x||y&&z", or(tag("x"), and(tag("y"), tag("z")))},
-	{"x&&y||z", or(and(tag("x"), tag("y")), tag("z"))},
-	{"x&&(y||z)", and(tag("x"), or(tag("y"), tag("z")))},
-	{"(x||y)&&z", and(or(tag("x"), tag("y")), tag("z"))},
-	{"!(x&&y)", negate(and(tag("x"), tag("y")))},
+	{"x||y&&z", or(tag("x"), und(tag("y"), tag("z")))},
+	{"x&&y||z", or(und(tag("x"), tag("y")), tag("z"))},
+	{"x&&(y||z)", und(tag("x"), or(tag("y"), tag("z")))},
+	{"(x||y)&&z", und(or(tag("x"), tag("y")), tag("z"))},
+	{"!(x&&y)", negate(und(tag("x"), tag("y")))},
 }
 
 func TestParseExpr(t *testing.T) {
@@ -209,11 +209,11 @@ var parsePlusBuildExprTests = []struct {
 	x  Expr
 }{
 	{"x", tag("x")},
-	{"x,y", and(tag("x"), tag("y"))},
+	{"x,y", und(tag("x"), tag("y"))},
 	{"x y", or(tag("x"), tag("y"))},
-	{"x y,z", or(tag("x"), and(tag("y"), tag("z")))},
-	{"x,y z", or(and(tag("x"), tag("y")), tag("z"))},
-	{"x,!y !z", or(and(tag("x"), negate(tag("y"))), negate(tag("z")))},
+	{"x y,z", or(tag("x"), und(tag("y"), tag("z")))},
+	{"x,y z", or(und(tag("x"), tag("y")), tag("z"))},
+	{"x,!y !z", or(und(tag("x"), negate(tag("y"))), negate(tag("z")))},
 	{"!! x", or(tag("ignore"), tag("x"))},
 	{"!!x", tag("ignore")},
 	{"!x", negate(tag("x"))},
@@ -245,8 +245,8 @@ var constraintTests = []struct {
 	{"// +build x y \nmore", nil, "not a build constraint"},
 	{" //+build x y", nil, "not a build constraint"},
 
-	{"//go:build x && y", and(tag("x"), tag("y")), ""},
-	{"//go:build x && y\n", and(tag("x"), tag("y")), ""},
+	{"//go:build x && y", und(tag("x"), tag("y")), ""},
+	{"//go:build x && y\n", und(tag("x"), tag("y")), ""},
 	{"//go:build x && y\n ", nil, "not a build constraint"},
 	{"//go:build x && y\nmore", nil, "not a build constraint"},
 	{" //go:build x && y", nil, "not a build constraint"},

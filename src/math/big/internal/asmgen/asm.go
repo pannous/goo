@@ -292,7 +292,7 @@ func (a *Asm) AddWords(src1 Reg, src2, dst RegPtr) {
 // And emits dst = src1 & src2
 // It may modify the carry flag.
 func (a *Asm) And(src1, src2, dst Reg) {
-	a.op3(a.Arch.and, src1, src2, dst)
+	a.op3(a.Arch.und, src1, src2, dst)
 }
 
 // Or emits dst = src1 | src2

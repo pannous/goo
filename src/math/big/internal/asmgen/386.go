@@ -38,7 +38,7 @@ var Arch386 = &Arch{
 	lshd:     "SHLL",
 	rsh:      "SHRL",
 	rshd:     "SHRL",
-	and:      "ANDL",
+	und:      "ANDL",
 	or:       "ORL",
 	xor:      "XORL",
 	neg:      "NEGL",

@@ -49,7 +49,7 @@ var ArchPPC64x = &Arch{
 	mulhi: "MULHDU",
 	lsh:   "SLD",
 	rsh:   "SRD",
-	and:   "ANDCC", // regular AND does not accept immediates
+	und:   "ANDCC", // regular AND does not accept immediates
 	or:    "OR",
 	xor:   "XOR",
 

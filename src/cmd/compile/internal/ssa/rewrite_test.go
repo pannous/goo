@@ -198,7 +198,7 @@ func TestMergePPC64SldiSrw(t *testing.T) {
 
 func TestMergePPC64AndSrwi(t *testing.T) {
 	tests := []struct {
-		and    int64
+		und    int64
 		srw    int64
 		valid  bool
 		rotate int64
@@ -213,7 +213,7 @@ func TestMergePPC64AndSrwi(t *testing.T) {
 		{0xFFFFFFFF, 0, true, 0, 0xFFFFFFFF},
 	}
 	for i, v := range tests {
-		result := mergePPC64AndSrwi(v.and, v.srw)
+		result := mergePPC64AndSrwi(v.und, v.srw)
 		if v.valid && result == 0 {
 			t.Errorf("mergePPC64AndSrwi(Test %d) did not merge", i)
 		} else if !v.valid && result != 0 {

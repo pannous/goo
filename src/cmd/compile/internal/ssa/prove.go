@@ -1990,17 +1990,17 @@ func (ft *factsTable) detectSignedModByPowerOfTwo(v *Value) bool {
 	}
 
 	x := v.Args[0]
-	and := v.Args[1]
-	if and.Op != andOp {
+	und := v.Args[1]
+	if und.Op != andOp {
 		return false
 	}
 	var add, mask *Value
-	if and.Args[0].Op == addOp && and.Args[1].Op == constOp {
-		add = and.Args[0]
-		mask = and.Args[1]
-	} else if and.Args[1].Op == addOp && and.Args[0].Op == constOp {
-		add = and.Args[1]
-		mask = and.Args[0]
+	if und.Args[0].Op == addOp && und.Args[1].Op == constOp {
+		add = und.Args[0]
+		mask = und.Args[1]
+	} else if und.Args[1].Op == addOp && und.Args[0].Op == constOp {
+		add = und.Args[1]
+		mask = und.Args[0]
 	} else {
 		return false
 	}

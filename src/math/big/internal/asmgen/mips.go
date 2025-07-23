@@ -35,7 +35,7 @@ var ArchMIPS = &Arch{
 	mulWideF: mipsMulWide,
 	lsh:      "SLL",
 	rsh:      "SRL",
-	and:      "AND",
+	und:      "AND",
 	or:       "OR",
 	xor:      "XOR",
 

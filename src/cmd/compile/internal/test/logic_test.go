@@ -16,7 +16,7 @@ func TestLogic64(t *testing.T) {
 	zero := func(x int64) int64 { return 0 }
 	id := func(x int64) int64 { return x }
 	or := func(x, y int64) int64 { return x | y }
-	and := func(x, y int64) int64 { return x & y }
+	und := func(x, y int64) int64 { return x & y }
 	y := func(x, y int64) int64 { return y }
 
 	for _, test := range [...]struct {
@@ -55,10 +55,10 @@ func TestLogic64(t *testing.T) {
 		{"x|(y|x)", func(x, y int64) int64 { return x | (y | x) }, or},
 		{"(x|y)|x", func(x, y int64) int64 { return (x | y) | x }, or},
 		{"(y|x)|x", func(x, y int64) int64 { return (y | x) | x }, or},
-		{"x&(x&y)", func(x, y int64) int64 { return x & (x & y) }, and},
-		{"x&(y&x)", func(x, y int64) int64 { return x & (y & x) }, and},
-		{"(x&y)&x", func(x, y int64) int64 { return (x & y) & x }, and},
-		{"(y&x)&x", func(x, y int64) int64 { return (y & x) & x }, and},
+		{"x&(x&y)", func(x, y int64) int64 { return x & (x & y) }, und},
+		{"x&(y&x)", func(x, y int64) int64 { return x & (y & x) }, und},
+		{"(x&y)&x", func(x, y int64) int64 { return (x & y) & x }, und},
+		{"(y&x)&x", func(x, y int64) int64 { return (y & x) & x }, und},
 		{"x^(x^y)", func(x, y int64) int64 { return x ^ (x ^ y) }, y},
 		{"x^(y^x)", func(x, y int64) int64 { return x ^ (y ^ x) }, y},
 		{"(x^y)^x", func(x, y int64) int64 { return (x ^ y) ^ x }, y},
@@ -87,7 +87,7 @@ func TestLogic32(t *testing.T) {
 	zero := func(x int32) int32 { return 0 }
 	id := func(x int32) int32 { return x }
 	or := func(x, y int32) int32 { return x | y }
-	and := func(x, y int32) int32 { return x & y }
+	und := func(x, y int32) int32 { return x & y }
 	y := func(x, y int32) int32 { return y }
 
 	for _, test := range [...]struct {
@@ -126,10 +126,10 @@ func TestLogic32(t *testing.T) {
 		{"x|(y|x)", func(x, y int32) int32 { return x | (y | x) }, or},
 		{"(x|y)|x", func(x, y int32) int32 { return (x | y) | x }, or},
 		{"(y|x)|x", func(x, y int32) int32 { return (y | x) | x }, or},
-		{"x&(x&y)", func(x, y int32) int32 { return x & (x & y) }, and},
-		{"x&(y&x)", func(x, y int32) int32 { return x & (y & x) }, and},
-		{"(x&y)&x", func(x, y int32) int32 { return (x & y) & x }, and},
-		{"(y&x)&x", func(x, y int32) int32 { return (y & x) & x }, and},
+		{"x&(x&y)", func(x, y int32) int32 { return x & (x & y) }, und},
+		{"x&(y&x)", func(x, y int32) int32 { return x & (y & x) }, und},
+		{"(x&y)&x", func(x, y int32) int32 { return (x & y) & x }, und},
+		{"(y&x)&x", func(x, y int32) int32 { return (y & x) & x }, und},
 		{"x^(x^y)", func(x, y int32) int32 { return x ^ (x ^ y) }, y},
 		{"x^(y^x)", func(x, y int32) int32 { return x ^ (y ^ x) }, y},
 		{"(x^y)^x", func(x, y int32) int32 { return (x ^ y) ^ x }, y},
@@ -158,7 +158,7 @@ func TestLogic16(t *testing.T) {
 	zero := func(x int16) int16 { return 0 }
 	id := func(x int16) int16 { return x }
 	or := func(x, y int16) int16 { return x | y }
-	and := func(x, y int16) int16 { return x & y }
+	und := func(x, y int16) int16 { return x & y }
 	y := func(x, y int16) int16 { return y }
 
 	for _, test := range [...]struct {
@@ -197,10 +197,10 @@ func TestLogic16(t *testing.T) {
 		{"x|(y|x)", func(x, y int16) int16 { return x | (y | x) }, or},
 		{"(x|y)|x", func(x, y int16) int16 { return (x | y) | x }, or},
 		{"(y|x)|x", func(x, y int16) int16 { return (y | x) | x }, or},
-		{"x&(x&y)", func(x, y int16) int16 { return x & (x & y) }, and},
-		{"x&(y&x)", func(x, y int16) int16 { return x & (y & x) }, and},
-		{"(x&y)&x", func(x, y int16) int16 { return (x & y) & x }, and},
-		{"(y&x)&x", func(x, y int16) int16 { return (y & x) & x }, and},
+		{"x&(x&y)", func(x, y int16) int16 { return x & (x & y) }, und},
+		{"x&(y&x)", func(x, y int16) int16 { return x & (y & x) }, und},
+		{"(x&y)&x", func(x, y int16) int16 { return (x & y) & x }, und},
+		{"(y&x)&x", func(x, y int16) int16 { return (y & x) & x }, und},
 		{"x^(x^y)", func(x, y int16) int16 { return x ^ (x ^ y) }, y},
 		{"x^(y^x)", func(x, y int16) int16 { return x ^ (y ^ x) }, y},
 		{"(x^y)^x", func(x, y int16) int16 { return (x ^ y) ^ x }, y},
@@ -229,7 +229,7 @@ func TestLogic8(t *testing.T) {
 	zero := func(x int8) int8 { return 0 }
 	id := func(x int8) int8 { return x }
 	or := func(x, y int8) int8 { return x | y }
-	and := func(x, y int8) int8 { return x & y }
+	und := func(x, y int8) int8 { return x & y }
 	y := func(x, y int8) int8 { return y }
 
 	for _, test := range [...]struct {
@@ -268,10 +268,10 @@ func TestLogic8(t *testing.T) {
 		{"x|(y|x)", func(x, y int8) int8 { return x | (y | x) }, or},
 		{"(x|y)|x", func(x, y int8) int8 { return (x | y) | x }, or},
 		{"(y|x)|x", func(x, y int8) int8 { return (y | x) | x }, or},
-		{"x&(x&y)", func(x, y int8) int8 { return x & (x & y) }, and},
-		{"x&(y&x)", func(x, y int8) int8 { return x & (y & x) }, and},
-		{"(x&y)&x", func(x, y int8) int8 { return (x & y) & x }, and},
-		{"(y&x)&x", func(x, y int8) int8 { return (y & x) & x }, and},
+		{"x&(x&y)", func(x, y int8) int8 { return x & (x & y) }, und},
+		{"x&(y&x)", func(x, y int8) int8 { return x & (y & x) }, und},
+		{"(x&y)&x", func(x, y int8) int8 { return (x & y) & x }, und},
+		{"(y&x)&x", func(x, y int8) int8 { return (y & x) & x }, und},
 		{"x^(x^y)", func(x, y int8) int8 { return x ^ (x ^ y) }, y},
 		{"x^(y^x)", func(x, y int8) int8 { return x ^ (y ^ x) }, y},
 		{"(x^y)^x", func(x, y int8) int8 { return (x ^ y) ^ x }, y},

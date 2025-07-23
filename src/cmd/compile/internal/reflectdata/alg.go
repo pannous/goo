@@ -523,7 +523,7 @@ func eqFunc(t *types.Type) *ir.Func {
 			var expr ir.Node
 			var hasCallExprs bool
 			allCallExprs := true
-			and := func(cond ir.Node) {
+			und := func(cond ir.Node) {
 				if expr == nil {
 					expr = cond
 				} else {
@@ -560,7 +560,7 @@ func eqFunc(t *types.Type) *ir.Func {
 					}
 					for _, c := range flatConds {
 						if !isCall(c) {
-							and(c)
+							und(c)
 						}
 					}
 					return expr
@@ -570,7 +570,7 @@ func eqFunc(t *types.Type) *ir.Func {
 					flatConds, _ := compare.EqStruct(t.Elem(), pi, qi)
 					for _, c := range flatConds {
 						if isCall(c) {
-							and(c)
+							und(c)
 						}
 					}
 					return expr

@@ -2172,15 +2172,15 @@ func (s *state) stmt(n ir.Node) {
 			loopBody := s.f.NewBlock(ssa.BlockPlain)
 
 			// Pick right size ops.
-			var mul, and, add, zext ssa.Op
+			var mul, und, add, zext ssa.Op
 			if s.config.PtrSize == 4 {
 				mul = ssa.OpMul32
-				and = ssa.OpAnd32
+				und = ssa.OpAnd32
 				add = ssa.OpAdd32
 				zext = ssa.OpCopy
 			} else {
 				mul = ssa.OpMul64
-				and = ssa.OpAnd64
+				und = ssa.OpAnd64
 				add = ssa.OpAdd64
 				zext = ssa.OpZeroExt32to64
 			}
@@ -2204,7 +2204,7 @@ func (s *state) stmt(n ir.Node) {
 			//   e := &cache.Entries[hash&mask]
 			s.startBlock(loopHead)
 			entries := s.newValue2(ssa.OpAddPtr, typs.UintptrPtr, cache, s.uintptrConstant(uint64(s.config.PtrSize)))
-			idx := s.newValue2(and, typs.Uintptr, s.variable(hashVar, typs.Uintptr), mask)
+			idx := s.newValue2(und, typs.Uintptr, s.variable(hashVar, typs.Uintptr), mask)
 			idx = s.newValue2(mul, typs.Uintptr, idx, s.uintptrConstant(uint64(3*s.config.PtrSize)))
 			e := s.newValue2(ssa.OpAddPtr, typs.UintptrPtr, entries, idx)
 			//   hash++
@@ -5562,14 +5562,14 @@ func (s *state) slice(v, i, j, k *ssa.Value, bounded bool) (p, l, c *ssa.Value) 
 }
 
 type u642fcvtTab struct {
-	leq, cvt2F, and, rsh, or, add ssa.Op
+	leq, cvt2F, und, rsh, or, add ssa.Op
 	one                           func(*state, *types.Type, int64) *ssa.Value
 }
 
 var u64_f64 = u642fcvtTab{
 	leq:   ssa.OpLeq64,
 	cvt2F: ssa.OpCvt64to64F,
-	and:   ssa.OpAnd64,
+	und:   ssa.OpAnd64,
 	rsh:   ssa.OpRsh64Ux64,
 	or:    ssa.OpOr64,
 	add:   ssa.OpAdd64F,
@@ -5579,7 +5579,7 @@ var u64_f64 = u642fcvtTab{
 var u64_f32 = u642fcvtTab{
 	leq:   ssa.OpLeq64,
 	cvt2F: ssa.OpCvt64to32F,
-	and:   ssa.OpAnd64,
+	und:   ssa.OpAnd64,
 	rsh:   ssa.OpRsh64Ux64,
 	or:    ssa.OpOr64,
 	add:   ssa.OpAdd32F,
@@ -5639,7 +5639,7 @@ func (s *state) uint64Tofloat(cvttab *u642fcvtTab, n ir.Node, x *ssa.Value, ft, 
 	b.AddEdgeTo(bElse)
 	s.startBlock(bElse)
 	one := cvttab.one(s, ft, 1)
-	y := s.newValue2(cvttab.and, ft, x, one)
+	y := s.newValue2(cvttab.und, ft, x, one)
 	z := s.newValue2(cvttab.rsh, ft, x, one)
 	z = s.newValue2(cvttab.or, ft, z, y)
 	a := s.newValue1(cvttab.cvt2F, tt, z)
@@ -6043,15 +6043,15 @@ func (s *state) dottype1(pos src.XPos, src, dst *types.Type, iface, source, targ
 					s.Fatalf("atomic load not available")
 				}
 				// Pick right size ops.
-				var mul, and, add, zext ssa.Op
+				var mul, und, add, zext ssa.Op
 				if s.config.PtrSize == 4 {
 					mul = ssa.OpMul32
-					and = ssa.OpAnd32
+					und = ssa.OpAnd32
 					add = ssa.OpAdd32
 					zext = ssa.OpCopy
 				} else {
 					mul = ssa.OpMul64
-					and = ssa.OpAnd64
+					und = ssa.OpAnd64
 					add = ssa.OpAdd64
 					zext = ssa.OpZeroExt32to64
 				}
@@ -6085,7 +6085,7 @@ func (s *state) dottype1(pos src.XPos, src, dst *types.Type, iface, source, targ
 				// At loop head, get pointer to the cache entry.
 				//   e := &cache.Entries[hash&mask]
 				s.startBlock(loopHead)
-				idx := s.newValue2(and, typs.Uintptr, s.variable(hashVar, typs.Uintptr), mask)
+				idx := s.newValue2(und, typs.Uintptr, s.variable(hashVar, typs.Uintptr), mask)
 				idx = s.newValue2(mul, typs.Uintptr, idx, s.uintptrConstant(uint64(2*s.config.PtrSize)))
 				idx = s.newValue2(add, typs.Uintptr, idx, s.uintptrConstant(uint64(s.config.PtrSize)))
 				e := s.newValue2(ssa.OpAddPtr, typs.UintptrPtr, cache, idx)

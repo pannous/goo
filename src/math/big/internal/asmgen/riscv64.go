@@ -37,7 +37,7 @@ var ArchRISCV64 = &Arch{
 	mulhi: "MULHU",
 	lsh:   "SLL",
 	rsh:   "SRL",
-	and:   "AND",
+	und:   "AND",
 	or:    "OR",
 	xor:   "XOR",
 	sltu:  "SLTU",
