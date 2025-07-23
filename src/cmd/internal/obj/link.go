@@ -33,6 +33,10 @@ package obj
 import (
 	"bufio"
 	"bytes"
+	"strconv"
+	"sync"
+	"sync/atomic"
+
 	"cmd/internal/dwarf"
 	"cmd/internal/goobj"
 	"cmd/internal/objabi"
@@ -41,8 +45,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"internal/abi"
-	"sync"
-	"sync/atomic"
 )
 
 // An Addr is an argument to an instruction.
@@ -229,8 +231,6 @@ const (
 	NAME_TOCREF
 )
 
-//go:generate stringer -type AddrType
-
 type AddrType uint8
 
 const (
@@ -250,6 +250,34 @@ const (
 	TYPE_REGLIST
 	TYPE_SPECIAL
 )
+
+// AddrTypeNames provides string representations for AddrType constants, replacing stringer-generated addrtype_string.go
+var AddrTypeNames = [...]string{
+	TYPE_NONE:     "TYPE_NONE",
+	TYPE_BRANCH:   "TYPE_BRANCH",
+	TYPE_TEXTSIZE: "TYPE_TEXTSIZE",
+	TYPE_MEM:      "TYPE_MEM",
+	TYPE_CONST:    "TYPE_CONST",
+	TYPE_FCONST:   "TYPE_FCONST",
+	TYPE_SCONST:   "TYPE_SCONST",
+	TYPE_REG:      "TYPE_REG",
+	TYPE_ADDR:     "TYPE_ADDR",
+	TYPE_SHIFT:    "TYPE_SHIFT",
+	TYPE_REGREG:   "TYPE_REGREG",
+	TYPE_REGREG2:  "TYPE_REGREG2",
+	TYPE_INDIR:    "TYPE_INDIR",
+	TYPE_REGLIST:  "TYPE_REGLIST",
+	TYPE_SPECIAL:  "TYPE_SPECIAL",
+}
+
+// String returns the string representation of the AddrType.
+// This replaces the stringer-generated String() method.
+func (a AddrType) String() string {
+	if int(a) < len(AddrTypeNames) && AddrTypeNames[a] != "" {
+		return AddrTypeNames[a]
+	}
+	return "AddrType(" + strconv.FormatInt(int64(a), 10) + ")"
+}
 
 func (a *Addr) Target() *Prog {
 	if a.Type == TYPE_BRANCH && a.Val != nil {
@@ -818,8 +846,6 @@ func (fi *FuncInfo) RecordAutoType(gotype *LSym) {
 	fi.Autot[gotype] = struct{}{}
 }
 
-//go:generate stringer -type ABI
-
 // ABI is the calling convention of a text symbol.
 type ABI uint8
 
@@ -839,6 +865,22 @@ const (
 
 	ABICount
 )
+
+// ABINames provides string representations for ABI constants, replacing stringer-generated abi_string.go
+var ABINames = [...]string{
+	ABI0:        "ABI0",
+	ABIInternal: "ABIInternal",
+	ABICount:    "ABICount",
+}
+
+// String returns the string representation of the ABI.
+// This replaces the stringer-generated String() method.
+func (a ABI) String() string {
+	if int(a) < len(ABINames) && ABINames[a] != "" {
+		return ABINames[a]
+	}
+	return "ABI(" + strconv.FormatInt(int64(a), 10) + ")"
+}
 
 // ParseABI converts from a string representation in 'abistr' to the
 // corresponding ABI value. Second return value is TRUE if the

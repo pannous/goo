@@ -5,6 +5,9 @@
 package types
 
 import (
+	"strconv"
+	"sync"
+
 	"cmd/compile/internal/base"
 	"cmd/internal/objabi"
 	"cmd/internal/src"
@@ -12,7 +15,6 @@ import (
 	"go/constant"
 	"internal/buildcfg"
 	"internal/types/errors"
-	"sync"
 )
 
 // Object represents an ir.Node, but without needing to import cmd/compile/internal/ir,
@@ -23,8 +25,6 @@ type Object interface {
 	Sym() *Sym
 	Type() *Type
 }
-
-//go:generate stringer -type Kind -trimprefix T type.go
 
 // Kind describes a kind of type.
 type Kind uint8
@@ -81,6 +81,57 @@ const (
 
 	NTYPE
 )
+
+// KindNames provides string representations for Kind constants, replacing stringer-generated kind_string.go
+var KindNames = [...]string{
+	Txxx:        "xxx",
+	TINT8:       "INT8",
+	TUINT8:      "UINT8",
+	TINT16:      "INT16",
+	TUINT16:     "UINT16",
+	TINT32:      "INT32",
+	TUINT32:     "UINT32",
+	TINT64:      "INT64",
+	TUINT64:     "UINT64",
+	TINT:        "INT",
+	TUINT:       "UINT",
+	TUINTPTR:    "UINTPTR",
+	TCOMPLEX64:  "COMPLEX64",
+	TCOMPLEX128: "COMPLEX128",
+	TFLOAT32:    "FLOAT32",
+	TFLOAT64:    "FLOAT64",
+	TBOOL:       "BOOL",
+	TPTR:        "PTR",
+	TFUNC:       "FUNC",
+	TSLICE:      "SLICE",
+	TARRAY:      "ARRAY",
+	TSTRUCT:     "STRUCT",
+	TCHAN:       "CHAN",
+	TMAP:        "MAP",
+	TINTER:      "INTER",
+	TFORW:       "FORW",
+	TANY:        "ANY",
+	TSTRING:     "STRING",
+	TUNSAFEPTR:  "UNSAFEPTR",
+	TIDEAL:      "IDEAL",
+	TNIL:        "NIL",
+	TBLANK:      "BLANK",
+	TFUNCARGS:   "FUNCARGS",
+	TCHANARGS:   "CHANARGS",
+	TSSA:        "SSA",
+	TTUPLE:      "TUPLE",
+	TRESULTS:    "RESULTS",
+	NTYPE:       "TYPE",
+}
+
+// String returns the string representation of the Kind.
+// This replaces the stringer-generated String() method.
+func (k Kind) String() string {
+	if int(k) < len(KindNames) && KindNames[k] != "" {
+		return KindNames[k]
+	}
+	return "Kind(" + strconv.FormatInt(int64(k), 10) + ")"
+}
 
 // ChanDir is whether a channel can send, receive, or both.
 type ChanDir uint8
