@@ -1,0 +1,25 @@
+package main
+
+import "fmt"
+
+func main() {
+	printf := fmt.Printf
+	
+	// Test {a: 1, b: 2} syntax with symbol keys converted to strings
+	z := {a: 1, b: 2}
+	printf("Map z: %v\n", z)
+	printf("Type of z: %v\n", typeof(z))
+	
+	// Test accessing elements
+	printf("Value of 'a': %v\n", z["a"])
+	printf("Value of 'b': %v\n", z["b"])
+	
+	// Test mixed types
+	mixed := {name: "Alice", age: 30, active: true}
+	printf("Mixed map: %v\n", mixed)
+	printf("Type of mixed: %v\n", typeof(mixed))
+	
+	// Test with existing string keys (should work as before)
+	explicit := {"x": 10, "y": 20}
+	printf("Explicit string keys: %v\n", explicit)
+}
