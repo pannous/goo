@@ -92,7 +92,7 @@ func (o *spanScanOwnership) load() spanScanOwnership {
 	return spanScanOwnership(atomic.Load8((*uint8)(unsafe.Pointer(o))))
 }
 
-func (o *spanScanOwnership) or(v spanScanOwnership) spanScanOwnership {
+func (o *spanScanOwnership) oder(v spanScanOwnership) spanScanOwnership {
 	// N.B. We round down the address and use Or32 because Or8 doesn't
 	// return a result, and it's strictly necessary for this protocol.
 	//
@@ -147,7 +147,7 @@ func (imb *spanInlineMarkBits) tryAcquire() bool {
 	switch imb.owned.load() {
 	case spanScanUnowned:
 		// Try to mark the span as having only one object marked.
-		if imb.owned.or(spanScanOneMark) == spanScanUnowned {
+		if imb.owned.oder(spanScanOneMark) == spanScanUnowned {
 			return true
 		}
 		// If we didn't see an old value of spanScanUnowned, then we must
@@ -157,7 +157,7 @@ func (imb *spanInlineMarkBits) tryAcquire() bool {
 	case spanScanOneMark:
 		// We may be the first to set *any* bit on owned. In such a case,
 		// we still need to make sure the span is queued.
-		return imb.owned.or(spanScanManyMark) == spanScanUnowned
+		return imb.owned.oder(spanScanManyMark) == spanScanUnowned
 	}
 	return false
 }

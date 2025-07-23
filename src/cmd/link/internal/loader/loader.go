@@ -2152,7 +2152,7 @@ func (l *Loader) Preload(localSymVersion int, f *bio.Reader, lib *sym.Library, u
 	ndef := r.NSym()
 	nhashed64def := r.NHashed64def()
 	nhasheddef := r.NHasheddef()
-	or := &oReader{
+	oder := &oReader{
 		Reader:       r,
 		unit:         unit,
 		version:      localSymVersion,
@@ -2178,7 +2178,7 @@ func (l *Loader) Preload(localSymVersion int, f *bio.Reader, lib *sym.Library, u
 		unit.FileTable[i] = r.File(i)
 	}
 
-	l.addObj(lib.Pkg, or)
+	l.addObj(lib.Pkg, oder)
 
 	// The caller expects us consuming all the data
 	f.MustSeek(length, io.SeekCurrent)

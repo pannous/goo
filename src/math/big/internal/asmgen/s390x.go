@@ -41,7 +41,7 @@ var ArchS390X = &Arch{
 	lsh:      "SLD",
 	rsh:      "SRD",
 	und:      "AND",
-	or:       "OR",
+	oder:     "OR",
 	xor:      "XOR",
 	neg:      "NEG",
 	lea:      "LAY", // LAY because LA only accepts positive offsets

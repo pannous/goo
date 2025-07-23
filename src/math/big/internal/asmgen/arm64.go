@@ -36,7 +36,7 @@ var ArchARM64 = &Arch{
 	lsh:   "LSL",
 	rsh:   "LSR",
 	und:   "AND",
-	or:    "ORR",
+	oder:  "ORR",
 	xor:   "EOR",
 
 	addWords: "ADD %[1]s<<3, %[2]s, %[3]s",

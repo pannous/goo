@@ -1238,8 +1238,8 @@ func TestUint64(t *testing.T) {
 }
 
 var bitwiseTests = []struct {
-	x, y                 string
-	und, or, xor, andNot string
+	x, y                   string
+	und, oder, xor, andNot string
 }{
 	{"0x00", "0x00", "0x00", "0x00", "0x00", "0x00"},
 	{"0x00", "0x01", "0x00", "0x01", "0x01", "0x00"},
@@ -1529,8 +1529,8 @@ func TestBitwise(t *testing.T) {
 		testBitFunSelf(t, "and", (*Int).And, x, y, test.und)
 		testBitFun(t, "andNot", (*Int).AndNot, x, y, test.andNot)
 		testBitFunSelf(t, "andNot", (*Int).AndNot, x, y, test.andNot)
-		testBitFun(t, "or", (*Int).Or, x, y, test.or)
-		testBitFunSelf(t, "or", (*Int).Or, x, y, test.or)
+		testBitFun(t, "or", (*Int).Or, x, y, test.oder)
+		testBitFunSelf(t, "or", (*Int).Or, x, y, test.oder)
 		testBitFun(t, "xor", (*Int).Xor, x, y, test.xor)
 		testBitFunSelf(t, "xor", (*Int).Xor, x, y, test.xor)
 	}

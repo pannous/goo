@@ -298,7 +298,7 @@ func (a *Asm) And(src1, src2, dst Reg) {
 // Or emits dst = src1 | src2
 // It may modify the carry flag.
 func (a *Asm) Or(src1, src2, dst Reg) {
-	a.op3(a.Arch.or, src1, src2, dst)
+	a.op3(a.Arch.oder, src1, src2, dst)
 }
 
 // Xor emits dst = src1 ^ src2

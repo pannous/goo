@@ -36,7 +36,7 @@ var ArchMIPS = &Arch{
 	lsh:      "SLL",
 	rsh:      "SRL",
 	und:      "AND",
-	or:       "OR",
+	oder:     "OR",
 	xor:      "XOR",
 
 	jmpZero:    "BEQ %s, %s",

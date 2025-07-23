@@ -30,11 +30,11 @@ var exprStringTests = []struct {
 		out: "!(abc && def)",
 	},
 	{
-		x:   und(tag("abc"), or(tag("def"), tag("ghi"))),
+		x:   und(tag("abc"), oder(tag("def"), tag("ghi"))),
 		out: "abc && (def || ghi)",
 	},
 	{
-		x:   or(und(tag("abc"), tag("def")), tag("ghi")),
+		x:   oder(und(tag("abc"), tag("def")), tag("ghi")),
 		out: "(abc && def) || ghi",
 	},
 }
@@ -117,12 +117,12 @@ var parseExprTests = []struct {
 }{
 	{"x", tag("x")},
 	{"x&&y", und(tag("x"), tag("y"))},
-	{"x||y", or(tag("x"), tag("y"))},
+	{"x||y", oder(tag("x"), tag("y"))},
 	{"(x)", tag("x")},
-	{"x||y&&z", or(tag("x"), und(tag("y"), tag("z")))},
-	{"x&&y||z", or(und(tag("x"), tag("y")), tag("z"))},
-	{"x&&(y||z)", und(tag("x"), or(tag("y"), tag("z")))},
-	{"(x||y)&&z", und(or(tag("x"), tag("y")), tag("z"))},
+	{"x||y&&z", oder(tag("x"), und(tag("y"), tag("z")))},
+	{"x&&y||z", oder(und(tag("x"), tag("y")), tag("z"))},
+	{"x&&(y||z)", und(tag("x"), oder(tag("y"), tag("z")))},
+	{"(x||y)&&z", und(oder(tag("x"), tag("y")), tag("z"))},
 	{"!(x&&y)", negate(und(tag("x"), tag("y")))},
 }
 
@@ -210,11 +210,11 @@ var parsePlusBuildExprTests = []struct {
 }{
 	{"x", tag("x")},
 	{"x,y", und(tag("x"), tag("y"))},
-	{"x y", or(tag("x"), tag("y"))},
-	{"x y,z", or(tag("x"), und(tag("y"), tag("z")))},
-	{"x,y z", or(und(tag("x"), tag("y")), tag("z"))},
-	{"x,!y !z", or(und(tag("x"), negate(tag("y"))), negate(tag("z")))},
-	{"!! x", or(tag("ignore"), tag("x"))},
+	{"x y", oder(tag("x"), tag("y"))},
+	{"x y,z", oder(tag("x"), und(tag("y"), tag("z")))},
+	{"x,y z", oder(und(tag("x"), tag("y")), tag("z"))},
+	{"x,!y !z", oder(und(tag("x"), negate(tag("y"))), negate(tag("z")))},
+	{"!! x", oder(tag("ignore"), tag("x"))},
 	{"!!x", tag("ignore")},
 	{"!x", negate(tag("x"))},
 	{"!", tag("ignore")},
@@ -239,8 +239,8 @@ var constraintTests = []struct {
 }{
 	{"//+build !", tag("ignore"), ""},
 	{"//+build", tag("ignore"), ""},
-	{"//+build x y", or(tag("x"), tag("y")), ""},
-	{"// +build x y \n", or(tag("x"), tag("y")), ""},
+	{"//+build x y", oder(tag("x"), tag("y")), ""},
+	{"// +build x y \n", oder(tag("x"), tag("y")), ""},
 	{"// +build x y \n ", nil, "not a build constraint"},
 	{"// +build x y \nmore", nil, "not a build constraint"},
 	{" //+build x y", nil, "not a build constraint"},

@@ -825,6 +825,12 @@ scanAgain:
 		} else if lit == "¬" {
 			tok = token.NOT
 			lit = "!"
+		} else if lit == "and" {
+			tok = token.LAND
+			lit = "&&"
+		} else if lit == "or" {
+			tok = token.LOR
+			lit = "||"
 		} else if len(lit) > 1 {
 			// keywords are longer than one letter - avoid lookup otherwise
 			tok = token.Lookup(lit)

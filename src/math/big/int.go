@@ -1167,7 +1167,7 @@ func (z *Int) And(x, y *Int) *Int {
 			// (-x) & (-y) == ^(x-1) & ^(y-1) == ^((x-1) | (y-1)) == -(((x-1) | (y-1)) + 1)
 			x1 := nat(nil).sub(x.abs, natOne)
 			y1 := nat(nil).sub(y.abs, natOne)
-			z.abs = z.abs.add(z.abs.or(x1, y1), natOne)
+			z.abs = z.abs.add(z.abs.oder(x1, y1), natOne)
 			z.neg = true // z cannot be zero if x and y are negative
 			return z
 		}
@@ -1211,7 +1211,7 @@ func (z *Int) AndNot(x, y *Int) *Int {
 	if x.neg {
 		// (-x) &^ y == ^(x-1) &^ y == ^(x-1) & ^y == ^((x-1) | y) == -(((x-1) | y) + 1)
 		x1 := nat(nil).sub(x.abs, natOne)
-		z.abs = z.abs.add(z.abs.or(x1, y.abs), natOne)
+		z.abs = z.abs.add(z.abs.oder(x1, y.abs), natOne)
 		z.neg = true // z cannot be zero if x is negative and y is positive
 		return z
 	}
@@ -1236,7 +1236,7 @@ func (z *Int) Or(x, y *Int) *Int {
 		}
 
 		// x | y == x | y
-		z.abs = z.abs.or(x.abs, y.abs)
+		z.abs = z.abs.oder(x.abs, y.abs)
 		z.neg = false
 		return z
 	}

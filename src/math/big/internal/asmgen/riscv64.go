@@ -38,7 +38,7 @@ var ArchRISCV64 = &Arch{
 	lsh:   "SLL",
 	rsh:   "SRL",
 	und:   "AND",
-	or:    "OR",
+	oder:  "OR",
 	xor:   "XOR",
 	sltu:  "SLTU",
 

@@ -50,7 +50,7 @@ var ArchPPC64x = &Arch{
 	lsh:   "SLD",
 	rsh:   "SRD",
 	und:   "ANDCC", // regular AND does not accept immediates
-	or:    "OR",
+	oder:  "OR",
 	xor:   "XOR",
 
 	jmpZero:    "CMP %[1]s, $0; BEQ %[2]s",
