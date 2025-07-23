@@ -172,8 +172,6 @@ const (
 
 type Operator uint
 
-//go:generate stringer -type Operator -linecomment tokens.go
-
 const (
 	_ Operator = iota
 
@@ -212,6 +210,43 @@ const (
 	Shl    // <<
 	Shr    // >>
 )
+
+// OperatorNames provides string representations for Operator constants, replacing stringer-generated operator_string.go
+var OperatorNames = [...]string{
+	0:      "", // unused (Operator 0)
+	Def:    ":",
+	Not:    "!",
+	Recv:   "<-",
+	Tilde:  "~",
+	OrOr:   "||",
+	AndAnd: "&&",
+	Eql:    "==",
+	Neq:    "!=",
+	Lss:    "<",
+	Leq:    "<=",
+	Gtr:    ">",
+	Geq:    ">=",
+	Add:    "+",
+	Sub:    "-",
+	Or:     "|",
+	Xor:    "^",
+	Mul:    "*",
+	Div:    "/",
+	Rem:    "%",
+	And:    "&",
+	AndNot: "&^",
+	Shl:    "<<",
+	Shr:    ">>",
+}
+
+// String returns the string representation of the Operator.
+// This replaces the stringer-generated String() method.
+func (op Operator) String() string {
+	if int(op) < len(OperatorNames) && OperatorNames[op] != "" {
+		return OperatorNames[op]
+	}
+	return "Operator(" + strconv.FormatInt(int64(op), 10) + ")"
+}
 
 // Operator precedences
 const (

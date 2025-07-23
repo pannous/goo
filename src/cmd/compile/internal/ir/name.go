@@ -5,6 +5,8 @@
 package ir
 
 import (
+	"strconv"
+
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/types"
 	"cmd/internal/obj"
@@ -379,7 +381,6 @@ func DeclaredBy(x, stmt Node) bool {
 // called declaration contexts.
 type Class uint8
 
-//go:generate stringer -type=Class name.go
 const (
 	Pxxx       Class = iota // no class; used during ssa conversion to indicate pseudo-variables
 	PEXTERN                 // global variables
@@ -393,6 +394,27 @@ const (
 	// Careful: Class is stored in three bits in Node.flags.
 	_ = uint((1 << 3) - iota) // static assert for iota <= (1 << 3)
 )
+
+// ClassNames provides string representations for Class constants, replacing stringer-generated class_string.go
+var ClassNames = [...]string{
+	Pxxx:       "Pxxx",
+	PEXTERN:    "PEXTERN",
+	PAUTO:      "PAUTO",
+	PAUTOHEAP:  "PAUTOHEAP",
+	PPARAM:     "PPARAM",
+	PPARAMOUT:  "PPARAMOUT",
+	PTYPEPARAM: "PTYPEPARAM",
+	PFUNC:      "PFUNC",
+}
+
+// String returns the string representation of the Class.
+// This replaces the stringer-generated String() method.
+func (c Class) String() string {
+	if int(c) < len(ClassNames) && ClassNames[c] != "" {
+		return ClassNames[c]
+	}
+	return "Class(" + strconv.FormatInt(int64(c), 10) + ")"
+}
 
 type Embed struct {
 	Pos      src.XPos
