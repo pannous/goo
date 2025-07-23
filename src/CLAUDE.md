@@ -21,12 +21,40 @@ So far incremental building does not work like this :(
 
 # Go Compiler Lexer/Scanner Summary
 
-## Main Scanner File: `/opt/other/go/src/cmd/compile/internal/syntax/scanner.go`
+## Main Files: 
+- Project root folder `/opt/other/go/`
+- Claude root folder `/opt/other/go/src/`
 - Core lexical analysis for Go compiler
-- `next()` method: main tokenization loop with large switch statement for each character
+- Main files:
+  - `cmd/compile/internal/syntax/scanner.go`: main scanner implementation
+  - `go/scanner/scanner.go`: standard scanner used by tools like `go run`, `go build`
+  - `go/scanner/tokens.go`: token definitions
+  - `go/scanner/source.go`: source reading and buffering
+  - ./cmd/compile/internal/noder folder with important files:
+      unified.go
+      lex_test.go
+      lex.go
+      import.go
+      posmap.go
+      types.go
+      export.go
+      quirks.go
+      codes.go
+      writer.go
+      linker.go
+      doc.go
+      reader.go
+      irgen.go
+      helpers.go
+      noder.go
 - Token types defined in `tokens.go`, scanner state in scanner struct
 - Character reading via `source.go` buffered reader
 - Supports UTF-8, tracks line/column positions
+- `next()` method: main tokenization loop with large switch statement for each character
+
+- ### Dual Scanner System
+  1. Standard Scanner (go/scanner/scanner.go) - Used by go run, go build, and other tools for initial parsing/package analysis
+  2. Internal Syntax Scanner (cmd/compile/internal/syntax/scanner.go) - Used by the compiler itself for actual compilation
 - Two main scanning modes: normal tokens + comment/directive callbacks
 
 ## Key Methods:

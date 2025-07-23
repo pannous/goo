@@ -12,8 +12,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 goo file extension
 🗹 not operator keyword for `!`
 🗹 ø keyword for `nil`
-☐ ≠ operator for `!=`
-☐ ¬ operator for `!`
+🗹 ≠ operator for `!=`
+🗹 ¬ operator for `!`
 ☐ return void, e.g. return print("ok")  
 ☐ and or not operators for && || !
 ☐ print := fmt.Println    
@@ -39,7 +39,19 @@ BSD-style license found in the LICENSE file.
 
 #### Binary Distributions
 
-TODO
+Official binary distributions are available at https://github.com/pannous/goo/releases.
+
+Download the archive file appropriate for your installation and operating system. Extract it to `/usr/local` (you may need to run the command as root or through sudo):
+
+```
+tar -C /usr/local -xzf goo1.x.x.linux-amd64.tar.gz
+```
+
+Add `/usr/local/goo/bin` to your PATH environment variable. You can do this by adding this line to your `$HOME/.profile` or `/etc/profile` (for a system-wide installation):
+
+```
+export PATH=$PATH:/usr/local/goo/bin
+```
 
 #### Install From Source
 
