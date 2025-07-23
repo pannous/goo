@@ -30,9 +30,10 @@
 
 package objabi
 
+import "strconv"
+
 type RelocType int16
 
-//go:generate stringer -type=RelocType
 const (
 	R_ADDR RelocType = 1 + iota
 	// R_ADDRPOWER relocates a pair of "D-form" instructions (instructions with 16-bit
@@ -416,6 +417,121 @@ const (
 	R_WEAKADDR    = R_WEAK | R_ADDR
 	R_WEAKADDROFF = R_WEAK | R_ADDROFF
 )
+
+// RelocTypeNames provides string representations for RelocType constants, replacing stringer-generated reloctype_string.go
+var RelocTypeNames = map[RelocType]string{
+	R_ADDR:                    "R_ADDR",
+	R_ADDRPOWER:               "R_ADDRPOWER",
+	R_ADDRARM64:               "R_ADDRARM64",
+	R_ADDRMIPS:                "R_ADDRMIPS",
+	R_ADDROFF:                 "R_ADDROFF",
+	R_SIZE:                    "R_SIZE",
+	R_CALL:                    "R_CALL",
+	R_CALLARM:                 "R_CALLARM",
+	R_CALLARM64:               "R_CALLARM64",
+	R_CALLIND:                 "R_CALLIND",
+	R_CALLPOWER:               "R_CALLPOWER",
+	R_CALLMIPS:                "R_CALLMIPS",
+	R_CONST:                   "R_CONST",
+	R_PCREL:                   "R_PCREL",
+	R_TLS_LE:                  "R_TLS_LE",
+	R_TLS_IE:                  "R_TLS_IE",
+	R_GOTOFF:                  "R_GOTOFF",
+	R_PLT0:                    "R_PLT0",
+	R_PLT1:                    "R_PLT1",
+	R_PLT2:                    "R_PLT2",
+	R_USEFIELD:                "R_USEFIELD",
+	R_USETYPE:                 "R_USETYPE",
+	R_USEIFACE:                "R_USEIFACE",
+	R_USEIFACEMETHOD:          "R_USEIFACEMETHOD",
+	R_USENAMEDMETHOD:          "R_USENAMEDMETHOD",
+	R_METHODOFF:               "R_METHODOFF",
+	R_KEEP:                    "R_KEEP",
+	R_POWER_TOC:               "R_POWER_TOC",
+	R_GOTPCREL:                "R_GOTPCREL",
+	R_JMPMIPS:                 "R_JMPMIPS",
+	R_DWARFSECREF:             "R_DWARFSECREF",
+	R_ARM64_TLS_LE:            "R_ARM64_TLS_LE",
+	R_ARM64_TLS_IE:            "R_ARM64_TLS_IE",
+	R_ARM64_GOTPCREL:          "R_ARM64_GOTPCREL",
+	R_ARM64_GOT:               "R_ARM64_GOT",
+	R_ARM64_PCREL:             "R_ARM64_PCREL",
+	R_ARM64_PCREL_LDST8:       "R_ARM64_PCREL_LDST8",
+	R_ARM64_PCREL_LDST16:      "R_ARM64_PCREL_LDST16",
+	R_ARM64_PCREL_LDST32:      "R_ARM64_PCREL_LDST32",
+	R_ARM64_PCREL_LDST64:      "R_ARM64_PCREL_LDST64",
+	R_ARM64_LDST8:             "R_ARM64_LDST8",
+	R_ARM64_LDST16:            "R_ARM64_LDST16",
+	R_ARM64_LDST32:            "R_ARM64_LDST32",
+	R_ARM64_LDST64:            "R_ARM64_LDST64",
+	R_ARM64_LDST128:           "R_ARM64_LDST128",
+	R_POWER_TLS_LE:            "R_POWER_TLS_LE",
+	R_POWER_TLS_IE:            "R_POWER_TLS_IE",
+	R_POWER_TLS:               "R_POWER_TLS",
+	R_POWER_TLS_IE_PCREL34:    "R_POWER_TLS_IE_PCREL34",
+	R_POWER_TLS_LE_TPREL34:    "R_POWER_TLS_LE_TPREL34",
+	R_ADDRPOWER_DS:            "R_ADDRPOWER_DS",
+	R_ADDRPOWER_GOT:           "R_ADDRPOWER_GOT",
+	R_ADDRPOWER_GOT_PCREL34:   "R_ADDRPOWER_GOT_PCREL34",
+	R_ADDRPOWER_PCREL:         "R_ADDRPOWER_PCREL",
+	R_ADDRPOWER_TOCREL:        "R_ADDRPOWER_TOCREL",
+	R_ADDRPOWER_TOCREL_DS:     "R_ADDRPOWER_TOCREL_DS",
+	R_ADDRPOWER_D34:           "R_ADDRPOWER_D34",
+	R_ADDRPOWER_PCREL34:       "R_ADDRPOWER_PCREL34",
+	R_RISCV_JAL:               "R_RISCV_JAL",
+	R_RISCV_JAL_TRAMP:         "R_RISCV_JAL_TRAMP",
+	R_RISCV_CALL:              "R_RISCV_CALL",
+	R_RISCV_PCREL_ITYPE:       "R_RISCV_PCREL_ITYPE",
+	R_RISCV_PCREL_STYPE:       "R_RISCV_PCREL_STYPE",
+	R_RISCV_TLS_IE:            "R_RISCV_TLS_IE",
+	R_RISCV_TLS_LE:            "R_RISCV_TLS_LE",
+	R_RISCV_GOT_HI20:          "R_RISCV_GOT_HI20",
+	R_RISCV_GOT_PCREL_ITYPE:   "R_RISCV_GOT_PCREL_ITYPE",
+	R_RISCV_PCREL_HI20:        "R_RISCV_PCREL_HI20",
+	R_RISCV_PCREL_LO12_I:      "R_RISCV_PCREL_LO12_I",
+	R_RISCV_PCREL_LO12_S:      "R_RISCV_PCREL_LO12_S",
+	R_RISCV_BRANCH:            "R_RISCV_BRANCH",
+	R_RISCV_RVC_BRANCH:        "R_RISCV_RVC_BRANCH",
+	R_RISCV_RVC_JUMP:          "R_RISCV_RVC_JUMP",
+	R_PCRELDBL:                "R_PCRELDBL",
+	R_LOONG64_ADDR_HI:         "R_LOONG64_ADDR_HI",
+	R_LOONG64_ADDR_LO:         "R_LOONG64_ADDR_LO",
+	R_LOONG64_TLS_LE_HI:       "R_LOONG64_TLS_LE_HI",
+	R_LOONG64_TLS_LE_LO:       "R_LOONG64_TLS_LE_LO",
+	R_CALLLOONG64:             "R_CALLLOONG64",
+	R_LOONG64_TLS_IE_HI:       "R_LOONG64_TLS_IE_HI",
+	R_LOONG64_TLS_IE_LO:       "R_LOONG64_TLS_IE_LO",
+	R_LOONG64_GOT_HI:          "R_LOONG64_GOT_HI",
+	R_LOONG64_GOT_LO:          "R_LOONG64_GOT_LO",
+	R_LOONG64_ADD64:           "R_LOONG64_ADD64",
+	R_LOONG64_SUB64:           "R_LOONG64_SUB64",
+	R_JMP16LOONG64:            "R_JMP16LOONG64",
+	R_JMP21LOONG64:            "R_JMP21LOONG64",
+	R_JMPLOONG64:              "R_JMPLOONG64",
+	R_ADDRMIPSU:               "R_ADDRMIPSU",
+	R_ADDRMIPSTLS:             "R_ADDRMIPSTLS",
+	R_ADDRCUOFF:               "R_ADDRCUOFF",
+	R_WASMIMPORT:              "R_WASMIMPORT",
+	R_XCOFFREF:                "R_XCOFFREF",
+	R_PEIMAGEOFF:              "R_PEIMAGEOFF",
+	R_INITORDER:               "R_INITORDER",
+	R_DWTXTADDR_U1:            "R_DWTXTADDR_U1",
+	R_DWTXTADDR_U2:            "R_DWTXTADDR_U2",
+	R_DWTXTADDR_U3:            "R_DWTXTADDR_U3",
+	R_DWTXTADDR_U4:            "R_DWTXTADDR_U4",
+	R_WEAK:                    "R_WEAK",
+	R_WEAKADDR:                "R_WEAKADDR",
+	R_WEAKADDROFF:             "R_WEAKADDROFF",
+}
+
+// String returns the string representation of the RelocType.
+// This replaces the stringer-generated String() method.
+func (r RelocType) String() string {
+	if s, ok := RelocTypeNames[r]; ok {
+		return s
+	}
+	return "RelocType(" + strconv.FormatInt(int64(r), 10) + ")"
+}
 
 // IsDirectCall reports whether r is a relocation for a direct call.
 // A direct call is a CALL instruction that takes the target address
