@@ -12,7 +12,7 @@ import "runtime"
 
 var c = make(chan int)
 
-func check(a []int) {
+func checks(a []int) {
 	for i := 0; i < len(a); i++ {
 		n := <-c
 		if n != a[i] {
@@ -85,15 +85,15 @@ func main() {
 	var fail bool
 
 	go f()
-	check([]int{1, 4, 5, 4})
+	checks([]int{1, 4, 5, 4})
 
 	a := accum(0)
 	b := accum(1)
 	go g(a, b)
-	check([]int{2, 4, 6, 9})
+	checks([]int{2, 4, 6, 9})
 
 	go h()
-	check([]int{100, 200, 101, 201, 500, 101, 201, 500})
+	checks([]int{100, 200, 101, 201, 500, 101, 201, 500})
 
 	memstats := new(runtime.MemStats)
 	runtime.ReadMemStats(memstats)

@@ -61,10 +61,10 @@ func TestHash(t *testing.T) {
 func TestHashMatch(t *testing.T) {
 	b := new(bytes.Buffer)
 	hd := NewHashDebug("GOSSAHASH", "v1110", b)
-	check := hd.MatchPkgFunc("bar", "0", func() string { return "note" })
+	checks := hd.MatchPkgFunc("bar", "0", func() string { return "note" })
 	msg := b.String()
 	t.Logf("message was '%s'", msg)
-	if !check {
+	if !checks {
 		t.Errorf("GOSSAHASH=1110 should have matched for 'bar', '0'")
 	}
 	wantPrefix(t, msg, "bar.0: note [bisect-match ")
@@ -74,10 +74,10 @@ func TestHashMatch(t *testing.T) {
 func TestYMatch(t *testing.T) {
 	b := new(bytes.Buffer)
 	hd := NewHashDebug("GOSSAHASH", "vy", b)
-	check := hd.MatchPkgFunc("bar", "0", nil)
+	checks := hd.MatchPkgFunc("bar", "0", nil)
 	msg := b.String()
 	t.Logf("message was '%s'", msg)
-	if !check {
+	if !checks {
 		t.Errorf("GOSSAHASH=y should have matched for 'bar', '0'")
 	}
 	wantPrefix(t, msg, "bar.0 [bisect-match ")
@@ -87,10 +87,10 @@ func TestYMatch(t *testing.T) {
 func TestNMatch(t *testing.T) {
 	b := new(bytes.Buffer)
 	hd := NewHashDebug("GOSSAHASH", "vn", b)
-	check := hd.MatchPkgFunc("bar", "0", nil)
+	checks := hd.MatchPkgFunc("bar", "0", nil)
 	msg := b.String()
 	t.Logf("message was '%s'", msg)
-	if check {
+	if checks {
 		t.Errorf("GOSSAHASH=n should NOT have matched for 'bar', '0'")
 	}
 	wantPrefix(t, msg, "bar.0 [DISABLED] [bisect-match ")
@@ -100,10 +100,10 @@ func TestNMatch(t *testing.T) {
 func TestHashNoMatch(t *testing.T) {
 	b := new(bytes.Buffer)
 	hd := NewHashDebug("GOSSAHASH", "01110", b)
-	check := hd.MatchPkgFunc("bar", "0", nil)
+	checks := hd.MatchPkgFunc("bar", "0", nil)
 	msg := b.String()
 	t.Logf("message was '%s'", msg)
-	if check {
+	if checks {
 		t.Errorf("GOSSAHASH=001100 should NOT have matched for 'bar', '0'")
 	}
 	if msg != "" {
@@ -116,10 +116,10 @@ func TestHashSecondMatch(t *testing.T) {
 	b := new(bytes.Buffer)
 	hd := NewHashDebug("GOSSAHASH", "01110/11110", b)
 
-	check := hd.MatchPkgFunc("bar", "0", nil)
+	checks := hd.MatchPkgFunc("bar", "0", nil)
 	msg := b.String()
 	t.Logf("message was '%s'", msg)
-	if !check {
+	if !checks {
 		t.Errorf("GOSSAHASH=001100, GOSSAHASH0=0011 should have matched for 'bar', '0'")
 	}
 	wantContains(t, msg, "\nGOSSAHASH0 triggered bar")

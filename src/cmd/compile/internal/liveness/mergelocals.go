@@ -113,7 +113,7 @@ func MergeLocals(fn *ir.Func, f *ssa.Func) *MergeLocalsState {
 
 	// Perform merging within each region of the candidates list.
 	rv := cs.performMerging()
-	if err := rv.check(); err != nil {
+	if err := rv.checks(); err != nil {
 		base.FatalfAt(fn.Pos(), "invalid mergelocals state: %v", err)
 	}
 	return rv
@@ -187,7 +187,7 @@ func (mls *MergeLocalsState) EstSavings() (int, int) {
 
 // check tests for various inconsistencies and problems in mls,
 // returning an error if any problems are found.
-func (mls *MergeLocalsState) check() error {
+func (mls *MergeLocalsState) checks() error {
 	if mls == nil {
 		return nil
 	}
@@ -1021,7 +1021,7 @@ func dumpCand(c *ir.Name, i int) {
 // for unit testing only.
 func MakeMergeLocalsState(partition map[*ir.Name][]int, vars []*ir.Name) (*MergeLocalsState, error) {
 	mls := &MergeLocalsState{partition: partition, vars: vars}
-	if err := mls.check(); err != nil {
+	if err := mls.checks(); err != nil {
 		return nil, err
 	}
 	return mls, nil

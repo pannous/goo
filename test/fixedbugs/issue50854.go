@@ -23,7 +23,7 @@ func h(p int64, x, y int64) bool { return -(x<<1) <= p && p <= y }
 func k(p int32, x, y int32) bool { return -(1<<x) <= p && p <= y }
 
 //go:noinline
-func check(b bool) {
+func checks(b bool) {
 	if b {
 		return
 	}
@@ -31,8 +31,8 @@ func check(b bool) {
 }
 
 func main() {
-	check(f(1, -1<<63, 1<<63-1))
-	check(g(1, -1<<31, 1<<31-1))
-	check(h(1, -1<<62, 1<<63-1))
-	check(k(1, 31, 1<<31-1))
+	checks(f(1, -1<<63, 1<<63-1))
+	checks(g(1, -1<<31, 1<<31-1))
+	checks(h(1, -1<<62, 1<<63-1))
+	checks(k(1, 31, 1<<31-1))
 }

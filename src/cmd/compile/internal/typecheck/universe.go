@@ -32,6 +32,7 @@ var builtinFuncs = [...]struct {
 	op   ir.Op
 }{
 	{"append", ir.OAPPEND},
+	{"assert", ir.OASSERT},
 	{"cap", ir.OCAP},
 	{"clear", ir.OCLEAR},
 	{"close", ir.OCLOSE},

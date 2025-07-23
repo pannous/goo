@@ -1034,7 +1034,7 @@ type rootConsistencyTest struct {
 	detailedErrorMismatch func(t *testing.T) bool
 
 	// check is called before the test starts, and may t.Skip if necessary.
-	check func(t *testing.T)
+	checks func(t *testing.T)
 }
 
 var rootConsistencyTestCases = []rootConsistencyTest{{
@@ -1192,7 +1192,7 @@ var rootConsistencyTestCases = []rootConsistencyTest{{
 		// and os.Open returns "The file cannot be accessed by the system.".
 		return runtime.GOOS == "windows"
 	},
-	check: func(t *testing.T) {
+	checks: func(t *testing.T) {
 		if runtime.GOOS == "windows" && strings.HasPrefix(t.Name(), "TestRootConsistencyRemoveAll/") {
 			// Root.RemoveAll notices that a/ is not a directory,
 			// and returns success.
@@ -1243,8 +1243,8 @@ func (test rootConsistencyTest) run(t *testing.T, f func(t *testing.T, path stri
 	}
 
 	t.Run(test.name, func(t *testing.T) {
-		if test.check != nil {
-			test.check(t)
+		if test.checks != nil {
+			test.checks(t)
 		}
 
 		dir1 := makefs(t, test.fs)

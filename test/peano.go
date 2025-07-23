@@ -77,7 +77,7 @@ func count(x *Number) int {
 	return count(sub1(x)) + 1
 }
 
-func check(x *Number, expected int) {
+func checks(x *Number, expected int) {
 	var c = count(x)
 	if c != expected {
 		print("error: found ", c, "; expected ", expected, "\n")
@@ -89,24 +89,24 @@ func check(x *Number, expected int) {
 // Test basic functionality
 
 func init() {
-	check(zero(), 0)
-	check(add1(zero()), 1)
-	check(gen(10), 10)
+	checks(zero(), 0)
+	checks(add1(zero()), 1)
+	checks(gen(10), 10)
 
-	check(add(gen(3), zero()), 3)
-	check(add(zero(), gen(4)), 4)
-	check(add(gen(3), gen(4)), 7)
+	checks(add(gen(3), zero()), 3)
+	checks(add(zero(), gen(4)), 4)
+	checks(add(gen(3), gen(4)), 7)
 
-	check(mul(zero(), zero()), 0)
-	check(mul(gen(3), zero()), 0)
-	check(mul(zero(), gen(4)), 0)
-	check(mul(gen(3), add1(zero())), 3)
-	check(mul(add1(zero()), gen(4)), 4)
-	check(mul(gen(3), gen(4)), 12)
+	checks(mul(zero(), zero()), 0)
+	checks(mul(gen(3), zero()), 0)
+	checks(mul(zero(), gen(4)), 0)
+	checks(mul(gen(3), add1(zero())), 3)
+	checks(mul(add1(zero()), gen(4)), 4)
+	checks(mul(gen(3), gen(4)), 12)
 
-	check(fact(zero()), 1)
-	check(fact(add1(zero())), 1)
-	check(fact(gen(5)), 120)
+	checks(fact(zero()), 1)
+	checks(fact(add1(zero())), 1)
+	checks(fact(gen(5)), 120)
 }
 
 // -------------------------------------

@@ -107,7 +107,7 @@ import (
 //
 // Before type aliases (Go 1.9), the spec called defined types "named types".
 type Named struct {
-	check *Checker  // non-nil during type-checking; nil otherwise
+	checks *Checker  // non-nil during type-checking; nil otherwise
 	obj   *TypeName // corresponding declared object for declared types; see above for instantiated types
 
 	// fromRHS holds the type (on RHS of declaration) this *Named type is derived
@@ -240,14 +240,14 @@ func (n *Named) setState(state namedState) {
 }
 
 // newNamed is like NewNamed but with a *Checker receiver.
-func (check *Checker) newNamed(obj *TypeName, underlying Type, methods []*Func) *Named {
-	typ := &Named{check: check, obj: obj, fromRHS: underlying, underlying: underlying, methods: methods}
+func (checks *Checker) newNamed(obj *TypeName, underlying Type, methods []*Func) *Named {
+	typ := &Named{checks: checks, obj: obj, fromRHS: underlying, underlying: underlying, methods: methods}
 	if obj.typ == nil {
 		obj.typ = typ
 	}
 	// Ensure that typ is always sanity-checked.
-	if check != nil {
-		check.needsCleanup(typ)
+	if checks != nil {
+		checks.needsCleanup(typ)
 	}
 	return typ
 }
@@ -258,7 +258,7 @@ func (check *Checker) newNamed(obj *TypeName, underlying Type, methods []*Func) 
 //
 // If set, expanding is the named type instance currently being expanded, that
 // led to the creation of this instance.
-func (check *Checker) newNamedInstance(pos token.Pos, orig *Named, targs []Type, expanding *Named) *Named {
+func (checks *Checker) newNamedInstance(pos token.Pos, orig *Named, targs []Type, expanding *Named) *Named {
 	assert(len(targs) > 0)
 
 	obj := NewTypeName(pos, orig.obj.pkg, orig.obj.name, nil)
@@ -272,11 +272,11 @@ func (check *Checker) newNamedInstance(pos token.Pos, orig *Named, targs []Type,
 	if expanding != nil && expanding.Obj().pkg == obj.pkg {
 		inst.ctxt = expanding.inst.ctxt
 	}
-	typ := &Named{check: check, obj: obj, inst: inst}
+	typ := &Named{checks: checks, obj: obj, inst: inst}
 	obj.typ = typ
 	// Ensure that typ is always sanity-checked.
-	if check != nil {
-		check.needsCleanup(typ)
+	if checks != nil {
+		checks.needsCleanup(typ)
 	}
 	return typ
 }
@@ -299,7 +299,7 @@ func (t *Named) cleanup() {
 	case *Named, *Alias:
 		t.under() // t.under may add entries to check.cleaners
 	}
-	t.check = nil
+	t.checks = nil
 }
 
 // Obj returns the type name for the declaration defining the named type t. For
@@ -397,10 +397,10 @@ func (t *Named) expandMethod(i int) *Func {
 	origm := t.inst.orig.Method(i)
 	assert(origm != nil)
 
-	check := t.check
+	checks := t.checks
 	// Ensure that the original method is type-checked.
-	if check != nil {
-		check.objDecl(origm, nil)
+	if checks != nil {
+		checks.objDecl(origm, nil)
 	}
 
 	origSig := origm.typ.(*Signature)
@@ -424,10 +424,10 @@ func (t *Named) expandMethod(i int) *Func {
 	if origSig.RecvTypeParams().Len() == t.inst.targs.Len() {
 		smap := makeSubstMap(origSig.RecvTypeParams().list(), t.inst.targs.list())
 		var ctxt *Context
-		if check != nil {
-			ctxt = check.context()
+		if checks != nil {
+			ctxt = checks.context()
 		}
-		sig = check.subst(origm.pos, origSig, smap, t, ctxt).(*Signature)
+		sig = checks.subst(origm.pos, origSig, smap, t, ctxt).(*Signature)
 	}
 
 	if sig == origSig {
@@ -555,13 +555,13 @@ func (n0 *Named) under() Type {
 		n1 = u1
 	}
 
-	if n0.check == nil {
+	if n0.checks == nil {
 		panic("Named.check == nil but type is incomplete")
 	}
 
 	// Invariant: after this point n0 as well as any named types in its
 	// underlying chain should be set up when this function exits.
-	check := n0.check
+	checks := n0.checks
 	n := n0
 
 	seen := make(map[*Named]int) // types that need their underlying type resolved
@@ -574,7 +574,7 @@ loop:
 		n = n1
 		if i, ok := seen[n]; ok {
 			// cycle
-			check.cycleError(path[i:], firstInSrc(path[i:]))
+			checks.cycleError(path[i:], firstInSrc(path[i:]))
 			u = Typ[Invalid]
 			break
 		}
@@ -596,7 +596,7 @@ loop:
 		// those underlying types should have been resolved during the import.
 		// Also, doing so would lead to a race condition (was go.dev/issue/31749).
 		// Do this check always, not just in debug mode (it's cheap).
-		if n.obj.pkg != check.pkg {
+		if n.obj.pkg != checks.pkg {
 			panic("imported type with unresolved underlying type")
 		}
 		n.underlying = u
@@ -620,23 +620,23 @@ func (n *Named) lookupMethod(pkg *Package, name string, foldCase bool) (int, *Fu
 }
 
 // context returns the type-checker context.
-func (check *Checker) context() *Context {
-	if check.ctxt == nil {
-		check.ctxt = NewContext()
+func (checks *Checker) context() *Context {
+	if checks.ctxt == nil {
+		checks.ctxt = NewContext()
 	}
-	return check.ctxt
+	return checks.ctxt
 }
 
 // expandUnderlying substitutes type arguments in the underlying type n.orig,
 // returning the result. Returns Typ[Invalid] if there was an error.
 func (n *Named) expandUnderlying() Type {
-	check := n.check
-	if check != nil && check.conf._Trace {
-		check.trace(n.obj.pos, "-- Named.expandUnderlying %s", n)
-		check.indent++
+	checks := n.checks
+	if checks != nil && checks.conf._Trace {
+		checks.trace(n.obj.pos, "-- Named.expandUnderlying %s", n)
+		checks.indent++
 		defer func() {
-			check.indent--
-			check.trace(n.obj.pos, "=> %s (tparams = %s, under = %s)", n, n.tparams.list(), n.underlying)
+			checks.indent--
+			checks.trace(n.obj.pos, "=> %s (tparams = %s, under = %s)", n, n.tparams.list(), n.underlying)
 		}()
 	}
 
@@ -651,7 +651,7 @@ func (n *Named) expandUnderlying() Type {
 	if asNamed(orig.underlying) != nil {
 		// We should only get a Named underlying type here during type checking
 		// (for example, in recursive type declarations).
-		assert(check != nil)
+		assert(checks != nil)
 	}
 
 	if orig.tparams.Len() != targs.Len() {
@@ -667,10 +667,10 @@ func (n *Named) expandUnderlying() Type {
 
 	smap := makeSubstMap(orig.tparams.list(), targs.list())
 	var ctxt *Context
-	if check != nil {
-		ctxt = check.context()
+	if checks != nil {
+		ctxt = checks.context()
 	}
-	underlying := n.check.subst(n.obj.pos, orig.underlying, smap, n, ctxt)
+	underlying := n.checks.subst(n.obj.pos, orig.underlying, smap, n, ctxt)
 	// If the underlying type of n is an interface, we need to set the receiver of
 	// its methods accurately -- we set the receiver of interface methods on
 	// the RHS of a type declaration to the defined type.
@@ -681,7 +681,7 @@ func (n *Named) expandUnderlying() Type {
 			// a new *Interface before modifying receivers.
 			if iface == orig.underlying {
 				old := iface
-				iface = check.newInterface()
+				iface = checks.newInterface()
 				iface.embeddeds = old.embeddeds
 				assert(old.complete) // otherwise we are copying incomplete data
 				iface.complete = old.complete
@@ -692,7 +692,7 @@ func (n *Named) expandUnderlying() Type {
 			iface.tset = nil // recompute type set with new methods
 
 			// If check != nil, check.newInterface will have saved the interface for later completion.
-			if check == nil { // golang/go#61561: all newly created interfaces must be fully evaluated
+			if checks == nil { // golang/go#61561: all newly created interfaces must be fully evaluated
 				iface.typeSet()
 			}
 		}

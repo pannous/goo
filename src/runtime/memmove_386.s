@@ -66,7 +66,7 @@ tail:
 
 nosse2:
 /*
- * check and set for backwards
+ * checks and set for backwards
  */
 	CMPL	SI, DI
 	JLS	back
@@ -99,7 +99,7 @@ fwdBy4:
 	JMP	tail
 
 /*
- * check overlap
+ * checks overlap
  */
 back:
 	MOVL	SI, CX

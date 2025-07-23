@@ -95,7 +95,7 @@ func (s *hashSet) addS_seed(x string, seed Seed) {
 	h.WriteString(x)
 	s.add(h.Sum64())
 }
-func (s *hashSet) check(t *testing.T) {
+func (s *hashSet) checks(t *testing.T) {
 	t.Helper()
 	list := s.list
 	slices.Sort(list)
@@ -127,7 +127,7 @@ func TestSmhasherAppendedZeros(t *testing.T) {
 	for i := 0; i <= len(s); i++ {
 		h.addS(s[:i])
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // All 0-3 byte strings have distinct hashes.
@@ -149,7 +149,7 @@ func TestSmhasherSmallKeys(t *testing.T) {
 			}
 		}
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // Different length strings of all zeros have distinct hashes.
@@ -164,7 +164,7 @@ func TestSmhasherZeros(t *testing.T) {
 	for i := 0; i <= N; i++ {
 		h.addB(b[:i])
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // Strings with up to two nonzero bytes all have distinct hashes.
@@ -180,7 +180,7 @@ func TestSmhasherTwoNonzero(t *testing.T) {
 	for n := 2; n <= 16; n++ {
 		twoNonZero(h, n)
 	}
-	h.check(t)
+	h.checks(t)
 }
 func twoNonZero(h *hashSet, n int) {
 	b := make([]byte, n)
@@ -236,7 +236,7 @@ func TestSmhasherCyclic(t *testing.T) {
 			}
 			h.addB(b)
 		}
-		h.check(t)
+		h.checks(t)
 	}
 }
 
@@ -263,7 +263,7 @@ func sparse(t *testing.T, h *hashSet, n int, k int) {
 	t.Helper()
 	b := make([]byte, n/8)
 	setbits(h, b, 0, k)
-	h.check(t)
+	h.checks(t)
 }
 
 // set up to k bits at index i and greater
@@ -300,7 +300,7 @@ func permutation(t *testing.T, h *hashSet, s []uint32, n int) {
 	t.Helper()
 	b := make([]byte, n*4)
 	genPerm(h, b, s, 0)
-	h.check(t)
+	h.checks(t)
 }
 func genPerm(h *hashSet, b []byte, s []uint32, n int) {
 	h.addB(b[:n])
@@ -444,7 +444,7 @@ func windowed(t *testing.T, k key) {
 			}
 			h.add(k.hash())
 		}
-		h.check(t)
+		h.checks(t)
 	}
 }
 
@@ -481,7 +481,7 @@ func text(t *testing.T, h *hashSet, prefix, suffix string) {
 			}
 		}
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // Make sure different seed values generate different hashes.
@@ -497,5 +497,5 @@ func TestSmhasherSeed(t *testing.T) {
 		h.addS_seed(s, Seed{s: uint64(i + 1)})
 		h.addS_seed(s, Seed{s: uint64(i+1) << 32}) // make sure high bits are used
 	}
-	h.check(t)
+	h.checks(t)
 }

@@ -178,8 +178,8 @@ func walkMethodValue(n *ir.SelectorExpr, init *ir.Nodes) ir.Node {
 		n.X = walkExpr(n.X, nil)
 
 		tab := ir.NewUnaryExpr(base.Pos, ir.OITAB, n.X)
-		check := ir.NewUnaryExpr(base.Pos, ir.OCHECKNIL, tab)
-		init.Append(typecheck.Stmt(check))
+		checks := ir.NewUnaryExpr(base.Pos, ir.OCHECKNIL, tab)
+		init.Append(typecheck.Stmt(checks))
 	}
 
 	typ := typecheck.MethodValueType(n)

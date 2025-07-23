@@ -470,7 +470,7 @@ func TestExitCode(t *testing.T) {
 func TestPipes(t *testing.T) {
 	t.Parallel()
 
-	check := func(what string, err error) {
+	checks := func(what string, err error) {
 		if err != nil {
 			t.Fatalf("%s: %v", what, err)
 		}
@@ -478,11 +478,11 @@ func TestPipes(t *testing.T) {
 	// Cat, testing stdin and stdout.
 	c := helperCommand(t, "pipetest")
 	stdin, err := c.StdinPipe()
-	check("StdinPipe", err)
+	checks("StdinPipe", err)
 	stdout, err := c.StdoutPipe()
-	check("StdoutPipe", err)
+	checks("StdoutPipe", err)
 	stderr, err := c.StderrPipe()
-	check("StderrPipe", err)
+	checks("StderrPipe", err)
 
 	outbr := bufio.NewReader(stdout)
 	errbr := bufio.NewReader(stderr)
@@ -495,29 +495,29 @@ func TestPipes(t *testing.T) {
 	}
 
 	err = c.Start()
-	check("Start", err)
+	checks("Start", err)
 
 	_, err = stdin.Write([]byte("O:I am output\n"))
-	check("first stdin Write", err)
+	checks("first stdin Write", err)
 	if g, e := line("first output line", outbr), "O:I am output"; g != e {
 		t.Errorf("got %q, want %q", g, e)
 	}
 
 	_, err = stdin.Write([]byte("E:I am error\n"))
-	check("second stdin Write", err)
+	checks("second stdin Write", err)
 	if g, e := line("first error line", errbr), "E:I am error"; g != e {
 		t.Errorf("got %q, want %q", g, e)
 	}
 
 	_, err = stdin.Write([]byte("O:I am output2\n"))
-	check("third stdin Write 3", err)
+	checks("third stdin Write 3", err)
 	if g, e := line("second output line", outbr), "O:I am output2"; g != e {
 		t.Errorf("got %q, want %q", g, e)
 	}
 
 	stdin.Close()
 	err = c.Wait()
-	check("Wait", err)
+	checks("Wait", err)
 }
 
 const stdinCloseTestString = "Some test string."
@@ -526,21 +526,21 @@ const stdinCloseTestString = "Some test string."
 func TestStdinClose(t *testing.T) {
 	t.Parallel()
 
-	check := func(what string, err error) {
+	checks := func(what string, err error) {
 		if err != nil {
 			t.Fatalf("%s: %v", what, err)
 		}
 	}
 	cmd := helperCommand(t, "stdinClose")
 	stdin, err := cmd.StdinPipe()
-	check("StdinPipe", err)
+	checks("StdinPipe", err)
 	// Check that we can access methods of the underlying os.File.`
 	if _, ok := stdin.(interface {
 		Fd() uintptr
 	}); !ok {
 		t.Error("can't access methods of underlying *os.File")
 	}
-	check("Start", cmd.Start())
+	checks("Start", cmd.Start())
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -549,7 +549,7 @@ func TestStdinClose(t *testing.T) {
 		defer wg.Done()
 
 		_, err := io.Copy(stdin, strings.NewReader(stdinCloseTestString))
-		check("Copy", err)
+		checks("Copy", err)
 
 		// Before the fix, this next line would race with cmd.Wait.
 		if err := stdin.Close(); err != nil && !errors.Is(err, os.ErrClosed) {
@@ -557,7 +557,7 @@ func TestStdinClose(t *testing.T) {
 		}
 	}()
 
-	check("Wait", cmd.Wait())
+	checks("Wait", cmd.Wait())
 }
 
 // Issue 17647.

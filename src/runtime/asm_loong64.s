@@ -52,7 +52,7 @@ nocgo:
 	// save m0 to g0->m
 	MOVV	R19, g_m(g)
 
-	JAL	runtime·check(SB)
+	JAL	runtime·checks(SB)
 
 	// args are already prepared
 	JAL	runtime·args(SB)

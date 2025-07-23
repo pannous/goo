@@ -15,7 +15,7 @@ type subOnly struct{ SubFS }
 func (subOnly) Open(name string) (File, error) { return nil, ErrNotExist }
 
 func TestSub(t *testing.T) {
-	check := func(desc string, sub FS, err error) {
+	checks := func(desc string, sub FS, err error) {
 		t.Helper()
 		if err != nil {
 			t.Errorf("Sub(sub): %v", err)
@@ -38,11 +38,11 @@ func TestSub(t *testing.T) {
 
 	// Test that Sub uses the method when present.
 	sub, err := Sub(subOnly{testFsys}, "sub")
-	check("subOnly", sub, err)
+	checks("subOnly", sub, err)
 
 	// Test that Sub uses Open when the method is not present.
 	sub, err = Sub(openOnly{testFsys}, "sub")
-	check("openOnly", sub, err)
+	checks("openOnly", sub, err)
 
 	_, err = sub.Open("nonexist")
 	if err == nil {

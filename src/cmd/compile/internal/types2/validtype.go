@@ -10,8 +10,8 @@ import "cmd/compile/internal/syntax"
 // producing a cycle in the type graph.
 // (Cycles involving alias types, as in "type A = [10]A" are detected
 // earlier, via the objDecl cycle detection mechanism.)
-func (check *Checker) validType(typ *Named) {
-	check.validType0(nopos, typ, nil, nil)
+func (checks *Checker) validType(typ *Named) {
+	checks.validType0(nopos, typ, nil, nil)
 }
 
 // validType0 checks if the given type is valid. If typ is a type parameter
@@ -24,17 +24,17 @@ func (check *Checker) validType(typ *Named) {
 // of) F in S, leading to the nest S->F. If a type appears in its own nest
 // (say S->F->S) we have an invalid recursive type. The path list is the full
 // path of named types in a cycle, it is only needed for error reporting.
-func (check *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) bool {
+func (checks *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) bool {
 	typ = Unalias(typ)
 
-	if check.conf.Trace {
+	if checks.conf.Trace {
 		if t, _ := typ.(*Named); t != nil && t.obj != nil /* obj should always exist but be conservative */ {
 			pos = t.obj.pos
 		}
-		check.indent++
-		check.trace(pos, "validType(%s) nest %v, path %v", typ, pathString(makeObjList(nest)), pathString(makeObjList(path)))
+		checks.indent++
+		checks.trace(pos, "validType(%s) nest %v, path %v", typ, pathString(makeObjList(nest)), pathString(makeObjList(path)))
 		defer func() {
-			check.indent--
+			checks.indent--
 		}()
 	}
 
@@ -47,25 +47,25 @@ func (check *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) 
 		}
 
 	case *Array:
-		return check.validType0(pos, t.elem, nest, path)
+		return checks.validType0(pos, t.elem, nest, path)
 
 	case *Struct:
 		for _, f := range t.fields {
-			if !check.validType0(pos, f.typ, nest, path) {
+			if !checks.validType0(pos, f.typ, nest, path) {
 				return false
 			}
 		}
 
 	case *Union:
 		for _, t := range t.terms {
-			if !check.validType0(pos, t.typ, nest, path) {
+			if !checks.validType0(pos, t.typ, nest, path) {
 				return false
 			}
 		}
 
 	case *Interface:
 		for _, etyp := range t.embeddeds {
-			if !check.validType0(pos, etyp, nest, path) {
+			if !checks.validType0(pos, etyp, nest, path) {
 				return false
 			}
 		}
@@ -123,8 +123,8 @@ func (check *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) 
 				// Therefore it is safe to change their underlying types; there is
 				// no chance for a race condition (the types of the current package
 				// are not yet available to other goroutines).
-				assert(t.obj.pkg == check.pkg)
-				assert(t.Origin().obj.pkg == check.pkg)
+				assert(t.obj.pkg == checks.pkg)
+				assert(t.Origin().obj.pkg == checks.pkg)
 				t.underlying = Typ[Invalid]
 				t.Origin().underlying = Typ[Invalid]
 
@@ -135,7 +135,7 @@ func (check *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) 
 				// index of t in nest. Search again.
 				for start, p := range path {
 					if Identical(p, t) {
-						check.cycleError(makeObjList(path[start:]), 0)
+						checks.cycleError(makeObjList(path[start:]), 0)
 						return false
 					}
 				}
@@ -147,7 +147,7 @@ func (check *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) 
 		// Every type added to nest is also added to path; thus every type that is in nest
 		// must also be in path (invariant). But not every type in path is in nest, since
 		// nest may be pruned (see below, *TypeParam case).
-		if !check.validType0(pos, t.Origin().fromRHS, append(nest, t), append(path, t)) {
+		if !checks.validType0(pos, t.Origin().fromRHS, append(nest, t), append(path, t)) {
 			return false
 		}
 
@@ -173,7 +173,7 @@ func (check *Checker) validType0(pos syntax.Pos, typ Type, nest, path []*Named) 
 					// the current (instantiated) type (see the example
 					// at the end of this file).
 					// For error reporting we keep the full path.
-					res := check.validType0(pos, targ, nest[:d], path)
+					res := checks.validType0(pos, targ, nest[:d], path)
 					// The check.validType0 call with nest[:d] may have
 					// overwritten the entry at the current depth d.
 					// Restore the entry (was issue go.dev/issue/66323).

@@ -13,10 +13,10 @@ TEXT runtime·memmove(SB), NOSPLIT|NOFRAME, $0-24
 	MOVV	to+0(FP), R1
 	MOVV	from+8(FP), R2
 	MOVV	n+16(FP), R3
-	BNE	R3, check
+	BNE	R3, checks
 	RET
 
-check:
+checks:
 	SGTU	R1, R2, R4
 	BNE	R4, backward
 

@@ -37,22 +37,22 @@ var valNotInHeap = notInHeap{i: val}
 
 func main() {
 	i := val
-	check(i)
+	checks(i)
 	mi := myInt{f: &valNotInHeap}
-	check(mi.Get())
+	checks(mi.Get())
 	ifv := iface(mi)
-	check(ifv.Get())
+	checks(ifv.Get())
 	ifv = iface(&mi)
-	check(ifv.Get())
+	checks(ifv.Get())
 	em := embed{&mi}
-	check(em.Get())
+	checks(em.Get())
 	ifv = em
-	check(ifv.Get())
+	checks(ifv.Get())
 	ifv = &em
-	check(ifv.Get())
+	checks(ifv.Get())
 }
 
-func check(v int) {
+func checks(v int) {
 	if v != val {
 		panic(v)
 	}

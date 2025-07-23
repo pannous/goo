@@ -25060,14 +25060,14 @@ func rewriteValueAMD64_OpCondSelect(v *Value) bool {
 		t := v.Type
 		x := v_0
 		y := v_1
-		check := v_2
-		if !(!check.Type.IsFlags() && check.Type.Size() == 1) {
+		checks := v_2
+		if !(!checks.Type.IsFlags() && checks.Type.Size() == 1) {
 			break
 		}
 		v.reset(OpCondSelect)
 		v.Type = t
 		v0 := b.NewValue0(v.Pos, OpAMD64MOVBQZX, typ.UInt64)
-		v0.AddArg(check)
+		v0.AddArg(checks)
 		v.AddArg3(x, y, v0)
 		return true
 	}
@@ -25078,14 +25078,14 @@ func rewriteValueAMD64_OpCondSelect(v *Value) bool {
 		t := v.Type
 		x := v_0
 		y := v_1
-		check := v_2
-		if !(!check.Type.IsFlags() && check.Type.Size() == 2) {
+		checks := v_2
+		if !(!checks.Type.IsFlags() && checks.Type.Size() == 2) {
 			break
 		}
 		v.reset(OpCondSelect)
 		v.Type = t
 		v0 := b.NewValue0(v.Pos, OpAMD64MOVWQZX, typ.UInt64)
-		v0.AddArg(check)
+		v0.AddArg(checks)
 		v.AddArg3(x, y, v0)
 		return true
 	}
@@ -25096,14 +25096,14 @@ func rewriteValueAMD64_OpCondSelect(v *Value) bool {
 		t := v.Type
 		x := v_0
 		y := v_1
-		check := v_2
-		if !(!check.Type.IsFlags() && check.Type.Size() == 4) {
+		checks := v_2
+		if !(!checks.Type.IsFlags() && checks.Type.Size() == 4) {
 			break
 		}
 		v.reset(OpCondSelect)
 		v.Type = t
 		v0 := b.NewValue0(v.Pos, OpAMD64MOVLQZX, typ.UInt64)
-		v0.AddArg(check)
+		v0.AddArg(checks)
 		v.AddArg3(x, y, v0)
 		return true
 	}
@@ -25114,14 +25114,14 @@ func rewriteValueAMD64_OpCondSelect(v *Value) bool {
 		t := v.Type
 		x := v_0
 		y := v_1
-		check := v_2
-		if !(!check.Type.IsFlags() && check.Type.Size() == 8 && (is64BitInt(t) || isPtr(t))) {
+		checks := v_2
+		if !(!checks.Type.IsFlags() && checks.Type.Size() == 8 && (is64BitInt(t) || isPtr(t))) {
 			break
 		}
 		v.reset(OpAMD64CMOVQNE)
 		v0 := b.NewValue0(v.Pos, OpAMD64CMPQconst, types.TypeFlags)
 		v0.AuxInt = int32ToAuxInt(0)
-		v0.AddArg(check)
+		v0.AddArg(checks)
 		v.AddArg3(y, x, v0)
 		return true
 	}
@@ -25132,14 +25132,14 @@ func rewriteValueAMD64_OpCondSelect(v *Value) bool {
 		t := v.Type
 		x := v_0
 		y := v_1
-		check := v_2
-		if !(!check.Type.IsFlags() && check.Type.Size() == 8 && is32BitInt(t)) {
+		checks := v_2
+		if !(!checks.Type.IsFlags() && checks.Type.Size() == 8 && is32BitInt(t)) {
 			break
 		}
 		v.reset(OpAMD64CMOVLNE)
 		v0 := b.NewValue0(v.Pos, OpAMD64CMPQconst, types.TypeFlags)
 		v0.AuxInt = int32ToAuxInt(0)
-		v0.AddArg(check)
+		v0.AddArg(checks)
 		v.AddArg3(y, x, v0)
 		return true
 	}
@@ -25150,14 +25150,14 @@ func rewriteValueAMD64_OpCondSelect(v *Value) bool {
 		t := v.Type
 		x := v_0
 		y := v_1
-		check := v_2
-		if !(!check.Type.IsFlags() && check.Type.Size() == 8 && is16BitInt(t)) {
+		checks := v_2
+		if !(!checks.Type.IsFlags() && checks.Type.Size() == 8 && is16BitInt(t)) {
 			break
 		}
 		v.reset(OpAMD64CMOVWNE)
 		v0 := b.NewValue0(v.Pos, OpAMD64CMPQconst, types.TypeFlags)
 		v0.AuxInt = int32ToAuxInt(0)
-		v0.AddArg(check)
+		v0.AddArg(checks)
 		v.AddArg3(y, x, v0)
 		return true
 	}

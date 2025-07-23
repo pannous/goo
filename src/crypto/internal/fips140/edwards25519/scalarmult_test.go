@@ -70,13 +70,13 @@ func TestScalarMultDistributesOverAdd(t *testing.T) {
 	scalarMultDistributesOverAdd := func(x, y Scalar) bool {
 		var z Scalar
 		z.Add(&x, &y)
-		var p, q, r, check Point
+		var p, q, r, checks Point
 		p.ScalarMult(&x, B)
 		q.ScalarMult(&y, B)
 		r.ScalarMult(&z, B)
-		check.Add(&p, &q)
-		checkOnCurve(t, &p, &q, &r, &check)
-		return check.Equal(&r) == 1
+		checks.Add(&p, &q)
+		checkOnCurve(t, &p, &q, &r, &checks)
+		return checks.Equal(&r) == 1
 	}
 
 	if err := quick.Check(scalarMultDistributesOverAdd, quickCheckConfig(32)); err != nil {
@@ -161,16 +161,16 @@ func TestBasepointNafTableGeneration(t *testing.T) {
 
 func TestVarTimeDoubleBaseMultMatchesBaseMult(t *testing.T) {
 	varTimeDoubleBaseMultMatchesBaseMult := func(x, y Scalar) bool {
-		var p, q1, q2, check Point
+		var p, q1, q2, checks Point
 
 		p.VarTimeDoubleScalarBaseMult(&x, B, &y)
 
 		q1.ScalarBaseMult(&x)
 		q2.ScalarBaseMult(&y)
-		check.Add(&q1, &q2)
+		checks.Add(&q1, &q2)
 
-		checkOnCurve(t, &p, &check, &q1, &q2)
-		return p.Equal(&check) == 1
+		checkOnCurve(t, &p, &checks, &q1, &q2)
+		return p.Equal(&checks) == 1
 	}
 
 	if err := quick.Check(varTimeDoubleBaseMultMatchesBaseMult, quickCheckConfig(32)); err != nil {

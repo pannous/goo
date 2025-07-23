@@ -303,7 +303,7 @@ func writeFile(name string, data []byte) {
 // check panics if err is not nil. Otherwise it returns x.
 // It is only meant to be used in a function that has deferred
 // a function to recover appropriately from the panic.
-func check[T any](x T, err error) T {
+func checks[T any](x T, err error) T {
 	check1(err)
 	return x
 }
@@ -335,7 +335,7 @@ func writeTgz(name string, a *Archive) {
 		}
 	}()
 
-	zw := check(gzip.NewWriterLevel(out, gzip.BestCompression))
+	zw := checks(gzip.NewWriterLevel(out, gzip.BestCompression))
 	tw := tar.NewWriter(zw)
 
 	// Find the mode and mtime to use for directory entries,
@@ -368,7 +368,7 @@ func writeTgz(name string, a *Archive) {
 			Time: mtime,
 			Mode: dirMode,
 		}
-		h := check(tar.FileInfoHeader(df.Info(), ""))
+		h := checks(tar.FileInfoHeader(df.Info(), ""))
 		h.Name = dir + "/"
 		if err := tw.WriteHeader(h); err != nil {
 			panic(err)
@@ -376,14 +376,14 @@ func writeTgz(name string, a *Archive) {
 	}
 
 	for _, f = range a.Files {
-		h := check(tar.FileInfoHeader(f.Info(), ""))
+		h := checks(tar.FileInfoHeader(f.Info(), ""))
 		mkdirAll(path.Dir(f.Name))
 		h.Name = f.Name
 		if err := tw.WriteHeader(h); err != nil {
 			panic(err)
 		}
-		r := check(os.Open(f.Src))
-		check(io.Copy(tw, r))
+		r := checks(os.Open(f.Src))
+		checks(io.Copy(tw, r))
 		check1(r.Close())
 	}
 	f.Name = ""
@@ -416,12 +416,12 @@ func writeZip(name string, a *Archive) {
 		return flate.NewWriter(out, flate.BestCompression)
 	})
 	for _, f = range a.Files {
-		h := check(zip.FileInfoHeader(f.Info()))
+		h := checks(zip.FileInfoHeader(f.Info()))
 		h.Name = f.Name
 		h.Method = zip.Deflate
-		w := check(zw.CreateHeader(h))
-		r := check(os.Open(f.Src))
-		check(io.Copy(w, r))
+		w := checks(zw.CreateHeader(h))
+		r := checks(os.Open(f.Src))
+		checks(io.Copy(w, r))
 		check1(r.Close())
 	}
 	f.Name = ""

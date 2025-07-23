@@ -254,7 +254,7 @@
 
 // Lowering shifts
 
-// Lower bounded shifts first. No need to check shift value.
+// Lower bounded shifts first. No need to checks shift value.
 (Lsh64x(64|32|16|8)  x y) && shiftIsBounded(v) => (SLD x y)
 (Lsh32x(64|32|16|8)  x y) && shiftIsBounded(v) => (SLW x y)
 (Lsh16x(64|32|16|8)  x y) && shiftIsBounded(v) => (SLW x y)
@@ -746,7 +746,7 @@
 //   ^^^^^^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //          rotate                          mask
 //
-// To perform this optimization we therefore just need to check that it
+// To perform this optimization we therefore just need to checks that it
 // is valid to merge the shift mask (^(uint64(0)<<c)) into the selected
 // bits mask (i.e. that the resultant mask is non-zero and contiguous).
 //

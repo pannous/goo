@@ -28,7 +28,7 @@ var i Inter
 
 var ok = true
 
-func check(s string, v int64) {
+func checks(s string, v int64) {
 	if v != Value {
 		println(s, v)
 		ok = false
@@ -36,23 +36,23 @@ func check(s string, v int64) {
 }
 
 func main() {
-	check("t.M()", t.M())
-	check("pt.M()", pt.M())
-	check("ti.M()", ti.M())
-	check("s.M()", s.M())
-	check("ps.M()", ps.M())
+	checks("t.M()", t.M())
+	checks("pt.M()", pt.M())
+	checks("ti.M()", ti.M())
+	checks("s.M()", s.M())
+	checks("ps.M()", ps.M())
 
 	i = t
-	check("i = t; i.M()", i.M())
+	checks("i = t; i.M()", i.M())
 
 	i = pt
-	check("i = pt; i.M()", i.M())
+	checks("i = pt; i.M()", i.M())
 
 	i = s
-	check("i = s; i.M()", i.M())
+	checks("i = s; i.M()", i.M())
 
 	i = ps
-	check("i = ps; i.M()", i.M())
+	checks("i = ps; i.M()", i.M())
 
 	if !ok {
 		println("BUG: interface10")

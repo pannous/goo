@@ -22,12 +22,12 @@ func checker(t *testing.T) func(string, error) {
 }
 
 func TestFileTransport(t *testing.T) {
-	check := checker(t)
+	checks := checker(t)
 
 	dname := t.TempDir()
 	fname := filepath.Join(dname, "foo.txt")
 	err := os.WriteFile(fname, []byte("Bar"), 0644)
-	check("WriteFile", err)
+	checks("WriteFile", err)
 	defer os.Remove(fname)
 
 	tr := &Transport{}
@@ -37,7 +37,7 @@ func TestFileTransport(t *testing.T) {
 	fooURLs := []string{"file:///foo.txt", "file://../foo.txt"}
 	for _, urlstr := range fooURLs {
 		res, err := c.Get(urlstr)
-		check("Get "+urlstr, err)
+		checks("Get "+urlstr, err)
 		if res.StatusCode != 200 {
 			t.Errorf("for %s, StatusCode = %d, want 200", urlstr, res.StatusCode)
 		}
@@ -49,7 +49,7 @@ func TestFileTransport(t *testing.T) {
 		}
 		slurp, err := io.ReadAll(res.Body)
 		res.Body.Close()
-		check("ReadAll "+urlstr, err)
+		checks("ReadAll "+urlstr, err)
 		if string(slurp) != "Bar" {
 			t.Errorf("for %s, got content %q, want %q", urlstr, string(slurp), "Bar")
 		}
@@ -57,7 +57,7 @@ func TestFileTransport(t *testing.T) {
 
 	const badURL = "file://../no-exist.txt"
 	res, err := c.Get(badURL)
-	check("Get "+badURL, err)
+	checks("Get "+badURL, err)
 	if res.StatusCode != 404 {
 		t.Errorf("for %s, StatusCode = %d, want 404", badURL, res.StatusCode)
 	}
@@ -65,7 +65,7 @@ func TestFileTransport(t *testing.T) {
 }
 
 func TestFileTransportFS(t *testing.T) {
-	check := checker(t)
+	checks := checker(t)
 
 	fsys := fstest.MapFS{
 		"index.html": {Data: []byte("index.html says hello")},
@@ -78,7 +78,7 @@ func TestFileTransportFS(t *testing.T) {
 	for fname, mfile := range fsys {
 		urlstr := "file:///" + fname
 		res, err := c.Get(urlstr)
-		check("Get "+urlstr, err)
+		checks("Get "+urlstr, err)
 		if res.StatusCode != 200 {
 			t.Errorf("for %s, StatusCode = %d, want 200", urlstr, res.StatusCode)
 		}
@@ -90,7 +90,7 @@ func TestFileTransportFS(t *testing.T) {
 		}
 		slurp, err := io.ReadAll(res.Body)
 		res.Body.Close()
-		check("ReadAll "+urlstr, err)
+		checks("ReadAll "+urlstr, err)
 		if string(slurp) != string(mfile.Data) {
 			t.Errorf("for %s, got content %q, want %q", urlstr, string(slurp), "Bar")
 		}
@@ -98,7 +98,7 @@ func TestFileTransportFS(t *testing.T) {
 
 	const badURL = "file://../no-exist.txt"
 	res, err := c.Get(badURL)
-	check("Get "+badURL, err)
+	checks("Get "+badURL, err)
 	if res.StatusCode != 404 {
 		t.Errorf("for %s, StatusCode = %d, want 404", badURL, res.StatusCode)
 	}

@@ -299,13 +299,13 @@ func makeOnePass(p *onePassProg) *onePassProg {
 	var (
 		instQueue    = newQueue(len(p.Inst))
 		visitQueue   = newQueue(len(p.Inst))
-		check        func(uint32, []bool) bool
+		checks        func(uint32, []bool) bool
 		onePassRunes = make([][]rune, len(p.Inst))
 	)
 
 	// check that paths from Alt instructions are unambiguous, and rebuild the new
 	// program as a onepass program
-	check = func(pc uint32, m []bool) (ok bool) {
+	checks = func(pc uint32, m []bool) (ok bool) {
 		ok = true
 		inst := &p.Inst[pc]
 		if visitQueue.contains(pc) {
@@ -314,7 +314,7 @@ func makeOnePass(p *onePassProg) *onePassProg {
 		visitQueue.insert(pc)
 		switch inst.Op {
 		case syntax.InstAlt, syntax.InstAltMatch:
-			ok = check(inst.Out, m) && check(inst.Arg, m)
+			ok = checks(inst.Out, m) && checks(inst.Arg, m)
 			// check no-input paths to InstMatch
 			matchOut := m[inst.Out]
 			matchArg := m[inst.Arg]
@@ -340,7 +340,7 @@ func makeOnePass(p *onePassProg) *onePassProg {
 				break
 			}
 		case syntax.InstCapture, syntax.InstNop:
-			ok = check(inst.Out, m)
+			ok = checks(inst.Out, m)
 			m[pc] = m[inst.Out]
 			// pass matching runes back through these no-ops.
 			onePassRunes[pc] = append([]rune{}, onePassRunes[inst.Out]...)
@@ -349,7 +349,7 @@ func makeOnePass(p *onePassProg) *onePassProg {
 				inst.Next[i] = inst.Out
 			}
 		case syntax.InstEmptyWidth:
-			ok = check(inst.Out, m)
+			ok = checks(inst.Out, m)
 			m[pc] = m[inst.Out]
 			onePassRunes[pc] = append([]rune{}, onePassRunes[inst.Out]...)
 			inst.Next = make([]uint32, len(onePassRunes[pc])/2+1)
@@ -439,7 +439,7 @@ func makeOnePass(p *onePassProg) *onePassProg {
 	for !instQueue.empty() {
 		visitQueue.clear()
 		pc := instQueue.next()
-		if !check(pc, m) {
+		if !checks(pc, m) {
 			p = nil
 			break
 		}

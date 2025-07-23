@@ -433,19 +433,19 @@
     => (CMOVW(EQ|NE|LT|GT|LE|GE|HI|CS|CC|LS|EQF|NEF|GTF|GEF) y x cond)
 
 // If the condition does not set the flags, we need to generate a comparison.
-(CondSelect <t> x y check) && !check.Type.IsFlags() && check.Type.Size() == 1
-    => (CondSelect <t> x y (MOVBQZX <typ.UInt64> check))
-(CondSelect <t> x y check) && !check.Type.IsFlags() && check.Type.Size() == 2
-    => (CondSelect <t> x y (MOVWQZX <typ.UInt64> check))
-(CondSelect <t> x y check) && !check.Type.IsFlags() && check.Type.Size() == 4
-    => (CondSelect <t> x y (MOVLQZX <typ.UInt64> check))
+(CondSelect <t> x y checks) && !checks.Type.IsFlags() && checks.Type.Size() == 1
+    => (CondSelect <t> x y (MOVBQZX <typ.UInt64> checks))
+(CondSelect <t> x y checks) && !checks.Type.IsFlags() && checks.Type.Size() == 2
+    => (CondSelect <t> x y (MOVWQZX <typ.UInt64> checks))
+(CondSelect <t> x y checks) && !checks.Type.IsFlags() && checks.Type.Size() == 4
+    => (CondSelect <t> x y (MOVLQZX <typ.UInt64> checks))
 
-(CondSelect <t> x y check) && !check.Type.IsFlags() && check.Type.Size() == 8 && (is64BitInt(t) || isPtr(t))
-    => (CMOVQNE y x (CMPQconst [0] check))
-(CondSelect <t> x y check) && !check.Type.IsFlags() && check.Type.Size() == 8 && is32BitInt(t)
-    => (CMOVLNE y x (CMPQconst [0] check))
-(CondSelect <t> x y check) && !check.Type.IsFlags() && check.Type.Size() == 8 && is16BitInt(t)
-    => (CMOVWNE y x (CMPQconst [0] check))
+(CondSelect <t> x y checks) && !checks.Type.IsFlags() && checks.Type.Size() == 8 && (is64BitInt(t) || isPtr(t))
+    => (CMOVQNE y x (CMPQconst [0] checks))
+(CondSelect <t> x y checks) && !checks.Type.IsFlags() && checks.Type.Size() == 8 && is32BitInt(t)
+    => (CMOVLNE y x (CMPQconst [0] checks))
+(CondSelect <t> x y checks) && !checks.Type.IsFlags() && checks.Type.Size() == 8 && is16BitInt(t)
+    => (CMOVWNE y x (CMPQconst [0] checks))
 
 // Absorb InvertFlags
 (CMOVQ(EQ|NE|LT|GT|LE|GE|HI|CS|CC|LS) x y (InvertFlags cond))
@@ -617,7 +617,7 @@
 // Recognize bit tests: a&(1<<b) != 0 for b suitably bounded
 // Note that BTx instructions use the carry bit, so we need to convert tests for zero flag
 // into tests for carry flags.
-// ULT and SETB check the carry flag; they are identical to CS and SETCS. Same, mutatis
+// ULT and SETB checks the carry flag; they are identical to CS and SETCS. Same, mutatis
 // mutandis, for UGE and SETAE, and CC and SETCC.
 ((NE|EQ) (TESTL (SHLL (MOVLconst [1]) x) y)) => ((ULT|UGE) (BTL x y))
 ((NE|EQ) (TESTQ (SHLQ (MOVQconst [1]) x) y)) => ((ULT|UGE) (BTQ x y))
@@ -1640,7 +1640,7 @@
 (AND(Q|L) x (NEG(Q|L) x))               && buildcfg.GOAMD64 >= 3 => (BLSI(Q|L) x)
 (XOR(Q|L) x (ADD(Q|L)const [-1] x))     && buildcfg.GOAMD64 >= 3 => (BLSMSK(Q|L) x)
 (AND(Q|L) <t> x (ADD(Q|L)const [-1] x)) && buildcfg.GOAMD64 >= 3 => (Select0 <t> (BLSR(Q|L) x))
-// eliminate TEST instruction in classical "isPowerOfTwo" check
+// eliminate TEST instruction in classical "isPowerOfTwo" checks
 (SETEQ       (TEST(Q|L) s:(Select0 blsr:(BLSR(Q|L) _)) s))        => (SETEQ       (Select1 <types.TypeFlags> blsr))
 (CMOVQEQ x y (TEST(Q|L) s:(Select0 blsr:(BLSR(Q|L) _)) s))        => (CMOVQEQ x y (Select1 <types.TypeFlags> blsr))
 (CMOVLEQ x y (TEST(Q|L) s:(Select0 blsr:(BLSR(Q|L) _)) s))        => (CMOVLEQ x y (Select1 <types.TypeFlags> blsr))

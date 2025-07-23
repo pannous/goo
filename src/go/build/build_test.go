@@ -811,7 +811,7 @@ func TestDirectives(t *testing.T) {
 		t.Fatalf("could not import testdata: %v", err)
 	}
 
-	check := func(name string, list []Directive, want string) {
+	checks := func(name string, list []Directive, want string) {
 		if runtime.GOOS == "windows" {
 			want = strings.ReplaceAll(want, "testdata/directives/", `testdata\\directives\\`)
 		}
@@ -821,10 +821,10 @@ func TestDirectives(t *testing.T) {
 			t.Errorf("%s = %s, want %s", name, s, want)
 		}
 	}
-	check("Directives", p.Directives,
+	checks("Directives", p.Directives,
 		`[{"//go:main1" "testdata/directives/a.go:1:1"} {"//go:plant" "testdata/directives/eve.go:1:1"}]`)
-	check("TestDirectives", p.TestDirectives,
+	checks("TestDirectives", p.TestDirectives,
 		`[{"//go:test1" "testdata/directives/a_test.go:1:1"} {"//go:test2" "testdata/directives/b_test.go:1:1"}]`)
-	check("XTestDirectives", p.XTestDirectives,
+	checks("XTestDirectives", p.XTestDirectives,
 		`[{"//go:xtest1" "testdata/directives/c_test.go:1:1"} {"//go:xtest2" "testdata/directives/d_test.go:1:1"} {"//go:xtest3" "testdata/directives/d_test.go:2:1"}]`)
 }

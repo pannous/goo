@@ -16,17 +16,17 @@ type ET struct{}
 func (*ET) Error() string { return "err" }
 
 func main() {
-	check("false", fmt.Sprintf("(*ET)(nil) == error(nil): %v", (*ET)(nil) == error(nil)))
-	check("true", fmt.Sprintf("(*ET)(nil) != error(nil): %v", (*ET)(nil) != error(nil)))
+	checks("false", fmt.Sprintf("(*ET)(nil) == error(nil): %v", (*ET)(nil) == error(nil)))
+	checks("true", fmt.Sprintf("(*ET)(nil) != error(nil): %v", (*ET)(nil) != error(nil)))
 
 	nilET := (*ET)(nil)
 	nilError := error(nil)
 
-	check("false", fmt.Sprintf("nilET == nilError: %v", nilET == nilError))
-	check("true", fmt.Sprintf("nilET != nilError: %v", nilET != nilError))
+	checks("false", fmt.Sprintf("nilET == nilError: %v", nilET == nilError))
+	checks("true", fmt.Sprintf("nilET != nilError: %v", nilET != nilError))
 }
 
-func check(want, gotfull string) {
+func checks(want, gotfull string) {
 	got := gotfull[strings.Index(gotfull, ": ")+len(": "):]
 	if got != want {
 		panic("want " + want + " got " + got + " from " + gotfull)

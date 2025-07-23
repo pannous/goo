@@ -140,7 +140,7 @@ func testAtomic64() {
 	}
 }
 
-func check() {
+func checks() {
 	var (
 		a     int8
 		b     uint8

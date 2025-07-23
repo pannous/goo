@@ -71,7 +71,7 @@ type globOnly struct{ GlobFS }
 func (globOnly) Open(name string) (File, error) { return nil, ErrNotExist }
 
 func TestGlobMethod(t *testing.T) {
-	check := func(desc string, names []string, err error) {
+	checks := func(desc string, names []string, err error) {
 		t.Helper()
 		if err != nil || len(names) != 1 || names[0] != "hello.txt" {
 			t.Errorf("Glob(%s) = %v, %v, want %v, nil", desc, names, err, []string{"hello.txt"})
@@ -80,9 +80,9 @@ func TestGlobMethod(t *testing.T) {
 
 	// Test that ReadDir uses the method when present.
 	names, err := Glob(globOnly{testFsys}, "*.txt")
-	check("readDirOnly", names, err)
+	checks("readDirOnly", names, err)
 
 	// Test that ReadDir uses Open when the method is not present.
 	names, err = Glob(openOnly{testFsys}, "*.txt")
-	check("openOnly", names, err)
+	checks("openOnly", names, err)
 }

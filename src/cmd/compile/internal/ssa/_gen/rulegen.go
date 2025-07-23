@@ -885,11 +885,11 @@ func genBlockRewrite(rule Rule, arch arch, data blockData) *RuleRewrite {
 			rr.add(declf(rr.Loc, vname, cname))
 			p, op := genMatch0(rr, arch, expr, vname, nil, false) // TODO: pass non-nil cnt?
 			if op != "" {
-				check := fmt.Sprintf("%s.Op == %s", cname, op)
+				checks := fmt.Sprintf("%s.Op == %s", cname, op)
 				if rr.Check == "" {
-					rr.Check = check
+					rr.Check = checks
 				} else {
-					rr.Check += " && " + check
+					rr.Check += " && " + checks
 				}
 			}
 			if p == "" {

@@ -175,7 +175,7 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			n.SetTypecheck(0) // re-typechecking new op is OK, not a loop
 			return typecheck(n, top)
 
-		case ir.OCAP, ir.OCLEAR, ir.OCLOSE, ir.OIMAG, ir.OLEN, ir.OPANIC, ir.OREAL, ir.OTYPEOF, ir.OUNSAFESTRINGDATA, ir.OUNSAFESLICEDATA:
+		case ir.OASSERT, ir.OCAP, ir.OCLEAR, ir.OCLOSE, ir.OIMAG, ir.OLEN, ir.OPANIC, ir.OREAL, ir.OTYPEOF, ir.OUNSAFESTRINGDATA, ir.OUNSAFESLICEDATA:
 			typecheckargs(n)
 			fallthrough
 		case ir.ONEW:
@@ -699,6 +699,19 @@ func tcPanic(n *ir.UnaryExpr) ir.Node {
 	if n.X.Type() == nil {
 		n.SetType(nil)
 		return n
+	}
+	return n
+}
+
+// tcAssert typechecks an OASSERT node.
+func tcAssert(n *ir.UnaryExpr) ir.Node {
+	n.X = Expr(n.X)
+	if n.X.Type() == nil {
+		n.SetType(nil)
+		return n
+	}
+	if !n.X.Type().IsBoolean() {
+		base.Errorf("argument to assert must be boolean, not %v", n.X.Type())
 	}
 	return n
 }

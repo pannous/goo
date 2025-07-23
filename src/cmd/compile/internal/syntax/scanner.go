@@ -387,7 +387,7 @@ func (s *scanner) ident() {
 	lit := s.segment()
 	if len(lit) >= 2 {
 		if tok := keywordMap[hash(lit)]; tok != 0 && tokStrFast(tok) == string(lit) {
-			s.nlsemi = contains(1<<_Break|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
+			s.nlsemi = contains(1<<_Break|1<<_Check|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
 			s.tok = tok
 			return
 		}

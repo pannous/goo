@@ -29,7 +29,7 @@ func TestValueSeq(t *testing.T) {
 	tests := []struct {
 		name  string
 		val   Value
-		check func(*testing.T, iter.Seq[Value])
+		checks func(*testing.T, iter.Seq[Value])
 	}{
 		{"int", ValueOf(4), func(t *testing.T, s iter.Seq[Value]) {
 			i := int64(0)
@@ -206,7 +206,7 @@ func TestValueSeq(t *testing.T) {
 	}
 	for _, tc := range tests {
 		seq := tc.val.Seq()
-		tc.check(t, seq)
+		tc.checks(t, seq)
 	}
 }
 
@@ -220,7 +220,7 @@ func TestValueSeq2(t *testing.T) {
 	tests := []struct {
 		name  string
 		val   Value
-		check func(*testing.T, iter.Seq2[Value, Value])
+		checks func(*testing.T, iter.Seq2[Value, Value])
 	}{
 		{"*[4]int", ValueOf(&[4]int{1, 2, 3, 4}), func(t *testing.T, s iter.Seq2[Value, Value]) {
 			i := int64(0)
@@ -377,7 +377,7 @@ func TestValueSeq2(t *testing.T) {
 	}
 	for _, tc := range tests {
 		seq := tc.val.Seq2()
-		tc.check(t, seq)
+		tc.checks(t, seq)
 	}
 }
 

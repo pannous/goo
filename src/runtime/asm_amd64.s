@@ -338,7 +338,7 @@ ok:
 	JNE	bad_cpu
 #endif
 
-	CALL	runtime·check(SB)
+	CALL	runtime·checks(SB)
 
 	MOVL	24(SP), AX		// copy argc
 	MOVL	AX, 0(SP)

@@ -18,7 +18,7 @@ import (
 //
 // This can't be changed after the program has started.
 func Enabled() bool {
-	if fips140.Enabled && !check.Verified {
+	if fips140.Enabled && !checks.Verified {
 		panic("crypto/fips140: FIPS 140-3 mode enabled, but integrity check didn't pass")
 	}
 	return fips140.Enabled

@@ -95,7 +95,7 @@ var formatDurationTestdata = []struct {
 
 func TestFormatDuration(t *testing.T) {
 	var gotBuf []byte
-	check := func(td time.Duration, s string, base uint64) {
+	checks := func(td time.Duration, s string, base uint64) {
 		a := durationArshaler{td, base}
 		gotBuf, _ = a.appendMarshal(gotBuf[:0])
 		if string(gotBuf) != s {
@@ -109,11 +109,11 @@ func TestFormatDuration(t *testing.T) {
 		}
 	}
 	for _, tt := range formatDurationTestdata {
-		check(tt.td, tt.base10Sec, 1e9)
-		check(tt.td, tt.base10Milli, 1e6)
-		check(tt.td, tt.base10Micro, 1e3)
-		check(tt.td, tt.base10Nano, 1e0)
-		check(tt.td, tt.iso8601, 8601)
+		checks(tt.td, tt.base10Sec, 1e9)
+		checks(tt.td, tt.base10Milli, 1e6)
+		checks(tt.td, tt.base10Micro, 1e3)
+		checks(tt.td, tt.base10Nano, 1e0)
+		checks(tt.td, tt.iso8601, 8601)
 	}
 }
 
@@ -298,7 +298,7 @@ var formatTimeTestdata = func() []formatTimeTestdataEntry {
 
 func TestFormatTime(t *testing.T) {
 	var gotBuf []byte
-	check := func(ts time.Time, s string, pow10 uint64) {
+	checks := func(ts time.Time, s string, pow10 uint64) {
 		gotBuf = appendTimeUnix(gotBuf[:0], ts, pow10)
 		if string(gotBuf) != s {
 			t.Errorf("formatTime(time.Unix(%d, %d), %s) = %q, want %q", ts.Unix(), ts.Nanosecond(), baseLabel(pow10), string(gotBuf), s)
@@ -312,10 +312,10 @@ func TestFormatTime(t *testing.T) {
 		}
 	}
 	for _, tt := range formatTimeTestdata {
-		check(tt.ts, tt.unixSec, 1e0)
-		check(tt.ts, tt.unixMilli, 1e3)
-		check(tt.ts, tt.unixMicro, 1e6)
-		check(tt.ts, tt.unixNano, 1e9)
+		checks(tt.ts, tt.unixSec, 1e0)
+		checks(tt.ts, tt.unixMilli, 1e3)
+		checks(tt.ts, tt.unixMicro, 1e6)
+		checks(tt.ts, tt.unixNano, 1e9)
 	}
 }
 

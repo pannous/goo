@@ -23,7 +23,7 @@ func EnableNoWriteBarrierRecCheck() {
 func NoWriteBarrierRecCheck() {
 	// Write barriers are now known. Check the
 	// call graph.
-	nowritebarrierrecCheck.check()
+	nowritebarrierrecCheck.checks()
 	nowritebarrierrecCheck = nil
 }
 
@@ -117,7 +117,7 @@ func (c *nowritebarrierrecChecker) recordCall(fn *ir.Func, to *obj.LSym, pos src
 	*fn.NWBRCalls = append(*fn.NWBRCalls, ir.SymAndPos{Sym: to, Pos: pos})
 }
 
-func (c *nowritebarrierrecChecker) check() {
+func (c *nowritebarrierrecChecker) checks() {
 	// We walk the call graph as late as possible so we can
 	// capture all calls created by lowering, but this means we
 	// only get to see the obj.LSyms of calls. symToFunc lets us

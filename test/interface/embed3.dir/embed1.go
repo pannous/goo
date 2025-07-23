@@ -36,31 +36,31 @@ func (X8) foo(int) {}
 
 func main() {
 	var i1 interface{} = X1{}
-	check(func() { _ = i1.(p.I1) }, "interface conversion: main.X1 is not p.I1: missing method Foo")
+	checks(func() { _ = i1.(p.I1) }, "interface conversion: main.X1 is not p.I1: missing method Foo")
 
 	var i2 interface{} = X2{}
-	check(func() { _ = i2.(p.I2) }, "interface conversion: main.X2 is not p.I2: missing method foo")
+	checks(func() { _ = i2.(p.I2) }, "interface conversion: main.X2 is not p.I2: missing method foo")
 
 	var i3 interface{} = X3{}
-	check(func() { _ = i3.(p.I2) }, "interface conversion: main.X3 is not p.I2: missing method foo")
+	checks(func() { _ = i3.(p.I2) }, "interface conversion: main.X3 is not p.I2: missing method foo")
 
 	var i4 interface{} = X4{}
-	check(func() { _ = i4.(p.I2) }, "interface conversion: main.X4 is not p.I2: missing method foo")
+	checks(func() { _ = i4.(p.I2) }, "interface conversion: main.X4 is not p.I2: missing method foo")
 
 	var i5 interface{} = X5{}
-	check(func() { _ = i5.(p.I2) }, "interface conversion: main.X5 is not p.I2: missing method foo")
+	checks(func() { _ = i5.(p.I2) }, "interface conversion: main.X5 is not p.I2: missing method foo")
 
 	var i6 interface{} = X6{}
-	check(func() { _ = i6.(p.I2) }, "")
+	checks(func() { _ = i6.(p.I2) }, "")
 
 	var i7 interface{} = X7{}
-	check(func() { _ = i7.(p.I2) }, "")
+	checks(func() { _ = i7.(p.I2) }, "")
 
 	var i8 interface{} = X8{}
-	check(func() { _ = i8.(p.I2) }, "")
+	checks(func() { _ = i8.(p.I2) }, "")
 }
 
-func check(f func(), msg string) {
+func checks(f func(), msg string) {
 	defer func() {
 		v := recover()
 		if v == nil {

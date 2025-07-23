@@ -43,7 +43,7 @@ func TestLogTextHandler(t *testing.T) {
 
 	l := New(NewTextHandler(&buf, nil))
 
-	check := func(want string) {
+	checks := func(want string) {
 		t.Helper()
 		if want != "" {
 			want = "time=" + textTimeRE + " " + want
@@ -53,29 +53,29 @@ func TestLogTextHandler(t *testing.T) {
 	}
 
 	l.Info("msg", "a", 1, "b", 2)
-	check(`level=INFO msg=msg a=1 b=2`)
+	checks(`level=INFO msg=msg a=1 b=2`)
 
 	// By default, debug messages are not printed.
 	l.Debug("bg", Int("a", 1), "b", 2)
-	check("")
+	checks("")
 
 	l.Warn("w", Duration("dur", 3*time.Second))
-	check(`level=WARN msg=w dur=3s`)
+	checks(`level=WARN msg=w dur=3s`)
 
 	l.Error("bad", "a", 1)
-	check(`level=ERROR msg=bad a=1`)
+	checks(`level=ERROR msg=bad a=1`)
 
 	l.Log(ctx, LevelWarn+1, "w", Int("a", 1), String("b", "two"))
-	check(`level=WARN\+1 msg=w a=1 b=two`)
+	checks(`level=WARN\+1 msg=w a=1 b=two`)
 
 	l.LogAttrs(ctx, LevelInfo+1, "a b c", Int("a", 1), String("b", "two"))
-	check(`level=INFO\+1 msg="a b c" a=1 b=two`)
+	checks(`level=INFO\+1 msg="a b c" a=1 b=two`)
 
 	l.Info("info", "a", []Attr{Int("i", 1)})
-	check(`level=INFO msg=info a.i=1`)
+	checks(`level=INFO msg=info a.i=1`)
 
 	l.Info("info", "a", GroupValue(Int("i", 1)))
-	check(`level=INFO msg=info a.i=1`)
+	checks(`level=INFO msg=info a.i=1`)
 }
 
 func TestConnections(t *testing.T) {
@@ -165,7 +165,7 @@ func (h wrappingHandler) WithAttrs(as []Attr) Handler                { return h.
 func (h wrappingHandler) Handle(ctx context.Context, r Record) error { return h.h.Handle(ctx, r) }
 
 func TestAttrs(t *testing.T) {
-	check := func(got []Attr, want ...Attr) {
+	checks := func(got []Attr, want ...Attr) {
 		t.Helper()
 		if !attrsEqual(got, want) {
 			t.Errorf("got %v, want %v", got, want)
@@ -176,8 +176,8 @@ func TestAttrs(t *testing.T) {
 	l2 := New(l1.Handler()).With("b", 2)
 	l2.Info("m", "c", 3)
 	h := l2.Handler().(*captureHandler)
-	check(h.attrs, Int("a", 1), Int("b", 2))
-	check(attrsSlice(h.r), Int("c", 3))
+	checks(h.attrs, Int("a", 1), Int("b", 2))
+	checks(attrsSlice(h.r), Int("c", 3))
 }
 
 func TestCallDepth(t *testing.T) {
@@ -185,7 +185,7 @@ func TestCallDepth(t *testing.T) {
 	h := &captureHandler{}
 	var startLine int
 
-	check := func(count int) {
+	checks := func(count int) {
 		t.Helper()
 		const wantFunc = "log/slog.TestCallDepth"
 		const wantFile = "logger_test.go"
@@ -212,29 +212,29 @@ func TestCallDepth(t *testing.T) {
 	// Do not change the number of lines between here and the call to check(0).
 
 	logger.Log(ctx, LevelInfo, "")
-	check(0)
+	checks(0)
 	logger.LogAttrs(ctx, LevelInfo, "")
-	check(1)
+	checks(1)
 	logger.Debug("")
-	check(2)
+	checks(2)
 	logger.Info("")
-	check(3)
+	checks(3)
 	logger.Warn("")
-	check(4)
+	checks(4)
 	logger.Error("")
-	check(5)
+	checks(5)
 	Debug("")
-	check(6)
+	checks(6)
 	Info("")
-	check(7)
+	checks(7)
 	Warn("")
-	check(8)
+	checks(8)
 	Error("")
-	check(9)
+	checks(9)
 	Log(ctx, LevelInfo, "")
-	check(10)
+	checks(10)
 	LogAttrs(ctx, LevelInfo, "")
-	check(11)
+	checks(11)
 }
 
 func TestCallDepthConnection(t *testing.T) {

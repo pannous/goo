@@ -32,7 +32,7 @@ func init() {
 }
 
 // Verify that contents of buf match the string s.
-func check(t *testing.T, testname string, buf *Buffer, s string) {
+func checks(t *testing.T, testname string, buf *Buffer, s string) {
 	bytes := buf.Bytes()
 	str := buf.String()
 	if buf.Len() != len(bytes) {
@@ -56,7 +56,7 @@ func check(t *testing.T, testname string, buf *Buffer, s string) {
 // The initial contents of buf corresponds to the string s;
 // the result is the final contents of buf returned as a string.
 func fillString(t *testing.T, testname string, buf *Buffer, s string, n int, fus string) string {
-	check(t, testname+" (fill 1)", buf, s)
+	checks(t, testname+" (fill 1)", buf, s)
 	for ; n > 0; n-- {
 		m, err := buf.WriteString(fus)
 		if m != len(fus) {
@@ -66,7 +66,7 @@ func fillString(t *testing.T, testname string, buf *Buffer, s string, n int, fus
 			t.Errorf(testname+" (fill 3): err should always be nil, found err == %s", err)
 		}
 		s += fus
-		check(t, testname+" (fill 4)", buf, s)
+		checks(t, testname+" (fill 4)", buf, s)
 	}
 	return s
 }
@@ -75,7 +75,7 @@ func fillString(t *testing.T, testname string, buf *Buffer, s string, n int, fus
 // The initial contents of buf corresponds to the string s;
 // the result is the final contents of buf returned as a string.
 func fillBytes(t *testing.T, testname string, buf *Buffer, s string, n int, fub []byte) string {
-	check(t, testname+" (fill 1)", buf, s)
+	checks(t, testname+" (fill 1)", buf, s)
 	for ; n > 0; n-- {
 		m, err := buf.Write(fub)
 		if m != len(fub) {
@@ -85,14 +85,14 @@ func fillBytes(t *testing.T, testname string, buf *Buffer, s string, n int, fub 
 			t.Errorf(testname+" (fill 3): err should always be nil, found err == %s", err)
 		}
 		s += string(fub)
-		check(t, testname+" (fill 4)", buf, s)
+		checks(t, testname+" (fill 4)", buf, s)
 	}
 	return s
 }
 
 func TestNewBuffer(t *testing.T) {
 	buf := NewBuffer(testBytes)
-	check(t, "NewBuffer", buf, testString)
+	checks(t, "NewBuffer", buf, testString)
 }
 
 var buf Buffer
@@ -108,18 +108,18 @@ func TestNewBufferShallow(t *testing.T) {
 	if n > 0 {
 		t.Errorf("allocations occurred while shallow copying")
 	}
-	check(t, "NewBuffer", &buf, testString)
+	checks(t, "NewBuffer", &buf, testString)
 }
 
 func TestNewBufferString(t *testing.T) {
 	buf := NewBufferString(testString)
-	check(t, "NewBufferString", buf, testString)
+	checks(t, "NewBufferString", buf, testString)
 }
 
 // Empty buf through repeated reads into fub.
 // The initial contents of buf corresponds to the string s.
 func empty(t *testing.T, testname string, buf *Buffer, s string, fub []byte) {
-	check(t, testname+" (empty 1)", buf, s)
+	checks(t, testname+" (empty 1)", buf, s)
 
 	for {
 		n, err := buf.Read(fub)
@@ -130,44 +130,44 @@ func empty(t *testing.T, testname string, buf *Buffer, s string, fub []byte) {
 			t.Errorf(testname+" (empty 2): err should always be nil, found err == %s", err)
 		}
 		s = s[n:]
-		check(t, testname+" (empty 3)", buf, s)
+		checks(t, testname+" (empty 3)", buf, s)
 	}
 
-	check(t, testname+" (empty 4)", buf, "")
+	checks(t, testname+" (empty 4)", buf, "")
 }
 
 func TestBasicOperations(t *testing.T) {
 	var buf Buffer
 
 	for i := 0; i < 5; i++ {
-		check(t, "TestBasicOperations (1)", &buf, "")
+		checks(t, "TestBasicOperations (1)", &buf, "")
 
 		buf.Reset()
-		check(t, "TestBasicOperations (2)", &buf, "")
+		checks(t, "TestBasicOperations (2)", &buf, "")
 
 		buf.Truncate(0)
-		check(t, "TestBasicOperations (3)", &buf, "")
+		checks(t, "TestBasicOperations (3)", &buf, "")
 
 		n, err := buf.Write(testBytes[0:1])
 		if want := 1; err != nil || n != want {
 			t.Errorf("Write: got (%d, %v), want (%d, %v)", n, err, want, nil)
 		}
-		check(t, "TestBasicOperations (4)", &buf, "a")
+		checks(t, "TestBasicOperations (4)", &buf, "a")
 
 		buf.WriteByte(testString[1])
-		check(t, "TestBasicOperations (5)", &buf, "ab")
+		checks(t, "TestBasicOperations (5)", &buf, "ab")
 
 		n, err = buf.Write(testBytes[2:26])
 		if want := 24; err != nil || n != want {
 			t.Errorf("Write: got (%d, %v), want (%d, %v)", n, err, want, nil)
 		}
-		check(t, "TestBasicOperations (6)", &buf, testString[0:26])
+		checks(t, "TestBasicOperations (6)", &buf, testString[0:26])
 
 		buf.Truncate(26)
-		check(t, "TestBasicOperations (7)", &buf, testString[0:26])
+		checks(t, "TestBasicOperations (7)", &buf, testString[0:26])
 
 		buf.Truncate(20)
-		check(t, "TestBasicOperations (8)", &buf, testString[0:20])
+		checks(t, "TestBasicOperations (8)", &buf, testString[0:20])
 
 		empty(t, "TestBasicOperations (9)", &buf, testString[0:20], make([]byte, 5))
 		empty(t, "TestBasicOperations (10)", &buf, "", make([]byte, 100))
@@ -194,7 +194,7 @@ func TestLargeStringWrites(t *testing.T) {
 		s := fillString(t, "TestLargeWrites (1)", &buf, "", 5, testString)
 		empty(t, "TestLargeStringWrites (2)", &buf, s, make([]byte, len(testString)/i))
 	}
-	check(t, "TestLargeStringWrites (3)", &buf, "")
+	checks(t, "TestLargeStringWrites (3)", &buf, "")
 }
 
 func TestLargeByteWrites(t *testing.T) {
@@ -207,7 +207,7 @@ func TestLargeByteWrites(t *testing.T) {
 		s := fillBytes(t, "TestLargeWrites (1)", &buf, "", 5, testBytes)
 		empty(t, "TestLargeByteWrites (2)", &buf, s, make([]byte, len(testString)/i))
 	}
-	check(t, "TestLargeByteWrites (3)", &buf, "")
+	checks(t, "TestLargeByteWrites (3)", &buf, "")
 }
 
 func TestLargeStringReads(t *testing.T) {
@@ -216,7 +216,7 @@ func TestLargeStringReads(t *testing.T) {
 		s := fillString(t, "TestLargeReads (1)", &buf, "", 5, testString[:len(testString)/i])
 		empty(t, "TestLargeReads (2)", &buf, s, make([]byte, len(testString)))
 	}
-	check(t, "TestLargeStringReads (3)", &buf, "")
+	checks(t, "TestLargeStringReads (3)", &buf, "")
 }
 
 func TestLargeByteReads(t *testing.T) {
@@ -225,7 +225,7 @@ func TestLargeByteReads(t *testing.T) {
 		s := fillBytes(t, "TestLargeReads (1)", &buf, "", 5, testBytes[:len(testBytes)/i])
 		empty(t, "TestLargeReads (2)", &buf, s, make([]byte, len(testString)))
 	}
-	check(t, "TestLargeByteReads (3)", &buf, "")
+	checks(t, "TestLargeByteReads (3)", &buf, "")
 }
 
 func TestMixedReadsAndWrites(t *testing.T) {
@@ -303,13 +303,13 @@ func TestReadFromPanicReader(t *testing.T) {
 	if i != 0 {
 		t.Fatalf("unexpected return from bytes.ReadFrom (1): got: %d, want %d", i, 0)
 	}
-	check(t, "TestReadFromPanicReader (1)", &buf, "")
+	checks(t, "TestReadFromPanicReader (1)", &buf, "")
 
 	// Confirm that when Reader panics, the empty buffer remains empty
 	var buf2 Buffer
 	defer func() {
 		recover()
-		check(t, "TestReadFromPanicReader (2)", &buf2, "")
+		checks(t, "TestReadFromPanicReader (2)", &buf2, "")
 	}()
 	buf2.ReadFrom(panicReader{panic: true})
 }
@@ -439,7 +439,7 @@ func TestWriteInvalidRune(t *testing.T) {
 	for _, r := range []rune{-1, utf8.MaxRune + 1} {
 		var buf Buffer
 		buf.WriteRune(r)
-		check(t, fmt.Sprintf("TestWriteInvalidRune (%d)", r), &buf, "\uFFFD")
+		checks(t, fmt.Sprintf("TestWriteInvalidRune (%d)", r), &buf, "\uFFFD")
 	}
 }
 

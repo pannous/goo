@@ -866,7 +866,7 @@ type vcsPath struct {
 	regexp         *lazyregexp.Regexp                  // compiled pattern for import path
 	repo           string                              // repository to use (expand with match of re)
 	vcs            string                              // version control system to use (expand with match of re)
-	check          func(match map[string]string) error // additional checks
+	checks          func(match map[string]string) error // additional checks
 	schemelessRepo bool                                // if true, the repo pattern lacks a scheme
 }
 
@@ -1200,8 +1200,8 @@ func repoRootFromVCSPaths(importPath string, security web.SecurityMode, vcsPaths
 		if srv.repo != "" {
 			match["repo"] = expand(match, srv.repo)
 		}
-		if srv.check != nil {
-			if err := srv.check(match); err != nil {
+		if srv.checks != nil {
+			if err := srv.checks(match); err != nil {
 				return nil, err
 			}
 		}
@@ -1573,7 +1573,7 @@ var vcsPaths = []*vcsPath{
 		regexp:     lazyregexp.New(`^(?P<root>github\.com/[\w.\-]+/[\w.\-]+)(/[\w.\-]+)*$`),
 		vcs:        "git",
 		repo:       "https://{root}",
-		check:      noVCSSuffix,
+		checks:      noVCSSuffix,
 	},
 
 	// Bitbucket
@@ -1582,7 +1582,7 @@ var vcsPaths = []*vcsPath{
 		regexp:     lazyregexp.New(`^(?P<root>bitbucket\.org/(?P<bitname>[\w.\-]+/[\w.\-]+))(/[\w.\-]+)*$`),
 		vcs:        "git",
 		repo:       "https://{root}",
-		check:      noVCSSuffix,
+		checks:      noVCSSuffix,
 	},
 
 	// IBM DevOps Services (JazzHub)
@@ -1591,7 +1591,7 @@ var vcsPaths = []*vcsPath{
 		regexp:     lazyregexp.New(`^(?P<root>hub\.jazz\.net/git/[a-z0-9]+/[\w.\-]+)(/[\w.\-]+)*$`),
 		vcs:        "git",
 		repo:       "https://{root}",
-		check:      noVCSSuffix,
+		checks:      noVCSSuffix,
 	},
 
 	// Git at Apache
@@ -1637,7 +1637,7 @@ var vcsPathsAfterDynamic = []*vcsPath{
 		regexp:     lazyregexp.New(`^(?P<root>launchpad\.net/((?P<project>[\w.\-]+)(?P<series>/[\w.\-]+)?|~[\w.\-]+/(\+junk|[\w.\-]+)/[\w.\-]+))(/[\w.\-]+)*$`),
 		vcs:        "bzr",
 		repo:       "https://{root}",
-		check:      launchpadVCS,
+		checks:      launchpadVCS,
 	},
 }
 

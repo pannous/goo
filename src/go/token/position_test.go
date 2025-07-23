@@ -542,7 +542,7 @@ func TestIssue57490(t *testing.T) {
 func TestFileSet_AddExistingFiles(t *testing.T) {
 	fset := NewFileSet()
 
-	check := func(descr, want string) {
+	checks := func(descr, want string) {
 		t.Helper()
 		if got := fsetString(fset); got != want {
 			t.Errorf("%s: got %s, want %s", descr, got, want)
@@ -552,19 +552,19 @@ func TestFileSet_AddExistingFiles(t *testing.T) {
 	fileA := fset.AddFile("A", -1, 3)
 	fileB := fset.AddFile("B", -1, 5)
 	_ = fileB
-	check("after AddFile [AB]", "{A:1-4 B:5-10}")
+	checks("after AddFile [AB]", "{A:1-4 B:5-10}")
 
 	fset.AddExistingFiles() // noop
-	check("after AddExistingFiles []", "{A:1-4 B:5-10}")
+	checks("after AddExistingFiles []", "{A:1-4 B:5-10}")
 
 	fileC := NewFileSet().AddFile("C", 100, 5)
 	fileD := NewFileSet().AddFile("D", 200, 5)
 	fset.AddExistingFiles(fileC, fileA, fileD, fileC)
-	check("after AddExistingFiles [CADC]", "{A:1-4 B:5-10 C:100-105 D:200-205}")
+	checks("after AddExistingFiles [CADC]", "{A:1-4 B:5-10 C:100-105 D:200-205}")
 
 	fileE := fset.AddFile("E", -1, 3)
 	_ = fileE
-	check("after AddFile [E]", "{A:1-4 B:5-10 C:100-105 D:200-205 E:206-209}")
+	checks("after AddFile [E]", "{A:1-4 B:5-10 C:100-105 D:200-205 E:206-209}")
 }
 
 func fsetString(fset *FileSet) string {

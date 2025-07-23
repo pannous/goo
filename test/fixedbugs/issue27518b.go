@@ -20,7 +20,7 @@ func (h *HeapObj) init() {
 		h[i] = filler
 	}
 }
-func (h *HeapObj) check() {
+func (h *HeapObj) checks() {
 	for i := 0; i < len(*h); i++ {
 		if h[i] != filler {
 			err = "filler overwritten"
@@ -51,7 +51,7 @@ func main() {
 	gc(false)
 	h := g(&s)
 	gc(false)
-	h.check()
+	h.checks()
 	gc(true) // finalize here, after return value's last use. (Go1.11 never runs the finalizer.)
 	if err != "" {
 		panic(err)

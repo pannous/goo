@@ -41,7 +41,7 @@ that allocation events can refer to.
    types start at ID 127, so look for the `const` block defining events
    starting there).
 2. Describe your new events in `specs`.
-   Use the documentation for `Spec` to write your new specs, and check your
+   Use the documentation for `Spec` to write your new specs, and checks your
    work by running the tests in the `internal/trace/tracev2` package.
    If you wish for your event argument to be interpreted in a particular
    way, follow the naming convention in

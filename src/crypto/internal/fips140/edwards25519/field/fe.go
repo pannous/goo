@@ -405,12 +405,12 @@ func (r *Element) SqrtRatio(u, v *Element) (R *Element, wasSquare int) {
 	uv7 := new(Element).Multiply(uv3, t0.Square(v2))
 	rr := new(Element).Multiply(uv3, t0.Pow22523(uv7))
 
-	check := new(Element).Multiply(v, t0.Square(rr)) // check = v * r^2
+	checks := new(Element).Multiply(v, t0.Square(rr)) // check = v * r^2
 
 	uNeg := new(Element).Negate(u)
-	correctSignSqrt := check.Equal(u)
-	flippedSignSqrt := check.Equal(uNeg)
-	flippedSignSqrtI := check.Equal(t0.Multiply(uNeg, sqrtM1))
+	correctSignSqrt := checks.Equal(u)
+	flippedSignSqrt := checks.Equal(uNeg)
+	flippedSignSqrtI := checks.Equal(t0.Multiply(uNeg, sqrtM1))
 
 	rPrime := new(Element).Multiply(rr, sqrtM1) // r_prime = SQRT_M1 * r
 	// r = CT_SELECT(r_prime IF flipped_sign_sqrt | flipped_sign_sqrt_i ELSE r)

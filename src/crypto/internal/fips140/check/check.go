@@ -10,7 +10,7 @@
 // Instead, those packages must be careful not to change global variables during init.
 // (If necessary, we could have check call a PostCheck function in those packages
 // after the check has completed.)
-package check
+package checks
 
 import (
 	"crypto/internal/fips140"

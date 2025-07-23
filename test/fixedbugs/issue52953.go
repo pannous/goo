@@ -18,11 +18,11 @@ func main() {
 	ret.Field1 = true
 	var v *bool = &ret.Field1
 	ret = T{Field1: *v}
-	check(ret.Field1)
+	checks(ret.Field1)
 }
 
 //go:noinline
-func check(b bool) {
+func checks(b bool) {
 	if !b {
 		panic("FAIL")
 	}

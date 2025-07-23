@@ -21,7 +21,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
 ☐ def as synonym for func, e.g. def main() { ... }  
 ☐ void(!) as synonym for func, e.g. void main(){}
-☐ assert / check  
+☐ assert / checks  
 ☐ assert 1>2 // panic if false, otherwise do nothing
 ☐ assert $condition => if(not truthy($condition)) panic($condition.text)
 🗹 z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}

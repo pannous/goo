@@ -60,8 +60,8 @@ func typeErrorf(format string, args ...any) *typeError {
 
 // format formats a type error as a string.
 // check may be nil.
-func (err *typeError) format(check *Checker) string {
-	return check.sprintf(err.format_, err.args...)
+func (err *typeError) format(checks *Checker) string {
+	return checks.sprintf(err.format_, err.args...)
 }
 
 // If t is a type parameter, cond is nil, and t's type set contains no channel types,

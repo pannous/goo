@@ -12,7 +12,7 @@ import "os"
 
 var fail int
 
-func check(b bool, msg string) {
+func checks(b bool, msg string) {
 	if (!b) {
 		println("failure in", msg)
 		fail++
@@ -29,24 +29,24 @@ func f1() {
 	s := S1{1}
 	var i I1 = s
 	i.Put(2)
-	check(i.Get() == 1, "f1 i")
-	check(s.i == 1, "f1 s")
+	checks(i.Get() == 1, "f1 i")
+	checks(s.i == 1, "f1 s")
 }
 
 func f2() {
 	s := S1{1}
 	var i I1 = &s
 	i.Put(2)
-	check(i.Get() == 1, "f2 i")
-	check(s.i == 1, "f2 s")
+	checks(i.Get() == 1, "f2 i")
+	checks(s.i == 1, "f2 s")
 }
 
 func f3() {
 	s := &S1{1}
 	var i I1 = s
 	i.Put(2)
-	check(i.Get() == 1, "f3 i")
-	check(s.i == 1, "f3 s")
+	checks(i.Get() == 1, "f3 i")
+	checks(s.i == 1, "f3 s")
 }
 
 type S2 struct { i int }
@@ -66,16 +66,16 @@ func f5() {
 	s := S2{1}
 	var i I1 = &s
 	i.Put(2)
-	check(i.Get() == 2, "f5 i")
-	check(s.i == 2, "f5 s")
+	checks(i.Get() == 2, "f5 i")
+	checks(s.i == 2, "f5 s")
 }
 
 func f6() {
 	s := &S2{1}
 	var i I1 = s
 	i.Put(2)
-	check(i.Get() == 2, "f6 i")
-	check(s.i == 2, "f6 s")
+	checks(i.Get() == 2, "f6 i")
+	checks(s.i == 2, "f6 s")
 }
 
 type I2 interface { Get() int64; Put(int64) }
@@ -88,24 +88,24 @@ func f7() {
 	s := S3{1, 2, 3, 4}
 	var i I2 = s
 	i.Put(5)
-	check(i.Get() == 4, "f7 i")
-	check(s.l == 4, "f7 s")
+	checks(i.Get() == 4, "f7 i")
+	checks(s.l == 4, "f7 s")
 }
 
 func f8() {
 	s := S3{1, 2, 3, 4}
 	var i I2 = &s
 	i.Put(5)
-	check(i.Get() == 4, "f8 i")
-	check(s.l == 4, "f8 s")
+	checks(i.Get() == 4, "f8 i")
+	checks(s.l == 4, "f8 s")
 }
 
 func f9() {
 	s := &S3{1, 2, 3, 4}
 	var i I2 = s
 	i.Put(5)
-	check(i.Get() == 4, "f9 i")
-	check(s.l == 4, "f9 s")
+	checks(i.Get() == 4, "f9 i")
+	checks(s.l == 4, "f9 s")
 }
 
 type S4 struct { i, j, k, l int64 }
@@ -125,16 +125,16 @@ func f11() {
 	s := S4{1, 2, 3, 4}
 	var i I2 = &s
 	i.Put(5)
-	check(i.Get() == 5, "f11 i")
-	check(s.l == 5, "f11 s")
+	checks(i.Get() == 5, "f11 i")
+	checks(s.l == 5, "f11 s")
 }
 
 func f12() {
 	s := &S4{1, 2, 3, 4}
 	var i I2 = s
 	i.Put(5)
-	check(i.Get() == 5, "f12 i")
-	check(s.l == 5, "f12 s")
+	checks(i.Get() == 5, "f12 i")
+	checks(s.l == 5, "f12 s")
 }
 
 func main() {

@@ -106,7 +106,7 @@ func (s *HashSet) addB(x []byte) {
 func (s *HashSet) addS_seed(x string, seed uintptr) {
 	s.add(StringHash(x, seed))
 }
-func (s *HashSet) check(t *testing.T) {
+func (s *HashSet) checks(t *testing.T) {
 	list := s.list
 	slices.Sort(list)
 
@@ -136,7 +136,7 @@ func TestSmhasherAppendedZeros(t *testing.T) {
 	for i := 0; i <= len(s); i++ {
 		h.addS(s[:i])
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // All 0-3 byte strings have distinct hashes.
@@ -161,7 +161,7 @@ func TestSmhasherSmallKeys(t *testing.T) {
 			}
 		}
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // Different length strings of all zeros have distinct hashes.
@@ -176,7 +176,7 @@ func TestSmhasherZeros(t *testing.T) {
 	for i := 0; i <= N; i++ {
 		h.addB(b[:i])
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // Strings with up to two nonzero bytes all have distinct hashes.
@@ -195,7 +195,7 @@ func TestSmhasherTwoNonzero(t *testing.T) {
 	for n := 2; n <= 16; n++ {
 		twoNonZero(h, n)
 	}
-	h.check(t)
+	h.checks(t)
 }
 func twoNonZero(h *HashSet, n int) {
 	b := make([]byte, n)
@@ -254,7 +254,7 @@ func TestSmhasherCyclic(t *testing.T) {
 			}
 			h.addB(b)
 		}
-		h.check(t)
+		h.checks(t)
 	}
 }
 
@@ -280,7 +280,7 @@ func TestSmhasherSparse(t *testing.T) {
 func sparse(t *testing.T, h *HashSet, n int, k int) {
 	b := make([]byte, n/8)
 	setbits(h, b, 0, k)
-	h.check(t)
+	h.checks(t)
 }
 
 // set up to k bits at index i and greater
@@ -319,7 +319,7 @@ func TestSmhasherPermutation(t *testing.T) {
 func permutation(t *testing.T, h *HashSet, s []uint32, n int) {
 	b := make([]byte, n*4)
 	genPerm(h, b, s, 0)
-	h.check(t)
+	h.checks(t)
 }
 func genPerm(h *HashSet, b []byte, s []uint32, n int) {
 	h.addB(b[:n])
@@ -585,7 +585,7 @@ func windowed(t *testing.T, h *HashSet, k Key) {
 			}
 			h.add(k.hash())
 		}
-		h.check(t)
+		h.checks(t)
 	}
 }
 
@@ -621,7 +621,7 @@ func text(t *testing.T, h *HashSet, prefix, suffix string) {
 			}
 		}
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // Make sure different seed values generate different hashes.
@@ -632,7 +632,7 @@ func TestSmhasherSeed(t *testing.T) {
 	for i := 0; i < N; i++ {
 		h.addS_seed(s, uintptr(i))
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 func TestIssue66841(t *testing.T) {
@@ -654,7 +654,7 @@ func TestIssue66841(t *testing.T) {
 		binary.LittleEndian.PutUint64(b[8:], uint64(i))
 		h.addB(b[:])
 	}
-	h.check(t)
+	h.checks(t)
 }
 
 // size of the hash output (32 or 64 bits)

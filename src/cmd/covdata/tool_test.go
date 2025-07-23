@@ -447,46 +447,46 @@ func runDumpChecks(t *testing.T, s state, dir string, flags []string, checks []d
 	}
 
 	bad := false
-	for _, check := range checks {
+	for _, checks := range checks {
 		found := false
 		for _, line := range lines {
-			if m := check.re.FindStringSubmatch(line); m != nil {
+			if m := checks.re.FindStringSubmatch(line); m != nil {
 				found = true
-				if check.negate {
-					t.Errorf("tag %q: unexpected match", check.tag)
+				if checks.negate {
+					t.Errorf("tag %q: unexpected match", checks.tag)
 					bad = true
 
 				}
-				if check.nonzero || check.zero {
+				if checks.nonzero || checks.zero {
 					if len(m) < 2 {
-						t.Errorf("tag %s: submatch failed (short m)", check.tag)
+						t.Errorf("tag %s: submatch failed (short m)", checks.tag)
 						bad = true
 						continue
 					}
 					if m[1] == "" {
-						t.Errorf("tag %s: submatch failed", check.tag)
+						t.Errorf("tag %s: submatch failed", checks.tag)
 						bad = true
 						continue
 					}
 					i, err := strconv.Atoi(m[1])
 					if err != nil {
 						t.Errorf("tag %s: match Atoi failed on %s",
-							check.tag, m[1])
+							checks.tag, m[1])
 						continue
 					}
-					if check.zero && i != 0 {
+					if checks.zero && i != 0 {
 						t.Errorf("tag %s: match zero failed on %s",
-							check.tag, m[1])
-					} else if check.nonzero && i == 0 {
+							checks.tag, m[1])
+					} else if checks.nonzero && i == 0 {
 						t.Errorf("tag %s: match nonzero failed on %s",
-							check.tag, m[1])
+							checks.tag, m[1])
 					}
 				}
 				break
 			}
 		}
-		if !found && !check.negate {
-			t.Errorf("dump output regexp match failed for %s", check.tag)
+		if !found && !checks.negate {
+			t.Errorf("dump output regexp match failed for %s", checks.tag)
 			bad = true
 		}
 	}

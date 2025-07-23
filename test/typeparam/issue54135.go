@@ -18,7 +18,7 @@ type Baz interface {
 	Some()
 }
 
-func check[T comparable](p Bar[T]) {
+func checks[T comparable](p Bar[T]) {
 	if x, ok := p.(any); !ok || x != p {
 		panic("FAIL")
 	}
@@ -28,5 +28,5 @@ func check[T comparable](p Bar[T]) {
 }
 
 func main() {
-	check[int](Foo{})
+	checks[int](Foo{})
 }

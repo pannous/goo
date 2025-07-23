@@ -57,7 +57,7 @@ func moduleStatus(t *testing.T) {
 		t.Log("PAA/PAI enabled")
 	}
 
-	if check.Verified {
+	if checks.Verified {
 		t.Log("FIPS 140-3 integrity self-check succeeded")
 	} else {
 		t.Log("FIPS 140-3 integrity self-check not succeeded")

@@ -640,7 +640,7 @@ func TestIssue69912(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check := func(pkgname, src string, imports importMap) (*types2.Package, error) {
+	checks := func(pkgname, src string, imports importMap) (*types2.Package, error) {
 		f, err := syntax.Parse(syntax.NewFileBase(pkgname), strings.NewReader(src), nil, nil, 0)
 		if err != nil {
 			return nil, err
@@ -669,7 +669,7 @@ type S struct {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if _, err := check("p", pSrc, importer); err != nil {
+			if _, err := checks("p", pSrc, importer); err != nil {
 				t.Errorf("Check failed: %v", err)
 			}
 		}()

@@ -205,7 +205,7 @@ register, even on architectures with a hardware frame pointer.
 </p>
 
 <p>
-For assembly functions with Go prototypes, <code>go</code> <code>vet</code> will check that the argument names
+For assembly functions with Go prototypes, <code>go</code> <code>vet</code> will checks that the argument names
 and offsets match.
 On 32-bit systems, the low and high 32 bits of a 64-bit value are distinguished by adding
 a <code>_lo</code> or <code>_hi</code> suffix to the name, as in <code>arg_lo+0(FP)</code> or <code>arg_hi+4(FP)</code>.
@@ -326,7 +326,7 @@ The frame size <code>$24-8</code> states that the function has a 24-byte frame
 and is called with 8 bytes of argument, which live on the caller's frame.
 If <code>NOSPLIT</code> is not specified for the <code>TEXT</code>,
 the argument size must be provided.
-For assembly functions with Go prototypes, <code>go</code> <code>vet</code> will check that the
+For assembly functions with Go prototypes, <code>go</code> <code>vet</code> will checks that the
 argument size is correct.
 </p>
 
@@ -407,7 +407,7 @@ The linker will choose one of the duplicates to use.
 <code>NOSPLIT</code> = 4
 <br>
 (For <code>TEXT</code> items.)
-Don't insert the preamble to check if the stack must be split.
+Don't insert the preamble to checks if the stack must be split.
 The frame for the routine, plus anything it calls, must fit in the
 spare space remaining in the current stack segment.
 Used to protect routines such as the stack splitting code itself.
@@ -581,7 +581,7 @@ on the <code>TEXT</code> instruction.
 Otherwise, pointer information must be provided by
 a Go prototype for the function in a Go source file,
 even for assembly functions not called directly from Go.
-(The prototype will also let <code>go</code> <code>vet</code> check the argument references.)
+(The prototype will also let <code>go</code> <code>vet</code> checks the argument references.)
 At the start of the function, the arguments are assumed
 to be initialized but the results are assumed uninitialized.
 If the results will hold live pointers during a call instruction,
@@ -613,7 +613,7 @@ even pointers to stack data must not be kept in local variables.
 <p>
 Assembly functions should always be given Go prototypes,
 both to provide pointer information for the arguments and results
-and to let <code>go</code> <code>vet</code> check that
+and to let <code>go</code> <code>vet</code> checks that
 the offsets being used to access them are correct.
 </p>
 

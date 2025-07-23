@@ -1139,7 +1139,7 @@ func TestHexBytes(t *testing.T) {
 	if n != 1 || err != nil {
 		t.Errorf("simple: got count, err = %d, %v; expected 1, nil", n, err)
 	}
-	check := func(msg string, x []byte) {
+	checks := func(msg string, x []byte) {
 		if len(x) != 4 {
 			t.Errorf("%s: bad length %d", msg, len(x))
 		}
@@ -1149,15 +1149,15 @@ func TestHexBytes(t *testing.T) {
 			}
 		}
 	}
-	check("simple", a)
+	checks("simple", a)
 	a = nil
 
 	n, err = Sscanf("00010203 00010203", "%x %x", &a, &b)
 	if n != 2 || err != nil {
 		t.Errorf("simple pair: got count, err = %d, %v; expected 2, nil", n, err)
 	}
-	check("simple pair a", a)
-	check("simple pair b", b)
+	checks("simple pair a", a)
+	checks("simple pair b", b)
 	a = nil
 	b = nil
 
@@ -1165,15 +1165,15 @@ func TestHexBytes(t *testing.T) {
 	if n != 1 || err != nil {
 		t.Errorf("colon: got count, err = %d, %v; expected 1, nil", n, err)
 	}
-	check("colon", a)
+	checks("colon", a)
 	a = nil
 
 	n, err = Sscanf("00010203:00010203", "%x:%x", &a, &b)
 	if n != 2 || err != nil {
 		t.Errorf("colon pair: got count, err = %d, %v; expected 2, nil", n, err)
 	}
-	check("colon pair a", a)
-	check("colon pair b", b)
+	checks("colon pair a", a)
+	checks("colon pair b", b)
 	a = nil
 	b = nil
 

@@ -95,8 +95,8 @@ readlines:
 			t.Errorf("for key %q got %q; expected %q", key, got, expected)
 		}
 	}
-	for _, check := range checks {
-		check(m)
+	for _, checks := range checks {
+		checks(m)
 	}
 }
 

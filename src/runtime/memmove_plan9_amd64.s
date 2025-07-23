@@ -51,7 +51,7 @@ tail:
 	JBE	move_9through16
 
 /*
- * check and set for backwards
+ * checks and set for backwards
  */
 	CMPQ	SI, DI
 	JLS	back
@@ -69,7 +69,7 @@ forward:
 
 back:
 /*
- * check overlap
+ * checks overlap
  */
 	MOVQ	SI, CX
 	ADDQ	BX, CX

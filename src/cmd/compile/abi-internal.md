@@ -851,9 +851,9 @@ One way to ensure enough space is available to spill would be for
 every function to ensure there is enough space for the function's own
 frame *as well as* the spill space of all functions it calls.
 For most functions, this would change the threshold for the prologue
-stack growth check.
+stack growth checks.
 For `nosplit` functions, this would change the threshold used in the
-linker's static stack size check.
+linker's static stack size checks.
 
 Allocating spill space in the callee rather than the caller may also
 allow for faster reflection calls in the common case where a function

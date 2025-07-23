@@ -47,7 +47,7 @@ func TestExitCodeFilter(t *testing.T) {
 
 func TestExitCodeMissing(t *testing.T) {
 	var wantErr *regexp.Regexp
-	check := func(text string) {
+	checks := func(text string) {
 		t.Helper()
 		var out strings.Builder
 		f, exitStr := newExitCodeFilter(&out)
@@ -67,10 +67,10 @@ func TestExitCodeMissing(t *testing.T) {
 		}
 	}
 	wantErr = regexp.MustCompile("^no exit code")
-	check("abc")
-	check("exitcode")
-	check("exitcode=")
-	check("exitcode=123\n")
+	checks("abc")
+	checks("exitcode")
+	checks("exitcode=")
+	checks("exitcode=123\n")
 	wantErr = regexp.MustCompile("^bad exit code: .* value out of range")
-	check("exitcode=999999999999999999999999")
+	checks("exitcode=999999999999999999999999")
 }

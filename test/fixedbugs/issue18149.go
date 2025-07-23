@@ -15,7 +15,7 @@ import (
 	"runtime"
 )
 
-func check(file string, line int) {
+func checks(file string, line int) {
 	_, f, l, ok := runtime.Caller(1)
 	if !ok {
 		panic("runtime.Caller(1) failed")
@@ -27,7 +27,7 @@ func check(file string, line int) {
 
 func main() {
 //line /foo/bar.go:123
-	check(`/foo/bar.go`, 123)
+	checks(`/foo/bar.go`, 123)
 //line c:/foo/bar.go:987
-	check(`c:/foo/bar.go`, 987)
+	checks(`c:/foo/bar.go`, 987)
 }

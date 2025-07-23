@@ -3788,14 +3788,14 @@ func TestHeaderToWire(t *testing.T) {
 	tests := []struct {
 		name    string
 		handler func(ResponseWriter, *Request)
-		check   func(got, logs string) error
+		checks   func(got, logs string) error
 	}{
 		{
 			name: "write without Header",
 			handler: func(rw ResponseWriter, r *Request) {
 				rw.Write([]byte("hello world"))
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Content-Length:") {
 					return errors.New("no content-length")
 				}
@@ -3813,7 +3813,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.Write([]byte("hello world"))
 				h.Set("Too-Late", "bogus")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Content-Length:") {
 					return errors.New("no content-length")
 				}
@@ -3832,7 +3832,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.Write([]byte("hello world"))
 				rw.Header().Set("Too-Late", "Write already wrote headers")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if strings.Contains(got, "Too-Late") {
 					return errors.New("header appeared from after WriteHeader")
 				}
@@ -3846,7 +3846,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.Write([]byte("post-flush"))
 				rw.Header().Set("Too-Late", "Write already wrote headers")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Transfer-Encoding: chunked") {
 					return errors.New("not chunked")
 				}
@@ -3864,7 +3864,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.Write([]byte("post-flush"))
 				rw.Header().Set("Too-Late", "Write already wrote headers")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Transfer-Encoding: chunked") {
 					return errors.New("not chunked")
 				}
@@ -3883,7 +3883,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.Write([]byte("<html><head></head><body>some html</body></html>"))
 				rw.Header().Set("Content-Type", "x/wrong")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Content-Type: text/html") {
 					return errors.New("wrong content-type; want html")
 				}
@@ -3896,7 +3896,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.Header().Set("Content-Type", "some/type")
 				rw.Write([]byte("<html><head></head><body>some html</body></html>"))
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Content-Type: some/type") {
 					return errors.New("wrong content-type; want html")
 				}
@@ -3907,7 +3907,7 @@ func TestHeaderToWire(t *testing.T) {
 			name: "empty handler",
 			handler: func(rw ResponseWriter, r *Request) {
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Content-Length: 0") {
 					return errors.New("want 0 content-length")
 				}
@@ -3919,7 +3919,7 @@ func TestHeaderToWire(t *testing.T) {
 			handler: func(rw ResponseWriter, r *Request) {
 				rw.Header().Set("Some-Header", "some-value")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "Some-Header") {
 					return errors.New("didn't get header")
 				}
@@ -3932,7 +3932,7 @@ func TestHeaderToWire(t *testing.T) {
 				rw.WriteHeader(404)
 				rw.Header().Set("Too-Late", "some-value")
 			},
-			check: func(got, logs string) error {
+			checks: func(got, logs string) error {
 				if !strings.Contains(got, "404") {
 					return errors.New("wrong status")
 				}
@@ -3947,7 +3947,7 @@ func TestHeaderToWire(t *testing.T) {
 		ht := newHandlerTest(HandlerFunc(tc.handler))
 		got := ht.rawResponse("GET / HTTP/1.1\nHost: golang.org")
 		logs := ht.logbuf.String()
-		if err := tc.check(got, logs); err != nil {
+		if err := tc.checks(got, logs); err != nil {
 			t.Errorf("%s: %v\nGot response:\n%s\n\n%s", tc.name, err, got, logs)
 		}
 	}

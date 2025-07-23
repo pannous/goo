@@ -18,7 +18,7 @@ type readDirOnly struct{ ReadDirFS }
 func (readDirOnly) Open(name string) (File, error) { return nil, ErrNotExist }
 
 func TestReadDir(t *testing.T) {
-	check := func(desc string, dirs []DirEntry, err error) {
+	checks := func(desc string, dirs []DirEntry, err error) {
 		t.Helper()
 		if err != nil || len(dirs) != 2 || dirs[0].Name() != "hello.txt" || dirs[1].Name() != "sub" {
 			var names []string
@@ -31,11 +31,11 @@ func TestReadDir(t *testing.T) {
 
 	// Test that ReadDir uses the method when present.
 	dirs, err := ReadDir(readDirOnly{testFsys}, ".")
-	check("readDirOnly", dirs, err)
+	checks("readDirOnly", dirs, err)
 
 	// Test that ReadDir uses Open when the method is not present.
 	dirs, err = ReadDir(openOnly{testFsys}, ".")
-	check("openOnly", dirs, err)
+	checks("openOnly", dirs, err)
 
 	// Test that ReadDir on Sub of . works (sub_test checks non-trivial subs).
 	sub, err := Sub(testFsys, ".")
@@ -43,7 +43,7 @@ func TestReadDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	dirs, err = ReadDir(sub, ".")
-	check("sub(.)", dirs, err)
+	checks("sub(.)", dirs, err)
 }
 
 func TestFileInfoToDirEntry(t *testing.T) {

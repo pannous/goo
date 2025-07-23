@@ -54,7 +54,7 @@ nocgo:
 	// save m0 to g0->m
 	MOVW	R1, g_m(g)
 
-	JAL	runtime·check(SB)
+	JAL	runtime·checks(SB)
 
 	// args are already prepared
 	JAL	runtime·args(SB)

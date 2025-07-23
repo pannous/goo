@@ -413,7 +413,7 @@ func (tg *testgoData) must(err error) {
 }
 
 // check gives a test non-fatal error if err is not nil.
-func (tg *testgoData) check(err error) {
+func (tg *testgoData) checks(err error) {
 	tg.t.Helper()
 	if err != nil {
 		tg.t.Error(err)
@@ -837,10 +837,10 @@ func (tg *testgoData) cleanup() {
 		return
 	}
 	for _, path := range tg.temps {
-		tg.check(removeAll(path))
+		tg.checks(removeAll(path))
 	}
 	if tg.tempdir != "" {
-		tg.check(removeAll(tg.tempdir))
+		tg.checks(removeAll(tg.tempdir))
 	}
 }
 
@@ -2799,7 +2799,7 @@ func TestExecInDeletedDir(t *testing.T) {
 	tg.makeTempdir()
 	t.Chdir(tg.tempdir)
 
-	tg.check(os.Remove(tg.tempdir))
+	tg.checks(os.Remove(tg.tempdir))
 
 	// `go version` should not fail
 	tg.run("version")

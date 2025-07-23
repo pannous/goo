@@ -12,7 +12,7 @@ import (
 	"unicode/utf8"
 )
 
-func check(t *testing.T, b *Builder, want string) {
+func checks(t *testing.T, b *Builder, want string) {
 	t.Helper()
 	got := b.String()
 	if got != want {
@@ -29,33 +29,33 @@ func check(t *testing.T, b *Builder, want string) {
 
 func TestBuilder(t *testing.T) {
 	var b Builder
-	check(t, &b, "")
+	checks(t, &b, "")
 	n, err := b.WriteString("hello")
 	if err != nil || n != 5 {
 		t.Errorf("WriteString: got %d,%s; want 5,nil", n, err)
 	}
-	check(t, &b, "hello")
+	checks(t, &b, "hello")
 	if err = b.WriteByte(' '); err != nil {
 		t.Errorf("WriteByte: %s", err)
 	}
-	check(t, &b, "hello ")
+	checks(t, &b, "hello ")
 	n, err = b.WriteString("world")
 	if err != nil || n != 5 {
 		t.Errorf("WriteString: got %d,%s; want 5,nil", n, err)
 	}
-	check(t, &b, "hello world")
+	checks(t, &b, "hello world")
 }
 
 func TestBuilderString(t *testing.T) {
 	var b Builder
 	b.WriteString("alpha")
-	check(t, &b, "alpha")
+	checks(t, &b, "alpha")
 	s1 := b.String()
 	b.WriteString("beta")
-	check(t, &b, "alphabeta")
+	checks(t, &b, "alphabeta")
 	s2 := b.String()
 	b.WriteString("gamma")
-	check(t, &b, "alphabetagamma")
+	checks(t, &b, "alphabetagamma")
 	s3 := b.String()
 
 	// Check that subsequent operations didn't change the returned strings.
@@ -72,17 +72,17 @@ func TestBuilderString(t *testing.T) {
 
 func TestBuilderReset(t *testing.T) {
 	var b Builder
-	check(t, &b, "")
+	checks(t, &b, "")
 	b.WriteString("aaa")
 	s := b.String()
-	check(t, &b, "aaa")
+	checks(t, &b, "aaa")
 	b.Reset()
-	check(t, &b, "")
+	checks(t, &b, "")
 
 	// Ensure that writing after Reset doesn't alter
 	// previously returned strings.
 	b.WriteString("bbb")
-	check(t, &b, "bbb")
+	checks(t, &b, "bbb")
 	if want := "aaa"; s != want {
 		t.Errorf("previous String result changed after Reset: got %q; want %q", s, want)
 	}
@@ -167,7 +167,7 @@ func TestBuilderWrite2(t *testing.T) {
 			if n != tt.n {
 				t.Errorf("first call: got n=%d; want %d", n, tt.n)
 			}
-			check(t, &b, tt.want)
+			checks(t, &b, tt.want)
 
 			n, err = tt.fn(&b)
 			if err != nil {
@@ -176,7 +176,7 @@ func TestBuilderWrite2(t *testing.T) {
 			if n != tt.n {
 				t.Errorf("second call: got n=%d; want %d", n, tt.n)
 			}
-			check(t, &b, tt.want+tt.want)
+			checks(t, &b, tt.want+tt.want)
 		})
 	}
 }
@@ -189,7 +189,7 @@ func TestBuilderWriteByte(t *testing.T) {
 	if err := b.WriteByte(0); err != nil {
 		t.Error(err)
 	}
-	check(t, &b, "a\x00")
+	checks(t, &b, "a\x00")
 }
 
 func TestBuilderAllocs(t *testing.T) {
@@ -325,7 +325,7 @@ func TestBuilderWriteInvalidRune(t *testing.T) {
 	for _, r := range []rune{-1, utf8.MaxRune + 1} {
 		var b Builder
 		b.WriteRune(r)
-		check(t, &b, "\uFFFD")
+		checks(t, &b, "\uFFFD")
 	}
 }
 

@@ -52,7 +52,7 @@ func bogus4() (int, int) {
 	return 0, 0
 }
 
-func check(a, b int) {
+func checks(a, b int) {
 	if a != 3 || b != 7 {
 		println(a, b)
 		panic("a != 3 || b != 7")
@@ -60,6 +60,6 @@ func check(a, b int) {
 }
 
 func main() {
-	check(bogus1(42))
-	check(bogus2())
+	checks(bogus1(42))
+	checks(bogus2())
 }

@@ -45,6 +45,7 @@ const (
 	_Break       // break
 	_Case        // case
 	_Chan        // chan
+	_Check       // check
 	_Const       // const
 	_Continue    // continue
 	_Default     // default

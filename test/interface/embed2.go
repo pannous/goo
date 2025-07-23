@@ -37,7 +37,7 @@ var pi = &i
 
 var ok = true
 
-func check(s string, v int64) {
+func checks(s string, v int64) {
 	if v != Value {
 		println(s, v)
 		ok = false
@@ -45,28 +45,28 @@ func check(s string, v int64) {
 }
 
 func main() {
-	check("t.M()", t.M())
-	check("pt.M()", pt.M())
-	check("ti.M()", ti.M())
-	check("pti.M()", pti.M()) // ERROR "pointer to interface, not interface|no field or method M"
-	check("s.M()", s.M())
-	check("ps.M()", ps.M())
+	checks("t.M()", t.M())
+	checks("pt.M()", pt.M())
+	checks("ti.M()", ti.M())
+	checks("pti.M()", pti.M()) // ERROR "pointer to interface, not interface|no field or method M"
+	checks("s.M()", s.M())
+	checks("ps.M()", ps.M())
 
 	i = t
-	check("i = t; i.M()", i.M())
-	check("i = t; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
+	checks("i = t; i.M()", i.M())
+	checks("i = t; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
 
 	i = pt
-	check("i = pt; i.M()", i.M())
-	check("i = pt; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
+	checks("i = pt; i.M()", i.M())
+	checks("i = pt; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
 
 	i = s
-	check("i = s; i.M()", i.M())
-	check("i = s; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
+	checks("i = s; i.M()", i.M())
+	checks("i = s; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
 
 	i = ps
-	check("i = ps; i.M()", i.M())
-	check("i = ps; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
+	checks("i = ps; i.M()", i.M())
+	checks("i = ps; pi.M()", pi.M()) // ERROR "pointer to interface, not interface|no field or method M"
 
 	if !ok {
 		println("BUG: interface10")

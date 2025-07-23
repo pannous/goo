@@ -3284,7 +3284,7 @@ func http2newGoroutineLock() http2goroutineLock {
 	return http2goroutineLock(http2curGoroutineID())
 }
 
-func (g http2goroutineLock) check() {
+func (g http2goroutineLock) checks() {
 	if !http2DebugGoroutines {
 		return
 	}
@@ -4608,7 +4608,7 @@ func (sc *http2serverConn) maxHeaderListSize() uint32 {
 }
 
 func (sc *http2serverConn) curOpenStreams() uint32 {
-	sc.serveG.check()
+	sc.serveG.checks()
 	return sc.curClientStreams + sc.curPushedStreams
 }
 
@@ -4656,7 +4656,7 @@ func (sc *http2serverConn) HeaderEncoder() (*hpack.Encoder, *bytes.Buffer) {
 }
 
 func (sc *http2serverConn) state(streamID uint32) (http2streamState, *http2stream) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	// http://tools.ietf.org/html/rfc7540#section-5.1
 	if st, ok := sc.streams[streamID]; ok {
 		return st.state, st
@@ -4762,7 +4762,7 @@ func (sc *http2serverConn) condlogf(err error, format string, args ...interface{
 const http2maxCachedCanonicalHeadersKeysSize = 2048
 
 func (sc *http2serverConn) canonicalHeader(v string) string {
-	sc.serveG.check()
+	sc.serveG.checks()
 	cv, ok := httpcommon.CachedCanonicalHeader(v)
 	if ok {
 		return cv
@@ -4842,14 +4842,14 @@ func (sc *http2serverConn) writeFrameAsync(wr http2FrameWriteRequest, wd *http2w
 }
 
 func (sc *http2serverConn) closeAllStreamsOnConnClose() {
-	sc.serveG.check()
+	sc.serveG.checks()
 	for _, st := range sc.streams {
 		sc.closeStream(st, http2errClientDisconnected)
 	}
 }
 
 func (sc *http2serverConn) stopShutdownTimer() {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if t := sc.shutdownTimer; t != nil {
 		t.Stop()
 	}
@@ -4871,7 +4871,7 @@ func (sc *http2serverConn) notePanic() {
 }
 
 func (sc *http2serverConn) serve(conf http2http2Config) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	defer sc.notePanic()
 	defer sc.conn.Close()
 	defer sc.closeAllStreamsOnConnClose()
@@ -5187,7 +5187,7 @@ func (sc *http2serverConn) writeFrameFromHandler(wr http2FrameWriteRequest) erro
 //
 // If you're not on the serve goroutine, use writeFrameFromHandler instead.
 func (sc *http2serverConn) writeFrame(wr http2FrameWriteRequest) {
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	// If true, wr will not be written and wr.done will not be signaled.
 	var ignoreWrite bool
@@ -5251,7 +5251,7 @@ func (sc *http2serverConn) writeFrame(wr http2FrameWriteRequest) {
 // goroutine since that might block on the network), and updates the
 // serve goroutine's state about the world, updated from info in wr.
 func (sc *http2serverConn) startFrameWrite(wr http2FrameWriteRequest) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if sc.writingFrame {
 		panic("internal error: can only be writing one frame at a time")
 	}
@@ -5308,7 +5308,7 @@ var http2errHandlerPanicked = errors.New("http2: handler panicked")
 // wroteFrame is called on the serve goroutine with the result of
 // whatever happened on writeFrameAsync.
 func (sc *http2serverConn) wroteFrame(res http2frameWriteResult) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if !sc.writingFrame {
 		panic("internal error: expected to be already writing a frame")
 	}
@@ -5376,7 +5376,7 @@ func (sc *http2serverConn) wroteFrame(res http2frameWriteResult) {
 // If a frame isn't being written and there's nothing else to send, we
 // flush the write buffer.
 func (sc *http2serverConn) scheduleFrameWrite() {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if sc.writingFrame || sc.inFrameScheduleLoop {
 		return
 	}
@@ -5451,7 +5451,7 @@ func (sc *http2serverConn) startGracefulShutdownInternal() {
 }
 
 func (sc *http2serverConn) goAway(code http2ErrCode) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if sc.inGoAway {
 		if sc.goAwayCode == http2ErrCodeNo {
 			sc.goAwayCode = code
@@ -5465,12 +5465,12 @@ func (sc *http2serverConn) goAway(code http2ErrCode) {
 }
 
 func (sc *http2serverConn) shutDownIn(d time.Duration) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	sc.shutdownTimer = sc.srv.afterFunc(d, sc.onShutdownTimer)
 }
 
 func (sc *http2serverConn) resetStream(se http2StreamError) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	sc.writeFrame(http2FrameWriteRequest{write: se})
 	if st, ok := sc.streams[se.StreamID]; ok {
 		st.resetQueued = true
@@ -5481,7 +5481,7 @@ func (sc *http2serverConn) resetStream(se http2StreamError) {
 // frame-reading goroutine.
 // processFrameFromReader returns whether the connection should be kept open.
 func (sc *http2serverConn) processFrameFromReader(res http2readFrameResult) bool {
-	sc.serveG.check()
+	sc.serveG.checks()
 	err := res.err
 	if err != nil {
 		if err == http2ErrFrameTooLarge {
@@ -5538,7 +5538,7 @@ func (sc *http2serverConn) processFrameFromReader(res http2readFrameResult) bool
 }
 
 func (sc *http2serverConn) processFrame(f http2Frame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	// First frame received must be SETTINGS.
 	if !sc.sawFirstSettings {
@@ -5591,7 +5591,7 @@ func (sc *http2serverConn) processFrame(f http2Frame) error {
 }
 
 func (sc *http2serverConn) processPing(f *http2PingFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if f.IsAck() {
 		if sc.pingSent && sc.sentPingData == f.Data {
 			// This is a response to a PING we sent.
@@ -5615,7 +5615,7 @@ func (sc *http2serverConn) processPing(f *http2PingFrame) error {
 }
 
 func (sc *http2serverConn) processWindowUpdate(f *http2WindowUpdateFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	switch {
 	case f.StreamID != 0: // stream-level flow control
 		state, st := sc.state(f.StreamID)
@@ -5647,7 +5647,7 @@ func (sc *http2serverConn) processWindowUpdate(f *http2WindowUpdateFrame) error 
 }
 
 func (sc *http2serverConn) processResetStream(f *http2RSTStreamFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	state, st := sc.state(f.StreamID)
 	if state == http2stateIdle {
@@ -5666,7 +5666,7 @@ func (sc *http2serverConn) processResetStream(f *http2RSTStreamFrame) error {
 }
 
 func (sc *http2serverConn) closeStream(st *http2stream, err error) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if st.state == http2stateIdle || st.state == http2stateClosed {
 		panic(fmt.Sprintf("invariant; can't close stream in state %v", st.state))
 	}
@@ -5713,7 +5713,7 @@ func (sc *http2serverConn) closeStream(st *http2stream, err error) {
 }
 
 func (sc *http2serverConn) processSettings(f *http2SettingsFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if f.IsAck() {
 		sc.unackedSettings--
 		if sc.unackedSettings < 0 {
@@ -5741,7 +5741,7 @@ func (sc *http2serverConn) processSettings(f *http2SettingsFrame) error {
 }
 
 func (sc *http2serverConn) processSetting(s http2Setting) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if err := s.Valid(); err != nil {
 		return err
 	}
@@ -5776,7 +5776,7 @@ func (sc *http2serverConn) processSetting(s http2Setting) error {
 }
 
 func (sc *http2serverConn) processSettingInitialWindowSize(val uint32) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	// Note: val already validated to be within range by
 	// processSetting's Valid call.
 
@@ -5804,7 +5804,7 @@ func (sc *http2serverConn) processSettingInitialWindowSize(val uint32) error {
 }
 
 func (sc *http2serverConn) processData(f *http2DataFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	id := f.Header().StreamID
 
 	data := f.Data()
@@ -5901,7 +5901,7 @@ func (sc *http2serverConn) processData(f *http2DataFrame) error {
 }
 
 func (sc *http2serverConn) processGoAway(f *http2GoAwayFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if f.ErrCode != http2ErrCodeNo {
 		sc.logf("http2: received GOAWAY %+v, starting graceful shutdown", f)
 	} else {
@@ -5923,7 +5923,7 @@ func (st *http2stream) isPushed() bool {
 // frame says a request body is over (or after trailers).
 func (st *http2stream) endStream() {
 	sc := st.sc
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	if st.declBodyBytes != -1 && st.declBodyBytes != st.bodyBytes {
 		st.body.CloseWithError(fmt.Errorf("request declared a Content-Length of %d but only wrote %d bytes",
@@ -5967,7 +5967,7 @@ func (st *http2stream) onWriteTimeout() {
 }
 
 func (sc *http2serverConn) processHeaders(f *http2MetaHeadersFrame) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	id := f.StreamID
 	// http://tools.ietf.org/html/rfc7540#section-5.1.1
 	// Streams initiated by a client MUST use odd-numbered stream
@@ -6078,7 +6078,7 @@ func (sc *http2serverConn) processHeaders(f *http2MetaHeadersFrame) error {
 }
 
 func (sc *http2serverConn) upgradeRequest(req *Request) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	id := uint32(1)
 	sc.maxClientStreamID = id
 	st := sc.newStream(id, 0, http2stateHalfClosedRemote)
@@ -6103,7 +6103,7 @@ func (sc *http2serverConn) upgradeRequest(req *Request) {
 
 func (st *http2stream) processTrailerHeaders(f *http2MetaHeadersFrame) error {
 	sc := st.sc
-	sc.serveG.check()
+	sc.serveG.checks()
 	if st.gotTrailerHeader {
 		return sc.countError("dup_trailers", http2ConnectionError(http2ErrCodeProtocol))
 	}
@@ -6151,7 +6151,7 @@ func (sc *http2serverConn) processPriority(f *http2PriorityFrame) error {
 }
 
 func (sc *http2serverConn) newStream(id, pusherID uint32, state http2streamState) *http2stream {
-	sc.serveG.check()
+	sc.serveG.checks()
 	if id == 0 {
 		panic("internal error: cannot create stream with id 0")
 	}
@@ -6187,7 +6187,7 @@ func (sc *http2serverConn) newStream(id, pusherID uint32, state http2streamState
 }
 
 func (sc *http2serverConn) newWriterAndRequest(st *http2stream, f *http2MetaHeadersFrame) (*http2responseWriter, *Request, error) {
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	rp := httpcommon.ServerRequestParam{
 		Method:    f.PseudoValue("method"),
@@ -6256,7 +6256,7 @@ func (sc *http2serverConn) newWriterAndRequest(st *http2stream, f *http2MetaHead
 }
 
 func (sc *http2serverConn) newWriterAndRequestNoBody(st *http2stream, rp httpcommon.ServerRequestParam) (*http2responseWriter, *Request, error) {
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	var tlsState *tls.ConnectionState // nil if not scheme https
 	if rp.Scheme == "https" {
@@ -6313,7 +6313,7 @@ type http2unstartedHandler struct {
 // scheduleHandler starts a handler goroutine,
 // or schedules one to start as soon as an existing handler finishes.
 func (sc *http2serverConn) scheduleHandler(streamID uint32, rw *http2responseWriter, req *Request, handler func(ResponseWriter, *Request)) error {
-	sc.serveG.check()
+	sc.serveG.checks()
 	maxHandlers := sc.advMaxStreams
 	if sc.curHandlers < maxHandlers {
 		sc.curHandlers++
@@ -6333,7 +6333,7 @@ func (sc *http2serverConn) scheduleHandler(streamID uint32, rw *http2responseWri
 }
 
 func (sc *http2serverConn) handlerDone() {
-	sc.serveG.check()
+	sc.serveG.checks()
 	sc.curHandlers--
 	i := 0
 	maxHandlers := sc.advMaxStreams
@@ -6459,7 +6459,7 @@ func (sc *http2serverConn) noteBodyReadFromHandler(st *http2stream, n int, err e
 }
 
 func (sc *http2serverConn) noteBodyRead(st *http2stream, n int) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	sc.sendWindowUpdate(nil, n) // conn-level
 	if st.state != http2stateHalfClosedRemote && st.state != http2stateClosed {
 		// Don't send this WINDOW_UPDATE if the stream is closed
@@ -6475,7 +6475,7 @@ func (sc *http2serverConn) sendWindowUpdate32(st *http2stream, n int32) {
 
 // st may be nil for conn-level
 func (sc *http2serverConn) sendWindowUpdate(st *http2stream, n int) {
-	sc.serveG.check()
+	sc.serveG.checks()
 	var streamID uint32
 	var send int32
 	if st == nil {
@@ -7131,7 +7131,7 @@ type http2startPushRequest struct {
 }
 
 func (sc *http2serverConn) startPush(msg *http2startPushRequest) {
-	sc.serveG.check()
+	sc.serveG.checks()
 
 	// http://tools.ietf.org/html/rfc7540#section-6.6.
 	// PUSH_PROMISE frames MUST only be sent on a peer-initiated stream that
@@ -7152,7 +7152,7 @@ func (sc *http2serverConn) startPush(msg *http2startPushRequest) {
 	// we allocate an ID for the promised stream lazily, when the PUSH_PROMISE
 	// is written. Once the ID is allocated, we start the request handler.
 	allocatePromisedID := func() (uint32, error) {
-		sc.serveG.check()
+		sc.serveG.checks()
 
 		// Check this again, just in case. Technically, we might have received
 		// an updated SETTINGS by the time we got around to writing this frame.

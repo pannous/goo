@@ -296,7 +296,7 @@ dependencies, so is not suitable for distributed build systems.)
 
 * toolstash also allows comparing the installed vs. stashed copy of
   the compiler, such as if you expect equivalent behavior after a refactor.
-  For example, to check that your changed compiler produces identical object files to
+  For example, to checks that your changed compiler produces identical object files to
   the stashed compiler while building the standard library:
   ```
   $ toolstash restore && go install cmd/compile   # build latest compiler
@@ -330,7 +330,7 @@ dependencies, so is not suitable for distributed build systems.)
   benchmark results, including by manipulating CPU frequency scaling settings on Linux.
 
 * [view-annotated-file](https://github.com/loov/view-annotated-file) (from the community)
-   overlays inlining, bounds check, and escape info back onto the source code.
+   overlays inlining, bounds checks, and escape info back onto the source code.
 
 * [godbolt.org](https://go.godbolt.org) is widely used to examine
   and share assembly output from many compilers, including the Go compiler. It can also

@@ -11,11 +11,11 @@ import (
 )
 
 // labels checks correct label use in body.
-func (check *Checker) labels(body *syntax.BlockStmt) {
+func (checks *Checker) labels(body *syntax.BlockStmt) {
 	// set of all labels in this body
 	all := NewScope(nil, body.Pos(), syntax.EndPos(body), "label")
 
-	fwdJumps := check.blockBranches(all, nil, nil, body.List)
+	fwdJumps := checks.blockBranches(all, nil, nil, body.List)
 
 	// If there are any forward jumps left, no label was found for
 	// the corresponding goto statements. Either those labels were
@@ -33,14 +33,14 @@ func (check *Checker) labels(body *syntax.BlockStmt) {
 			msg = "label %s not declared"
 			code = UndeclaredLabel
 		}
-		check.errorf(jmp.Label, code, msg, name)
+		checks.errorf(jmp.Label, code, msg, name)
 	}
 
 	// spec: "It is illegal to define a label that is never used."
 	for name, obj := range all.elems {
 		obj = resolve(name, obj)
 		if lbl := obj.(*Label); !lbl.used {
-			check.softErrorf(lbl.pos, UnusedLabel, "label %s declared and not used", lbl.name)
+			checks.softErrorf(lbl.pos, UnusedLabel, "label %s declared and not used", lbl.name)
 		}
 	}
 }
@@ -92,7 +92,7 @@ func (b *block) enclosingTarget(name string) *syntax.LabeledStmt {
 // blockBranches processes a block's statement list and returns the set of outgoing forward jumps.
 // all is the scope of all declared labels, parent the set of labels declared in the immediately
 // enclosing block, and lstmt is the labeled statement this block is associated with (or nil).
-func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.LabeledStmt, list []syntax.Stmt) []*syntax.BranchStmt {
+func (checks *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.LabeledStmt, list []syntax.Stmt) []*syntax.BranchStmt {
 	b := &block{parent, lstmt, nil}
 
 	var (
@@ -125,9 +125,9 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 		case *syntax.LabeledStmt:
 			// declare non-blank label
 			if name := s.Label.Value; name != "_" {
-				lbl := NewLabel(s.Label.Pos(), check.pkg, name)
+				lbl := NewLabel(s.Label.Pos(), checks.pkg, name)
 				if alt := all.Insert(lbl); alt != nil {
-					err := check.newError(DuplicateLabel)
+					err := checks.newError(DuplicateLabel)
 					err.soft = true
 					err.addf(lbl.pos, "label %s already declared", name)
 					err.addAltDecl(alt)
@@ -135,7 +135,7 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 					// ok to continue
 				} else {
 					b.insert(s)
-					check.recordDef(s.Label, lbl)
+					checks.recordDef(s.Label, lbl)
 				}
 				// resolve matching forward jumps and remove them from fwdJumps
 				i := 0
@@ -143,9 +143,9 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 					if jmp.Label.Value == name {
 						// match
 						lbl.used = true
-						check.recordUse(jmp.Label, lbl)
+						checks.recordUse(jmp.Label, lbl)
 						if jumpsOverVarDecl(jmp) {
-							check.softErrorf(
+							checks.softErrorf(
 								jmp.Label,
 								JumpOverDecl,
 								"goto %s jumps over variable declaration at line %d",
@@ -185,7 +185,7 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 					}
 				}
 				if !valid {
-					check.errorf(s.Label, MisplacedLabel, "invalid break label %s", name)
+					checks.errorf(s.Label, MisplacedLabel, "invalid break label %s", name)
 					return
 				}
 
@@ -200,7 +200,7 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 					}
 				}
 				if !valid {
-					check.errorf(s.Label, MisplacedLabel, "invalid continue label %s", name)
+					checks.errorf(s.Label, MisplacedLabel, "invalid continue label %s", name)
 					return
 				}
 
@@ -212,14 +212,14 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 				}
 
 			default:
-				check.errorf(s, InvalidSyntaxTree, "branch statement: %s %s", s.Tok, name)
+				checks.errorf(s, InvalidSyntaxTree, "branch statement: %s %s", s.Tok, name)
 				return
 			}
 
 			// record label use
 			obj := all.Lookup(name)
 			obj.(*Label).used = true
-			check.recordUse(s.Label, obj)
+			checks.recordUse(s.Label, obj)
 
 		case *syntax.AssignStmt:
 			if s.Op == syntax.Def {
@@ -229,7 +229,7 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 		case *syntax.BlockStmt:
 			// Unresolved forward jumps inside the nested block
 			// become forward jumps in the current block.
-			fwdJumps = append(fwdJumps, check.blockBranches(all, b, lstmt, s.List)...)
+			fwdJumps = append(fwdJumps, checks.blockBranches(all, b, lstmt, s.List)...)
 
 		case *syntax.IfStmt:
 			stmtBranches(lstmt, s.Then)
@@ -240,13 +240,13 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *syntax.Lab
 		case *syntax.SwitchStmt:
 			b := &block{b, lstmt, nil}
 			for _, s := range s.Body {
-				fwdJumps = append(fwdJumps, check.blockBranches(all, b, nil, s.Body)...)
+				fwdJumps = append(fwdJumps, checks.blockBranches(all, b, nil, s.Body)...)
 			}
 
 		case *syntax.SelectStmt:
 			b := &block{b, lstmt, nil}
 			for _, s := range s.Body {
-				fwdJumps = append(fwdJumps, check.blockBranches(all, b, nil, s.Body)...)
+				fwdJumps = append(fwdJumps, checks.blockBranches(all, b, nil, s.Body)...)
 			}
 
 		case *syntax.ForStmt:

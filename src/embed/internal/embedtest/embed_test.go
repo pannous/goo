@@ -164,7 +164,7 @@ func TestAliases(t *testing.T) {
 	if e != nil {
 		t.Fatal("ReadFile:", e)
 	}
-	check := func(g any) {
+	checks := func(g any) {
 		got := reflect.ValueOf(g)
 		for i := 0; i < got.Len(); i++ {
 			if byte(got.Index(i).Uint()) != want[i] {
@@ -172,11 +172,11 @@ func TestAliases(t *testing.T) {
 			}
 		}
 	}
-	check(helloT)
-	check(helloUint8)
-	check(helloEUint8)
-	check(helloBytes)
-	check(helloString)
+	checks(helloT)
+	checks(helloUint8)
+	checks(helloEUint8)
+	checks(helloBytes)
+	checks(helloString)
 }
 
 func TestOffset(t *testing.T) {

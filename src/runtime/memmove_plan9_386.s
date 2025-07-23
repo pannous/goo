@@ -50,7 +50,7 @@ tail:
 	JBE	move_9through16
 
 /*
- * check and set for backwards
+ * checks and set for backwards
  */
 	CMPL	SI, DI
 	JLS	back
@@ -66,7 +66,7 @@ forward:
 	REP;	MOVSL
 	JMP	tail
 /*
- * check overlap
+ * checks overlap
  */
 back:
 	MOVL	SI, CX

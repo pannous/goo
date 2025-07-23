@@ -191,7 +191,7 @@ are several reasons for this:
 2. Non-atomic access allows for automatic race detection. The runtime
    doesn't currently have a race detector, but it may in the future.
    Atomic access defeats the race detector, while non-atomic access
-   allows the race detector to check your assumptions.
+   allows the race detector to checks your assumptions.
 
 3. Non-atomic access may improve performance.
 

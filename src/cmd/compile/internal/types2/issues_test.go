@@ -414,19 +414,19 @@ func TestIssue29029(t *testing.T) {
 	// type-check together
 	var conf Config
 	info := &Info{Defs: make(map[*syntax.Name]Object)}
-	check := NewChecker(&conf, NewPackage("", "p"), info)
-	if err := check.Files([]*syntax.File{f1, f2}); err != nil {
+	checks := NewChecker(&conf, NewPackage("", "p"), info)
+	if err := checks.Files([]*syntax.File{f1, f2}); err != nil {
 		t.Fatal(err)
 	}
 	want := printInfo(info)
 
 	// type-check incrementally
 	info = &Info{Defs: make(map[*syntax.Name]Object)}
-	check = NewChecker(&conf, NewPackage("", "p"), info)
-	if err := check.Files([]*syntax.File{f1}); err != nil {
+	checks = NewChecker(&conf, NewPackage("", "p"), info)
+	if err := checks.Files([]*syntax.File{f1}); err != nil {
 		t.Fatal(err)
 	}
-	if err := check.Files([]*syntax.File{f2}); err != nil {
+	if err := checks.Files([]*syntax.File{f2}); err != nil {
 		t.Fatal(err)
 	}
 	got := printInfo(info)

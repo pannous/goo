@@ -2,6 +2,13 @@ package main
 
 import "fmt"
 func main() {
+	if true {
+		fmt.Println("This is true")
+	} else {
+		fmt.Println("This is false")
+	}
+	assert(true)
+	//assert(false) // ./test.go:11:2: assert(false) failed OK
 	write := fmt.Printf
 	// Test numeric truthiness
 	//x := tuple[int] (1,2,3)

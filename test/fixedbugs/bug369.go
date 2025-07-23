@@ -20,20 +20,20 @@ import (
 
 func main() {
 	err := os.Chdir(filepath.Join(".", "fixedbugs", "bug369.dir"))
-	check(err)
+	checks(err)
 
 	tmpDir, err := ioutil.TempDir("", "bug369")
-	check(err)
+	checks(err)
 	defer os.RemoveAll(tmpDir)
 
 	tmp := func(name string) string {
 		return filepath.Join(tmpDir, name)
 	}
 
-	check(os.Mkdir(tmp("test"), 0777))
+	checks(os.Mkdir(tmp("test"), 0777))
 
 	stdlibimportcfg, err := os.ReadFile(os.Getenv("STDLIB_IMPORTCFG"))
-	check(err)
+	checks(err)
 	importcfg := string(stdlibimportcfg) + "\npackagefile test/slow=" + tmp("test/slow.o") + "\npackagefile test/fast=" + tmp("test/fast.o")
 	os.WriteFile(tmp("importcfg"), []byte(importcfg), 0644)
 
@@ -54,7 +54,7 @@ func run(name string, args ...string) {
 	}
 }
 
-func check(err error) {
+func checks(err error) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

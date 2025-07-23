@@ -19,7 +19,7 @@ import (
 
 func main() {
 	err := os.Chdir(filepath.Join("fixedbugs", "issue9355.dir"))
-	check(err)
+	checks(err)
 
 	f, err := ioutil.TempFile("", "issue9355-*.o")
 	if err != nil {
@@ -56,7 +56,7 @@ func run(cmd string, args ...string) []byte {
 	return out
 }
 
-func check(err error) {
+func checks(err error) {
 	if err != nil {
 		fmt.Println("BUG:", err)
 		os.Exit(1)
