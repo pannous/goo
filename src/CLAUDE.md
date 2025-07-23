@@ -10,10 +10,18 @@ Do NOT explore the whole codebase structure and architecture
 
 We are trying to achieve small modifications to the compiler only and nothing else thus we only want to recompile the compiler and not the whole toolchain.
 
+Always start simple and when the simple case works add more complexity. 
 
 !!! Important! Never do destructive commands like remove, rm, git clean, etc without explicit user confirmation, even in YOLO mode!!!
 
-# To compile go, use the following command:
+### Style Guidelines
+
+Always replace interface{} with any 
+
+
+# Compile
+
+To compile go, use the following command:
 
 cd /opt/other/go/src
 ./make.bash >/dev/null 2>&1
@@ -83,3 +91,6 @@ GOROOT=$(pwd)/.. ./run.bash --no-rebuild 2>&1 | grep -Ev '^\?|^ok ' | tee /dev/t
 ```
 - This command runs the tests, filters out the output to show only failures, and exits with an error code if any tests fail.
 - if we encounter a FAIL, ponder whether our changes might be related to it and if so try once to fix it or tell me to look at it.
+
+## Memories
+- Remember the general mechanism for built-ins for next time

@@ -50,6 +50,7 @@ var builtinFuncs = [...]struct {
 	{"printf", ir.OPRINTF},
 	{"real", ir.OREAL},
 	{"recover", ir.ORECOVER},
+	{"typeof", ir.OTYPEOF},
 }
 
 var unsafeFuncs = [...]struct {

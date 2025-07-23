@@ -445,6 +445,10 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return tcPanic(n)
 
+	case ir.OTYPEOF:
+		n := n.(*ir.UnaryExpr)
+		return tcTypeof(n)
+
 	case ir.ORECOVER:
 		n := n.(*ir.CallExpr)
 		return tcRecover(n)
