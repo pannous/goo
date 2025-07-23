@@ -17,7 +17,6 @@ or maybe
 GOOS=darwin GOARCH=arm64 ./bootstrap.bash ?
 
 So far incremental building does not work like this :(
-
 ../bin/go tool dist install -v cmd/compile
 
 
@@ -80,6 +79,3 @@ GOROOT=$(pwd)/.. ./run.bash --no-rebuild 2>&1 | grep -Ev '^\?|^ok ' | tee /dev/t
 - This command runs the tests, filters out the output to show only failures, and exits with an error code if any tests fail.
 - if we encounter a FAIL, ponder whether our changes might be related to it and if so try once to fix it or tell me to look at it.
 
-# Compiler Build Notes
-- `go tool dist install` is unreliable and may do nothing
-- Recommendation: Use `./make.bash` directly for compiler installation

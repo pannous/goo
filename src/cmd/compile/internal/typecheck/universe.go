@@ -47,6 +47,7 @@ var builtinFuncs = [...]struct {
 	{"panic", ir.OPANIC},
 	{"print", ir.OPRINT},
 	{"println", ir.OPRINTLN},
+	{"printf", ir.OPRINTF},
 	{"real", ir.OREAL},
 	{"recover", ir.ORECOVER},
 }

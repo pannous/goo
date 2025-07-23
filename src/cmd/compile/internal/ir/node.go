@@ -224,6 +224,7 @@ const (
 	OPANIC            // panic(X)
 	OPRINT            // print(List)
 	OPRINTLN          // println(List)
+	OPRINTF           // printf(List) - fmt.Println with auto-import
 	OPAREN            // (X)
 	OSEND             // Chan <- Value
 	OSLICE            // X[Low : High] (X is untypechecked or slice)

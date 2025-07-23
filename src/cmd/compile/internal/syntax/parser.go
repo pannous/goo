@@ -455,11 +455,14 @@ func (p *parser) fileOrNil() *File {
 			if p.tok == _Lbrace && len(f.DeclList) > 0 && isEmptyFuncDecl(f.DeclList[len(f.DeclList)-1]) {
 				// opening { of function declaration on next line
 				p.syntaxError("unexpected semicolon or newline before {")
+				p.advance(_Import, _Const, _Type, _Var, _Func)
+				continue
 			} else {
-				p.syntaxError("non-declaration statement outside function body")
+				// Parse as a top-level statement for implicit main
+				if stmt := p.stmtOrNil(); stmt != nil {
+					f.TopLevelStmts = append(f.TopLevelStmts, stmt)
+				}
 			}
-			p.advance(_Import, _Const, _Type, _Var, _Func)
-			continue
 		}
 
 		// Reset p.pragma BEFORE advancing to the next token (consuming ';')
@@ -475,6 +478,33 @@ func (p *parser) fileOrNil() *File {
 
 	p.clearPragma()
 	f.EOF = p.pos()
+
+	// Generate implicit main function if needed
+	if f.PkgName != nil && f.PkgName.Value == "main" && len(f.TopLevelStmts) > 0 {
+		// Check if main function already exists
+		hasMain := false
+		for _, decl := range f.DeclList {
+			if fd, ok := decl.(*FuncDecl); ok && fd.Name.Value == "main" && fd.Recv == nil {
+				hasMain = true
+				break
+			}
+		}
+		
+		if !hasMain {
+			// Create synthetic main function
+			mainFunc := &FuncDecl{
+				Name: NewName(f.pos, "main"),
+				Type: &FuncType{},
+				Body: &BlockStmt{
+					List: f.TopLevelStmts,
+				},
+			}
+			mainFunc.SetPos(f.pos)
+			f.DeclList = append(f.DeclList, mainFunc)
+			// Clear TopLevelStmts since they're now in main
+			f.TopLevelStmts = nil
+		}
+	}
 
 	return f
 }
