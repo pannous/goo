@@ -189,6 +189,7 @@ const (
 	_Println
 	_Real
 	_Recover
+	_Typeof
 
 	// package unsafe
 	_Add
@@ -230,6 +231,7 @@ var predeclaredFuncs = [...]struct {
 	_Println: {"println", 0, true, statement},
 	_Real:    {"real", 1, false, expression},
 	_Recover: {"recover", 0, false, statement},
+	_Typeof:  {"typeof", 1, false, expression},
 
 	_Add:        {"Add", 2, false, expression},
 	_Alignof:    {"Alignof", 1, false, expression},

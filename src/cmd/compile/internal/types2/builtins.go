@@ -702,6 +702,15 @@ func (check *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) (
 			check.recordBuiltinType(call.Fun, makeSig(x.typ))
 		}
 
+	case _Typeof:
+		// typeof(x) string
+		x.mode = constant_
+		x.typ = Typ[String]
+		x.val = constant.MakeString(args[0].typ.String())
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(Typ[String], args[0].typ))
+		}
+
 	case _Add:
 		// unsafe.Add(ptr unsafe.Pointer, len IntegerType) unsafe.Pointer
 		check.verifyVersionf(call.Fun, go1_17, "unsafe.Add")

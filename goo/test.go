@@ -11,7 +11,6 @@ func main() {
 	z := map{"a": 1, "b": 2}
 	z["a"] = 10
 	write(z)
-	write(type(z))
 	write(typeof(z))
 	//printf(z)
 
