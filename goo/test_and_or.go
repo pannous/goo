@@ -37,10 +37,11 @@ func main() {
 	// Test with comparisons
 	x := 5
 	y := 10
+	
 	if x < y and y > 0 {
 		fmt.Println("x < y and y > 0 works!")
 	}
-
+	
 	if x > y or y == 10 {
 		fmt.Println("x > y or y == 10 works!")
 	}
