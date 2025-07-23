@@ -54,6 +54,8 @@ func (x *TagExpr) String() string {
 
 func tag(tag string) Expr { return &TagExpr{tag} }
 
+func negate(x Expr) Expr { return &NotExpr{x} }
+
 // A NotExpr represents the expression !X (the negation of X).
 type NotExpr struct {
 	X Expr
