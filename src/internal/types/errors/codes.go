@@ -4,6 +4,8 @@
 
 package errors
 
+import "strconv"
+
 //go:generate go run golang.org/x/tools/cmd/stringer@latest -type Code codes.go
 
 type Code int
@@ -37,6 +39,16 @@ const (
 	// to the type checker. It should never happen.
 	InvalidSyntaxTree Code = -1
 )
+
+// String returns the string representation of Code
+func (c Code) String() string {
+	switch c {
+	case InvalidSyntaxTree:
+		return "InvalidSyntaxTree"
+	default:
+		return "Code(" + strconv.Itoa(int(c)) + ")"
+	}
+}
 
 const (
 	// The zero Code value indicates an unset (invalid) error code.

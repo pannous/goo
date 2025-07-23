@@ -1,0 +1,1 @@
+stringer: err: exit status 1: stderr: go: ../../../go.mod requires go >= 1.25 (running go 1.24.5; GOTOOLCHAIN=local)

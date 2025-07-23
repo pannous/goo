@@ -4,6 +4,8 @@
 
 package typesinternal
 
+import "strconv"
+
 //go:generate stringer -type=ErrorCode
 
 type ErrorCode int
@@ -35,6 +37,16 @@ const (
 	// to the type checker. It should never happen.
 	InvalidSyntaxTree ErrorCode = -1
 )
+
+// String returns the string representation of ErrorCode
+func (e ErrorCode) String() string {
+	switch e {
+	case InvalidSyntaxTree:
+		return "InvalidSyntaxTree"
+	default:
+		return "ErrorCode(" + strconv.Itoa(int(e)) + ")"
+	}
+}
 
 const (
 	_ ErrorCode = iota

@@ -33,6 +33,22 @@ const (
 	psTop                      // dataflow lattice "top" element
 )
 
+// String returns the string representation of pstate
+func (p pstate) String() string {
+	switch p {
+	case psNoInfo:
+		return "psNoInfo"
+	case psCallsPanic:
+		return "psCallsPanic"
+	case psMayReturn:
+		return "psMayReturn"
+	case psTop:
+		return "psTop"
+	default:
+		return fmt.Sprintf("pstate(%d)", int(p))
+	}
+}
+
 func makeFuncFlagsAnalyzer(fn *ir.Func) *funcFlagsAnalyzer {
 	return &funcFlagsAnalyzer{
 		fn:     fn,

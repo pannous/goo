@@ -4,6 +4,10 @@
 
 package inlheur
 
+import (
+	"strings"
+)
+
 // This file defines a set of Go function "properties" intended to
 // guide inlining heuristics; these properties may apply to the
 // function as a whole, or to one or more function return values or
@@ -96,3 +100,66 @@ const (
 	// Result is always the same (potentially) inlinable function or closure.
 	ResultAlwaysSameInlinableFunc
 )
+
+// String returns the string representation of FuncPropBits
+func (f FuncPropBits) String() string {
+	var parts []string
+	if f&FuncPropNeverReturns != 0 {
+		parts = append(parts, "FuncPropNeverReturns")
+	}
+	if len(parts) == 0 {
+		return "0"
+	}
+	return strings.Join(parts, "|")
+}
+
+// String returns the string representation of ParamPropBits
+func (p ParamPropBits) String() string {
+	var parts []string
+	if p&ParamFeedsInterfaceMethodCall != 0 {
+		parts = append(parts, "ParamFeedsInterfaceMethodCall")
+	}
+	if p&ParamMayFeedInterfaceMethodCall != 0 {
+		parts = append(parts, "ParamMayFeedInterfaceMethodCall")
+	}
+	if p&ParamFeedsIndirectCall != 0 {
+		parts = append(parts, "ParamFeedsIndirectCall")
+	}
+	if p&ParamMayFeedIndirectCall != 0 {
+		parts = append(parts, "ParamMayFeedIndirectCall")
+	}
+	if p&ParamFeedsIfOrSwitch != 0 {
+		parts = append(parts, "ParamFeedsIfOrSwitch")
+	}
+	if p&ParamMayFeedIfOrSwitch != 0 {
+		parts = append(parts, "ParamMayFeedIfOrSwitch")
+	}
+	if len(parts) == 0 {
+		return "0"
+	}
+	return strings.Join(parts, "|")
+}
+
+// String returns the string representation of ResultPropBits
+func (r ResultPropBits) String() string {
+	var parts []string
+	if r&ResultIsAllocatedMem != 0 {
+		parts = append(parts, "ResultIsAllocatedMem")
+	}
+	if r&ResultIsConcreteTypeConvertedToInterface != 0 {
+		parts = append(parts, "ResultIsConcreteTypeConvertedToInterface")
+	}
+	if r&ResultAlwaysSameConstant != 0 {
+		parts = append(parts, "ResultAlwaysSameConstant")
+	}
+	if r&ResultAlwaysSameFunc != 0 {
+		parts = append(parts, "ResultAlwaysSameFunc")
+	}
+	if r&ResultAlwaysSameInlinableFunc != 0 {
+		parts = append(parts, "ResultAlwaysSameInlinableFunc")
+	}
+	if len(parts) == 0 {
+		return "0"
+	}
+	return strings.Join(parts, "|")
+}
