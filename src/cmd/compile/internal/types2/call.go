@@ -711,7 +711,7 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, def *TypeName
 				}
 				if exp == nil {
 					if isValidName(sel) {
-						check.errorf(e.Sel, UndeclaredImportedName, "undefined:1 %s", syntax.Expr(e)) // cast to syntax.Expr to silence vet
+						check.errorf(e.Sel, UndeclaredImportedName, "undefined: %s", syntax.Expr(e)) // cast to syntax.Expr to silence vet
 					}
 					goto Error
 				}
@@ -726,7 +726,7 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, def *TypeName
 							// report just the first one
 							check.errorf(e.Sel, UndeclaredImportedName, "undefined: %s (but have %s)", syntax.Expr(e), exps[0].Name())
 						} else {
-							check.errorf(e.Sel, UndeclaredImportedName, "undefined:2 %s", syntax.Expr(e))
+							check.errorf(e.Sel, UndeclaredImportedName, "undefined: %s", syntax.Expr(e))
 						}
 					}
 					goto Error
