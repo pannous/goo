@@ -551,19 +551,19 @@ func gencallstub(ctxt *ld.Link, ldr *loader.Loader, stubType int, stub *loader.S
 
 // Rewrite the instruction at offset into newinsn. Also, verify the
 // existing instruction under mask matches the check value.
-func rewritetoinsn(target *ld.Target, ldr *loader.Loader, su *loader.SymbolBuilder, offset int64, mask, check, newinsn uint32) {
+func rewritetoinsn(target *ld.Target, ldr *loader.Loader, su *loader.SymbolBuilder, offset int64, mask, checks, newinsn uint32) {
 	su.MakeWritable()
 	op := target.Arch.ByteOrder.Uint32(su.Data()[offset:])
-	if op&mask != check {
-		ldr.Errorf(su.Sym(), "Rewrite offset 0x%x to 0x%08X failed check (0x%08X&0x%08X != 0x%08X)", offset, newinsn, op, mask, check)
+	if op&mask != checks {
+		ldr.Errorf(su.Sym(), "Rewrite offset 0x%x to 0x%08X failed check (0x%08X&0x%08X != 0x%08X)", offset, newinsn, op, mask, checks)
 	}
 	su.SetUint32(target.Arch, offset, newinsn)
 }
 
 // Rewrite the instruction at offset into a hardware nop instruction. Also, verify the
 // existing instruction under mask matches the check value.
-func rewritetonop(target *ld.Target, ldr *loader.Loader, su *loader.SymbolBuilder, offset int64, mask, check uint32) {
-	rewritetoinsn(target, ldr, su, offset, mask, check, OP_NOP)
+func rewritetonop(target *ld.Target, ldr *loader.Loader, su *loader.SymbolBuilder, offset int64, mask, checks uint32) {
+	rewritetoinsn(target, ldr, su, offset, mask, checks, OP_NOP)
 }
 
 func adddynrel(target *ld.Target, ldr *loader.Loader, syms *ld.ArchSyms, s loader.Sym, r loader.Reloc, rIdx int) bool {

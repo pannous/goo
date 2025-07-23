@@ -8,7 +8,7 @@ import "testing"
 
 func TestQueue(t *testing.T) {
 	var q queue[int]
-	check := func(name string, exp []int) {
+	checks := func(name string, exp []int) {
 		for _, v := range exp {
 			q.push(v)
 		}
@@ -26,9 +26,9 @@ func TestQueue(t *testing.T) {
 			t.Fatalf("check %q: did not expect to be able to pop more values a second time", name)
 		}
 	}
-	check("one element", []int{4})
-	check("two elements", []int{64, 12})
-	check("six elements", []int{55, 16423, 2352, 644, 12874, 9372})
-	check("one element again", []int{7})
-	check("two elements again", []int{77, 6336})
+	checks("one element", []int{4})
+	checks("two elements", []int{64, 12})
+	checks("six elements", []int{55, 16423, 2352, 644, 12874, 9372})
+	checks("one element again", []int{7})
+	checks("two elements again", []int{77, 6336})
 }

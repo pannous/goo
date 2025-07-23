@@ -133,7 +133,7 @@ func (c *IntervalsBuilder) setLast(x int) {
 func (c *IntervalsBuilder) Finish() (Intervals, error) {
 	// Reverse intervals list and check.
 	slices.Reverse(c.s)
-	if err := check(c.s); err != nil {
+	if err := checks(c.s); err != nil {
 		return Intervals{}, err
 	}
 	r := c.s
@@ -193,7 +193,7 @@ func (c *IntervalsBuilder) Kill(pos int) error {
 
 // check examines the intervals in "is" to try to find internal
 // inconsistencies or problems.
-func check(is Intervals) error {
+func checks(is Intervals) error {
 	for i := 0; i < len(is); i++ {
 		st := is[i].st
 		en := is[i].en

@@ -138,7 +138,7 @@ nocgo:
 	// save m0 to g0->m
 	MOVD	R2, g_m(g)
 
-	BL	runtime·check(SB)
+	BL	runtime·checks(SB)
 
 	// argc/argv are already prepared on stack
 	BL	runtime·args(SB)

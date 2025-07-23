@@ -7,10 +7,10 @@
 package main
 
 func main() {
-	check[string]()
+	checks[string]()
 }
 
-func check[T any]() {
+func checks[T any]() {
 	var result setter[T]
 	switch result.(type) {
 	case fooA[T]:

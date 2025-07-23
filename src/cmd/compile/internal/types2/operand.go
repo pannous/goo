@@ -305,7 +305,7 @@ func (x *operand) isNil() bool {
 // is only valid if the (first) result is false. The check parameter may be nil
 // if assignableTo is invoked through an exported API call, i.e., when all
 // methods have been type-checked.
-func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Code) {
+func (x *operand) assignableTo(checks *Checker, T Type, cause *string) (bool, Code) {
 	if x.mode == invalid || !isValid(T) {
 		return true, 0 // avoid spurious errors
 	}
@@ -337,11 +337,11 @@ func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Cod
 				// A term may be a tilde term but the underlying
 				// type of an untyped value doesn't change so we
 				// don't need to do anything special.
-				newType, _, _ := check.implicitTypeAndValue(x, t.typ)
+				newType, _, _ := checks.implicitTypeAndValue(x, t.typ)
 				return newType != nil
 			}), IncompatibleAssign
 		}
-		newType, _, _ := check.implicitTypeAndValue(x, T)
+		newType, _, _ := checks.implicitTypeAndValue(x, T)
 		return newType != nil, IncompatibleAssign
 	}
 	// Vu is typed
@@ -357,7 +357,7 @@ func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Cod
 	// Also handle the case where T is a pointer to an interface so that we get
 	// the Checker.implements error cause.
 	if _, ok := Tu.(*Interface); ok && Tp == nil || isInterfacePtr(Tu) {
-		if check.implements(V, T, false, cause) {
+		if checks.implements(V, T, false, cause) {
 			return true, 0
 		}
 		// V doesn't implement T but V may still be assignable to T if V
@@ -372,7 +372,7 @@ func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Cod
 
 	// If V is an interface, check if a missing type assertion is the problem.
 	if Vi, _ := Vu.(*Interface); Vi != nil && Vp == nil {
-		if check.implements(T, V, false, nil) {
+		if checks.implements(T, V, false, nil) {
 			// T implements V, so give hint about type assertion.
 			if cause != nil {
 				*cause = "need type assertion"
@@ -396,8 +396,8 @@ func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Cod
 	}
 
 	errorf := func(format string, args ...any) {
-		if check != nil && cause != nil {
-			msg := check.sprintf(format, args...)
+		if checks != nil && cause != nil {
+			msg := checks.sprintf(format, args...)
 			if *cause != "" {
 				msg += "\n\t" + *cause
 			}
@@ -414,7 +414,7 @@ func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Cod
 			if T == nil {
 				return false // no specific types
 			}
-			ok, code = x.assignableTo(check, T.typ, cause)
+			ok, code = x.assignableTo(checks, T.typ, cause)
 			if !ok {
 				errorf("cannot assign %s to %s (in %s)", x.typ, T.typ, Tp)
 				return false
@@ -436,7 +436,7 @@ func (x *operand) assignableTo(check *Checker, T Type, cause *string) (bool, Cod
 				return false // no specific types
 			}
 			x.typ = V.typ
-			ok, code = x.assignableTo(check, T, cause)
+			ok, code = x.assignableTo(checks, T, cause)
 			if !ok {
 				errorf("cannot assign %s (in %s) to %s", V.typ, Vp, origT)
 				return false

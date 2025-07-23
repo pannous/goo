@@ -41,19 +41,19 @@ func main() {
 	// Test all the different ways we can invoke reflect.Value.Pointer.
 
 	// Direct method invocation.
-	check(unsafe.Pointer(testMeth(1).Pointer()), unsafe.Pointer(testMeth(2).Pointer()))
+	checks(unsafe.Pointer(testMeth(1).Pointer()), unsafe.Pointer(testMeth(2).Pointer()))
 
 	// Invocation via method expression.
-	check(unsafe.Pointer(reflect.Value.Pointer(testMeth(1))), unsafe.Pointer(reflect.Value.Pointer(testMeth(2))))
+	checks(unsafe.Pointer(reflect.Value.Pointer(testMeth(1))), unsafe.Pointer(reflect.Value.Pointer(testMeth(2))))
 
 	// Invocation via interface.
-	check(unsafe.Pointer(testInter(1).Pointer()), unsafe.Pointer(testInter(2).Pointer()))
+	checks(unsafe.Pointer(testInter(1).Pointer()), unsafe.Pointer(testInter(2).Pointer()))
 
 	// Invocation via method value.
-	check(unsafe.Pointer(testFunc(1)()), unsafe.Pointer(testFunc(2)()))
+	checks(unsafe.Pointer(testFunc(1)()), unsafe.Pointer(testFunc(2)()))
 }
 
-func check(p, q unsafe.Pointer) {
+func checks(p, q unsafe.Pointer) {
 	a, b := *(*int)(p), *(*int)(q)
 	if a != 1 || b != 2 {
 		fmt.Printf("got %v, %v; expected 1, 2\n", a, b)

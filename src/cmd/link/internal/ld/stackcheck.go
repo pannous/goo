@@ -76,7 +76,7 @@ func (ctxt *Link) doStackCheck() {
 	// visit every function once.
 	var failed []loader.Sym
 	for _, s := range ctxt.Textp {
-		if sc.check(s) > limit {
+		if sc.checks(s) > limit {
 			failed = append(failed, s)
 		}
 	}
@@ -88,7 +88,7 @@ func (ctxt *Link) doStackCheck() {
 		// record the graph this time.
 		sc = newStackCheck(ctxt, true)
 		for _, s := range failed {
-			sc.check(s)
+			sc.checks(s)
 		}
 
 		// Find the roots of the graph (functions that are not
@@ -141,7 +141,7 @@ func (sc *stackCheck) symName(sym loader.Sym) string {
 
 // check returns the stack height of sym. It populates sc.height and
 // sc.graph for sym and every function in its call tree.
-func (sc *stackCheck) check(sym loader.Sym) int {
+func (sc *stackCheck) checks(sym loader.Sym) int {
 	if h, ok := sc.height[sym]; ok {
 		// We've already visited this symbol or we're in a cycle.
 		return int(h)
@@ -221,7 +221,7 @@ func (sc *stackCheck) computeHeight(sym loader.Sym, graph bool) (int, []stackChe
 		}
 		height := growth
 		if target != 0 { // Don't walk into the leaf "edge"
-			height += sc.check(target)
+			height += sc.checks(target)
 		}
 		if height > maxHeight {
 			maxHeight = height

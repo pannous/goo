@@ -523,5 +523,5 @@ func makeIntervals(nums ...int) (Intervals, error) {
 		en := nums[i+1]
 		r = append(r, Interval{st: st, en: en})
 	}
-	return r, check(r)
+	return r, checks(r)
 }

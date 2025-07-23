@@ -118,7 +118,7 @@ func makeTestDial(t *testing.T) (*testConnSet, func(n, addr string) (net.Conn, e
 	return connSet, dial
 }
 
-func (tcs *testConnSet) check(t *testing.T) {
+func (tcs *testConnSet) checks(t *testing.T) {
 	tcs.mu.Lock()
 	defer tcs.mu.Unlock()
 	for i := 4; i >= 0; i-- {
@@ -246,7 +246,7 @@ func testTransportConnectionCloseOnResponse(t *testing.T, mode testMode) {
 		tr.CloseIdleConnections()
 	}
 
-	connSet.check(t)
+	connSet.checks(t)
 }
 
 // TestTransportConnectionCloseOnRequest tests that the Transport's doesn't reuse
@@ -314,7 +314,7 @@ func testTransportConnectionCloseOnRequest(t *testing.T, mode testMode) {
 		tr.CloseIdleConnections()
 	}
 
-	connSet.check(t)
+	connSet.checks(t)
 }
 
 // if the Transport's DisableKeepAlives is set, all requests should

@@ -43,7 +43,7 @@ func (v TF64) String() string { return Sprintf("F64: %f", float64(v)) }
 func (v TB) String() string   { return Sprintf("B: %t", bool(v)) }
 func (v TS) String() string   { return Sprintf("S: %q", string(v)) }
 
-func check(t *testing.T, got, want string) {
+func checks(t *testing.T, got, want string) {
 	if got != want {
 		t.Error(got, "!=", want)
 	}
@@ -51,11 +51,11 @@ func check(t *testing.T, got, want string) {
 
 func TestStringer(t *testing.T) {
 	s := Sprintf("%v %v %v %v %v", TI(0), TI8(1), TI16(2), TI32(3), TI64(4))
-	check(t, s, "I: 0 I8: 1 I16: 2 I32: 3 I64: 4")
+	checks(t, s, "I: 0 I8: 1 I16: 2 I32: 3 I64: 4")
 	s = Sprintf("%v %v %v %v %v %v", TU(5), TU8(6), TU16(7), TU32(8), TU64(9), TUI(10))
-	check(t, s, "U: 5 U8: 6 U16: 7 U32: 8 U64: 9 UI: 10")
+	checks(t, s, "U: 5 U8: 6 U16: 7 U32: 8 U64: 9 UI: 10")
 	s = Sprintf("%v %v %v", TF(1.0), TF32(2.0), TF64(3.0))
-	check(t, s, "F: 1.000000 F32: 2.000000 F64: 3.000000")
+	checks(t, s, "F: 1.000000 F32: 2.000000 F64: 3.000000")
 	s = Sprintf("%v %v", TB(true), TS("x"))
-	check(t, s, "B: true S: \"x\"")
+	checks(t, s, "B: true S: \"x\"")
 }

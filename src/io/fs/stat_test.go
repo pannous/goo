@@ -15,7 +15,7 @@ type statOnly struct{ StatFS }
 func (statOnly) Open(name string) (File, error) { return nil, ErrNotExist }
 
 func TestStat(t *testing.T) {
-	check := func(desc string, info FileInfo, err error) {
+	checks := func(desc string, info FileInfo, err error) {
 		t.Helper()
 		if err != nil || info == nil || info.Mode() != 0456 {
 			infoStr := "<nil>"
@@ -28,9 +28,9 @@ func TestStat(t *testing.T) {
 
 	// Test that Stat uses the method when present.
 	info, err := Stat(statOnly{testFsys}, "hello.txt")
-	check("statOnly", info, err)
+	checks("statOnly", info, err)
 
 	// Test that Stat uses Open when the method is not present.
 	info, err = Stat(openOnly{testFsys}, "hello.txt")
-	check("openOnly", info, err)
+	checks("openOnly", info, err)
 }

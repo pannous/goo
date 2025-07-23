@@ -85,7 +85,7 @@ func TestNewMethodSet(t *testing.T) {
 		// "type C interface{ f() }; func g[T C]() { type Y T; var a Y; _ = a }": {},
 	}
 
-	check := func(src string, methods []method, generic bool) {
+	checks := func(src string, methods []method, generic bool) {
 		pkg := mustTypecheck("package p;"+src, nil, nil)
 
 		scope := pkg.Scope()
@@ -119,11 +119,11 @@ func TestNewMethodSet(t *testing.T) {
 	}
 
 	for src, methods := range tests {
-		check(src, methods, false)
+		checks(src, methods, false)
 	}
 
 	for src, methods := range tParamTests {
-		check(src, methods, true)
+		checks(src, methods, true)
 	}
 }
 

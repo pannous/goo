@@ -209,7 +209,7 @@ var k2 = key2(1) // same int as k1, different type
 var k3 = key2(3) // same type as k2, different int
 
 func TestValues(t *testing.T) {
-	check := func(c Context, nm, v1, v2, v3 string) {
+	checks := func(c Context, nm, v1, v2, v3 string) {
 		if v, ok := c.Value(k1).(string); ok == (len(v1) == 0) || v != v1 {
 			t.Errorf(`%s.Value(k1).(string) = %q, %t want %q, %t`, nm, v, ok, v1, len(v1) != 0)
 		}
@@ -222,46 +222,46 @@ func TestValues(t *testing.T) {
 	}
 
 	c0 := Background()
-	check(c0, "c0", "", "", "")
+	checks(c0, "c0", "", "", "")
 
 	c1 := WithValue(Background(), k1, "c1k1")
-	check(c1, "c1", "c1k1", "", "")
+	checks(c1, "c1", "c1k1", "", "")
 
 	if got, want := fmt.Sprint(c1), `context.Background.WithValue(context_test.key1, c1k1)`; got != want {
 		t.Errorf("c.String() = %q want %q", got, want)
 	}
 
 	c2 := WithValue(c1, k2, "c2k2")
-	check(c2, "c2", "c1k1", "c2k2", "")
+	checks(c2, "c2", "c1k1", "c2k2", "")
 
 	if got, want := fmt.Sprint(c2), `context.Background.WithValue(context_test.key1, c1k1).WithValue(context_test.key2(1), c2k2)`; got != want {
 		t.Errorf("c.String() = %q want %q", got, want)
 	}
 
 	c3 := WithValue(c2, k3, "c3k3")
-	check(c3, "c2", "c1k1", "c2k2", "c3k3")
+	checks(c3, "c2", "c1k1", "c2k2", "c3k3")
 
 	c4 := WithValue(c3, k1, nil)
-	check(c4, "c4", "", "c2k2", "c3k3")
+	checks(c4, "c4", "", "c2k2", "c3k3")
 
 	if got, want := fmt.Sprint(c4), `context.Background.WithValue(context_test.key1, c1k1).WithValue(context_test.key2(1), c2k2).WithValue(context_test.key2(3), c3k3).WithValue(context_test.key1, <nil>)`; got != want {
 		t.Errorf("c.String() = %q want %q", got, want)
 	}
 
 	o0 := otherContext{Background()}
-	check(o0, "o0", "", "", "")
+	checks(o0, "o0", "", "", "")
 
 	o1 := otherContext{WithValue(Background(), k1, "c1k1")}
-	check(o1, "o1", "c1k1", "", "")
+	checks(o1, "o1", "c1k1", "", "")
 
 	o2 := WithValue(o1, k2, "o2k2")
-	check(o2, "o2", "c1k1", "o2k2", "")
+	checks(o2, "o2", "c1k1", "o2k2", "")
 
 	o3 := otherContext{c4}
-	check(o3, "o3", "", "c2k2", "c3k3")
+	checks(o3, "o3", "", "c2k2", "c3k3")
 
 	o4 := WithValue(o3, k3, nil)
-	check(o4, "o4", "", "c2k2", "")
+	checks(o4, "o4", "", "c2k2", "")
 }
 
 func TestAllocs(t *testing.T) {

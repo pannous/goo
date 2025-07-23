@@ -89,7 +89,7 @@ func TestAliasingAndClone(t *testing.T) {
 		return as
 	}
 
-	check := func(r Record, want []Attr) {
+	checks := func(r Record, want []Attr) {
 		t.Helper()
 		got := attrsSlice(r)
 		if !attrsEqual(got, want) {
@@ -111,17 +111,17 @@ func TestAliasingAndClone(t *testing.T) {
 	r1AttrsBefore := attrsSlice(r1)
 	r1.AddAttrs(Int("p", 0))
 	r2.AddAttrs(Int("p", 1))
-	check(r1, append(slices.Clip(r1AttrsBefore), Int("p", 0)))
+	checks(r1, append(slices.Clip(r1AttrsBefore), Int("p", 0)))
 	r1Attrs := attrsSlice(r1)
-	check(r2, append(slices.Clip(r1AttrsBefore),
+	checks(r2, append(slices.Clip(r1AttrsBefore),
 		String("!BUG", "AddAttrs unsafely called on copy of Record made without using Record.Clone"), Int("p", 1)))
 
 	// Adding to a clone is fine.
 	r2 = r1.Clone()
-	check(r2, r1Attrs)
+	checks(r2, r1Attrs)
 	r2.AddAttrs(Int("p", 2))
-	check(r1, r1Attrs) // r1 is unchanged
-	check(r2, append(slices.Clip(r1Attrs), Int("p", 2)))
+	checks(r1, r1Attrs) // r1 is unchanged
+	checks(r2, append(slices.Clip(r1Attrs), Int("p", 2)))
 }
 
 func newRecordWithAttrs(as []Attr) Record {

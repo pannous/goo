@@ -30,7 +30,7 @@ func f(i int) int {
 	return gx[i]
 }
 
-func check(x []int, x0, x1, x2 int) {
+func checks(x []int, x0, x1, x2 int) {
 	if x[0] != x0 || x[1] != x1 || x[2] != x2 {
 		fmt.Printf("%v, want %d,%d,%d\n", x, x0, x1, x2)
 		panic("failed")
@@ -49,7 +49,7 @@ func p1() {
 	i := 0
 	i, x[i] = 1, 100
 	_ = i
-	check(x, 100, 2, 3)
+	checks(x, 100, 2, 3)
 }
 
 func p2() {
@@ -57,7 +57,7 @@ func p2() {
 	i := 0
 	x[i], i = 100, 1
 	_ = i
-	check(x, 100, 2, 3)
+	checks(x, 100, 2, 3)
 }
 
 func p3() {
@@ -65,7 +65,7 @@ func p3() {
 	y := x
 	gx = x
 	x[1], y[0] = f(0), f(1)
-	check(x, 2, 1, 3)
+	checks(x, 2, 1, 3)
 }
 
 func p4() {
@@ -73,7 +73,7 @@ func p4() {
 	y := x
 	gx = x
 	x[1], y[0] = gx[0], gx[1]
-	check(x, 2, 1, 3)
+	checks(x, 2, 1, 3)
 }
 
 func p5() {
@@ -82,7 +82,7 @@ func p5() {
 	p := &x[0]
 	q := &x[1]
 	*p, *q = x[1], y[0]
-	check(x, 2, 1, 3)
+	checks(x, 2, 1, 3)
 }
 
 func p6() {

@@ -3294,7 +3294,7 @@ func (s *state) exprCheckPtr(n ir.Node, checkPtrOK bool) *ssa.Value {
 		bt := b.Type
 		if bt.IsSigned() {
 			cmp := s.newValue2(s.ssaOp(ir.OLE, bt), types.Types[types.TBOOL], s.zeroVal(bt), b)
-			s.check(cmp, ir.Syms.Panicshift)
+			s.checks(cmp, ir.Syms.Panicshift)
 			bt = bt.ToUnsigned()
 		}
 		return s.newValue2(s.ssaShiftOp(n.Op(), n.Type(), bt), a.Type, a, b)
@@ -3541,8 +3541,8 @@ func (s *state) exprCheckPtr(n ir.Node, checkPtrOK bool) *ssa.Value {
 
 	case ir.OSLICE, ir.OSLICEARR, ir.OSLICE3, ir.OSLICE3ARR:
 		n := n.(*ir.SliceExpr)
-		check := s.checkPtrEnabled && n.Op() == ir.OSLICE3ARR && n.X.Op() == ir.OCONVNOP && n.X.(*ir.ConvExpr).X.Type().IsUnsafePtr()
-		v := s.exprCheckPtr(n.X, !check)
+		checks := s.checkPtrEnabled && n.Op() == ir.OSLICE3ARR && n.X.Op() == ir.OCONVNOP && n.X.(*ir.ConvExpr).X.Type().IsUnsafePtr()
+		v := s.exprCheckPtr(n.X, !checks)
 		var i, j, k *ssa.Value
 		if n.Low != nil {
 			i = s.expr(n.Low)
@@ -3554,7 +3554,7 @@ func (s *state) exprCheckPtr(n ir.Node, checkPtrOK bool) *ssa.Value {
 			k = s.expr(n.Max)
 		}
 		p, l, c := s.slice(v, i, j, k, n.Bounded())
-		if check {
+		if checks {
 			// Emit checkptr instrumentation after bound check to prevent false positive, see #46938.
 			s.checkPtrAlignment(n.X.(*ir.ConvExpr), v, s.conv(n.Max, k, k.Type, types.Types[types.TUINTPTR]))
 		}
@@ -5209,7 +5209,7 @@ func (s *state) boundsCheck(idx, len *ssa.Value, kind ssa.BoundsKind, bounded bo
 }
 
 // If cmp (a bool) is false, panic using the given function.
-func (s *state) check(cmp *ssa.Value, fn *obj.LSym) {
+func (s *state) checks(cmp *ssa.Value, fn *obj.LSym) {
 	b := s.endBlock()
 	b.Kind = ssa.BlockIf
 	b.SetControl(cmp)
@@ -5243,7 +5243,7 @@ func (s *state) intDivide(n ir.Node, a, b *ssa.Value) *ssa.Value {
 	if needcheck {
 		// do a size-appropriate check for zero
 		cmp := s.newValue2(s.ssaOp(ir.ONE, n.Type()), types.Types[types.TBOOL], b, s.zeroVal(n.Type()))
-		s.check(cmp, ir.Syms.Panicdivide)
+		s.checks(cmp, ir.Syms.Panicdivide)
 	}
 	return s.newValue2(s.ssaOp(n.Op(), n.Type()), a.Type, a, b)
 }

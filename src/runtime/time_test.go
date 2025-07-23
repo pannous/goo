@@ -103,7 +103,7 @@ func TestTimeTimerType(t *testing.T) {
 	// (meaning those two must have the same layout).
 	runtimeTimeTimer := reflect.TypeOf(runtime.TimeTimer{})
 
-	check := func(name string, typ reflect.Type) {
+	checks := func(name string, typ reflect.Type) {
 		n1 := runtimeTimeTimer.NumField()
 		n2 := typ.NumField()
 		if n1 != n2+1 {
@@ -124,6 +124,6 @@ func TestTimeTimerType(t *testing.T) {
 		}
 	}
 
-	check("time.Timer", reflect.TypeOf(time.Timer{}))
-	check("time.Ticker", reflect.TypeOf(time.Ticker{}))
+	checks("time.Timer", reflect.TypeOf(time.Timer{}))
+	checks("time.Ticker", reflect.TypeOf(time.Ticker{}))
 }

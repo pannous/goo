@@ -361,19 +361,19 @@ func (c *comparer) identical(x, y Type, p *ifacePair) bool {
 			}
 			smap := makeSubstMap(ytparams, targs)
 
-			var check *Checker   // ok to call subst on a nil *Checker
+			var checks *Checker   // ok to call subst on a nil *Checker
 			ctxt := NewContext() // need a non-nil Context for the substitution below
 
 			// Constraints must be pair-wise identical, after substitution.
 			for i, xtparam := range xtparams {
-				ybound := check.subst(nopos, ytparams[i].bound, smap, nil, ctxt)
+				ybound := checks.subst(nopos, ytparams[i].bound, smap, nil, ctxt)
 				if !c.identical(xtparam.bound, ybound, p) {
 					return false
 				}
 			}
 
-			yparams = check.subst(nopos, y.params, smap, nil, ctxt).(*Tuple)
-			yresults = check.subst(nopos, y.results, smap, nil, ctxt).(*Tuple)
+			yparams = checks.subst(nopos, y.params, smap, nil, ctxt).(*Tuple)
+			yresults = checks.subst(nopos, y.results, smap, nil, ctxt).(*Tuple)
 		}
 
 		return x.variadic == y.variadic &&

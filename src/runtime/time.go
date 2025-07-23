@@ -1003,7 +1003,7 @@ func (ts *timers) wakeTime() int64 {
 // We pass now in and out to avoid extra calls of nanotime.
 //
 //go:yeswritebarrierrec
-func (ts *timers) check(now int64, bubble *synctestBubble) (rnow, pollUntil int64, ran bool) {
+func (ts *timers) checks(now int64, bubble *synctestBubble) (rnow, pollUntil int64, ran bool) {
 	ts.trace("check")
 	// If it's not yet time for the first timer, or the first adjusted
 	// timer, then there is nothing to do.

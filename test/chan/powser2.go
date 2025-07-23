@@ -645,7 +645,7 @@ func Init() {
 	Twos = Rep(itor(2))
 }
 
-func check(U PS, c *rat, count int, str string) {
+func checks(U PS, c *rat, count int, str string) {
 	for i := 0; i < count; i++ {
 		r := get(U)
 		if !r.eq(c) {
@@ -663,7 +663,7 @@ const N = 10
 
 func checka(U PS, a []*rat, str string) {
 	for i := 0; i < N; i++ {
-		check(U, a[i], 1, str)
+		checks(U, a[i], 1, str)
 	}
 }
 
@@ -693,9 +693,9 @@ func main() {
 		print("ATan: ")
 		Printn(Integ(zero, MonSubst(Ones, neg(one), 2)), 10)
 	} else { // test
-		check(Ones, one, 5, "Ones")
-		check(Add(Ones, Ones), itor(2), 0, "Add Ones Ones") // 1 1 1 1 1
-		check(Add(Ones, Twos), itor(3), 0, "Add Ones Twos") // 3 3 3 3 3
+		checks(Ones, one, 5, "Ones")
+		checks(Add(Ones, Ones), itor(2), 0, "Add Ones Ones") // 1 1 1 1 1
+		checks(Add(Ones, Twos), itor(3), 0, "Add Ones Twos") // 3 3 3 3 3
 		a := make([]*rat, N)
 		d := Diff(Ones)
 		for i := 0; i < N; i++ {
@@ -708,8 +708,8 @@ func main() {
 			a[i] = i2tor(1, int64(i))
 		}
 		checka(in, a, "Integ")                               // 0 1 1/2 1/3 1/4 1/5
-		check(Cmul(neg(one), Twos), itor(-2), 10, "CMul")    // -1 -1 -1 -1 -1
-		check(Sub(Ones, Twos), itor(-1), 0, "Sub Ones Twos") // -1 -1 -1 -1 -1
+		checks(Cmul(neg(one), Twos), itor(-2), 10, "CMul")    // -1 -1 -1 -1 -1
+		checks(Sub(Ones, Twos), itor(-1), 0, "Sub Ones Twos") // -1 -1 -1 -1 -1
 		m := Mul(Ones, Ones)
 		for i := 0; i < N; i++ {
 			a[i] = itor(int64(i + 1))

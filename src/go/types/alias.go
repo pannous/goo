@@ -141,7 +141,7 @@ func asNamed(t Type) *Named {
 
 // newAlias creates a new Alias type with the given type name and rhs.
 // rhs must not be nil.
-func (check *Checker) newAlias(obj *TypeName, rhs Type) *Alias {
+func (checks *Checker) newAlias(obj *TypeName, rhs Type) *Alias {
 	assert(rhs != nil)
 	a := new(Alias)
 	a.obj = obj
@@ -152,8 +152,8 @@ func (check *Checker) newAlias(obj *TypeName, rhs Type) *Alias {
 	}
 
 	// Ensure that a.actual is set at the end of type checking.
-	if check != nil {
-		check.needsCleanup(a)
+	if checks != nil {
+		checks.needsCleanup(a)
 	}
 
 	return a
@@ -162,11 +162,11 @@ func (check *Checker) newAlias(obj *TypeName, rhs Type) *Alias {
 // newAliasInstance creates a new alias instance for the given origin and type
 // arguments, recording pos as the position of its synthetic object (for error
 // reporting).
-func (check *Checker) newAliasInstance(pos token.Pos, orig *Alias, targs []Type, expanding *Named, ctxt *Context) *Alias {
+func (checks *Checker) newAliasInstance(pos token.Pos, orig *Alias, targs []Type, expanding *Named, ctxt *Context) *Alias {
 	assert(len(targs) > 0)
 	obj := NewTypeName(pos, orig.obj.pkg, orig.obj.name, nil)
-	rhs := check.subst(pos, orig.fromRHS, makeSubstMap(orig.TypeParams().list(), targs), expanding, ctxt)
-	res := check.newAlias(obj, rhs)
+	rhs := checks.subst(pos, orig.fromRHS, makeSubstMap(orig.TypeParams().list(), targs), expanding, ctxt)
+	res := checks.newAlias(obj, rhs)
 	res.orig = orig
 	res.tparams = orig.tparams
 	res.targs = newTypeList(targs)

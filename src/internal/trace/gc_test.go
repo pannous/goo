@@ -84,7 +84,7 @@ func TestMMUTrace(t *testing.T) {
 		// test input too big for all.bash
 		t.Skip("skipping in -short mode")
 	}
-	check := func(t *testing.T, mu [][]trace.MutatorUtil) {
+	checks := func(t *testing.T, mu [][]trace.MutatorUtil) {
 		mmuCurve := trace.NewMMUCurve(mu)
 
 		// Test the optimized implementation against the "obviously
@@ -138,7 +138,7 @@ func TestMMUTrace(t *testing.T) {
 			events = append(events, ev)
 		}
 		// Pass the trace through MutatorUtilizationV2 and check it.
-		check(t, trace.MutatorUtilizationV2(events, trace.UtilSTW|trace.UtilBackground|trace.UtilAssist))
+		checks(t, trace.MutatorUtilizationV2(events, trace.UtilSTW|trace.UtilBackground|trace.UtilAssist))
 	})
 }
 

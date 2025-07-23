@@ -3,5 +3,5 @@
 // license that can be found in the LICENSE file.
 
 The internal/runtime/sys directory contains tests that specifically need to be
-compiled as-if in the internal/runtime/sys package. For error-check tests,
+compiled as-if in the internal/runtime/sys package. For error-checks tests,
 these require the additional flags -+ and -p=internal/runtime/sys.

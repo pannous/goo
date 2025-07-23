@@ -86,7 +86,7 @@ Useful debugging flags (together with `go test -run Manual`):
 
 #### Checker
 
-File: check.go
+File: checks.go
 
 A `Checker` maintains all typechecking state relevant for typechecking a package.
 Typically the receiver type for typechecker methods.
@@ -131,7 +131,7 @@ The result of typechecking expression `e` is returned via the operand `x`
 (which sometimes also serves as incoming argument).
 If an error occurred the function f will report the error and try to continue
 as best as it can, but it may return an invalid operand (`x.mode == invalid`).
-Callers may need to explicitly check for invalid operands.
+Callers may need to explicitly checks for invalid operands.
 
 
 #

@@ -51,7 +51,7 @@ const maxTermCount = 100
 
 // parseUnion parses uexpr as a union of expressions.
 // The result is a Union type, or Typ[Invalid] for some errors.
-func parseUnion(check *Checker, uexpr ast.Expr) Type {
+func parseUnion(checks *Checker, uexpr ast.Expr) Type {
 	blist, tlist := flattenUnion(nil, uexpr)
 	assert(len(blist) == len(tlist)-1)
 
@@ -59,7 +59,7 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 
 	var u Type
 	for i, x := range tlist {
-		term := parseTilde(check, x)
+		term := parseTilde(checks, x)
 		if len(tlist) == 1 && !term.tilde {
 			// Single type. Ok to return early because all relevant
 			// checks have been performed in parseTilde (no need to
@@ -68,7 +68,7 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 		}
 		if len(terms) >= maxTermCount {
 			if isValid(u) {
-				check.errorf(x, InvalidUnion, "cannot handle more than %d union terms (implementation limitation)", maxTermCount)
+				checks.errorf(x, InvalidUnion, "cannot handle more than %d union terms (implementation limitation)", maxTermCount)
 				u = Typ[Invalid]
 			}
 		} else {
@@ -77,7 +77,7 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 		}
 
 		if i > 0 {
-			check.recordTypeAndValue(blist[i-1], typexpr, u, nil)
+			checks.recordTypeAndValue(blist[i-1], typexpr, u, nil)
 		}
 	}
 
@@ -88,7 +88,7 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 	// Check validity of terms.
 	// Do this check later because it requires types to be set up.
 	// Note: This is a quadratic algorithm, but unions tend to be short.
-	check.later(func() {
+	checks.later(func() {
 		for i, t := range terms {
 			if !isValid(t.typ) {
 				continue
@@ -98,12 +98,12 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 			f, _ := u.(*Interface)
 			if t.tilde {
 				if f != nil {
-					check.errorf(tlist[i], InvalidUnion, "invalid use of ~ (%s is an interface)", t.typ)
+					checks.errorf(tlist[i], InvalidUnion, "invalid use of ~ (%s is an interface)", t.typ)
 					continue // don't report another error for t
 				}
 
 				if !Identical(u, t.typ) {
-					check.errorf(tlist[i], InvalidUnion, "invalid use of ~ (underlying type of %s is %s)", t.typ, u)
+					checks.errorf(tlist[i], InvalidUnion, "invalid use of ~ (underlying type of %s is %s)", t.typ, u)
 					continue
 				}
 			}
@@ -116,11 +116,11 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 				tset := f.typeSet()
 				switch {
 				case tset.NumMethods() != 0:
-					check.errorf(tlist[i], InvalidUnion, "cannot use %s in union (%s contains methods)", t, t)
+					checks.errorf(tlist[i], InvalidUnion, "cannot use %s in union (%s contains methods)", t, t)
 				case t.typ == universeComparable.Type():
-					check.error(tlist[i], InvalidUnion, "cannot use comparable in union")
+					checks.error(tlist[i], InvalidUnion, "cannot use comparable in union")
 				case tset.comparable:
-					check.errorf(tlist[i], InvalidUnion, "cannot use %s in union (%s embeds comparable)", t, t)
+					checks.errorf(tlist[i], InvalidUnion, "cannot use %s in union (%s embeds comparable)", t, t)
 				}
 				continue // terms with interface types are not subject to the no-overlap rule
 			}
@@ -128,7 +128,7 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 			// Report overlapping (non-disjoint) terms such as
 			// a|a, a|~a, ~a|~a, and ~a|A (where under(A) == a).
 			if j := overlappingTerm(terms[:i], t); j >= 0 {
-				check.softErrorf(tlist[i], InvalidUnion, "overlapping terms %s and %s", t, terms[j])
+				checks.softErrorf(tlist[i], InvalidUnion, "overlapping terms %s and %s", t, terms[j])
 			}
 		}
 	}).describef(uexpr, "check term validity %s", uexpr)
@@ -136,14 +136,14 @@ func parseUnion(check *Checker, uexpr ast.Expr) Type {
 	return u
 }
 
-func parseTilde(check *Checker, tx ast.Expr) *Term {
+func parseTilde(checks *Checker, tx ast.Expr) *Term {
 	x := tx
 	var tilde bool
 	if op, _ := x.(*ast.UnaryExpr); op != nil && op.Op == token.TILDE {
 		x = op.X
 		tilde = true
 	}
-	typ := check.typ(x)
+	typ := checks.typ(x)
 	// Embedding stand-alone type parameters is not permitted (go.dev/issue/47127).
 	// We don't need this restriction anymore if we make the underlying type of a type
 	// parameter its constraint interface: if we embed a lone type parameter, we will
@@ -151,15 +151,15 @@ func parseTilde(check *Checker, tx ast.Expr) *Term {
 	// and since the underlying type is an interface the embedding is well defined.
 	if isTypeParam(typ) {
 		if tilde {
-			check.errorf(x, MisplacedTypeParam, "type in term %s cannot be a type parameter", tx)
+			checks.errorf(x, MisplacedTypeParam, "type in term %s cannot be a type parameter", tx)
 		} else {
-			check.error(x, MisplacedTypeParam, "term cannot be a type parameter")
+			checks.error(x, MisplacedTypeParam, "term cannot be a type parameter")
 		}
 		typ = Typ[Invalid]
 	}
 	term := NewTerm(tilde, typ)
 	if tilde {
-		check.recordTypeAndValue(tx, typexpr, &Union{[]*Term{term}}, nil)
+		checks.recordTypeAndValue(tx, typexpr, &Union{[]*Term{term}}, nil)
 	}
 	return term
 }

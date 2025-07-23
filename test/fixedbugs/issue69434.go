@@ -30,7 +30,7 @@ func NewS(round int) *S {
 	return s
 }
 
-func (s *S) check(round int) {
+func (s *S) checks(round int) {
 	if s.round != round {
 		panic("bad round")
 	}
@@ -39,13 +39,13 @@ func (s *S) check(round int) {
 func f() {
 	rounds := 0
 	s := NewS(rounds)
-	s.check(rounds)
+	s.checks(rounds)
 
 	for range All() {
-		s.check(rounds)
+		s.checks(rounds)
 		rounds++
 		s = NewS(rounds)
-		s.check(rounds)
+		s.checks(rounds)
 	}
 }
 

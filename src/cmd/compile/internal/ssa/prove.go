@@ -1359,17 +1359,17 @@ func prove(f *Func) {
 			continue
 		}
 
-		check := ind.Block.Controls[0]
+		checks := ind.Block.Controls[0]
 		// invert the check
-		check.Args[0], check.Args[1] = check.Args[1], check.Args[0]
+		checks.Args[0], checks.Args[1] = checks.Args[1], checks.Args[0]
 
 		// swap start and end in the loop
-		for i, v := range check.Args {
+		for i, v := range checks.Args {
 			if v != end {
 				continue
 			}
 
-			check.SetArg(i, start)
+			checks.SetArg(i, start)
 			goto replacedEnd
 		}
 		panic(fmt.Sprintf("unreachable, ind: %v, start: %v, end: %v", ind, start, end))

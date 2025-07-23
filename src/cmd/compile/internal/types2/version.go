@@ -51,15 +51,15 @@ var (
 // allowVersion reports whether the current effective Go version
 // (which may vary from one file to another) is allowed to use the
 // feature version (want).
-func (check *Checker) allowVersion(want goVersion) bool {
-	return !check.version.isValid() || check.version.cmp(want) >= 0
+func (checks *Checker) allowVersion(want goVersion) bool {
+	return !checks.version.isValid() || checks.version.cmp(want) >= 0
 }
 
 // verifyVersionf is like allowVersion but also accepts a format string and arguments
 // which are used to report a version error if allowVersion returns false.
-func (check *Checker) verifyVersionf(at poser, v goVersion, format string, args ...interface{}) bool {
-	if !check.allowVersion(v) {
-		check.versionErrorf(at, v, format, args...)
+func (checks *Checker) verifyVersionf(at poser, v goVersion, format string, args ...interface{}) bool {
+	if !checks.allowVersion(v) {
+		checks.versionErrorf(at, v, format, args...)
 		return false
 	}
 	return true

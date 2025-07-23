@@ -1206,3 +1206,17 @@ func walkPrintf(nn *ir.CallExpr, init *ir.Nodes) ir.Node {
 	r.List = calls
 	return walkStmt(typecheck.Stmt(r))
 }
+
+// walkAssert walks an OASSERT node.
+func walkAssert(n *ir.UnaryExpr, init *ir.Nodes) ir.Node {
+	// Walk the condition expression
+	cond := walkExpr(n.X, init)
+	
+	// Create an if statement: if !cond { panic("assertion failed") }
+	notCond := ir.NewUnaryExpr(n.Pos(), ir.ONOT, cond)
+	panicMsg := ir.NewString(n.Pos(), "assertion failed")
+	panicCall := mkcall("gopanic", nil, init, panicMsg)
+	
+	ifStmt := ir.NewIfStmt(n.Pos(), notCond, []ir.Node{panicCall}, nil)
+	return walkStmt(typecheck.Stmt(ifStmt))
+}

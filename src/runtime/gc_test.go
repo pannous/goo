@@ -313,7 +313,7 @@ func TestGCTestPointerClass(t *testing.T) {
 		t.Skip("extra allocations cause this test to fail; see #70079")
 	}
 	t.Parallel()
-	check := func(p unsafe.Pointer, want string) {
+	checks := func(p unsafe.Pointer, want string) {
 		t.Helper()
 		got := runtime.GCTestPointerClass(p)
 		if got != want {
@@ -324,11 +324,11 @@ func TestGCTestPointerClass(t *testing.T) {
 	}
 	var onStack int
 	var notOnStack int
-	check(unsafe.Pointer(&onStack), "stack")
-	check(unsafe.Pointer(runtime.Escape(&notOnStack)), "heap")
-	check(unsafe.Pointer(&pointerClassBSS), "bss")
-	check(unsafe.Pointer(&pointerClassData), "data")
-	check(nil, "other")
+	checks(unsafe.Pointer(&onStack), "stack")
+	checks(unsafe.Pointer(runtime.Escape(&notOnStack)), "heap")
+	checks(unsafe.Pointer(&pointerClassBSS), "bss")
+	checks(unsafe.Pointer(&pointerClassData), "data")
+	checks(nil, "other")
 }
 
 func BenchmarkAllocation(b *testing.B) {

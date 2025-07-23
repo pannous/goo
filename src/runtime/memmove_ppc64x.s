@@ -38,7 +38,7 @@ TEXT runtime·memmove<ABIInternal>(SB), NOSPLIT|NOFRAME, $0-24
 
 	// Determine if there are doublewords to
 	// copy so a more efficient move can be done
-check:
+checks:
 #ifdef GOPPC64_power10
 	CMP	LEN, $16
 	BGT	mcopy

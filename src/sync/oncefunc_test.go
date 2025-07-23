@@ -96,7 +96,7 @@ func testOncePanicX(t *testing.T, calls *int, f func()) {
 	})
 }
 
-func testOncePanicWith(t *testing.T, calls *int, f func(), check func(label string, p any)) {
+func testOncePanicWith(t *testing.T, calls *int, f func(), checks func(label string, p any)) {
 	// Check that the each call to f panics with the same value, but the
 	// underlying function is only called once.
 	for _, label := range []string{"first time", "second time"} {
@@ -112,7 +112,7 @@ func testOncePanicWith(t *testing.T, calls *int, f func(), check func(label stri
 		if !panicked {
 			t.Fatalf("%s: f did not panic", label)
 		}
-		check(label, p)
+		checks(label, p)
 	}
 	if *calls != 1 {
 		t.Errorf("want calls==1, got %d", *calls)

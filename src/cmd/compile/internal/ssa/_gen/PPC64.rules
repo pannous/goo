@@ -185,7 +185,7 @@
 ((Rsh8|Rsh8U)x64  x (MOVDconst [c])) && uint64(c) < 8 => (SR(AW|W)const ((Sign|Zero)Ext8to32 x) [c])
 (Lsh8x64  x (MOVDconst [c])) && uint64(c) < 8 => (SLWconst x [c])
 
-// Lower bounded shifts first. No need to check shift value.
+// Lower bounded shifts first. No need to checks shift value.
 (Lsh64x(64|32|16|8)  x y) && shiftIsBounded(v) => (SLD x y)
 (Lsh32x(64|32|16|8)  x y) && shiftIsBounded(v) => (SLW x y)
 (Lsh16x(64|32|16|8)  x y) && shiftIsBounded(v) => (SLD x y)

@@ -59,21 +59,21 @@ func TestDecodeProgressive(t *testing.T) {
 		switch m0 := m0.(type) {
 		case *image.YCbCr:
 			m1 := m1.(*image.YCbCr)
-			if err := check(m0.Bounds(), m0.Y, m1.Y, m0.YStride, m1.YStride); err != nil {
+			if err := checks(m0.Bounds(), m0.Y, m1.Y, m0.YStride, m1.YStride); err != nil {
 				t.Errorf("%s (Y): %v", tc, err)
 				continue
 			}
-			if err := check(m0.Bounds(), m0.Cb, m1.Cb, m0.CStride, m1.CStride); err != nil {
+			if err := checks(m0.Bounds(), m0.Cb, m1.Cb, m0.CStride, m1.CStride); err != nil {
 				t.Errorf("%s (Cb): %v", tc, err)
 				continue
 			}
-			if err := check(m0.Bounds(), m0.Cr, m1.Cr, m0.CStride, m1.CStride); err != nil {
+			if err := checks(m0.Bounds(), m0.Cr, m1.Cr, m0.CStride, m1.CStride); err != nil {
 				t.Errorf("%s (Cr): %v", tc, err)
 				continue
 			}
 		case *image.Gray:
 			m1 := m1.(*image.Gray)
-			if err := check(m0.Bounds(), m0.Pix, m1.Pix, m0.Stride, m1.Stride); err != nil {
+			if err := checks(m0.Bounds(), m0.Pix, m1.Pix, m0.Stride, m1.Stride); err != nil {
 				t.Errorf("%s: %v", tc, err)
 				continue
 			}
@@ -139,7 +139,7 @@ func TestDecodeEOF(t *testing.T) {
 }
 
 // check checks that the two pix data are equal, within the given bounds.
-func check(bounds image.Rectangle, pix0, pix1 []byte, stride0, stride1 int) error {
+func checks(bounds image.Rectangle, pix0, pix1 []byte, stride0, stride1 int) error {
 	if stride0 <= 0 || stride0%8 != 0 {
 		return fmt.Errorf("bad stride %d", stride0)
 	}

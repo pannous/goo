@@ -79,7 +79,7 @@ type monoEdge struct {
 	typ Type
 }
 
-func (check *Checker) monomorph() {
+func (checks *Checker) monomorph() {
 	// We detect unbounded instantiation cycles using a variant of
 	// Bellman-Ford's algorithm. Namely, instead of always running |V|
 	// iterations, we run until we either reach a fixed point or we've
@@ -90,9 +90,9 @@ func (check *Checker) monomorph() {
 	for again {
 		again = false
 
-		for i, edge := range check.mono.edges {
-			src := &check.mono.vertices[edge.src]
-			dst := &check.mono.vertices[edge.dst]
+		for i, edge := range checks.mono.edges {
+			src := &checks.mono.vertices[edge.src]
+			dst := &checks.mono.vertices[edge.dst]
 
 			// N.B., we're looking for the greatest weight paths, unlike
 			// typical Bellman-Ford.
@@ -103,8 +103,8 @@ func (check *Checker) monomorph() {
 
 			dst.pre = i
 			dst.len = src.len + 1
-			if dst.len == len(check.mono.vertices) {
-				check.reportInstanceLoop(edge.dst)
+			if dst.len == len(checks.mono.vertices) {
+				checks.reportInstanceLoop(edge.dst)
 				return
 			}
 
@@ -114,9 +114,9 @@ func (check *Checker) monomorph() {
 	}
 }
 
-func (check *Checker) reportInstanceLoop(v int) {
+func (checks *Checker) reportInstanceLoop(v int) {
 	var stack []int
-	seen := make([]bool, len(check.mono.vertices))
+	seen := make([]bool, len(checks.mono.vertices))
 
 	// We have a path that contains a cycle and ends at v, but v may
 	// only be reachable from the cycle, not on the cycle itself. We
@@ -125,7 +125,7 @@ func (check *Checker) reportInstanceLoop(v int) {
 	for !seen[v] {
 		stack = append(stack, v)
 		seen[v] = true
-		v = check.mono.edges[check.mono.vertices[v].pre].src
+		v = checks.mono.edges[checks.mono.vertices[v].pre].src
 	}
 
 	// Trim any vertices we visited before visiting v the first
@@ -137,14 +137,14 @@ func (check *Checker) reportInstanceLoop(v int) {
 
 	// TODO(mdempsky): Pivot stack so we report the cycle from the top?
 
-	err := check.newError(InvalidInstanceCycle)
-	obj0 := check.mono.vertices[v].obj
+	err := checks.newError(InvalidInstanceCycle)
+	obj0 := checks.mono.vertices[v].obj
 	err.addf(obj0, "instantiation cycle:")
 
-	qf := RelativeTo(check.pkg)
+	qf := RelativeTo(checks.pkg)
 	for _, v := range stack {
-		edge := check.mono.edges[check.mono.vertices[v].pre]
-		obj := check.mono.vertices[edge.dst].obj
+		edge := checks.mono.edges[checks.mono.vertices[v].pre]
+		obj := checks.mono.vertices[edge.dst].obj
 
 		switch obj.Type().(type) {
 		default:

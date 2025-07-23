@@ -1600,10 +1600,10 @@ func TestFiles(t *testing.T) {
 	fset := token.NewFileSet()
 	pkg := NewPackage("p", "p")
 	var info Info
-	check := NewChecker(&conf, fset, pkg, &info)
+	checks := NewChecker(&conf, fset, pkg, &info)
 
 	for _, src := range sources {
-		if err := check.Files([]*ast.File{mustParse(fset, src)}); err != nil {
+		if err := checks.Files([]*ast.File{mustParse(fset, src)}); err != nil {
 			t.Error(err)
 		}
 	}
@@ -3094,8 +3094,8 @@ func TestVersionIssue69477(t *testing.T) {
 	// Type check. The checker will consult the effective
 	// version for the BasicLit 123. This used to panic.
 	pkg := NewPackage("p", "p")
-	check := NewChecker(&Config{}, fset, pkg, nil)
-	if err := check.Files([]*ast.File{f}); err != nil {
+	checks := NewChecker(&Config{}, fset, pkg, nil)
+	if err := checks.Files([]*ast.File{f}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -3122,8 +3122,8 @@ func TestVersionWithoutPos(t *testing.T) {
 	// range-over-func are permitted: they are not.
 	// (Previously, no error was reported.)
 	pkg := NewPackage("p", "p")
-	check := NewChecker(&Config{}, fset, pkg, nil)
-	err := check.Files([]*ast.File{f})
+	checks := NewChecker(&Config{}, fset, pkg, nil)
+	err := checks.Files([]*ast.File{f})
 	got := fmt.Sprint(err)
 	want := "range over s (variable of type func(func() bool)): requires go1.23"
 	if !strings.Contains(got, want) {
@@ -3152,8 +3152,8 @@ func (recv T) f(param int) (result int) {
 
 	pkg := NewPackage("p", "p")
 	info := &Info{Defs: make(map[*ast.Ident]Object)}
-	check := NewChecker(&Config{}, fset, pkg, info)
-	if err := check.Files([]*ast.File{f}); err != nil {
+	checks := NewChecker(&Config{}, fset, pkg, info)
+	if err := checks.Files([]*ast.File{f}); err != nil {
 		t.Fatal(err)
 	}
 	var got []string
@@ -3191,8 +3191,8 @@ var _ = f[B]
 
 	pkg := NewPackage("p", "p")
 	info := &Info{Types: make(map[ast.Expr]TypeAndValue)}
-	check := NewChecker(&Config{}, fset, pkg, info)
-	if err := check.Files([]*ast.File{f}); err != nil {
+	checks := NewChecker(&Config{}, fset, pkg, info)
+	if err := checks.Files([]*ast.File{f}); err != nil {
 		t.Fatal(err)
 	}
 

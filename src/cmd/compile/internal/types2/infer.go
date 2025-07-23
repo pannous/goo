@@ -29,21 +29,21 @@ const enableReverseTypeInference = true // disable for debugging
 // If successful, infer returns the complete list of given and inferred type arguments, one for each
 // type parameter. Otherwise the result is nil. Errors are reported through the err parameter.
 // Note: infer may fail (return nil) due to invalid args operands without reporting additional errors.
-func (check *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, params *Tuple, args []*operand, reverse bool, err *error_) (inferred []Type) {
+func (checks *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, params *Tuple, args []*operand, reverse bool, err *error_) (inferred []Type) {
 	// Don't verify result conditions if there's no error handler installed:
 	// in that case, an error leads to an exit panic and the result value may
 	// be incorrect. But in that case it doesn't matter because callers won't
 	// be able to use it either.
-	if check.conf.Error != nil {
+	if checks.conf.Error != nil {
 		defer func() {
 			assert(inferred == nil || len(inferred) == len(tparams) && !slices.Contains(inferred, nil))
 		}()
 	}
 
 	if traceInference {
-		check.dump("== infer : %s%s ➞ %s", tparams, params, targs) // aligned with rename print below
+		checks.dump("== infer : %s%s ➞ %s", tparams, params, targs) // aligned with rename print below
 		defer func() {
-			check.dump("=> %s ➞ %s\n", tparams, inferred)
+			checks.dump("=> %s ➞ %s\n", tparams, inferred)
 		}()
 	}
 
@@ -105,13 +105,13 @@ func (check *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, 
 	//           the substitution (which always happens).
 	if params.Len() > 0 {
 		smap := makeSubstMap(tparams, targs)
-		params = check.subst(nopos, params, smap, nil, check.context()).(*Tuple)
+		params = checks.subst(nopos, params, smap, nil, checks.context()).(*Tuple)
 	}
 
 	// Unify parameter and argument types for generic parameters with typed arguments
 	// and collect the indices of generic parameters with untyped arguments.
 	// Terminology: generic parameter = function parameter with a type-parameterized type
-	u := newUnifier(tparams, targs, check.allowVersion(go1_21))
+	u := newUnifier(tparams, targs, checks.allowVersion(go1_21))
 
 	errorf := func(tpar, targ Type, arg *operand) {
 		// provide a better error message if we can
@@ -134,7 +134,7 @@ func (check *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, 
 		}
 		smap := makeSubstMap(tparams, targs)
 		// TODO(gri): pass a poser here, rather than arg.Pos().
-		inferred := check.subst(arg.Pos(), tpar, smap, nil, check.context())
+		inferred := checks.subst(arg.Pos(), tpar, smap, nil, checks.context())
 		// CannotInferTypeArgs indicates a failure of inference, though the actual
 		// error may be better attributed to a user-provided type argument (hence
 		// InvalidTypeArg). We can't differentiate these cases, so fall back on
@@ -299,7 +299,7 @@ func (check *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, 
 				//           Eventually, unify should return an error with cause.
 				var cause string
 				constraint := tpar.iface()
-				if !check.hasAllMethods(tx, constraint, true, func(x, y Type) bool { return u.unify(x, y, exact) }, &cause) {
+				if !checks.hasAllMethods(tx, constraint, true, func(x, y Type) bool { return u.unify(x, y, exact) }, &cause) {
 					// TODO(gri) better error message (see TODO above)
 					err.addf(pos, "%s (type %s) does not satisfy %s %s", tpar, tx, tpar.Constraint(), cause)
 					return nil
@@ -419,7 +419,7 @@ func (check *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, 
 		n := 0
 		for _, index := range dirty {
 			t0 := inferred[index]
-			if t1 := check.subst(nopos, t0, smap, nil, check.context()); t1 != t0 {
+			if t1 := checks.subst(nopos, t0, smap, nil, checks.context()); t1 != t0 {
 				// t0 was simplified to t1.
 				// If t0 was a generic function, but the simplified signature t1 does
 				// not contain any type parameters anymore, the function is not generic
@@ -465,7 +465,7 @@ func (check *Checker) infer(pos syntax.Pos, tparams []*TypeParam, targs []Type, 
 // If typ is a generic function, type parameters held with typ are not changed and
 // must be updated separately if desired.
 // The positions is only used for debug traces.
-func (check *Checker) renameTParams(pos syntax.Pos, tparams []*TypeParam, typ Type) ([]*TypeParam, Type) {
+func (checks *Checker) renameTParams(pos syntax.Pos, tparams []*TypeParam, typ Type) ([]*TypeParam, Type) {
 	// For the purpose of type inference we must differentiate type parameters
 	// occurring in explicit type or value function arguments from the type
 	// parameters we are solving for via unification because they may be the
@@ -506,10 +506,10 @@ func (check *Checker) renameTParams(pos syntax.Pos, tparams []*TypeParam, typ Ty
 
 	renameMap := makeRenameMap(tparams, tparams2)
 	for i, tparam := range tparams {
-		tparams2[i].bound = check.subst(pos, tparam.bound, renameMap, nil, check.context())
+		tparams2[i].bound = checks.subst(pos, tparam.bound, renameMap, nil, checks.context())
 	}
 
-	return tparams2, check.subst(pos, typ, renameMap, nil, check.context())
+	return tparams2, checks.subst(pos, typ, renameMap, nil, checks.context())
 }
 
 // typeParamsString produces a string containing all the type parameter names

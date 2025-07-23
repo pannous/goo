@@ -35,7 +35,7 @@ func TestReadLink(t *testing.T) {
 		},
 	}
 
-	check := func(fsys FS, name string, want string) {
+	checks := func(fsys FS, name string, want string) {
 		t.Helper()
 		got, err := ReadLink(fsys, name)
 		if got != want || err != nil {
@@ -43,9 +43,9 @@ func TestReadLink(t *testing.T) {
 		}
 	}
 
-	check(testFS, "foo", "bar")
-	check(testFS, "dir/parentlink", "../bar")
-	check(testFS, "dir/link", "file")
+	checks(testFS, "foo", "bar")
+	checks(testFS, "dir/parentlink", "../bar")
+	checks(testFS, "dir/link", "file")
 
 	// Test that ReadLink on Sub works.
 	sub, err := Sub(testFS, "dir")
@@ -53,8 +53,8 @@ func TestReadLink(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check(sub, "link", "file")
-	check(sub, "parentlink", "../bar")
+	checks(sub, "link", "file")
+	checks(sub, "parentlink", "../bar")
 }
 
 func TestLstat(t *testing.T) {
@@ -82,7 +82,7 @@ func TestLstat(t *testing.T) {
 		},
 	}
 
-	check := func(fsys FS, name string, want FileMode) {
+	checks := func(fsys FS, name string, want FileMode) {
 		t.Helper()
 		info, err := Lstat(fsys, name)
 		var got FileMode
@@ -94,13 +94,13 @@ func TestLstat(t *testing.T) {
 		}
 	}
 
-	check(testFS, "foo", ModeSymlink|0o777)
-	check(testFS, "bar", 0o644)
+	checks(testFS, "foo", ModeSymlink|0o777)
+	checks(testFS, "bar", 0o644)
 
 	// Test that Lstat on Sub works.
 	sub, err := Sub(testFS, "dir")
 	if err != nil {
 		t.Fatal(err)
 	}
-	check(sub, "link", ModeSymlink|0o777)
+	checks(sub, "link", ModeSymlink|0o777)
 }

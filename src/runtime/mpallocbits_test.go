@@ -496,7 +496,7 @@ func TestPallocBitsFree(t *testing.T) {
 }
 
 func TestFindBitRange64(t *testing.T) {
-	check := func(x uint64, n uint, result uint) {
+	checks := func(x uint64, n uint, result uint) {
 		i := FindBitRange64(x, n)
 		if result == ^uint(0) && i < 64 {
 			t.Errorf("case (%016x, %d): got %d, want failure", x, n, i)
@@ -505,19 +505,19 @@ func TestFindBitRange64(t *testing.T) {
 		}
 	}
 	for i := uint(1); i <= 64; i++ {
-		check(^uint64(0), i, 0)
+		checks(^uint64(0), i, 0)
 	}
 	for i := uint(1); i <= 64; i++ {
-		check(0, i, ^uint(0))
+		checks(0, i, ^uint(0))
 	}
-	check(0x8000000000000000, 1, 63)
-	check(0xc000010001010000, 2, 62)
-	check(0xc000010001030000, 2, 16)
-	check(0xe000030001030000, 3, 61)
-	check(0xe000030001070000, 3, 16)
-	check(0xffff03ff01070000, 16, 48)
-	check(0xffff03ff0107ffff, 16, 0)
-	check(0x0fff03ff01079fff, 16, ^uint(0))
+	checks(0x8000000000000000, 1, 63)
+	checks(0xc000010001010000, 2, 62)
+	checks(0xc000010001030000, 2, 16)
+	checks(0xe000030001030000, 3, 61)
+	checks(0xe000030001070000, 3, 16)
+	checks(0xffff03ff01070000, 16, 48)
+	checks(0xffff03ff0107ffff, 16, 0)
+	checks(0x0fff03ff01079fff, 16, ^uint(0))
 }
 
 func BenchmarkFindBitRange64(b *testing.B) {

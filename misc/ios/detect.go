@@ -38,27 +38,27 @@ func main() {
 	for _, mp := range mps {
 		fmt.Println()
 		f, err := os.CreateTemp("", "go_ios_detect_")
-		check(err)
+		checks(err)
 		fname := f.Name()
 		defer os.Remove(fname)
 
 		out := output(parseMobileProvision(mp))
 		_, err = f.Write(out)
-		check(err)
-		check(f.Close())
+		checks(err)
+		checks(f.Close())
 
 		cert, err := plistExtract(fname, "DeveloperCertificates:0")
-		check(err)
+		checks(err)
 		pcert, err := x509.ParseCertificate(cert)
-		check(err)
+		checks(err)
 		fmt.Printf("export GOIOS_DEV_ID=\"%s\"\n", pcert.Subject.CommonName)
 
 		appID, err := plistExtract(fname, "Entitlements:application-identifier")
-		check(err)
+		checks(err)
 		fmt.Printf("export GOIOS_APP_ID=%s\n", appID)
 
 		teamID, err := plistExtract(fname, "Entitlements:com.apple.developer.team-identifier")
-		check(err)
+		checks(err)
 		fmt.Printf("export GOIOS_TEAM_ID=%s\n", teamID)
 	}
 }
@@ -120,7 +120,7 @@ func output(cmd *exec.Cmd) []byte {
 	return out
 }
 
-func check(err error) {
+func checks(err error) {
 	if err != nil {
 		fail(err.Error())
 	}

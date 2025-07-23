@@ -58,7 +58,7 @@ func verify(t *testing.T, testname string, w *Writer, b *buffer, src, expected s
 	}
 }
 
-func check(t *testing.T, testname string, minwidth, tabwidth, padding int, padchar byte, flags uint, src, expected string) {
+func checks(t *testing.T, testname string, minwidth, tabwidth, padding int, padchar byte, flags uint, src, expected string) {
 	var b buffer
 	b.init(1000)
 
@@ -612,7 +612,7 @@ var tests = []struct {
 
 func Test(t *testing.T) {
 	for _, e := range tests {
-		check(t, e.testname, e.minwidth, e.tabwidth, e.padding, e.padchar, e.flags, e.src, e.expected)
+		checks(t, e.testname, e.minwidth, e.tabwidth, e.padding, e.padchar, e.flags, e.src, e.expected)
 	}
 }
 

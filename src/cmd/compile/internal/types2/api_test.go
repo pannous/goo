@@ -1591,10 +1591,10 @@ func TestFiles(t *testing.T) {
 	var conf Config
 	pkg := NewPackage("p", "p")
 	var info Info
-	check := NewChecker(&conf, pkg, &info)
+	checks := NewChecker(&conf, pkg, &info)
 
 	for _, src := range sources {
-		if err := check.Files([]*syntax.File{mustParse(src)}); err != nil {
+		if err := checks.Files([]*syntax.File{mustParse(src)}); err != nil {
 			t.Error(err)
 		}
 	}
@@ -3059,8 +3059,8 @@ func TestVersionWithoutPos(t *testing.T) {
 	// range-over-func are permitted: they are not.
 	// (Previously, no error was reported.)
 	pkg := NewPackage("p", "p")
-	check := NewChecker(&Config{}, pkg, nil)
-	err := check.Files([]*syntax.File{f})
+	checks := NewChecker(&Config{}, pkg, nil)
+	err := checks.Files([]*syntax.File{f})
 	got := fmt.Sprint(err)
 	want := "range over s (variable of type func(func() bool)): requires go1.23"
 	if !strings.Contains(got, want) {
@@ -3088,8 +3088,8 @@ func (recv T) f(param int) (result int) {
 
 	pkg := NewPackage("p", "p")
 	info := &Info{Defs: make(map[*syntax.Name]Object)}
-	check := NewChecker(&Config{}, pkg, info)
-	if err := check.Files([]*syntax.File{f}); err != nil {
+	checks := NewChecker(&Config{}, pkg, info)
+	if err := checks.Files([]*syntax.File{f}); err != nil {
 		t.Fatal(err)
 	}
 	var got []string

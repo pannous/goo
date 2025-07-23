@@ -251,7 +251,7 @@ var predeclaredFuncs = [...]struct {
 func defPredeclaredFuncs() {
 	for i := range predeclaredFuncs {
 		id := builtinId(i)
-		if id == _Assert || id == _Trace {
+		if id == _Trace {
 			continue // only define these in testing environment
 		}
 		def(newBuiltin(id))

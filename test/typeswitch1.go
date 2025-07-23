@@ -61,7 +61,7 @@ func whatis1(x interface{}) string {
 	panic("not reached")
 }
 
-func check(x interface{}, s string) {
+func checks(x interface{}, s string) {
 	w := whatis(x)
 	if w != s {
 		fmt.Println("whatis", x, "=>", w, "!=", s)
@@ -76,10 +76,10 @@ func check(x interface{}, s string) {
 }
 
 func main() {
-	check(1, "signed 1")
-	check(uint(1), "unsigned 1")
-	check(int64(1), "signed64 1")
-	check(uint64(1), "unsigned64 1")
-	check(1.5, "default 1.5")
-	check(nil, "nil <nil>")
+	checks(1, "signed 1")
+	checks(uint(1), "unsigned 1")
+	checks(int64(1), "signed64 1")
+	checks(uint64(1), "unsigned64 1")
+	checks(1.5, "default 1.5")
+	checks(nil, "nil <nil>")
 }

@@ -375,7 +375,7 @@ def pc_to_int(pc):
 #  eface: p *(*(struct 'runtime.rtype'*)'main.e'->type_->data)->string
 #  iface: p *(*(struct 'runtime.rtype'*)'main.s'->tab->Type->data)->string
 #
-# interface types can't be recognized by their name, instead we check
+# interface types can't be recognized by their name, instead we checks
 # if they have the expected fields.  Unfortunately the mapping of
 # fields to python attributes in gdb.py isn't complete: you can't test
 # for presence other than by trapping.

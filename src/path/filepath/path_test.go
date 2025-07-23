@@ -737,7 +737,7 @@ func TestWalkSkipDirOnFile(t *testing.T) {
 	walkFn := func(path string, _ fs.FileInfo, _ error) error { return walker(path) }
 	walkDirFn := func(path string, _ fs.DirEntry, _ error) error { return walker(path) }
 
-	check := func(t *testing.T, walk func(root string) error, root string) {
+	checks := func(t *testing.T, walk func(root string) error, root string) {
 		t.Helper()
 		sawFoo2 = false
 		err := walk(root)
@@ -751,13 +751,13 @@ func TestWalkSkipDirOnFile(t *testing.T) {
 
 	t.Run("Walk", func(t *testing.T) {
 		Walk := func(root string) error { return filepath.Walk(td, walkFn) }
-		check(t, Walk, td)
-		check(t, Walk, filepath.Join(td, "dir"))
+		checks(t, Walk, td)
+		checks(t, Walk, filepath.Join(td, "dir"))
 	})
 	t.Run("WalkDir", func(t *testing.T) {
 		WalkDir := func(root string) error { return filepath.WalkDir(td, walkDirFn) }
-		check(t, WalkDir, td)
-		check(t, WalkDir, filepath.Join(td, "dir"))
+		checks(t, WalkDir, td)
+		checks(t, WalkDir, filepath.Join(td, "dir"))
 	})
 }
 
@@ -796,7 +796,7 @@ func TestWalkSkipAllOnFile(t *testing.T) {
 	walkFn := func(path string, _ fs.FileInfo, _ error) error { return walker(path) }
 	walkDirFn := func(path string, _ fs.DirEntry, _ error) error { return walker(path) }
 
-	check := func(t *testing.T, walk func(root string) error, root string) {
+	checks := func(t *testing.T, walk func(root string) error, root string) {
 		t.Helper()
 		remainingWereSkipped = true
 		if err := walk(root); err != nil {
@@ -809,13 +809,13 @@ func TestWalkSkipAllOnFile(t *testing.T) {
 
 	t.Run("Walk", func(t *testing.T) {
 		Walk := func(_ string) error { return filepath.Walk(td, walkFn) }
-		check(t, Walk, td)
-		check(t, Walk, filepath.Join(td, "dir"))
+		checks(t, Walk, td)
+		checks(t, Walk, filepath.Join(td, "dir"))
 	})
 	t.Run("WalkDir", func(t *testing.T) {
 		WalkDir := func(_ string) error { return filepath.WalkDir(td, walkDirFn) }
-		check(t, WalkDir, td)
-		check(t, WalkDir, filepath.Join(td, "dir"))
+		checks(t, WalkDir, td)
+		checks(t, WalkDir, filepath.Join(td, "dir"))
 	})
 }
 
@@ -1767,18 +1767,18 @@ func TestEvalSymlinksAboveRoot(t *testing.T) {
 
 	// Try different numbers of "..".
 	for _, i := range []int{c, c + 1, c + 2} {
-		check := strings.Join([]string{evalTmpDir, strings.Join(dd[:i], string(os.PathSeparator)), evalTmpDir[len(vol)+1:], "b", "file"}, string(os.PathSeparator))
-		resolved, err := filepath.EvalSymlinks(check)
+		checks := strings.Join([]string{evalTmpDir, strings.Join(dd[:i], string(os.PathSeparator)), evalTmpDir[len(vol)+1:], "b", "file"}, string(os.PathSeparator))
+		resolved, err := filepath.EvalSymlinks(checks)
 		switch {
 		case runtime.GOOS == "darwin" && errors.Is(err, fs.ErrNotExist):
 			// On darwin, the temp dir is sometimes cleaned up mid-test (issue 37910).
 			testenv.SkipFlaky(t, 37910)
 		case err != nil:
-			t.Errorf("EvalSymlinks(%q) failed: %v", check, err)
+			t.Errorf("EvalSymlinks(%q) failed: %v", checks, err)
 		case !strings.HasSuffix(resolved, wantSuffix):
-			t.Errorf("EvalSymlinks(%q) = %q does not end with %q", check, resolved, wantSuffix)
+			t.Errorf("EvalSymlinks(%q) = %q does not end with %q", checks, resolved, wantSuffix)
 		default:
-			t.Logf("EvalSymlinks(%q) = %q", check, resolved)
+			t.Logf("EvalSymlinks(%q) = %q", checks, resolved)
 		}
 	}
 }
@@ -1807,14 +1807,14 @@ func TestEvalSymlinksAboveRootChdir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check := filepath.Join("..", "..", "..", "c", "file")
+	checks := filepath.Join("..", "..", "..", "c", "file")
 	wantSuffix := filepath.Join("a", "b", "file")
-	if resolved, err := filepath.EvalSymlinks(check); err != nil {
-		t.Errorf("EvalSymlinks(%q) failed: %v", check, err)
+	if resolved, err := filepath.EvalSymlinks(checks); err != nil {
+		t.Errorf("EvalSymlinks(%q) failed: %v", checks, err)
 	} else if !strings.HasSuffix(resolved, wantSuffix) {
-		t.Errorf("EvalSymlinks(%q) = %q does not end with %q", check, resolved, wantSuffix)
+		t.Errorf("EvalSymlinks(%q) = %q does not end with %q", checks, resolved, wantSuffix)
 	} else {
-		t.Logf("EvalSymlinks(%q) = %q", check, resolved)
+		t.Logf("EvalSymlinks(%q) = %q", checks, resolved)
 	}
 }
 

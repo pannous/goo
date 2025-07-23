@@ -14,7 +14,7 @@ TEXT runtime·memclrNoHeapPointers<ABIInternal>(SB), NOSPLIT|NOFRAME, $0-16
 	// R4 = n
 
 	// Determine if there are doublewords to clear
-check:
+checks:
 	ANDCC $7, R4, R5  // R5: leftover bytes to clear
 	SRD   $3, R4, R6  // R6: double words to clear
 	CMP   R6, $0, CR1 // CR1[EQ] set if no double words

@@ -103,7 +103,7 @@ func XTestParentFinishesChild(t testingT) {
 	pc.mu.Unlock()
 
 	// parent and children should all be finished.
-	check := func(ctx Context, name string) {
+	checks := func(ctx Context, name string) {
 		select {
 		case <-ctx.Done():
 		default:
@@ -113,10 +113,10 @@ func XTestParentFinishesChild(t testingT) {
 			t.Errorf("%s.Err() == %v want %v", name, e, Canceled)
 		}
 	}
-	check(parent, "parent")
-	check(cancelChild, "cancelChild")
-	check(valueChild, "valueChild")
-	check(timerChild, "timerChild")
+	checks(parent, "parent")
+	checks(cancelChild, "cancelChild")
+	checks(valueChild, "valueChild")
+	checks(timerChild, "timerChild")
 
 	// WithCancel should return a canceled context on a canceled parent.
 	precanceledChild := WithValue(parent, "key", "value")

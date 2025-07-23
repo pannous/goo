@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-func check(n int) {
+func checks(n int) {
 	var i int
 	var r rune
 
@@ -76,7 +76,7 @@ func check(n int) {
 }
 
 func main() {
-	check(0)
-	check(1)
-	check(15)
+	checks(0)
+	checks(1)
+	checks(15)
 }

@@ -583,7 +583,7 @@ func TestFill(t *testing.T) {
 		b := m.Bounds()
 		c := color.RGBA{11, 0, 0, 255}
 		src := &image.Uniform{C: c}
-		check := func(desc string) {
+		checks := func(desc string) {
 			for y := b.Min.Y; y < b.Max.Y; y++ {
 				for x := b.Min.X; x < b.Max.X; x++ {
 					if !eq(c, m.At(x, y)) {
@@ -599,26 +599,26 @@ func TestFill(t *testing.T) {
 				DrawMask(m, image.Rect(x, y, x+1, y+1), src, image.Point{}, nil, image.Point{}, Src)
 			}
 		}
-		check("pixel")
+		checks("pixel")
 		// Draw 1 row at a time.
 		c = color.RGBA{0, 22, 0, 255}
 		src = &image.Uniform{C: c}
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			DrawMask(m, image.Rect(b.Min.X, y, b.Max.X, y+1), src, image.Point{}, nil, image.Point{}, Src)
 		}
-		check("row")
+		checks("row")
 		// Draw 1 column at a time.
 		c = color.RGBA{0, 0, 33, 255}
 		src = &image.Uniform{C: c}
 		for x := b.Min.X; x < b.Max.X; x++ {
 			DrawMask(m, image.Rect(x, b.Min.Y, x+1, b.Max.Y), src, image.Point{}, nil, image.Point{}, Src)
 		}
-		check("column")
+		checks("column")
 		// Draw the whole image at once.
 		c = color.RGBA{44, 55, 66, 77}
 		src = &image.Uniform{C: c}
 		DrawMask(m, b, src, image.Point{}, nil, image.Point{}, Src)
-		check("whole")
+		checks("whole")
 	}
 }
 

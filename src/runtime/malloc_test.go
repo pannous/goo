@@ -89,8 +89,8 @@ func TestMemStats(t *testing.T) {
 			t.Errorf("unknown MemStats field %s", name)
 			continue
 		}
-		for _, check := range checks {
-			if err := check(val); err != nil {
+		for _, checks := range checks {
+			if err := checks(val); err != nil {
 				t.Errorf("%s = %v: %s", name, val, err)
 			}
 		}

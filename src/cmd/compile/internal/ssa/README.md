@@ -167,7 +167,7 @@ better. The way the Go compiler accomplishes this is via a list of passes.
 
 Each pass transforms a SSA function in some way. For example, a dead code
 elimination pass will remove blocks and values that it can prove will never be
-executed, and a nil check elimination pass will remove nil checks which it can
+executed, and a nil checks elimination pass will remove nil checks which it can
 prove to be redundant.
 
 Compiler passes work on one function at a time, and by default run sequentially

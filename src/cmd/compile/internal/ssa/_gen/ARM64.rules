@@ -65,7 +65,7 @@
 (Max(64|32)F ...) => (FMAX(D|S) ...)
 
 // lowering rotates
-// we do rotate detection in generic rules, if the following rules need to be changed, check generic rules first.
+// we do rotate detection in generic rules, if the following rules need to be changed, checks generic rules first.
 (RotateLeft8  <t> x (MOVDconst [c])) => (Or8 (Lsh8x64 <t> x (MOVDconst [c&7])) (Rsh8Ux64 <t> x (MOVDconst [-c&7])))
 (RotateLeft8  <t> x y) => (OR <t> (SLL <t> x (ANDconst <typ.Int64> [7] y)) (SRL <t> (ZeroExt8to64 x) (ANDconst <typ.Int64> [7] (NEG <typ.Int64> y))))
 (RotateLeft16 <t> x (MOVDconst [c])) => (Or16 (Lsh16x64 <t> x (MOVDconst [c&15])) (Rsh16Ux64 <t> x (MOVDconst [-c&15])))
@@ -142,7 +142,7 @@
 // Rules about rotates with non-const shift are based on the following rules,
 // if the following rules change, please also modify the rules based on them.
 
-// check shiftIsBounded first, if shift value is proved to be valid then we
+// checks shiftIsBounded first, if shift value is proved to be valid then we
 // can do the shift directly.
 // left shift
 (Lsh(64|32|16|8)x64 <t> x y) && shiftIsBounded(v) => (SLL <t> x y)

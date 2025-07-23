@@ -2306,7 +2306,7 @@ func TestECH(t *testing.T) {
 		{Config: echConfig, PrivateKey: echKey.Bytes(), SendAsRetry: true},
 	}
 
-	check := func() {
+	checks := func() {
 		ss, cs, err := testHandshake(t, clientConfig, serverConfig)
 		if err != nil {
 			t.Fatalf("unexpected failure: %s", err)
@@ -2331,7 +2331,7 @@ func TestECH(t *testing.T) {
 		}
 	}
 
-	check()
+	checks()
 
 	serverConfig.GetEncryptedClientHelloKeys = func(_ *ClientHelloInfo) ([]EncryptedClientHelloKey, error) {
 		return []EncryptedClientHelloKey{{Config: echConfig, PrivateKey: echKey.Bytes(), SendAsRetry: true}}, nil
@@ -2345,5 +2345,5 @@ func TestECH(t *testing.T) {
 		{Config: randConfig, PrivateKey: randKey.Bytes(), SendAsRetry: true},
 	}
 
-	check()
+	checks()
 }

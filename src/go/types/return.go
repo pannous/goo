@@ -14,7 +14,7 @@ import (
 // isTerminating reports if s is a terminating statement.
 // If s is labeled, label is the label name; otherwise s
 // is "".
-func (check *Checker) isTerminating(s ast.Stmt, label string) bool {
+func (checks *Checker) isTerminating(s ast.Stmt, label string) bool {
 	switch s := s.(type) {
 	default:
 		panic("unreachable")
@@ -25,11 +25,11 @@ func (check *Checker) isTerminating(s ast.Stmt, label string) bool {
 		// no chance
 
 	case *ast.LabeledStmt:
-		return check.isTerminating(s.Stmt, s.Label.Name)
+		return checks.isTerminating(s.Stmt, s.Label.Name)
 
 	case *ast.ExprStmt:
 		// calling the predeclared (possibly parenthesized) panic() function is terminating
-		if call, ok := ast.Unparen(s.X).(*ast.CallExpr); ok && check.isPanic[call] {
+		if call, ok := ast.Unparen(s.X).(*ast.CallExpr); ok && checks.isPanic[call] {
 			return true
 		}
 
@@ -42,25 +42,25 @@ func (check *Checker) isTerminating(s ast.Stmt, label string) bool {
 		}
 
 	case *ast.BlockStmt:
-		return check.isTerminatingList(s.List, "")
+		return checks.isTerminatingList(s.List, "")
 
 	case *ast.IfStmt:
 		if s.Else != nil &&
-			check.isTerminating(s.Body, "") &&
-			check.isTerminating(s.Else, "") {
+			checks.isTerminating(s.Body, "") &&
+			checks.isTerminating(s.Else, "") {
 			return true
 		}
 
 	case *ast.SwitchStmt:
-		return check.isTerminatingSwitch(s.Body, label)
+		return checks.isTerminatingSwitch(s.Body, label)
 
 	case *ast.TypeSwitchStmt:
-		return check.isTerminatingSwitch(s.Body, label)
+		return checks.isTerminatingSwitch(s.Body, label)
 
 	case *ast.SelectStmt:
 		for _, s := range s.Body.List {
 			cc := s.(*ast.CommClause)
-			if !check.isTerminatingList(cc.Body, "") || hasBreakList(cc.Body, label, true) {
+			if !checks.isTerminatingList(cc.Body, "") || hasBreakList(cc.Body, label, true) {
 				return false
 			}
 
@@ -76,24 +76,24 @@ func (check *Checker) isTerminating(s ast.Stmt, label string) bool {
 	return false
 }
 
-func (check *Checker) isTerminatingList(list []ast.Stmt, label string) bool {
+func (checks *Checker) isTerminatingList(list []ast.Stmt, label string) bool {
 	// trailing empty statements are permitted - skip them
 	for i := len(list) - 1; i >= 0; i-- {
 		if _, ok := list[i].(*ast.EmptyStmt); !ok {
-			return check.isTerminating(list[i], label)
+			return checks.isTerminating(list[i], label)
 		}
 	}
 	return false // all statements are empty
 }
 
-func (check *Checker) isTerminatingSwitch(body *ast.BlockStmt, label string) bool {
+func (checks *Checker) isTerminatingSwitch(body *ast.BlockStmt, label string) bool {
 	hasDefault := false
 	for _, s := range body.List {
 		cc := s.(*ast.CaseClause)
 		if cc.List == nil {
 			hasDefault = true
 		}
-		if !check.isTerminatingList(cc.Body, "") || hasBreakList(cc.Body, label, true) {
+		if !checks.isTerminatingList(cc.Body, "") || hasBreakList(cc.Body, label, true) {
 			return false
 		}
 	}

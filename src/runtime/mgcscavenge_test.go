@@ -53,7 +53,7 @@ func TestFillAligned(t *testing.T) {
 		}
 		return out
 	}
-	check := func(x uint64, m uint) {
+	checks := func(x uint64, m uint) {
 		want := fillAlignedSlow(x, m)
 		if got := FillAligned(x, m); got != want {
 			t.Logf("got:  %064b", got)
@@ -82,11 +82,11 @@ func TestFillAligned(t *testing.T) {
 			0x60f14d80ef2fa0e6,
 		}
 		for _, test := range tests {
-			check(test, m)
+			checks(test, m)
 		}
 		for i := 0; i < 1000; i++ {
 			// Try a pseudo-random numbers.
-			check(rand.Uint64(), m)
+			checks(rand.Uint64(), m)
 
 			if m > 1 {
 				// For m != 1, let's construct a slightly more interesting
@@ -101,7 +101,7 @@ func TestFillAligned(t *testing.T) {
 						val |= (rand.Uint64() & ((1 << m) - 1)) << n
 					}
 				}
-				check(val, m)
+				checks(val, m)
 			}
 		}
 	}

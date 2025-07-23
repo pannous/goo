@@ -145,7 +145,7 @@ func runcheck(t *testing.T, source, golden string, mode checkMode) {
 	}
 }
 
-func check(t *testing.T, source, golden string, mode checkMode) {
+func checks(t *testing.T, source, golden string, mode checkMode) {
 	// run the test
 	cc := make(chan int, 1)
 	go func() {
@@ -202,7 +202,7 @@ func TestFiles(t *testing.T) {
 		mode := e.mode
 		t.Run(e.source, func(t *testing.T) {
 			t.Parallel()
-			check(t, source, golden, mode)
+			checks(t, source, golden, mode)
 			// TODO(gri) check that golden is idempotent
 			//check(t, golden, golden, e.mode)
 		})

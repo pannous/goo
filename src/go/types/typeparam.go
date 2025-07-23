@@ -23,7 +23,7 @@ func nextID() uint64 { return uint64(lastID.Add(1)) }
 // A TypeParam has a name; use the [TypeParam.Obj] method to access
 // its [TypeName] object.
 type TypeParam struct {
-	check *Checker  // for lazy type bound completion
+	checks *Checker  // for lazy type bound completion
 	id    uint64    // unique id, for debugging only
 	obj   *TypeName // corresponding type name
 	index int       // type parameter index in source order, starting at 0
@@ -41,21 +41,21 @@ func NewTypeParam(obj *TypeName, constraint Type) *TypeParam {
 }
 
 // check may be nil
-func (check *Checker) newTypeParam(obj *TypeName, constraint Type) *TypeParam {
+func (checks *Checker) newTypeParam(obj *TypeName, constraint Type) *TypeParam {
 	// Always increment lastID, even if it is not used.
 	id := nextID()
-	if check != nil {
-		check.nextID++
-		id = check.nextID
+	if checks != nil {
+		checks.nextID++
+		id = checks.nextID
 	}
-	typ := &TypeParam{check: check, id: id, obj: obj, index: -1, bound: constraint}
+	typ := &TypeParam{checks: checks, id: id, obj: obj, index: -1, bound: constraint}
 	if obj.typ == nil {
 		obj.typ = typ
 	}
 	// iface may mutate typ.bound, so we must ensure that iface() is called
 	// at least once before the resulting TypeParam escapes.
-	if check != nil {
-		check.needsCleanup(typ)
+	if checks != nil {
+		checks.needsCleanup(typ)
 	} else if constraint != nil {
 		typ.iface()
 	}
@@ -107,7 +107,7 @@ func (t *TypeParam) String() string { return TypeString(t, nil) }
 
 func (t *TypeParam) cleanup() {
 	t.iface()
-	t.check = nil
+	t.checks = nil
 }
 
 // iface returns the constraint interface of t.
@@ -145,7 +145,7 @@ func (t *TypeParam) iface() *Interface {
 		if n := asNamed(bound); n != nil {
 			pos = n.obj.pos
 		}
-		computeInterfaceTypeSet(t.check, pos, ityp)
+		computeInterfaceTypeSet(t.checks, pos, ityp)
 	}
 
 	return ityp

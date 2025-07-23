@@ -2652,8 +2652,8 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
 	return
 }
 
-func buildFlags(name, defaults string, fromPackage []string, check func(string, string, []string) error) ([]string, error) {
-	if err := check(name, "#cgo "+name, fromPackage); err != nil {
+func buildFlags(name, defaults string, fromPackage []string, checks func(string, string, []string) error) ([]string, error) {
+	if err := checks(name, "#cgo "+name, fromPackage); err != nil {
 		return nil, err
 	}
 	return str.StringList(envList("CGO_"+name, defaults), fromPackage), nil

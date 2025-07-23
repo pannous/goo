@@ -15,7 +15,7 @@ import (
 
 // An Interface represents an interface type.
 type Interface struct {
-	check     *Checker     // for error reporting; nil once type set is computed
+	checks     *Checker     // for error reporting; nil once type set is computed
 	methods   []*Func      // ordered list of explicitly declared methods
 	embeddeds []Type       // ordered list of explicitly embedded elements
 	embedPos  *[]token.Pos // positions of embedded elements; or nil (for error messages) - use pointer to save space
@@ -26,7 +26,7 @@ type Interface struct {
 }
 
 // typeSet returns the type set for interface t.
-func (t *Interface) typeSet() *_TypeSet { return computeInterfaceTypeSet(t.check, nopos, t) }
+func (t *Interface) typeSet() *_TypeSet { return computeInterfaceTypeSet(t.checks, nopos, t) }
 
 // emptyInterface represents the empty (completed) interface
 var emptyInterface = Interface{complete: true, tset: &topTypeSet}
@@ -74,10 +74,10 @@ func NewInterfaceType(methods []*Func, embeddeds []Type) *Interface {
 }
 
 // check may be nil
-func (check *Checker) newInterface() *Interface {
-	typ := &Interface{check: check}
-	if check != nil {
-		check.needsCleanup(typ)
+func (checks *Checker) newInterface() *Interface {
+	typ := &Interface{checks: checks}
+	if checks != nil {
+		checks.needsCleanup(typ)
 	}
 	return typ
 }
@@ -152,11 +152,11 @@ func (t *Interface) String() string   { return TypeString(t, nil) }
 
 func (t *Interface) cleanup() {
 	t.typeSet() // any interface that escapes type checking must be safe for concurrent use
-	t.check = nil
+	t.checks = nil
 	t.embedPos = nil
 }
 
-func (check *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, def *TypeName) {
+func (checks *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, def *TypeName) {
 	addEmbedded := func(pos token.Pos, typ Type) {
 		ityp.embeddeds = append(ityp.embeddeds, typ)
 		if ityp.embedPos == nil {
@@ -167,7 +167,7 @@ func (check *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, d
 
 	for _, f := range iface.Methods.List {
 		if len(f.Names) == 0 {
-			addEmbedded(f.Type.Pos(), parseUnion(check, f.Type))
+			addEmbedded(f.Type.Pos(), parseUnion(checks, f.Type))
 			continue
 		}
 		// f.Name != nil
@@ -175,15 +175,15 @@ func (check *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, d
 		// We have a method with name f.Names[0].
 		name := f.Names[0]
 		if name.Name == "_" {
-			check.error(name, BlankIfaceMethod, "methods must have a unique non-blank name")
+			checks.error(name, BlankIfaceMethod, "methods must have a unique non-blank name")
 			continue // ignore
 		}
 
-		typ := check.typ(f.Type)
+		typ := checks.typ(f.Type)
 		sig, _ := typ.(*Signature)
 		if sig == nil {
 			if isValid(typ) {
-				check.errorf(f.Type, InvalidSyntaxTree, "%s is not a method signature", typ)
+				checks.errorf(f.Type, InvalidSyntaxTree, "%s is not a method signature", typ)
 			}
 			continue // ignore
 		}
@@ -194,7 +194,7 @@ func (check *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, d
 			if ftyp, _ := f.Type.(*ast.FuncType); ftyp != nil && ftyp.TypeParams != nil {
 				at = ftyp.TypeParams
 			}
-			check.error(at, InvalidSyntaxTree, "methods cannot have type parameters")
+			checks.error(at, InvalidSyntaxTree, "methods cannot have type parameters")
 		}
 
 		// use named receiver type if available (for better error messages)
@@ -204,10 +204,10 @@ func (check *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, d
 				recvTyp = named
 			}
 		}
-		sig.recv = newVar(RecvVar, name.Pos(), check.pkg, "", recvTyp)
+		sig.recv = newVar(RecvVar, name.Pos(), checks.pkg, "", recvTyp)
 
-		m := NewFunc(name.Pos(), check.pkg, name.Name, sig)
-		check.recordDef(name, m)
+		m := NewFunc(name.Pos(), checks.pkg, name.Name, sig)
+		checks.recordDef(name, m)
 		ityp.methods = append(ityp.methods, m)
 	}
 
@@ -228,7 +228,7 @@ func (check *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, d
 	// Compute type set as soon as possible to report any errors.
 	// Subsequent uses of type sets will use this computed type
 	// set and won't need to pass in a *Checker.
-	check.later(func() {
-		computeInterfaceTypeSet(check, iface.Pos(), ityp)
+	checks.later(func() {
+		computeInterfaceTypeSet(checks, iface.Pos(), ityp)
 	}).describef(iface, "compute type set for %s", ityp)
 }

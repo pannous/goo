@@ -904,7 +904,7 @@
 (OffPtr p [0]) && v.Type.Compare(p.Type) == types.CMPeq => p
 
 // indexing operations
-// Note: bounds check has already been done
+// Note: bounds checks has already been done
 (PtrIndex <t> ptr idx) && config.PtrSize == 4 && is32Bit(t.Elem().Size()) => (AddPtr ptr (Mul32 <typ.Int> idx (Const32 <typ.Int> [int32(t.Elem().Size())])))
 (PtrIndex <t> ptr idx) && config.PtrSize == 8 => (AddPtr ptr (Mul64 <typ.Int> idx (Const64 <typ.Int> [t.Elem().Size()])))
 
@@ -1344,7 +1344,7 @@
 // where (x/c) is performed using multiplication with magic constants.
 // To rewrite x%c == 0 requires pattern matching the rewritten expression
 // and checking that the division by the same constant wasn't already calculated.
-// This check is made by counting uses of the magic constant multiplication.
+// This checks is made by counting uses of the magic constant multiplication.
 // Note that if there were an intermediate opt pass, this rule could be applied
 // directly on the Div op and magic division rewrites could be delayed to late opt.
 
@@ -1855,7 +1855,7 @@
 			(Const64 <typ.UInt64> [int64(sdivisible64(c).max)])
 		)
 
-// Divisibility check for signed integers for power of two constant are simple mask.
+// Divisibility checks for signed integers for power of two constant are simple mask.
 // However, we must match against the rewritten n%c == 0 -> n - c*(n/c) == 0 -> n == c*(n/c)
 // where n/c contains fixup code to handle signed n.
 ((Eq8|Neq8) n (Lsh8x64
@@ -2074,12 +2074,12 @@
 
 (NilCheck ptr:(SelectN [0] call:(StaticLECall _ _)) _)
 	&& isSameCall(call.Aux, "runtime.newobject")
-	&& warnRule(fe.Debug_checknil(), v, "removed nil check")
+	&& warnRule(fe.Debug_checknil(), v, "removed nil checks")
 	=> ptr
 
 (NilCheck ptr:(OffPtr (SelectN [0] call:(StaticLECall _ _))) _)
 	&& isSameCall(call.Aux, "runtime.newobject")
-	&& warnRule(fe.Debug_checknil(), v, "removed nil check")
+	&& warnRule(fe.Debug_checknil(), v, "removed nil checks")
 	=> ptr
 
 // Addresses of globals are always non-nil.
@@ -2088,7 +2088,7 @@
 
 // Addresses of locals are always non-nil.
 (NilCheck ptr:(LocalAddr _ _) _)
-	&& warnRule(fe.Debug_checknil(), v, "removed nil check")
+	&& warnRule(fe.Debug_checknil(), v, "removed nil checks")
 	=> ptr
 
 // Nil checks of nil checks are redundant.

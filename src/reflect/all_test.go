@@ -7354,21 +7354,21 @@ func TestTypeOfTypeOf(t *testing.T) {
 	// Check that all the type constructors return concrete *rtype implementations.
 	// It's difficult to test directly because the reflect package is only at arm's length.
 	// The easiest thing to do is just call a function that crashes if it doesn't get an *rtype.
-	check := func(name string, typ Type) {
+	checks := func(name string, typ Type) {
 		if underlying := TypeOf(typ).String(); underlying != "*reflect.rtype" {
 			t.Errorf("%v returned %v, not *reflect.rtype", name, underlying)
 		}
 	}
 
 	type T struct{ int }
-	check("TypeOf", TypeOf(T{}))
+	checks("TypeOf", TypeOf(T{}))
 
-	check("ArrayOf", ArrayOf(10, TypeOf(T{})))
-	check("ChanOf", ChanOf(BothDir, TypeOf(T{})))
-	check("FuncOf", FuncOf([]Type{TypeOf(T{})}, nil, false))
-	check("MapOf", MapOf(TypeOf(T{}), TypeOf(T{})))
-	check("PtrTo", PointerTo(TypeOf(T{})))
-	check("SliceOf", SliceOf(TypeOf(T{})))
+	checks("ArrayOf", ArrayOf(10, TypeOf(T{})))
+	checks("ChanOf", ChanOf(BothDir, TypeOf(T{})))
+	checks("FuncOf", FuncOf([]Type{TypeOf(T{})}, nil, false))
+	checks("MapOf", MapOf(TypeOf(T{}), TypeOf(T{})))
+	checks("PtrTo", PointerTo(TypeOf(T{})))
+	checks("SliceOf", SliceOf(TypeOf(T{})))
 }
 
 type XM struct{ _ bool }

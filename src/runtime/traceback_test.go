@@ -22,7 +22,7 @@ import (
 // Test traceback printing of inlined frames.
 func TestTracebackInlined(t *testing.T) {
 	testenv.SkipIfOptimizationOff(t) // This test requires inlining
-	check := func(t *testing.T, r *ttiResult, funcs ...string) {
+	checks := func(t *testing.T, r *ttiResult, funcs ...string) {
 		t.Helper()
 
 		// Check the printed traceback.
@@ -56,26 +56,26 @@ func TestTracebackInlined(t *testing.T) {
 	t.Run("simple", func(t *testing.T) {
 		// Check a simple case of inlining
 		r := ttiSimple1()
-		check(t, r, "runtime_test.ttiSimple3(...)", "runtime_test.ttiSimple2(...)", "runtime_test.ttiSimple1()")
+		checks(t, r, "runtime_test.ttiSimple3(...)", "runtime_test.ttiSimple2(...)", "runtime_test.ttiSimple1()")
 	})
 
 	t.Run("sigpanic", func(t *testing.T) {
 		// Check that sigpanic from an inlined function prints correctly
 		r := ttiSigpanic1()
-		check(t, r, "runtime_test.ttiSigpanic1.func1()", "panic", "runtime_test.ttiSigpanic3(...)", "runtime_test.ttiSigpanic2(...)", "runtime_test.ttiSigpanic1()")
+		checks(t, r, "runtime_test.ttiSigpanic1.func1()", "panic", "runtime_test.ttiSigpanic3(...)", "runtime_test.ttiSigpanic2(...)", "runtime_test.ttiSigpanic1()")
 	})
 
 	t.Run("wrapper", func(t *testing.T) {
 		// Check that a method inlined into a wrapper prints correctly
 		r := ttiWrapper1()
-		check(t, r, "runtime_test.ttiWrapper.m1(...)", "runtime_test.ttiWrapper1()")
+		checks(t, r, "runtime_test.ttiWrapper.m1(...)", "runtime_test.ttiWrapper1()")
 	})
 
 	t.Run("excluded", func(t *testing.T) {
 		// Check that when F -> G is inlined and F is excluded from stack
 		// traces, G still appears.
 		r := ttiExcluded1()
-		check(t, r, "runtime_test.ttiExcluded3(...)", "runtime_test.ttiExcluded1()")
+		checks(t, r, "runtime_test.ttiExcluded3(...)", "runtime_test.ttiExcluded1()")
 	})
 }
 

@@ -1184,13 +1184,13 @@ func gcDrain(gcw *gcWork, flags gcDrainFlags) {
 	// checkWork is the scan work before performing the next
 	// self-preempt check.
 	checkWork := int64(1<<63 - 1)
-	var check func() bool
+	var checks func() bool
 	if flags&(gcDrainIdle|gcDrainFractional) != 0 {
 		checkWork = initScanWork + drainCheckThreshold
 		if idle {
-			check = pollWork
+			checks = pollWork
 		} else if flags&gcDrainFractional != 0 {
-			check = pollFractionalWorkerExit
+			checks = pollFractionalWorkerExit
 		}
 	}
 
@@ -1204,7 +1204,7 @@ func gcDrain(gcw *gcWork, flags gcDrainFlags) {
 				break
 			}
 			markroot(gcw, job, flushBgCredit)
-			if check != nil && check() {
+			if checks != nil && checks() {
 				goto done
 			}
 
@@ -1285,7 +1285,7 @@ func gcDrain(gcw *gcWork, flags gcDrainFlags) {
 
 			if checkWork <= 0 {
 				checkWork += drainCheckThreshold
-				if check != nil && check() {
+				if checks != nil && checks() {
 					break
 				}
 			}

@@ -14,14 +14,14 @@ import (
 	"slices"
 )
 
-func (check *Checker) declare(scope *Scope, id *ast.Ident, obj Object, pos token.Pos) {
+func (checks *Checker) declare(scope *Scope, id *ast.Ident, obj Object, pos token.Pos) {
 	// spec: "The blank identifier, represented by the underscore
 	// character _, may be used in a declaration like any other
 	// identifier but the declaration does not introduce a new
 	// binding."
 	if obj.Name() != "_" {
 		if alt := scope.Insert(obj); alt != nil {
-			err := check.newError(DuplicateDecl)
+			err := checks.newError(DuplicateDecl)
 			err.addf(obj, "%s redeclared in this block", obj.Name())
 			err.addAltDecl(alt)
 			err.report()
@@ -30,7 +30,7 @@ func (check *Checker) declare(scope *Scope, id *ast.Ident, obj Object, pos token
 		obj.setScopePos(pos)
 	}
 	if id != nil {
-		check.recordDef(id, obj)
+		checks.recordDef(id, obj)
 	}
 }
 
@@ -48,27 +48,27 @@ func pathString(path []Object) string {
 
 // objDecl type-checks the declaration of obj in its respective (file) environment.
 // For the meaning of def, see Checker.definedType, in typexpr.go.
-func (check *Checker) objDecl(obj Object, def *TypeName) {
+func (checks *Checker) objDecl(obj Object, def *TypeName) {
 	if tracePos {
-		check.pushPos(atPos(obj.Pos()))
+		checks.pushPos(atPos(obj.Pos()))
 		defer func() {
 			// If we're panicking, keep stack of source positions.
 			if p := recover(); p != nil {
 				panic(p)
 			}
-			check.popPos()
+			checks.popPos()
 		}()
 	}
 
-	if check.conf._Trace && obj.Type() == nil {
-		if check.indent == 0 {
+	if checks.conf._Trace && obj.Type() == nil {
+		if checks.indent == 0 {
 			fmt.Println() // empty line between top-level objects for readability
 		}
-		check.trace(obj.Pos(), "-- checking %s (%s, objPath = %s)", obj, obj.color(), pathString(check.objPath))
-		check.indent++
+		checks.trace(obj.Pos(), "-- checking %s (%s, objPath = %s)", obj, obj.color(), pathString(checks.objPath))
+		checks.indent++
 		defer func() {
-			check.indent--
-			check.trace(obj.Pos(), "=> %s (%s)", obj, obj.color())
+			checks.indent--
+			checks.trace(obj.Pos(), "=> %s (%s)", obj, obj.color())
 		}()
 	}
 
@@ -110,9 +110,9 @@ func (check *Checker) objDecl(obj Object, def *TypeName) {
 		// All color values other than white and black are considered grey.
 		// Because black and white are < grey, all values >= grey are grey.
 		// Use those values to encode the object's index into the object path.
-		obj.setColor(grey + color(check.push(obj)))
+		obj.setColor(grey + color(checks.push(obj)))
 		defer func() {
-			check.pop().setColor(black)
+			checks.pop().setColor(black)
 		}()
 
 	case black:
@@ -136,17 +136,17 @@ func (check *Checker) objDecl(obj Object, def *TypeName) {
 		// order code.
 		switch obj := obj.(type) {
 		case *Const:
-			if !check.validCycle(obj) || obj.typ == nil {
+			if !checks.validCycle(obj) || obj.typ == nil {
 				obj.typ = Typ[Invalid]
 			}
 
 		case *Var:
-			if !check.validCycle(obj) || obj.typ == nil {
+			if !checks.validCycle(obj) || obj.typ == nil {
 				obj.typ = Typ[Invalid]
 			}
 
 		case *TypeName:
-			if !check.validCycle(obj) {
+			if !checks.validCycle(obj) {
 				// break cycle
 				// (without this, calling underlying()
 				// below may lead to an endless loop
@@ -156,7 +156,7 @@ func (check *Checker) objDecl(obj Object, def *TypeName) {
 			}
 
 		case *Func:
-			if !check.validCycle(obj) {
+			if !checks.validCycle(obj) {
 				// Don't set obj.typ to Typ[Invalid] here
 				// because plenty of code type-asserts that
 				// functions have a *Signature type. Grey
@@ -172,17 +172,17 @@ func (check *Checker) objDecl(obj Object, def *TypeName) {
 		return
 	}
 
-	d := check.objMap[obj]
+	d := checks.objMap[obj]
 	if d == nil {
-		check.dump("%v: %s should have been declared", obj.Pos(), obj)
+		checks.dump("%v: %s should have been declared", obj.Pos(), obj)
 		panic("unreachable")
 	}
 
 	// save/restore current environment and set up object environment
 	defer func(env environment) {
-		check.environment = env
-	}(check.environment)
-	check.environment = environment{scope: d.file, version: d.version}
+		checks.environment = env
+	}(checks.environment)
+	checks.environment = environment{scope: d.file, version: d.version}
 
 	// Const and var declarations must not have initialization
 	// cycles. We track them by remembering the current declaration
@@ -191,18 +191,18 @@ func (check *Checker) objDecl(obj Object, def *TypeName) {
 	// check.decl.
 	switch obj := obj.(type) {
 	case *Const:
-		check.decl = d // new package-level const decl
-		check.constDecl(obj, d.vtyp, d.init, d.inherited)
+		checks.decl = d // new package-level const decl
+		checks.constDecl(obj, d.vtyp, d.init, d.inherited)
 	case *Var:
-		check.decl = d // new package-level var decl
-		check.varDecl(obj, d.lhs, d.vtyp, d.init)
+		checks.decl = d // new package-level var decl
+		checks.varDecl(obj, d.lhs, d.vtyp, d.init)
 	case *TypeName:
 		// invalid recursive types are detected via path
-		check.typeDecl(obj, d.tdecl, def)
-		check.collectMethods(obj) // methods can only be added to top-level types
+		checks.typeDecl(obj, d.tdecl, def)
+		checks.collectMethods(obj) // methods can only be added to top-level types
 	case *Func:
 		// functions may be recursive - no need to track dependencies
-		check.funcDecl(obj, d)
+		checks.funcDecl(obj, d)
 	default:
 		panic("unreachable")
 	}
@@ -210,14 +210,14 @@ func (check *Checker) objDecl(obj Object, def *TypeName) {
 
 // validCycle checks if the cycle starting with obj is valid and
 // reports an error if it is not.
-func (check *Checker) validCycle(obj Object) (valid bool) {
+func (checks *Checker) validCycle(obj Object) (valid bool) {
 	// The object map contains the package scope objects and the non-interface methods.
 	if debug {
-		info := check.objMap[obj]
+		info := checks.objMap[obj]
 		inObjMap := info != nil && (info.fdecl == nil || info.fdecl.Recv == nil) // exclude methods
-		isPkgObj := obj.Parent() == check.pkg.scope
+		isPkgObj := obj.Parent() == checks.pkg.scope
 		if isPkgObj != inObjMap {
-			check.dump("%v: inconsistent object map for %s (isPkgObj = %v, inObjMap = %v)", obj.Pos(), obj, isPkgObj, inObjMap)
+			checks.dump("%v: inconsistent object map for %s (isPkgObj = %v, inObjMap = %v)", obj.Pos(), obj, isPkgObj, inObjMap)
 			panic("unreachable")
 		}
 	}
@@ -225,7 +225,7 @@ func (check *Checker) validCycle(obj Object) (valid bool) {
 	// Count cycle objects.
 	assert(obj.color() >= grey)
 	start := obj.color() - grey // index of obj in objPath
-	cycle := check.objPath[start:]
+	cycle := checks.objPath[start:]
 	tparCycle := false // if set, the cycle is through a type parameter list
 	nval := 0          // number of (constant or variable) values in the cycle; valid if !generic
 	ndef := 0          // number of type definitions in the cycle; valid if !generic
@@ -238,7 +238,7 @@ loop:
 			// If we reach a generic type that is part of a cycle
 			// and we are in a type parameter list, we have a cycle
 			// through a type parameter list, which is invalid.
-			if check.inTParamList && isGeneric(obj.typ) {
+			if checks.inTParamList && isGeneric(obj.typ) {
 				tparCycle = true
 				break loop
 			}
@@ -253,10 +253,10 @@ loop:
 			// the syntactic information. We should consider storing
 			// this information explicitly in the object.
 			var alias bool
-			if check.conf._EnableAlias {
+			if checks.conf._EnableAlias {
 				alias = obj.IsAlias()
 			} else {
-				if d := check.objMap[obj]; d != nil {
+				if d := checks.objMap[obj]; d != nil {
 					alias = d.tdecl.Assign.IsValid() // package-level object
 				} else {
 					alias = obj.IsAlias() // function local object
@@ -272,18 +272,18 @@ loop:
 		}
 	}
 
-	if check.conf._Trace {
-		check.trace(obj.Pos(), "## cycle detected: objPath = %s->%s (len = %d)", pathString(cycle), obj.Name(), len(cycle))
+	if checks.conf._Trace {
+		checks.trace(obj.Pos(), "## cycle detected: objPath = %s->%s (len = %d)", pathString(cycle), obj.Name(), len(cycle))
 		if tparCycle {
-			check.trace(obj.Pos(), "## cycle contains: generic type in a type parameter list")
+			checks.trace(obj.Pos(), "## cycle contains: generic type in a type parameter list")
 		} else {
-			check.trace(obj.Pos(), "## cycle contains: %d values, %d type definitions", nval, ndef)
+			checks.trace(obj.Pos(), "## cycle contains: %d values, %d type definitions", nval, ndef)
 		}
 		defer func() {
 			if valid {
-				check.trace(obj.Pos(), "=> cycle is valid")
+				checks.trace(obj.Pos(), "=> cycle is valid")
 			} else {
-				check.trace(obj.Pos(), "=> error: cycle is invalid")
+				checks.trace(obj.Pos(), "=> error: cycle is invalid")
 			}
 		}()
 	}
@@ -304,18 +304,18 @@ loop:
 		}
 	}
 
-	check.cycleError(cycle, firstInSrc(cycle))
+	checks.cycleError(cycle, firstInSrc(cycle))
 	return false
 }
 
 // cycleError reports a declaration cycle starting with the object at cycle[start].
-func (check *Checker) cycleError(cycle []Object, start int) {
+func (checks *Checker) cycleError(cycle []Object, start int) {
 	// name returns the (possibly qualified) object name.
 	// This is needed because with generic types, cycles
 	// may refer to imported types. See go.dev/issue/50788.
 	// TODO(gri) This functionality is used elsewhere. Factor it out.
 	name := func(obj Object) string {
-		return packagePrefix(obj.Pkg(), check.qualifier) + obj.Name()
+		return packagePrefix(obj.Pkg(), checks.qualifier) + obj.Name()
 	}
 
 	// If obj is a type alias, mark it as valid (not broken) in order to avoid follow-on errors.
@@ -324,22 +324,22 @@ func (check *Checker) cycleError(cycle []Object, start int) {
 	if tname != nil && tname.IsAlias() {
 		// If we use Alias nodes, it is initialized with Typ[Invalid].
 		// TODO(gri) Adjust this code if we initialize with nil.
-		if !check.conf._EnableAlias {
-			check.validAlias(tname, Typ[Invalid])
+		if !checks.conf._EnableAlias {
+			checks.validAlias(tname, Typ[Invalid])
 		}
 	}
 
 	// report a more concise error for self references
 	if len(cycle) == 1 {
 		if tname != nil {
-			check.errorf(obj, InvalidDeclCycle, "invalid recursive type: %s refers to itself", name(obj))
+			checks.errorf(obj, InvalidDeclCycle, "invalid recursive type: %s refers to itself", name(obj))
 		} else {
-			check.errorf(obj, InvalidDeclCycle, "invalid cycle in declaration: %s refers to itself", name(obj))
+			checks.errorf(obj, InvalidDeclCycle, "invalid cycle in declaration: %s refers to itself", name(obj))
 		}
 		return
 	}
 
-	err := check.newError(InvalidDeclCycle)
+	err := checks.newError(InvalidDeclCycle)
 	if tname != nil {
 		err.addf(obj, "invalid recursive type %s", name(obj))
 	} else {
@@ -390,13 +390,13 @@ func (d varDecl) node() ast.Node    { return d.spec }
 func (d typeDecl) node() ast.Node   { return d.spec }
 func (d funcDecl) node() ast.Node   { return d.decl }
 
-func (check *Checker) walkDecls(decls []ast.Decl, f func(decl)) {
+func (checks *Checker) walkDecls(decls []ast.Decl, f func(decl)) {
 	for _, d := range decls {
-		check.walkDecl(d, f)
+		checks.walkDecl(d, f)
 	}
 }
 
-func (check *Checker) walkDecl(d ast.Decl, f func(decl)) {
+func (checks *Checker) walkDecl(d ast.Decl, f func(decl)) {
 	switch d := d.(type) {
 	case *ast.BadDecl:
 		// ignore
@@ -419,49 +419,49 @@ func (check *Checker) walkDecl(d ast.Decl, f func(decl)) {
 						last = new(ast.ValueSpec) // make sure last exists
 						inherited = false
 					}
-					check.arityMatch(s, last)
+					checks.arityMatch(s, last)
 					f(constDecl{spec: s, iota: iota, typ: last.Type, init: last.Values, inherited: inherited})
 				case token.VAR:
-					check.arityMatch(s, nil)
+					checks.arityMatch(s, nil)
 					f(varDecl{s})
 				default:
-					check.errorf(s, InvalidSyntaxTree, "invalid token %s", d.Tok)
+					checks.errorf(s, InvalidSyntaxTree, "invalid token %s", d.Tok)
 				}
 			case *ast.TypeSpec:
 				f(typeDecl{s})
 			default:
-				check.errorf(s, InvalidSyntaxTree, "unknown ast.Spec node %T", s)
+				checks.errorf(s, InvalidSyntaxTree, "unknown ast.Spec node %T", s)
 			}
 		}
 	case *ast.FuncDecl:
 		f(funcDecl{d})
 	default:
-		check.errorf(d, InvalidSyntaxTree, "unknown ast.Decl node %T", d)
+		checks.errorf(d, InvalidSyntaxTree, "unknown ast.Decl node %T", d)
 	}
 }
 
-func (check *Checker) constDecl(obj *Const, typ, init ast.Expr, inherited bool) {
+func (checks *Checker) constDecl(obj *Const, typ, init ast.Expr, inherited bool) {
 	assert(obj.typ == nil)
 
 	// use the correct value of iota
 	defer func(iota constant.Value, errpos positioner) {
-		check.iota = iota
-		check.errpos = errpos
-	}(check.iota, check.errpos)
-	check.iota = obj.val
-	check.errpos = nil
+		checks.iota = iota
+		checks.errpos = errpos
+	}(checks.iota, checks.errpos)
+	checks.iota = obj.val
+	checks.errpos = nil
 
 	// provide valid constant value under all circumstances
 	obj.val = constant.MakeUnknown()
 
 	// determine type, if any
 	if typ != nil {
-		t := check.typ(typ)
+		t := checks.typ(typ)
 		if !isConstType(t) {
 			// don't report an error if the type is an invalid C (defined) type
 			// (go.dev/issue/22090)
 			if isValid(under(t)) {
-				check.errorf(typ, InvalidConstType, "invalid constant type %s", t)
+				checks.errorf(typ, InvalidConstType, "invalid constant type %s", t)
 			}
 			obj.typ = Typ[Invalid]
 			return
@@ -479,19 +479,19 @@ func (check *Checker) constDecl(obj *Const, typ, init ast.Expr, inherited bool) 
 			// the constant identifier position for any errors during
 			// init expression evaluation since that is all we have
 			// (see issues go.dev/issue/42991, go.dev/issue/42992).
-			check.errpos = atPos(obj.pos)
+			checks.errpos = atPos(obj.pos)
 		}
-		check.expr(nil, &x, init)
+		checks.expr(nil, &x, init)
 	}
-	check.initConst(obj, &x)
+	checks.initConst(obj, &x)
 }
 
-func (check *Checker) varDecl(obj *Var, lhs []*Var, typ, init ast.Expr) {
+func (checks *Checker) varDecl(obj *Var, lhs []*Var, typ, init ast.Expr) {
 	assert(obj.typ == nil)
 
 	// determine type, if any
 	if typ != nil {
-		obj.typ = check.varType(typ)
+		obj.typ = checks.varType(typ)
 		// We cannot spread the type to all lhs variables if there
 		// are more than one since that would mark them as checked
 		// (see Checker.objDecl) and the assignment of init exprs,
@@ -514,8 +514,8 @@ func (check *Checker) varDecl(obj *Var, lhs []*Var, typ, init ast.Expr) {
 	if lhs == nil || len(lhs) == 1 {
 		assert(lhs == nil || lhs[0] == obj)
 		var x operand
-		check.expr(newTarget(obj.typ, obj.name), &x, init)
-		check.initVar(obj, &x, "variable declaration")
+		checks.expr(newTarget(obj.typ, obj.name), &x, init)
+		checks.initVar(obj, &x, "variable declaration")
 		return
 	}
 
@@ -536,32 +536,32 @@ func (check *Checker) varDecl(obj *Var, lhs []*Var, typ, init ast.Expr) {
 		}
 	}
 
-	check.initVars(lhs, []ast.Expr{init}, nil)
+	checks.initVars(lhs, []ast.Expr{init}, nil)
 }
 
 // isImportedConstraint reports whether typ is an imported type constraint.
-func (check *Checker) isImportedConstraint(typ Type) bool {
+func (checks *Checker) isImportedConstraint(typ Type) bool {
 	named := asNamed(typ)
-	if named == nil || named.obj.pkg == check.pkg || named.obj.pkg == nil {
+	if named == nil || named.obj.pkg == checks.pkg || named.obj.pkg == nil {
 		return false
 	}
 	u, _ := named.under().(*Interface)
 	return u != nil && !u.IsMethodSet()
 }
 
-func (check *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, def *TypeName) {
+func (checks *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, def *TypeName) {
 	assert(obj.typ == nil)
 
 	// Only report a version error if we have not reported one already.
 	versionErr := false
 
 	var rhs Type
-	check.later(func() {
+	checks.later(func() {
 		if t := asNamed(obj.typ); t != nil { // type may be invalid
-			check.validType(t)
+			checks.validType(t)
 		}
 		// If typ is local, an error was already reported where typ is specified/defined.
-		_ = !versionErr && check.isImportedConstraint(rhs) && check.verifyVersionf(tdecl.Type, go1_18, "using type constraint %s", rhs)
+		_ = !versionErr && checks.isImportedConstraint(rhs) && checks.verifyVersionf(tdecl.Type, go1_18, "using type constraint %s", rhs)
 	}).describef(obj, "validType(%s)", obj.Name())
 
 	// First type parameter, or nil.
@@ -574,14 +574,14 @@ func (check *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, def *TypeName
 	if tdecl.Assign.IsValid() {
 		// Report highest version requirement first so that fixing a version issue
 		// avoids possibly two -lang changes (first to Go 1.9 and then to Go 1.23).
-		if !versionErr && tparam0 != nil && !check.verifyVersionf(tparam0, go1_23, "generic type alias") {
+		if !versionErr && tparam0 != nil && !checks.verifyVersionf(tparam0, go1_23, "generic type alias") {
 			versionErr = true
 		}
-		if !versionErr && !check.verifyVersionf(atPos(tdecl.Assign), go1_9, "type alias") {
+		if !versionErr && !checks.verifyVersionf(atPos(tdecl.Assign), go1_9, "type alias") {
 			versionErr = true
 		}
 
-		if check.conf._EnableAlias {
+		if checks.conf._EnableAlias {
 			// TODO(gri) Should be able to use nil instead of Typ[Invalid] to mark
 			//           the alias as incomplete. Currently this causes problems
 			//           with certain cycles. Investigate.
@@ -590,21 +590,21 @@ func (check *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, def *TypeName
 			// by (e.g.) a var whose type is an unfinished cycle,
 			// Unalias does not memoize if Invalid. Perhaps we should use a
 			// special sentinel distinct from Invalid.
-			alias := check.newAlias(obj, Typ[Invalid])
+			alias := checks.newAlias(obj, Typ[Invalid])
 			setDefType(def, alias)
 
 			// handle type parameters even if not allowed (Alias type is supported)
 			if tparam0 != nil {
 				if !versionErr && !buildcfg.Experiment.AliasTypeParams {
-					check.error(tdecl, UnsupportedFeature, "generic type alias requires GOEXPERIMENT=aliastypeparams")
+					checks.error(tdecl, UnsupportedFeature, "generic type alias requires GOEXPERIMENT=aliastypeparams")
 					versionErr = true
 				}
-				check.openScope(tdecl, "type parameters")
-				defer check.closeScope()
-				check.collectTypeParams(&alias.tparams, tdecl.TypeParams)
+				checks.openScope(tdecl, "type parameters")
+				defer checks.closeScope()
+				checks.collectTypeParams(&alias.tparams, tdecl.TypeParams)
 			}
 
-			rhs = check.definedType(tdecl.Type, obj)
+			rhs = checks.definedType(tdecl.Type, obj)
 			assert(rhs != nil)
 			alias.fromRHS = rhs
 			Unalias(alias) // resolve alias.actual
@@ -617,33 +617,33 @@ func (check *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, def *TypeName
 			gotypesalias.IncNonDefault()
 
 			if !versionErr && tparam0 != nil {
-				check.error(tdecl, UnsupportedFeature, "generic type alias requires GODEBUG=gotypesalias=1 or unset")
+				checks.error(tdecl, UnsupportedFeature, "generic type alias requires GODEBUG=gotypesalias=1 or unset")
 				versionErr = true
 			}
 
-			check.brokenAlias(obj)
-			rhs = check.typ(tdecl.Type)
-			check.validAlias(obj, rhs)
+			checks.brokenAlias(obj)
+			rhs = checks.typ(tdecl.Type)
+			checks.validAlias(obj, rhs)
 		}
 		return
 	}
 
 	// type definition or generic type declaration
-	if !versionErr && tparam0 != nil && !check.verifyVersionf(tparam0, go1_18, "type parameter") {
+	if !versionErr && tparam0 != nil && !checks.verifyVersionf(tparam0, go1_18, "type parameter") {
 		versionErr = true
 	}
 
-	named := check.newNamed(obj, nil, nil)
+	named := checks.newNamed(obj, nil, nil)
 	setDefType(def, named)
 
 	if tdecl.TypeParams != nil {
-		check.openScope(tdecl, "type parameters")
-		defer check.closeScope()
-		check.collectTypeParams(&named.tparams, tdecl.TypeParams)
+		checks.openScope(tdecl, "type parameters")
+		defer checks.closeScope()
+		checks.collectTypeParams(&named.tparams, tdecl.TypeParams)
 	}
 
 	// determine underlying type of named
-	rhs = check.definedType(tdecl.Type, obj)
+	rhs = checks.definedType(tdecl.Type, obj)
 	assert(rhs != nil)
 	named.fromRHS = rhs
 
@@ -659,12 +659,12 @@ func (check *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, def *TypeName
 	// use its underlying type (like we do for any RHS in a type declaration), and its
 	// underlying type is an interface and the type declaration is well defined.
 	if isTypeParam(rhs) {
-		check.error(tdecl.Type, MisplacedTypeParam, "cannot use a type parameter as RHS in type declaration")
+		checks.error(tdecl.Type, MisplacedTypeParam, "cannot use a type parameter as RHS in type declaration")
 		named.underlying = Typ[Invalid]
 	}
 }
 
-func (check *Checker) collectTypeParams(dst **TypeParamList, list *ast.FieldList) {
+func (checks *Checker) collectTypeParams(dst **TypeParamList, list *ast.FieldList) {
 	var tparams []*TypeParam
 	// Declare type parameters up-front, with empty interface as type bound.
 	// The scope of type parameters starts at the beginning of the type parameter
@@ -672,7 +672,7 @@ func (check *Checker) collectTypeParams(dst **TypeParamList, list *ast.FieldList
 	scopePos := list.Pos()
 	for _, f := range list.List {
 		for _, name := range f.Names {
-			tparams = append(tparams, check.declareTypeParam(name, scopePos))
+			tparams = append(tparams, checks.declareTypeParam(name, scopePos))
 		}
 	}
 
@@ -688,10 +688,10 @@ func (check *Checker) collectTypeParams(dst **TypeParamList, list *ast.FieldList
 	// sequential fashion. Note that with each new declaration, we save
 	// the existing environment and restore it when done; thus inTPList is
 	// true exactly only when we are in a specific type parameter list.
-	assert(!check.inTParamList)
-	check.inTParamList = true
+	assert(!checks.inTParamList)
+	checks.inTParamList = true
 	defer func() {
-		check.inTParamList = false
+		checks.inTParamList = false
 	}()
 
 	index := 0
@@ -700,13 +700,13 @@ func (check *Checker) collectTypeParams(dst **TypeParamList, list *ast.FieldList
 		// NOTE: we may be able to assert that f.Type != nil here, but this is not
 		// an invariant of the AST, so we are cautious.
 		if f.Type != nil {
-			bound = check.bound(f.Type)
+			bound = checks.bound(f.Type)
 			if isTypeParam(bound) {
 				// We may be able to allow this since it is now well-defined what
 				// the underlying type and thus type set of a type parameter is.
 				// But we may need some additional form of cycle detection within
 				// type parameter lists.
-				check.error(f.Type, MisplacedTypeParam, "cannot use a type parameter as constraint")
+				checks.error(f.Type, MisplacedTypeParam, "cannot use a type parameter as constraint")
 				bound = Typ[Invalid]
 			}
 		} else {
@@ -719,7 +719,7 @@ func (check *Checker) collectTypeParams(dst **TypeParamList, list *ast.FieldList
 	}
 }
 
-func (check *Checker) bound(x ast.Expr) Type {
+func (checks *Checker) bound(x ast.Expr) Type {
 	// A type set literal of the form ~T and A|B may only appear as constraint;
 	// embed it in an implicit interface so that only interface type-checking
 	// needs to take care of such type expressions.
@@ -732,40 +732,40 @@ func (check *Checker) bound(x ast.Expr) Type {
 	}
 	if wrap {
 		x = &ast.InterfaceType{Methods: &ast.FieldList{List: []*ast.Field{{Type: x}}}}
-		t := check.typ(x)
+		t := checks.typ(x)
 		// mark t as implicit interface if all went well
 		if t, _ := t.(*Interface); t != nil {
 			t.implicit = true
 		}
 		return t
 	}
-	return check.typ(x)
+	return checks.typ(x)
 }
 
-func (check *Checker) declareTypeParam(name *ast.Ident, scopePos token.Pos) *TypeParam {
+func (checks *Checker) declareTypeParam(name *ast.Ident, scopePos token.Pos) *TypeParam {
 	// Use Typ[Invalid] for the type constraint to ensure that a type
 	// is present even if the actual constraint has not been assigned
 	// yet.
 	// TODO(gri) Need to systematically review all uses of type parameter
 	//           constraints to make sure we don't rely on them if they
 	//           are not properly set yet.
-	tname := NewTypeName(name.Pos(), check.pkg, name.Name, nil)
-	tpar := check.newTypeParam(tname, Typ[Invalid]) // assigns type to tname as a side-effect
-	check.declare(check.scope, name, tname, scopePos)
+	tname := NewTypeName(name.Pos(), checks.pkg, name.Name, nil)
+	tpar := checks.newTypeParam(tname, Typ[Invalid]) // assigns type to tname as a side-effect
+	checks.declare(checks.scope, name, tname, scopePos)
 	return tpar
 }
 
-func (check *Checker) collectMethods(obj *TypeName) {
+func (checks *Checker) collectMethods(obj *TypeName) {
 	// get associated methods
 	// (Checker.collectObjects only collects methods with non-blank names;
 	// Checker.resolveBaseTypeName ensures that obj is not an alias name
 	// if it has attached methods.)
-	methods := check.methods[obj]
+	methods := checks.methods[obj]
 	if methods == nil {
 		return
 	}
-	delete(check.methods, obj)
-	assert(!check.objMap[obj].tdecl.Assign.IsValid()) // don't use TypeName.IsAlias (requires fully set up object)
+	delete(checks.methods, obj)
+	assert(!checks.objMap[obj].tdecl.Assign.IsValid()) // don't use TypeName.IsAlias (requires fully set up object)
 
 	// use an objset to check for name conflicts
 	var mset objset
@@ -778,8 +778,8 @@ func (check *Checker) collectMethods(obj *TypeName) {
 
 		// See go.dev/issue/52529: we must delay the expansion of underlying here, as
 		// base may not be fully set-up.
-		check.later(func() {
-			check.checkFieldUniqueness(base)
+		checks.later(func() {
+			checks.checkFieldUniqueness(base)
 		}).describef(obj, "verifying field uniqueness for %v", base)
 
 		// Checker.Files may be called multiple times; additional package files
@@ -799,9 +799,9 @@ func (check *Checker) collectMethods(obj *TypeName) {
 		assert(m.name != "_")
 		if alt := mset.insert(m); alt != nil {
 			if alt.Pos().IsValid() {
-				check.errorf(m, DuplicateMethod, "method %s.%s already declared at %v", obj.Name(), m.name, alt.Pos())
+				checks.errorf(m, DuplicateMethod, "method %s.%s already declared at %v", obj.Name(), m.name, alt.Pos())
 			} else {
-				check.errorf(m, DuplicateMethod, "method %s.%s already declared", obj.Name(), m.name)
+				checks.errorf(m, DuplicateMethod, "method %s.%s already declared", obj.Name(), m.name)
 			}
 			continue
 		}
@@ -812,7 +812,7 @@ func (check *Checker) collectMethods(obj *TypeName) {
 	}
 }
 
-func (check *Checker) checkFieldUniqueness(base *Named) {
+func (checks *Checker) checkFieldUniqueness(base *Named) {
 	if t, _ := base.under().(*Struct); t != nil {
 		var mset objset
 		for i := 0; i < base.NumMethods(); i++ {
@@ -832,7 +832,7 @@ func (check *Checker) checkFieldUniqueness(base *Named) {
 
 					// For historical consistency, we report the primary error on the
 					// method, and the alt decl on the field.
-					err := check.newError(DuplicateFieldAndMethod)
+					err := checks.newError(DuplicateFieldAndMethod)
 					err.addf(alt, "field and method with the same name %s", fld.name)
 					err.addAltDecl(fld)
 					err.report()
@@ -842,11 +842,11 @@ func (check *Checker) checkFieldUniqueness(base *Named) {
 	}
 }
 
-func (check *Checker) funcDecl(obj *Func, decl *declInfo) {
+func (checks *Checker) funcDecl(obj *Func, decl *declInfo) {
 	assert(obj.typ == nil)
 
 	// func declarations cannot use iota
-	assert(check.iota == nil)
+	assert(checks.iota == nil)
 
 	sig := new(Signature)
 	obj.typ = sig // guard against cycles
@@ -860,7 +860,7 @@ func (check *Checker) funcDecl(obj *Func, decl *declInfo) {
 	saved := obj.color_
 	obj.color_ = black
 	fdecl := decl.fdecl
-	check.funcType(sig, fdecl.Recv, fdecl.Type)
+	checks.funcType(sig, fdecl.Recv, fdecl.Type)
 	obj.color_ = saved
 
 	// Set the scope's extent to the complete "func (...) { ... }"
@@ -869,25 +869,25 @@ func (check *Checker) funcDecl(obj *Func, decl *declInfo) {
 	sig.scope.end = fdecl.End()
 
 	if fdecl.Type.TypeParams.NumFields() > 0 && fdecl.Body == nil {
-		check.softErrorf(fdecl.Name, BadDecl, "generic function is missing function body")
+		checks.softErrorf(fdecl.Name, BadDecl, "generic function is missing function body")
 	}
 
 	// function body must be type-checked after global declarations
 	// (functions implemented elsewhere have no body)
-	if !check.conf.IgnoreFuncBodies && fdecl.Body != nil {
-		check.later(func() {
-			check.funcBody(decl, obj.name, sig, fdecl.Body, nil)
+	if !checks.conf.IgnoreFuncBodies && fdecl.Body != nil {
+		checks.later(func() {
+			checks.funcBody(decl, obj.name, sig, fdecl.Body, nil)
 		}).describef(obj, "func %s", obj.name)
 	}
 }
 
-func (check *Checker) declStmt(d ast.Decl) {
-	pkg := check.pkg
+func (checks *Checker) declStmt(d ast.Decl) {
+	pkg := checks.pkg
 
-	check.walkDecl(d, func(d decl) {
+	checks.walkDecl(d, func(d decl) {
 		switch d := d.(type) {
 		case constDecl:
-			top := len(check.delayed)
+			top := len(checks.delayed)
 
 			// declare all constants
 			lhs := make([]*Const, len(d.spec.Names))
@@ -900,11 +900,11 @@ func (check *Checker) declStmt(d ast.Decl) {
 					init = d.init[i]
 				}
 
-				check.constDecl(obj, d.typ, init, d.inherited)
+				checks.constDecl(obj, d.typ, init, d.inherited)
 			}
 
 			// process function literals in init expressions before scope changes
-			check.processDelayed(top)
+			checks.processDelayed(top)
 
 			// spec: "The scope of a constant or variable identifier declared
 			// inside a function begins at the end of the ConstSpec or VarSpec
@@ -912,11 +912,11 @@ func (check *Checker) declStmt(d ast.Decl) {
 			// end of the innermost containing block."
 			scopePos := d.spec.End()
 			for i, name := range d.spec.Names {
-				check.declare(check.scope, name, lhs[i], scopePos)
+				checks.declare(checks.scope, name, lhs[i], scopePos)
 			}
 
 		case varDecl:
-			top := len(check.delayed)
+			top := len(checks.delayed)
 
 			lhs0 := make([]*Var, len(d.spec.Names))
 			for i, name := range d.spec.Names {
@@ -940,7 +940,7 @@ func (check *Checker) declStmt(d ast.Decl) {
 						init = d.spec.Values[i]
 					}
 				}
-				check.varDecl(obj, lhs, d.spec.Type, init)
+				checks.varDecl(obj, lhs, d.spec.Type, init)
 				if len(d.spec.Values) == 1 {
 					// If we have a single lhs variable we are done either way.
 					// If we have a single rhs expression, it must be a multi-
@@ -957,14 +957,14 @@ func (check *Checker) declStmt(d ast.Decl) {
 			}
 
 			// process function literals in init expressions before scope changes
-			check.processDelayed(top)
+			checks.processDelayed(top)
 
 			// declare all variables
 			// (only at this point are the variable scopes (parents) set)
 			scopePos := d.spec.End() // see constant declarations
 			for i, name := range d.spec.Names {
 				// see constant declarations
-				check.declare(check.scope, name, lhs0[i], scopePos)
+				checks.declare(checks.scope, name, lhs0[i], scopePos)
 			}
 
 		case typeDecl:
@@ -973,13 +973,13 @@ func (check *Checker) declStmt(d ast.Decl) {
 			// begins at the identifier in the TypeSpec and ends at the end of
 			// the innermost containing block."
 			scopePos := d.spec.Name.Pos()
-			check.declare(check.scope, d.spec.Name, obj, scopePos)
+			checks.declare(checks.scope, d.spec.Name, obj, scopePos)
 			// mark and unmark type before calling typeDecl; its type is still nil (see Checker.objDecl)
-			obj.setColor(grey + color(check.push(obj)))
-			check.typeDecl(obj, d.spec, nil)
-			check.pop().setColor(black)
+			obj.setColor(grey + color(checks.push(obj)))
+			checks.typeDecl(obj, d.spec, nil)
+			checks.pop().setColor(black)
 		default:
-			check.errorf(d.node(), InvalidSyntaxTree, "unknown ast.Decl node %T", d.node())
+			checks.errorf(d.node(), InvalidSyntaxTree, "unknown ast.Decl node %T", d.node())
 		}
 	})
 }

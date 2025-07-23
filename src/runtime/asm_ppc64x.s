@@ -79,7 +79,7 @@ nocgo:
 	// save m0 to g0->m
 	MOVD	R3, g_m(g)
 
-	BL	runtime·check(SB)
+	BL	runtime·checks(SB)
 
 	// args are already prepared
 	BL	runtime·args(SB)

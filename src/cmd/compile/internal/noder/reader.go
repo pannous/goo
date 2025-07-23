@@ -2777,8 +2777,8 @@ func (r *reader) syntheticClosure(origPos src.XPos, typ *types.Type, ifaceHack b
 		// We need to nil check interface receivers at the point of method
 		// value evaluation, ugh.
 		if ifaceHack && i == 1 && n.Type().IsInterface() {
-			check := ir.NewUnaryExpr(inlPos, ir.OCHECKNIL, ir.NewUnaryExpr(inlPos, ir.OITAB, tmp))
-			init.Append(typecheck.Stmt(check))
+			checks := ir.NewUnaryExpr(inlPos, ir.OCHECKNIL, ir.NewUnaryExpr(inlPos, ir.OITAB, tmp))
+			init.Append(typecheck.Stmt(checks))
 		}
 	}
 

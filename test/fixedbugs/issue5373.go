@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-func check(n int) {
+func checks(n int) {
 	// When n == 0, i is untouched by the range loop.
 	// Picking an initial value of -1 for i makes the
 	// "want" calculation below correct in all cases.
@@ -65,7 +65,7 @@ func check(n int) {
 }
 
 func main() {
-	check(0)
-	check(1)
-	check(15)
+	checks(0)
+	checks(1)
+	checks(15)
 }

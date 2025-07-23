@@ -18,43 +18,43 @@ import (
 // If an error occurred, x.mode is set to invalid.
 // For the meaning of def, see Checker.definedType, below.
 // If wantType is set, the identifier e is expected to denote a type.
-func (check *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bool) {
+func (checks *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bool) {
 	x.mode = invalid
 	x.expr = e
 
-	scope, obj := check.lookupScope(e.Name)
+	scope, obj := checks.lookupScope(e.Name)
 	switch obj {
 	case nil:
 		if e.Name == "_" {
-			check.error(e, InvalidBlank, "cannot use _ as value or type")
+			checks.error(e, InvalidBlank, "cannot use _ as value or type")
 		} else if isValidName(e.Name) {
-			check.errorf(e, UndeclaredName, "undefined: %s", e.Name)
+			checks.errorf(e, UndeclaredName, "undefined: %s", e.Name)
 		}
 		return
 	case universeComparable:
-		if !check.verifyVersionf(e, go1_18, "predeclared %s", e.Name) {
+		if !checks.verifyVersionf(e, go1_18, "predeclared %s", e.Name) {
 			return // avoid follow-on errors
 		}
 	}
 	// Because the representation of any depends on gotypesalias, we don't check
 	// pointer identity here.
 	if obj.Name() == "any" && obj.Parent() == Universe {
-		if !check.verifyVersionf(e, go1_18, "predeclared %s", e.Name) {
+		if !checks.verifyVersionf(e, go1_18, "predeclared %s", e.Name) {
 			return // avoid follow-on errors
 		}
 	}
-	check.recordUse(e, obj)
+	checks.recordUse(e, obj)
 
 	// If we want a type but don't have one, stop right here and avoid potential problems
 	// with missing underlying types. This also gives better error messages in some cases
 	// (see go.dev/issue/65344).
 	_, gotType := obj.(*TypeName)
 	if !gotType && wantType {
-		check.errorf(e, NotAType, "%s is not a type", obj.Name())
+		checks.errorf(e, NotAType, "%s is not a type", obj.Name())
 		// avoid "declared but not used" errors
 		// (don't use Checker.use - we don't want to evaluate too much)
-		if v, _ := obj.(*Var); v != nil && v.pkg == check.pkg /* see Checker.use1 */ {
-			check.usedVars[v] = true
+		if v, _ := obj.(*Var); v != nil && v.pkg == checks.pkg /* see Checker.use1 */ {
+			checks.usedVars[v] = true
 		}
 		return
 	}
@@ -71,8 +71,8 @@ func (check *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bo
 	// Note that it is important to avoid calling objDecl on objects from other
 	// packages, to avoid races: see issue #69912.
 	typ := obj.Type()
-	if typ == nil || (gotType && wantType && obj.Pkg() == check.pkg) {
-		check.objDecl(obj, def)
+	if typ == nil || (gotType && wantType && obj.Pkg() == checks.pkg) {
+		checks.objDecl(obj, def)
 		typ = obj.Type() // type must have been assigned by Checker.objDecl
 	}
 	assert(typ != nil)
@@ -81,26 +81,26 @@ func (check *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bo
 	// If so, mark the respective package as used.
 	// (This code is only needed for dot-imports. Without them,
 	// we only have to mark variables, see *Var case below).
-	if pkgName := check.dotImportMap[dotImportKey{scope, obj.Name()}]; pkgName != nil {
-		check.usedPkgNames[pkgName] = true
+	if pkgName := checks.dotImportMap[dotImportKey{scope, obj.Name()}]; pkgName != nil {
+		checks.usedPkgNames[pkgName] = true
 	}
 
 	switch obj := obj.(type) {
 	case *PkgName:
-		check.errorf(e, InvalidPkgUse, "use of package %s not in selector", obj.name)
+		checks.errorf(e, InvalidPkgUse, "use of package %s not in selector", obj.name)
 		return
 
 	case *Const:
-		check.addDeclDep(obj)
+		checks.addDeclDep(obj)
 		if !isValid(typ) {
 			return
 		}
 		if obj == universeIota {
-			if check.iota == nil {
-				check.error(e, InvalidIota, "cannot use iota outside constant declaration")
+			if checks.iota == nil {
+				checks.error(e, InvalidIota, "cannot use iota outside constant declaration")
 				return
 			}
-			x.val = check.iota
+			x.val = checks.iota
 		} else {
 			x.val = obj.val
 		}
@@ -108,8 +108,8 @@ func (check *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bo
 		x.mode = constant_
 
 	case *TypeName:
-		if !check.conf._EnableAlias && check.isBrokenAlias(obj) {
-			check.errorf(e, InvalidDeclCycle, "invalid use of type alias %s in recursive type (see go.dev/issue/50729)", obj.name)
+		if !checks.conf._EnableAlias && checks.isBrokenAlias(obj) {
+			checks.errorf(e, InvalidDeclCycle, "invalid use of type alias %s in recursive type (see go.dev/issue/50729)", obj.name)
 			return
 		}
 		x.mode = typexpr
@@ -118,17 +118,17 @@ func (check *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bo
 		// It's ok to mark non-local variables, but ignore variables
 		// from other packages to avoid potential race conditions with
 		// dot-imported variables.
-		if obj.pkg == check.pkg {
-			check.usedVars[obj] = true
+		if obj.pkg == checks.pkg {
+			checks.usedVars[obj] = true
 		}
-		check.addDeclDep(obj)
+		checks.addDeclDep(obj)
 		if !isValid(typ) {
 			return
 		}
 		x.mode = variable
 
 	case *Func:
-		check.addDeclDep(obj)
+		checks.addDeclDep(obj)
 		x.mode = value
 
 	case *Builtin:
@@ -147,22 +147,22 @@ func (check *Checker) ident(x *operand, e *ast.Ident, def *TypeName, wantType bo
 
 // typ type-checks the type expression e and returns its type, or Typ[Invalid].
 // The type must not be an (uninstantiated) generic type.
-func (check *Checker) typ(e ast.Expr) Type {
-	return check.definedType(e, nil)
+func (checks *Checker) typ(e ast.Expr) Type {
+	return checks.definedType(e, nil)
 }
 
 // varType type-checks the type expression e and returns its type, or Typ[Invalid].
 // The type must not be an (uninstantiated) generic type and it must not be a
 // constraint interface.
-func (check *Checker) varType(e ast.Expr) Type {
-	typ := check.definedType(e, nil)
-	check.validVarType(e, typ)
+func (checks *Checker) varType(e ast.Expr) Type {
+	typ := checks.definedType(e, nil)
+	checks.validVarType(e, typ)
 	return typ
 }
 
 // validVarType reports an error if typ is a constraint interface.
 // The expression e is used for error reporting, if any.
-func (check *Checker) validVarType(e ast.Expr, typ Type) {
+func (checks *Checker) validVarType(e ast.Expr, typ Type) {
 	// If we have a type parameter there's nothing to do.
 	if isTypeParam(typ) {
 		return
@@ -171,14 +171,14 @@ func (check *Checker) validVarType(e ast.Expr, typ Type) {
 	// We don't want to call under() or complete interfaces while we are in
 	// the middle of type-checking parameter declarations that might belong
 	// to interface methods. Delay this check to the end of type-checking.
-	check.later(func() {
+	checks.later(func() {
 		if t, _ := under(typ).(*Interface); t != nil {
-			tset := computeInterfaceTypeSet(check, e.Pos(), t) // TODO(gri) is this the correct position?
+			tset := computeInterfaceTypeSet(checks, e.Pos(), t) // TODO(gri) is this the correct position?
 			if !tset.IsMethodSet() {
 				if tset.comparable {
-					check.softErrorf(e, MisplacedConstraintIface, "cannot use type %s outside a type constraint: interface is (or embeds) comparable", typ)
+					checks.softErrorf(e, MisplacedConstraintIface, "cannot use type %s outside a type constraint: interface is (or embeds) comparable", typ)
 				} else {
-					check.softErrorf(e, MisplacedConstraintIface, "cannot use type %s outside a type constraint: interface contains type constraints", typ)
+					checks.softErrorf(e, MisplacedConstraintIface, "cannot use type %s outside a type constraint: interface contains type constraints", typ)
 				}
 			}
 		}
@@ -189,14 +189,14 @@ func (check *Checker) validVarType(e ast.Expr, typ Type) {
 // If def != nil, e is the type specification for the type named def, declared
 // in a type declaration, and def.typ.underlying will be set to the type of e
 // before any components of e are type-checked.
-func (check *Checker) definedType(e ast.Expr, def *TypeName) Type {
-	typ := check.typInternal(e, def)
+func (checks *Checker) definedType(e ast.Expr, def *TypeName) Type {
+	typ := checks.typInternal(e, def)
 	assert(isTyped(typ))
 	if isGeneric(typ) {
-		check.errorf(e, WrongTypeArgCount, "cannot use generic type %s without instantiation", typ)
+		checks.errorf(e, WrongTypeArgCount, "cannot use generic type %s without instantiation", typ)
 		typ = Typ[Invalid]
 	}
-	check.recordTypeAndValue(e, typexpr, typ, nil)
+	checks.recordTypeAndValue(e, typexpr, typ, nil)
 	return typ
 }
 
@@ -207,17 +207,17 @@ func (check *Checker) definedType(e ast.Expr, def *TypeName) Type {
 // Note: If the type expression was invalid and an error was reported before,
 // cause will not be populated; thus cause alone cannot be used to determine
 // if an error occurred.
-func (check *Checker) genericType(e ast.Expr, cause *string) Type {
-	typ := check.typInternal(e, nil)
+func (checks *Checker) genericType(e ast.Expr, cause *string) Type {
+	typ := checks.typInternal(e, nil)
 	assert(isTyped(typ))
 	if isValid(typ) && !isGeneric(typ) {
 		if cause != nil {
-			*cause = check.sprintf("%s is not a generic type", typ)
+			*cause = checks.sprintf("%s is not a generic type", typ)
 		}
 		typ = Typ[Invalid]
 	}
 	// TODO(gri) what is the correct call below?
-	check.recordTypeAndValue(e, typexpr, typ, nil)
+	checks.recordTypeAndValue(e, typexpr, typ, nil)
 	return typ
 }
 
@@ -229,12 +229,12 @@ func goTypeName(typ Type) string {
 
 // typInternal drives type checking of types.
 // Must only be called by definedType or genericType.
-func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
-	if check.conf._Trace {
-		check.trace(e0.Pos(), "-- type %s", e0)
-		check.indent++
+func (checks *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
+	if checks.conf._Trace {
+		checks.trace(e0.Pos(), "-- type %s", e0)
+		checks.indent++
 		defer func() {
-			check.indent--
+			checks.indent--
 			var under Type
 			if T != nil {
 				// Calling under() here may lead to endless instantiations.
@@ -242,9 +242,9 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 				under = safeUnderlying(T)
 			}
 			if T == under {
-				check.trace(e0.Pos(), "=> %s // %s", T, goTypeName(T))
+				checks.trace(e0.Pos(), "=> %s // %s", T, goTypeName(T))
 			} else {
-				check.trace(e0.Pos(), "=> %s (under = %s) // %s", T, under, goTypeName(T))
+				checks.trace(e0.Pos(), "=> %s (under = %s) // %s", T, under, goTypeName(T))
 			}
 		}()
 	}
@@ -255,7 +255,7 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 
 	case *ast.Ident:
 		var x operand
-		check.ident(&x, e, def, true)
+		checks.ident(&x, e, def, true)
 
 		switch x.mode {
 		case typexpr:
@@ -265,14 +265,14 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 		case invalid:
 			// ignore - error reported before
 		case novalue:
-			check.errorf(&x, NotAType, "%s used as type", &x)
+			checks.errorf(&x, NotAType, "%s used as type", &x)
 		default:
-			check.errorf(&x, NotAType, "%s is not a type", &x)
+			checks.errorf(&x, NotAType, "%s is not a type", &x)
 		}
 
 	case *ast.SelectorExpr:
 		var x operand
-		check.selector(&x, e, def, true)
+		checks.selector(&x, e, def, true)
 
 		switch x.mode {
 		case typexpr:
@@ -282,26 +282,26 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 		case invalid:
 			// ignore - error reported before
 		case novalue:
-			check.errorf(&x, NotAType, "%s used as type", &x)
+			checks.errorf(&x, NotAType, "%s used as type", &x)
 		default:
-			check.errorf(&x, NotAType, "%s is not a type", &x)
+			checks.errorf(&x, NotAType, "%s is not a type", &x)
 		}
 
 	case *ast.IndexExpr, *ast.IndexListExpr:
 		ix := unpackIndexedExpr(e)
-		check.verifyVersionf(inNode(e, ix.lbrack), go1_18, "type instantiation")
-		return check.instantiatedType(ix, def)
+		checks.verifyVersionf(inNode(e, ix.lbrack), go1_18, "type instantiation")
+		return checks.instantiatedType(ix, def)
 
 	case *ast.ParenExpr:
 		// Generic types must be instantiated before they can be used in any form.
 		// Consequently, generic types cannot be parenthesized.
-		return check.definedType(e.X, def)
+		return checks.definedType(e.X, def)
 
 	case *ast.ArrayType:
 		if e.Len == nil {
 			typ := new(Slice)
 			setDefType(def, typ)
-			typ.elem = check.varType(e.Elt)
+			typ.elem = checks.varType(e.Elt)
 			return typ
 		}
 
@@ -310,12 +310,12 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 		// Provide a more specific error when encountering a [...] array
 		// rather than leaving it to the handling of the ... expression.
 		if _, ok := e.Len.(*ast.Ellipsis); ok {
-			check.error(e.Len, BadDotDotDotSyntax, "invalid use of [...] array (outside a composite literal)")
+			checks.error(e.Len, BadDotDotDotSyntax, "invalid use of [...] array (outside a composite literal)")
 			typ.len = -1
 		} else {
-			typ.len = check.arrayLength(e.Len)
+			typ.len = checks.arrayLength(e.Len)
 		}
-		typ.elem = check.varType(e.Elt)
+		typ.elem = checks.varType(e.Elt)
 		if typ.len >= 0 {
 			return typ
 		}
@@ -323,19 +323,19 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 
 	case *ast.Ellipsis:
 		// dots are handled explicitly where they are valid
-		check.error(e, InvalidSyntaxTree, "invalid use of ...")
+		checks.error(e, InvalidSyntaxTree, "invalid use of ...")
 
 	case *ast.StructType:
 		typ := new(Struct)
 		setDefType(def, typ)
-		check.structType(typ, e)
+		checks.structType(typ, e)
 		return typ
 
 	case *ast.StarExpr:
 		typ := new(Pointer)
 		typ.base = Typ[Invalid] // avoid nil base in invalid recursive type declaration
 		setDefType(def, typ)
-		typ.base = check.varType(e.X)
+		typ.base = checks.varType(e.X)
 		// If typ.base is invalid, it's unlikely that *base is particularly
 		// useful - even a valid dereferenciation will lead to an invalid
 		// type again, and in some cases we get unexpected follow-on errors
@@ -348,21 +348,21 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 	case *ast.FuncType:
 		typ := new(Signature)
 		setDefType(def, typ)
-		check.funcType(typ, nil, e)
+		checks.funcType(typ, nil, e)
 		return typ
 
 	case *ast.InterfaceType:
-		typ := check.newInterface()
+		typ := checks.newInterface()
 		setDefType(def, typ)
-		check.interfaceType(typ, e, def)
+		checks.interfaceType(typ, e, def)
 		return typ
 
 	case *ast.MapType:
 		typ := new(Map)
 		setDefType(def, typ)
 
-		typ.key = check.varType(e.Key)
-		typ.elem = check.varType(e.Value)
+		typ.key = checks.varType(e.Key)
+		typ.elem = checks.varType(e.Value)
 
 		// spec: "The comparison operators == and != must be fully defined
 		// for operands of the key type; thus the key type must not be a
@@ -370,13 +370,13 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 		//
 		// Delay this check because it requires fully setup types;
 		// it is safe to continue in any case (was go.dev/issue/6667).
-		check.later(func() {
+		checks.later(func() {
 			if !Comparable(typ.key) {
 				var why string
 				if isTypeParam(typ.key) {
 					why = " (missing comparable constraint)"
 				}
-				check.errorf(e.Key, IncomparableMapKey, "invalid map key type %s%s", typ.key, why)
+				checks.errorf(e.Key, IncomparableMapKey, "invalid map key type %s%s", typ.key, why)
 			}
 		}).describef(e.Key, "check map key %s", typ.key)
 
@@ -395,17 +395,17 @@ func (check *Checker) typInternal(e0 ast.Expr, def *TypeName) (T Type) {
 		case ast.RECV:
 			dir = RecvOnly
 		default:
-			check.errorf(e, InvalidSyntaxTree, "unknown channel direction %d", e.Dir)
+			checks.errorf(e, InvalidSyntaxTree, "unknown channel direction %d", e.Dir)
 			// ok to continue
 		}
 
 		typ.dir = dir
-		typ.elem = check.varType(e.Value)
+		typ.elem = checks.varType(e.Value)
 		return typ
 
 	default:
-		check.errorf(e0, NotAType, "%s is not a type", e0)
-		check.use(e0)
+		checks.errorf(e0, NotAType, "%s is not a type", e0)
+		checks.use(e0)
 	}
 
 	typ := Typ[Invalid]
@@ -428,14 +428,14 @@ func setDefType(def *TypeName, typ Type) {
 	}
 }
 
-func (check *Checker) instantiatedType(ix *indexedExpr, def *TypeName) (res Type) {
-	if check.conf._Trace {
-		check.trace(ix.Pos(), "-- instantiating type %s with %s", ix.x, ix.indices)
-		check.indent++
+func (checks *Checker) instantiatedType(ix *indexedExpr, def *TypeName) (res Type) {
+	if checks.conf._Trace {
+		checks.trace(ix.Pos(), "-- instantiating type %s with %s", ix.x, ix.indices)
+		checks.indent++
 		defer func() {
-			check.indent--
+			checks.indent--
 			// Don't format the underlying here. It will always be nil.
-			check.trace(ix.Pos(), "=> %s", res)
+			checks.trace(ix.Pos(), "=> %s", res)
 		}()
 	}
 
@@ -444,9 +444,9 @@ func (check *Checker) instantiatedType(ix *indexedExpr, def *TypeName) (res Type
 	}()
 
 	var cause string
-	typ := check.genericType(ix.x, &cause)
+	typ := checks.genericType(ix.x, &cause)
 	if cause != "" {
-		check.errorf(ix.orig, NotAGenericType, invalidOp+"%s (%s)", ix.orig, cause)
+		checks.errorf(ix.orig, NotAGenericType, invalidOp+"%s (%s)", ix.orig, cause)
 	}
 	if !isValid(typ) {
 		return typ // error already reported
@@ -458,7 +458,7 @@ func (check *Checker) instantiatedType(ix *indexedExpr, def *TypeName) (res Type
 	gtyp := typ.(genericType)
 
 	// evaluate arguments
-	targs := check.typeList(ix.indices)
+	targs := checks.typeList(ix.indices)
 	if targs == nil {
 		return Typ[Invalid]
 	}
@@ -467,32 +467,32 @@ func (check *Checker) instantiatedType(ix *indexedExpr, def *TypeName) (res Type
 	// The instance is not generic anymore as it has type arguments, but unless
 	// instantiation failed, it still satisfies the genericType interface because
 	// it has type parameters, too.
-	ityp := check.instance(ix.Pos(), gtyp, targs, nil, check.context())
+	ityp := checks.instance(ix.Pos(), gtyp, targs, nil, checks.context())
 	inst, _ := ityp.(genericType)
 	if inst == nil {
 		return Typ[Invalid]
 	}
 
 	// For Named types, orig.tparams may not be set up, so we need to do expansion later.
-	check.later(func() {
+	checks.later(func() {
 		// This is an instance from the source, not from recursive substitution,
 		// and so it must be resolved during type-checking so that we can report
 		// errors.
-		check.recordInstance(ix.orig, targs, inst)
+		checks.recordInstance(ix.orig, targs, inst)
 
 		name := inst.(interface{ Obj() *TypeName }).Obj().name
 		tparams := inst.TypeParams().list()
-		if check.validateTArgLen(ix.Pos(), name, len(tparams), len(targs)) {
+		if checks.validateTArgLen(ix.Pos(), name, len(tparams), len(targs)) {
 			// check type constraints
-			if i, err := check.verify(ix.Pos(), inst.TypeParams().list(), targs, check.context()); err != nil {
+			if i, err := checks.verify(ix.Pos(), inst.TypeParams().list(), targs, checks.context()); err != nil {
 				// best position for error reporting
 				pos := ix.Pos()
 				if i < len(ix.indices) {
 					pos = ix.indices[i].Pos()
 				}
-				check.softErrorf(atPos(pos), InvalidTypeArg, "%v", err)
+				checks.softErrorf(atPos(pos), InvalidTypeArg, "%v", err)
 			} else {
-				check.mono.recordInstance(check.pkg, ix.Pos(), tparams, targs, ix.indices)
+				checks.mono.recordInstance(checks.pkg, ix.Pos(), tparams, targs, ix.indices)
 			}
 		}
 	}).describef(ix, "verify instantiation %s", inst)
@@ -503,35 +503,35 @@ func (check *Checker) instantiatedType(ix *indexedExpr, def *TypeName) (res Type
 // arrayLength type-checks the array length expression e
 // and returns the constant length >= 0, or a value < 0
 // to indicate an error (and thus an unknown length).
-func (check *Checker) arrayLength(e ast.Expr) int64 {
+func (checks *Checker) arrayLength(e ast.Expr) int64 {
 	// If e is an identifier, the array declaration might be an
 	// attempt at a parameterized type declaration with missing
 	// constraint. Provide an error message that mentions array
 	// length.
 	if name, _ := e.(*ast.Ident); name != nil {
-		obj := check.lookup(name.Name)
+		obj := checks.lookup(name.Name)
 		if obj == nil {
-			check.errorf(name, InvalidArrayLen, "undefined array length %s or missing type constraint", name.Name)
+			checks.errorf(name, InvalidArrayLen, "undefined array length %s or missing type constraint", name.Name)
 			return -1
 		}
 		if _, ok := obj.(*Const); !ok {
-			check.errorf(name, InvalidArrayLen, "invalid array length %s", name.Name)
+			checks.errorf(name, InvalidArrayLen, "invalid array length %s", name.Name)
 			return -1
 		}
 	}
 
 	var x operand
-	check.expr(nil, &x, e)
+	checks.expr(nil, &x, e)
 	if x.mode != constant_ {
 		if x.mode != invalid {
-			check.errorf(&x, InvalidArrayLen, "array length %s must be constant", &x)
+			checks.errorf(&x, InvalidArrayLen, "array length %s must be constant", &x)
 		}
 		return -1
 	}
 
 	if isUntyped(x.typ) || isInteger(x.typ) {
 		if val := constant.ToInt(x.val); val.Kind() == constant.Int {
-			if representableConst(val, check, Typ[Int], nil) {
+			if representableConst(val, checks, Typ[Int], nil) {
 				if n, ok := constant.Int64Val(val); ok && n >= 0 {
 					return n
 				}
@@ -545,16 +545,16 @@ func (check *Checker) arrayLength(e ast.Expr) int64 {
 	} else {
 		msg = "array length %s must be integer"
 	}
-	check.errorf(&x, InvalidArrayLen, msg, &x)
+	checks.errorf(&x, InvalidArrayLen, msg, &x)
 	return -1
 }
 
 // typeList provides the list of types corresponding to the incoming expression list.
 // If an error occurred, the result is nil, but all list elements were type-checked.
-func (check *Checker) typeList(list []ast.Expr) []Type {
+func (checks *Checker) typeList(list []ast.Expr) []Type {
 	res := make([]Type, len(list)) // res != nil even if len(list) == 0
 	for i, x := range list {
-		t := check.varType(x)
+		t := checks.varType(x)
 		if !isValid(t) {
 			res = nil
 		}

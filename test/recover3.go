@@ -23,7 +23,7 @@ func bug() {
 	didbug = true
 }
 
-func check(name string, f func(), err string) {
+func checks(name string, f func(), err string) {
 	defer func() {
 		v := recover()
 		if v == nil {
@@ -55,23 +55,23 @@ func main() {
 	var q *[10000]int
 	var i int
 
-	check("int-div-zero", func() { println(1 / x) }, "integer divide by zero")
-	check("int64-div-zero", func() { println(1 / x64) }, "integer divide by zero")
+	checks("int-div-zero", func() { println(1 / x) }, "integer divide by zero")
+	checks("int64-div-zero", func() { println(1 / x64) }, "integer divide by zero")
 
-	check("nil-deref", func() { println(p[0]) }, "nil pointer dereference")
-	check("nil-deref-1", func() { println(p[1]) }, "nil pointer dereference")
-	check("nil-deref-big", func() { println(q[5000]) }, "nil pointer dereference")
+	checks("nil-deref", func() { println(p[0]) }, "nil pointer dereference")
+	checks("nil-deref-1", func() { println(p[1]) }, "nil pointer dereference")
+	checks("nil-deref-big", func() { println(q[5000]) }, "nil pointer dereference")
 
 	i = 99999
 	var sl []int
 	p1 := new([10]int)
-	check("array-bounds", func() { println(p1[i]) }, "index out of range")
-	check("slice-bounds", func() { println(sl[i]) }, "index out of range")
+	checks("array-bounds", func() { println(p1[i]) }, "index out of range")
+	checks("slice-bounds", func() { println(sl[i]) }, "index out of range")
 
 	var inter interface{}
 	inter = 1
-	check("type-concrete", func() { println(inter.(string)) }, "int, not string")
-	check("type-interface", func() { println(inter.(m)) }, "missing method m")
+	checks("type-concrete", func() { println(inter.(string)) }, "int, not string")
+	checks("type-interface", func() { println(inter.(m)) }, "missing method m")
 
 	if didbug {
 		panic("recover3")

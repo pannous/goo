@@ -19,8 +19,8 @@ func init() {
 
 	defer func() {
 		recover()
-		check(1, len(m))
-		check(42, m[2])
+		checks(1, len(m))
+		checks(42, m[2])
 	}()
 	m[2], *p = 42, 2
 }
@@ -31,8 +31,8 @@ func init() {
 
 	defer func() {
 		recover()
-		check(1, len(m))
-		check(2, m[2])
+		checks(1, len(m))
+		checks(2, m[2])
 	}()
 	m[2], p[1] = 2, 2
 }
@@ -44,8 +44,8 @@ func init() {
 
 	defer func() {
 		recover()
-		check(1, len(m))
-		check(3, m[2])
+		checks(1, len(m))
+		checks(3, m[2])
 	}()
 	m[2], p.i = 3, 2
 }
@@ -55,7 +55,7 @@ func init() {
 	var x T
 	p := &x
 	p, p.i = new(T), 4
-	check(4, x.i)
+	checks(4, x.i)
 }
 
 func init() {
@@ -65,7 +65,7 @@ func init() {
 
 	defer func() {
 		recover()
-		check(5, *p)
+		checks(5, *p)
 	}()
 	*p, m[2] = 5, 2
 }
@@ -76,7 +76,7 @@ func init() {
 	var m map[int]int
 	defer func() {
 		recover()
-		check(0, g)
+		checks(0, g)
 	}()
 	m[0], g = 1, 2
 }
@@ -86,8 +86,8 @@ func init() {
 	var x T
 	p := &x
 	p, p.x.y = new(T), 7
-	check(7, x.x.y)
-	check(0, p.x.y)
+	checks(7, x.x.y)
+	checks(0, p.x.y)
 }
 
 func init() {
@@ -96,17 +96,17 @@ func init() {
 	var q T = &struct{ x struct{ y int } }{x}
 	p := q
 	p, p.x.y = nil, 7
-	check(7, q.x.y)
+	checks(7, q.x.y)
 }
 
 func init() {
 	x, y := 1, 2
 	x, y = y, x
-	check(2, x)
-	check(1, y)
+	checks(2, x)
+	checks(1, y)
 }
 
-func check(want, got int) {
+func checks(want, got int) {
 	if want != got {
 		panic(fmt.Sprintf("wanted %d, but got %d", want, got))
 	}

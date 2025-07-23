@@ -25,13 +25,13 @@ func Example() {
 	</body>
 </html>`
 
-	check := func(err error) {
+	checks := func(err error) {
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 	t, err := template.New("webpage").Parse(tpl)
-	check(err)
+	checks(err)
 
 	data := struct {
 		Title string
@@ -45,7 +45,7 @@ func Example() {
 	}
 
 	err = t.Execute(os.Stdout, data)
-	check(err)
+	checks(err)
 
 	noItems := struct {
 		Title string
@@ -56,7 +56,7 @@ func Example() {
 	}
 
 	err = t.Execute(os.Stdout, noItems)
-	check(err)
+	checks(err)
 
 	// Output:
 	// <!DOCTYPE html>
@@ -83,15 +83,15 @@ func Example() {
 }
 
 func Example_autoescaping() {
-	check := func(err error) {
+	checks := func(err error) {
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 	t, err := template.New("foo").Parse(`{{define "T"}}Hello, {{.}}!{{end}}`)
-	check(err)
+	checks(err)
 	err = t.ExecuteTemplate(os.Stdout, "T", "<script>alert('you have been pwned')</script>")
-	check(err)
+	checks(err)
 	// Output:
 	// Hello, &lt;script&gt;alert(&#39;you have been pwned&#39;)&lt;/script&gt;!
 }

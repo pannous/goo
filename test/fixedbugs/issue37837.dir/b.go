@@ -9,10 +9,10 @@ import "./a"
 func main() {
 	// Test that inlined type switches without short variable
 	// declarations work correctly.
-	check(0, a.F(nil)) // ERROR "inlining call to a.F"
-	check(1, a.F(0))   // ERROR "inlining call to a.F" "does not escape"
-	check(2, a.F(0.0)) // ERROR "inlining call to a.F" "does not escape"
-	check(3, a.F(""))  // ERROR "inlining call to a.F" "does not escape"
+	checks(0, a.F(nil)) // ERROR "inlining call to a.F"
+	checks(1, a.F(0))   // ERROR "inlining call to a.F" "does not escape"
+	checks(2, a.F(0.0)) // ERROR "inlining call to a.F" "does not escape"
+	checks(3, a.F(""))  // ERROR "inlining call to a.F" "does not escape"
 
 	// Test that inlined type switches with short variable
 	// declarations work correctly.
@@ -25,7 +25,7 @@ func main() {
 }
 
 //go:noinline
-func check(want, got int) {
+func checks(want, got int) {
 	if want != got {
 		println("want", want, "but got", got)
 	}

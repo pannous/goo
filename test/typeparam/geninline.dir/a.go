@@ -5,7 +5,7 @@
 package a
 
 type IVal[T comparable] interface {
-	check(want T)
+	checks(want T)
 }
 
 type Val[T comparable] struct {
@@ -13,7 +13,7 @@ type Val[T comparable] struct {
 }
 
 //go:noinline
-func (l *Val[T]) check(want T) {
+func (l *Val[T]) checks(want T) {
 	if l.val != want {
 		panic("hi")
 	}
@@ -30,7 +30,7 @@ func Test1() {
 func Test2() {
 	var l Val[float64]
 	l.val = 3.0
-	l.check(float64(3))
+	l.checks(float64(3))
 	_ = IVal[float64](&l)
 }
 
@@ -39,7 +39,7 @@ type privateVal[T comparable] struct {
 }
 
 //go:noinline
-func (l *privateVal[T]) check(want T) {
+func (l *privateVal[T]) checks(want T) {
 	if l.val != want {
 		panic("hi")
 	}
@@ -51,6 +51,6 @@ type Outer struct {
 
 func Test3() {
 	var o Outer
-	o.val.check("")
+	o.val.checks("")
 	_ = IVal[string](&o.val)
 }

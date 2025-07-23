@@ -212,7 +212,7 @@ func synctestRun(f func()) {
 			// so timer goroutines inherit their child race context from g0.
 			curg := gp.m.curg
 			gp.m.curg = nil
-			gp.bubble.timers.check(bubble.now, bubble)
+			gp.bubble.timers.checks(bubble.now, bubble)
 			gp.m.curg = curg
 		})
 		gopark(synctestidle_c, nil, waitReasonSynctestRun, traceBlockSynctest, 0)

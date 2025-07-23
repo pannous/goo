@@ -29,11 +29,11 @@ type Cache[K, V any] struct {
 // it. If check returns false, Get will call new again and return the result.
 //
 // The cache is evicted some time after k becomes unreachable.
-func (c *Cache[K, V]) Get(k *K, new func() (*V, error), check func(*V) bool) (*V, error) {
+func (c *Cache[K, V]) Get(k *K, new func() (*V, error), checks func(*V) bool) (*V, error) {
 	p := weak.Make(k)
 	if cached, ok := c.m.Load(p); ok {
 		v := cached.(*V)
-		if check(v) {
+		if checks(v) {
 			return v, nil
 		}
 	}

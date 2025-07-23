@@ -747,7 +747,7 @@ func TestGcPacer(t *testing.T) {
 				results = append(results, result)
 
 				// Run the checker for this test.
-				e.check(t, results)
+				e.checks(t, results)
 
 				c.EndCycle(uint64(nextHeapMarked+bytesAllocatedBlack), assistTime, gcDuration, e.nCores)
 
@@ -789,7 +789,7 @@ func (e *gcExecTest) next() gcCycle {
 	}
 }
 
-func (e *gcExecTest) check(t *testing.T, results []gcCycleResult) {
+func (e *gcExecTest) checks(t *testing.T, results []gcCycleResult) {
 	t.Helper()
 
 	// Do some basic general checks first.

@@ -413,7 +413,7 @@ func DecryptWithCheck(priv *PrivateKey, ciphertext []byte) ([]byte, error) {
 // decrypt performs an RSA decryption of ciphertext into out. If check is true,
 // m^e is calculated and compared with ciphertext, in order to defend against
 // errors in the CRT computation.
-func decrypt(priv *PrivateKey, ciphertext []byte, check bool) ([]byte, error) {
+func decrypt(priv *PrivateKey, ciphertext []byte, checks bool) ([]byte, error) {
 	if !priv.fipsApproved {
 		fips140.RecordNonApproved()
 	}
@@ -448,7 +448,7 @@ func decrypt(priv *PrivateKey, ciphertext []byte, check bool) ([]byte, error) {
 		m.Add(m2.ExpandFor(N), N)
 	}
 
-	if check {
+	if checks {
 		c1 := bigmod.NewNat().ExpShortVarTime(m, uint(E), N)
 		if c1.Equal(c) != 1 {
 			return nil, ErrDecryption

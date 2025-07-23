@@ -164,7 +164,7 @@ func TestWithSimulated(t *testing.T) {
 			if err != nil {
 				t.Fatalf("log failed: %v", err)
 			}
-			check(t, msg, <-done, tr)
+			checks(t, msg, <-done, tr)
 			s.Close()
 		})
 	}
@@ -191,7 +191,7 @@ func TestFlap(t *testing.T) {
 	if err != nil {
 		t.Fatalf("log failed: %v", err)
 	}
-	check(t, msg, <-done, net)
+	checks(t, msg, <-done, net)
 
 	// restart the server
 	if err := os.Remove(addr); err != nil {
@@ -207,7 +207,7 @@ func TestFlap(t *testing.T) {
 	if err != nil {
 		t.Fatalf("log failed: %v", err)
 	}
-	check(t, msg, <-done, net)
+	checks(t, msg, <-done, net)
 
 	s.Close()
 }
@@ -267,7 +267,7 @@ func TestDial(t *testing.T) {
 	l.Close()
 }
 
-func check(t *testing.T, in, out, transport string) {
+func checks(t *testing.T, in, out, transport string) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		t.Errorf("Error retrieving hostname: %v", err)

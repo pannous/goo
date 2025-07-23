@@ -14,17 +14,17 @@ import (
 )
 
 func TestIsAlias(t *testing.T) {
-	check := func(obj *TypeName, want bool) {
+	checks := func(obj *TypeName, want bool) {
 		if got := obj.IsAlias(); got != want {
 			t.Errorf("%v: got IsAlias = %v; want %v", obj, got, want)
 		}
 	}
 
 	// predeclared types
-	check(Unsafe.Scope().Lookup("Pointer").(*TypeName), false)
+	checks(Unsafe.Scope().Lookup("Pointer").(*TypeName), false)
 	for _, name := range Universe.Names() {
 		if obj, _ := Universe.Lookup(name).(*TypeName); obj != nil {
-			check(obj, name == "any" || name == "byte" || name == "rune")
+			checks(obj, name == "any" || name == "byte" || name == "rune")
 		}
 	}
 
@@ -49,7 +49,7 @@ func TestIsAlias(t *testing.T) {
 		{NewTypeName(nopos, nil, "rune", Typ[Rune]), true},                // type name refers to basic type rune which is an alias already
 		{t5, false}, // type name refers to type parameter and vice versa
 	} {
-		check(test.name, test.alias)
+		checks(test.name, test.alias)
 	}
 }
 

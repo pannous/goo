@@ -138,15 +138,15 @@ func TestMonotonicSub(t *testing.T) {
 	}
 
 	sub := func(txs, tys string, tx, txw, ty, tyw Time, d, dw Duration) {
-		check := func(expr string, d, want Duration) {
+		checks := func(expr string, d, want Duration) {
 			if d != want {
 				t.Errorf("%s = %v, want %v", expr, d, want)
 			}
 		}
-		check(txs+".Sub("+tys+")", tx.Sub(ty), d)
-		check(txs+"w.Sub("+tys+")", txw.Sub(ty), dw)
-		check(txs+".Sub("+tys+"w)", tx.Sub(tyw), dw)
-		check(txs+"w.Sub("+tys+"w)", txw.Sub(tyw), dw)
+		checks(txs+".Sub("+tys+")", tx.Sub(ty), d)
+		checks(txs+"w.Sub("+tys+")", txw.Sub(ty), dw)
+		checks(txs+".Sub("+tys+"w)", tx.Sub(tyw), dw)
+		checks(txs+"w.Sub("+tys+"w)", txw.Sub(tyw), dw)
 	}
 	sub("t1", "t1", t1, t1w, t1, t1w, 0, 0)
 	sub("t1", "t2", t1, t1w, t2, t2w, -10*Millisecond, 990*Millisecond)
@@ -161,30 +161,30 @@ func TestMonotonicSub(t *testing.T) {
 	sub("t3", "t3", t3, t3w, t3, t3w, 0, 0)
 
 	cmp := func(txs, tys string, tx, txw, ty, tyw Time, c, cw int) {
-		check := func(expr string, b, want any) {
+		checks := func(expr string, b, want any) {
 			if b != want {
 				t.Errorf("%s = %v, want %v", expr, b, want)
 			}
 		}
-		check(txs+".After("+tys+")", tx.After(ty), c > 0)
-		check(txs+"w.After("+tys+")", txw.After(ty), cw > 0)
-		check(txs+".After("+tys+"w)", tx.After(tyw), cw > 0)
-		check(txs+"w.After("+tys+"w)", txw.After(tyw), cw > 0)
+		checks(txs+".After("+tys+")", tx.After(ty), c > 0)
+		checks(txs+"w.After("+tys+")", txw.After(ty), cw > 0)
+		checks(txs+".After("+tys+"w)", tx.After(tyw), cw > 0)
+		checks(txs+"w.After("+tys+"w)", txw.After(tyw), cw > 0)
 
-		check(txs+".Before("+tys+")", tx.Before(ty), c < 0)
-		check(txs+"w.Before("+tys+")", txw.Before(ty), cw < 0)
-		check(txs+".Before("+tys+"w)", tx.Before(tyw), cw < 0)
-		check(txs+"w.Before("+tys+"w)", txw.Before(tyw), cw < 0)
+		checks(txs+".Before("+tys+")", tx.Before(ty), c < 0)
+		checks(txs+"w.Before("+tys+")", txw.Before(ty), cw < 0)
+		checks(txs+".Before("+tys+"w)", tx.Before(tyw), cw < 0)
+		checks(txs+"w.Before("+tys+"w)", txw.Before(tyw), cw < 0)
 
-		check(txs+".Equal("+tys+")", tx.Equal(ty), c == 0)
-		check(txs+"w.Equal("+tys+")", txw.Equal(ty), cw == 0)
-		check(txs+".Equal("+tys+"w)", tx.Equal(tyw), cw == 0)
-		check(txs+"w.Equal("+tys+"w)", txw.Equal(tyw), cw == 0)
+		checks(txs+".Equal("+tys+")", tx.Equal(ty), c == 0)
+		checks(txs+"w.Equal("+tys+")", txw.Equal(ty), cw == 0)
+		checks(txs+".Equal("+tys+"w)", tx.Equal(tyw), cw == 0)
+		checks(txs+"w.Equal("+tys+"w)", txw.Equal(tyw), cw == 0)
 
-		check(txs+".Compare("+tys+")", tx.Compare(ty), c)
-		check(txs+"w.Compare("+tys+")", txw.Compare(ty), cw)
-		check(txs+".Compare("+tys+"w)", tx.Compare(tyw), cw)
-		check(txs+"w.Compare("+tys+"w)", txw.Compare(tyw), cw)
+		checks(txs+".Compare("+tys+")", tx.Compare(ty), c)
+		checks(txs+"w.Compare("+tys+")", txw.Compare(ty), cw)
+		checks(txs+".Compare("+tys+"w)", tx.Compare(tyw), cw)
+		checks(txs+"w.Compare("+tys+"w)", txw.Compare(tyw), cw)
 	}
 
 	cmp("t1", "t1", t1, t1w, t1, t1w, 0, 0)

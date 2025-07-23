@@ -93,7 +93,7 @@ nocgo:
 	// save m0 to g0->m
 	MOVD	R0, g_m(g)
 
-	BL	runtime·check(SB)
+	BL	runtime·checks(SB)
 
 #ifdef GOOS_windows
 	BL	runtime·wintls(SB)

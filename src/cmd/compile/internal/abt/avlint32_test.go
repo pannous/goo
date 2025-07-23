@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func makeTree(te *testing.T, x []int32, check bool) (t *T, k int, min, max int32) {
+func makeTree(te *testing.T, x []int32, checks bool) (t *T, k int, min, max int32) {
 	t = &T{}
 	k = 0
 	min = int32(0x7fffffff)
@@ -20,7 +20,7 @@ func makeTree(te *testing.T, x []int32, check bool) (t *T, k int, min, max int32
 	for _, d := range x {
 		d = d + d // double everything for Glb/Lub testing.
 
-		if check {
+		if checks {
 			history = append(history, t.Copy())
 		}
 
@@ -34,7 +34,7 @@ func makeTree(te *testing.T, x []int32, check bool) (t *T, k int, min, max int32
 			max = d
 		}
 
-		if !check {
+		if !checks {
 			continue
 		}
 

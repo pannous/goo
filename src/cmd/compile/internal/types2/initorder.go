@@ -14,21 +14,21 @@ import (
 )
 
 // initOrder computes the Info.InitOrder for package variables.
-func (check *Checker) initOrder() {
+func (checks *Checker) initOrder() {
 	// An InitOrder may already have been computed if a package is
 	// built from several calls to (*Checker).Files. Clear it.
-	check.Info.InitOrder = check.Info.InitOrder[:0]
+	checks.Info.InitOrder = checks.Info.InitOrder[:0]
 
 	// Compute the object dependency graph and initialize
 	// a priority queue with the list of graph nodes.
-	pq := nodeQueue(dependencyGraph(check.objMap))
+	pq := nodeQueue(dependencyGraph(checks.objMap))
 	heap.Init(&pq)
 
 	const debug = false
 	if debug {
-		fmt.Printf("Computing initialization order for %s\n\n", check.pkg)
+		fmt.Printf("Computing initialization order for %s\n\n", checks.pkg)
 		fmt.Println("Object dependency graph:")
-		for obj, d := range check.objMap {
+		for obj, d := range checks.objMap {
 			// only print objects that may appear in the dependency graph
 			if obj, _ := obj.(dependency); obj != nil {
 				if len(d.deps) > 0 {
@@ -73,7 +73,7 @@ func (check *Checker) initOrder() {
 
 		// if n still depends on other nodes, we have a cycle
 		if n.ndeps > 0 {
-			cycle := findPath(check.objMap, n.obj, n.obj, make(map[Object]bool))
+			cycle := findPath(checks.objMap, n.obj, n.obj, make(map[Object]bool))
 			// If n.obj is not part of the cycle (e.g., n.obj->b->c->d->c),
 			// cycle will be nil. Don't report anything in that case since
 			// the cycle is reported when the algorithm gets to an object
@@ -83,7 +83,7 @@ func (check *Checker) initOrder() {
 			// below), and so the remaining nodes in the cycle don't trigger
 			// another error (unless they are part of multiple cycles).
 			if cycle != nil {
-				check.reportCycle(cycle)
+				checks.reportCycle(cycle)
 			}
 			// Ok to continue, but the variable initialization order
 			// will be incorrect at this point since it assumes no
@@ -99,7 +99,7 @@ func (check *Checker) initOrder() {
 
 		// record the init order for variables with initializers only
 		v, _ := n.obj.(*Var)
-		info := check.objMap[v]
+		info := checks.objMap[v]
 		if v == nil || !info.hasInitializer() {
 			continue
 		}
@@ -118,13 +118,13 @@ func (check *Checker) initOrder() {
 			infoLhs = []*Var{v}
 		}
 		init := &Initializer{infoLhs, info.init}
-		check.Info.InitOrder = append(check.Info.InitOrder, init)
+		checks.Info.InitOrder = append(checks.Info.InitOrder, init)
 	}
 
 	if debug {
 		fmt.Println()
 		fmt.Println("Initialization order:")
-		for _, init := range check.Info.InitOrder {
+		for _, init := range checks.Info.InitOrder {
 			fmt.Printf("\t%s\n", init)
 		}
 		fmt.Println()
@@ -162,16 +162,16 @@ func findPath(objMap map[Object]*declInfo, from, to Object, seen map[Object]bool
 }
 
 // reportCycle reports an error for the given cycle.
-func (check *Checker) reportCycle(cycle []Object) {
+func (checks *Checker) reportCycle(cycle []Object) {
 	obj := cycle[0]
 
 	// report a more concise error for self references
 	if len(cycle) == 1 {
-		check.errorf(obj, InvalidInitCycle, "initialization cycle: %s refers to itself", obj.Name())
+		checks.errorf(obj, InvalidInitCycle, "initialization cycle: %s refers to itself", obj.Name())
 		return
 	}
 
-	err := check.newError(InvalidInitCycle)
+	err := checks.newError(InvalidInitCycle)
 	err.addf(obj, "initialization cycle for %s", obj.Name())
 	// "cycle[i] refers to cycle[j]" for (i,j) = (0,n-1), (n-1,n-2), ..., (1,0) for len(cycle) = n.
 	for j := len(cycle) - 1; j >= 0; j-- {

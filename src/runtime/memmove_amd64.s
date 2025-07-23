@@ -77,7 +77,7 @@ tail:
 	CMPB	AX, $const_avxSupported
 	JEQ	avxUnaligned
 /*
- * check and set for backwards
+ * checks and set for backwards
  */
 	CMPQ	SI, DI
 	JLS	back
@@ -125,7 +125,7 @@ fwdBy8:
 
 back:
 /*
- * check overlap
+ * checks overlap
  */
 	MOVQ	SI, CX
 	ADDQ	BX, CX

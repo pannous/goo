@@ -231,7 +231,7 @@ ok:
 	// convention is D is always cleared
 	CLD
 
-	CALL	runtime·check(SB)
+	CALL	runtime·checks(SB)
 
 	// saved argc, argv
 	MOVL	120(SP), AX

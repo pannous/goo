@@ -155,7 +155,7 @@ TEXT runtime·rt0_go(SB),NOSPLIT|NOFRAME|TOPFRAME,$0
 	MOVW	R0, g_stackguard0(g)
 	MOVW	R0, g_stackguard1(g)
 
-	BL	runtime·check(SB)
+	BL	runtime·checks(SB)
 
 	// saved argc, argv
 	MOVW	60(R13), R0

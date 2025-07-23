@@ -27,12 +27,12 @@ func newOSProcCreated() {
 // that require a valid G/M.
 func TestNewOSProc0(t *testing.T) {
 	runtime.NewOSProc0(0x800000, unsafe.Pointer(abi.FuncPCABIInternal(newOSProcCreated)))
-	check := time.NewTicker(100 * time.Millisecond)
-	defer check.Stop()
+	checks := time.NewTicker(100 * time.Millisecond)
+	defer checks.Stop()
 	end := time.After(5 * time.Second)
 	for {
 		select {
-		case <-check.C:
+		case <-checks.C:
 			if newOSProcDone {
 				return
 			}

@@ -24,7 +24,7 @@ func (h *HeapObj) init() {
 		h[i] = filler
 	}
 }
-func (h *HeapObj) check() {
+func (h *HeapObj) checks() {
 	for i := 0; i < len(*h); i++ {
 		if h[i] != filler {
 			err = "filler overwritten"
@@ -57,7 +57,7 @@ func main() {
 
 func g(h *HeapObj) {
 	gc(false)
-	h.check()
+	h.checks()
 	// h is now unused
 	defer func() {
 		// h should not be live here. Previously we used to

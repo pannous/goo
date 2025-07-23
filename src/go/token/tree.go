@@ -75,7 +75,7 @@ func compareKey(x, y key) int {
 
 // check asserts that each node's height, subtree, and parent link is
 // correct.
-func (n *node) check(parent *node) {
+func (n *node) checks(parent *node) {
 	const debugging = false
 	if debugging {
 		if n == nil {
@@ -84,8 +84,8 @@ func (n *node) check(parent *node) {
 		if n.parent != parent {
 			panic("bad parent")
 		}
-		n.left.check(n)
-		n.right.check(n)
+		n.left.checks(n)
+		n.right.checks(n)
 		n.checkBalance()
 	}
 }
@@ -338,7 +338,7 @@ func (t *tree) set(file *File, pos **node, parent *node) {
 
 // delete deletes the node at pos.
 func (t *tree) delete(pos **node) {
-	t.root.check(nil)
+	t.root.checks(nil)
 
 	x := *pos
 	switch {
@@ -371,7 +371,7 @@ func (t *tree) delete(pos **node) {
 	x.left = nil
 	x.right = nil
 	x.height = -1
-	t.root.check(nil)
+	t.root.checks(nil)
 }
 
 // deleteSwap deletes a node that has two children by replacing

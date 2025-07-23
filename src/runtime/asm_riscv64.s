@@ -48,7 +48,7 @@ nocgo:
 	// save m0 to g0->m
 	MOV	T0, g_m(g)
 
-	CALL	runtime·check(SB)
+	CALL	runtime·checks(SB)
 
 	// args are already prepared
 	CALL	runtime·args(SB)

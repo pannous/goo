@@ -378,7 +378,7 @@ func editRequirements(ctx context.Context, rs *Requirements, tryUpgrade, mustSel
 					fmt.Fprintf(os.Stderr, "go: %v\n", conflict)
 					panic(fmt.Sprintf("internal error: selected version of root %v is %v, but it was not expanded as a new root", m, u))
 				}
-				if !t.check(u, uPruning).isDisqualified() && !rejectedRoot[u] {
+				if !t.checks(u, uPruning).isDisqualified() && !rejectedRoot[u] {
 					// Applying the upgrade from m to u will resolve the conflict,
 					// so plan to do that if there are no other conflicts to resolve.
 					continue
@@ -432,7 +432,7 @@ func editRequirements(ctx context.Context, rs *Requirements, tryUpgrade, mustSel
 						pruning = summary.pruning
 					}
 				}
-				if t.check(prev, pruning).isDisqualified() {
+				if t.checks(prev, pruning).isDisqualified() {
 					// We found a problem with prev this round that would also disqualify
 					// it as a root. Don't bother trying it next round.
 					rejectedRoot[prev] = true
@@ -831,7 +831,7 @@ func (t *dqTracker) disqualify(m module.Version, fromPruning modPruning, reason 
 }
 
 // check reports whether m is disqualified in the given pruning context.
-func (t *dqTracker) check(m module.Version, pruning modPruning) dqState {
+func (t *dqTracker) checks(m module.Version, pruning modPruning) dqState {
 	return t.dqReason[m].from(pruning)
 }
 

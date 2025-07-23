@@ -105,11 +105,11 @@ There are three different ways to specify on which architecture a test
 should be run:
 
 * Specify only the architecture (eg: "amd64"). This indicates that the
-  check should be run on all the supported architecture variants. For
+  checks should be run on all the supported architecture variants. For
   instance, arm checks will be run against all supported GOARM
   variations (5,6,7).
 * Specify both the architecture and a variant, separated by a slash
-  (eg: "arm/7"). This means that the check will be run only on that
+  (eg: "arm/7"). This means that the checks will be run only on that
   specific variant.
 * Specify the operating system, the architecture and the variant,
   separated by slashes (eg: "plan9/386/sse2", "plan9/amd64/"). This is
