@@ -1,3 +1,8 @@
+# Claude Memory File
+
+## Working Guidelines
+- never unstage or undo my changes (unless explicitly asked), understand and incorporate them!
+
 This project contains the source code for the go language and it's compiler and its toolchains.
 It is very comprehensive and we need to be careful when searching for a code to not use up all our clout code subscription context window and usage.
 
@@ -78,4 +83,3 @@ GOROOT=$(pwd)/.. ./run.bash --no-rebuild 2>&1 | grep -Ev '^\?|^ok ' | tee /dev/t
 ```
 - This command runs the tests, filters out the output to show only failures, and exits with an error code if any tests fail.
 - if we encounter a FAIL, ponder whether our changes might be related to it and if so try once to fix it or tell me to look at it.
-

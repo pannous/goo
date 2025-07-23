@@ -14,17 +14,21 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 ø keyword for `nil`  
 🗹 ≠ operator for `!=`  
 🗹 ¬ operator for `!`  
-🗹 and or not operators for && ||  
+🗹 and or not operators for && ||
+☐ String methods "abc".contains("a")
 ☐ return void, e.g. return print("ok")  
 ☐ go command should default to run, so go test.go should work  
 ☐ cross off all done tasks from this list  
-☐ print := fmt.Println    
+☐ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
+☐ def as synonym for func, e.g. def main() { ... }  
+☐ void(!) as synonym for func, e.g. void main(){}
 ☐ assert / check  
 ☐ public() -> Public() calls OK  
 ☐ silent/implicit error propagation    
 ☐ for loops    
 ☐ enums via struct  
 ☐ class via struct  
+☐ imported and not used only warning 
 ☐ no Main needed, implicit package main  
 ☐ any other pain points you and I might have   
 
