@@ -1,0 +1,26 @@
+package main
+
+import "fmt"
+
+func main() {
+	a := 5
+	b := 10
+	
+	// Test ≠ operator (should work like !=)
+	if a ≠ b {
+		fmt.Println("a ≠ b works!")
+	}
+	
+	// Test ¬ operator (should work like !)
+	if ¬(a == b) {
+		fmt.Println("¬(a == b) works!")
+	}
+	
+	// Test with nil using ø
+	var ptr *int = ø
+	if ptr ≠ ø {
+		fmt.Println("This should not print")
+	} else {
+		fmt.Println("ø and ≠ work together!")
+	}
+}

@@ -1,0 +1,14 @@
+package main
+
+import "fmt"
+
+func main() {
+	condition := true
+	
+	// Test not operator
+	if not condition {
+		fmt.Println("This should not print")
+	} else {
+		fmt.Println("not operator works!")
+	}
+}
