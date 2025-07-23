@@ -400,11 +400,26 @@ func (s *scanner) ident() {
 		return
 	}
 
+
 	// special case for 'ø' as nil
 	if string(lit) == "ø" {
 		s.nlsemi = true
 		s.lit = "nil"
 		s.tok = _Name
+		return
+	}
+
+	// special case for '≠' as !=
+	if string(lit) == "≠" {
+		s.op, s.prec = Neq, precCmp
+		s.tok = _Operator
+		return
+	}
+
+	// special case for '¬' as !
+	if string(lit) == "¬" {
+		s.op, s.prec = Not, 0
+		s.tok = _Operator
 		return
 	}
 
@@ -427,6 +442,8 @@ func (s *scanner) atIdentChar(first bool) bool {
 		if first {
 			s.errorf("identifier cannot begin with digit %#U", s.ch)
 		}
+	case s.ch == '≠' || s.ch == '¬':
+		// allow special Unicode operators
 	case s.ch >= utf8.RuneSelf:
 		s.errorf("invalid character %#U in identifier", s.ch)
 	default:

@@ -317,7 +317,7 @@ func trailingDigits(text []byte) (int, int, bool) {
 }
 
 func isLetter(ch rune) bool {
-	return 'a' <= lower(ch) && lower(ch) <= 'z' || ch == '_' || ch >= utf8.RuneSelf && unicode.IsLetter(ch)
+	return 'a' <= lower(ch) && lower(ch) <= 'z' || ch == '_' || ch == '≠' || ch == '¬' || ch >= utf8.RuneSelf && unicode.IsLetter(ch)
 }
 
 func isDigit(ch rune) bool {
@@ -817,7 +817,15 @@ scanAgain:
 	switch ch := s.ch; {
 	case isLetter(ch):
 		lit = s.scanIdentifier()
-		if len(lit) > 1 {
+		
+		// special case for Unicode operators
+		if lit == "≠" {
+			tok = token.NEQ
+			lit = "!="
+		} else if lit == "¬" {
+			tok = token.NOT
+			lit = "!"
+		} else if len(lit) > 1 {
 			// keywords are longer than one letter - avoid lookup otherwise
 			tok = token.Lookup(lit)
 			switch tok {

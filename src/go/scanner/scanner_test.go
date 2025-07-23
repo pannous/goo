@@ -756,7 +756,7 @@ var errors = []struct {
 	err string
 }{
 	{"\a", token.ILLEGAL, 0, "", "illegal character U+0007"},
-	{`#`, token.ILLEGAL, 0, "", "illegal character U+0023 '#'"},
+	{`#`, token.COMMENT, 0, "#", ""},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
 	{"..", token.PERIOD, 0, "", ""}, // two periods, not invalid token (issue #28112)
 	{`' '`, token.CHAR, 0, `' '`, ""},
