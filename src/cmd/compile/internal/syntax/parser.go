@@ -1133,6 +1133,10 @@ func (p *parser) operand(keep_parens bool) Expr {
 		t.Elem = p.type_()
 		return t
 		
+	case _Lbrace:
+		// Handle {a: 1, b: 2} map literals with symbol keys
+		return p.mapLiteralFromBrace()
+		
 	case _Chan, _Struct, _Interface:
 		return p.type_() // othertype
 
@@ -1575,6 +1579,64 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	
 	lit.Rbrace = p.pos()
 	p.want(_Rbrack)
+	return lit
+}
+
+// mapLiteralFromBrace parses {a: 1, b: 2} style map literals with symbol key conversion
+func (p *parser) mapLiteralFromBrace() Expr {
+	if trace {
+		defer p.trace("mapLiteralFromBrace")()
+	}
+
+	pos := p.pos()
+	p.want(_Lbrace)
+
+	// Create map type with any key/value types (map[any]any)
+	mapType := new(MapType)
+	mapType.pos = pos
+	anyName := new(Name)
+	anyName.pos = pos
+	anyName.Value = "any"
+	mapType.Key = anyName
+	mapType.Value = anyName
+
+	// Create composite literal
+	lit := new(CompositeLit)
+	lit.pos = pos
+	lit.Type = mapType
+
+	// Parse elements
+	for p.tok != _Rbrace && p.tok != _EOF {
+		keyExpr := p.expr()
+		
+		// Convert unquoted identifiers to string literals
+		if nameExpr, ok := keyExpr.(*Name); ok {
+			// Convert identifier 'a' to string literal "a"
+			stringLit := new(BasicLit)
+			stringLit.pos = nameExpr.pos
+			stringLit.Value = `"` + nameExpr.Value + `"`
+			stringLit.Kind = StringLit
+			keyExpr = stringLit
+		}
+		
+		p.want(_Colon)
+		valueExpr := p.expr()
+		
+		// Create key-value pair
+		kvExpr := new(KeyValueExpr)
+		kvExpr.pos = keyExpr.Pos()
+		kvExpr.Key = keyExpr
+		kvExpr.Value = valueExpr
+		lit.ElemList = append(lit.ElemList, kvExpr)
+		lit.NKeys++
+		
+		if !p.got(_Comma) {
+			break
+		}
+	}
+
+	lit.Rbrace = p.pos()
+	p.want(_Rbrace)
 	return lit
 }
 
