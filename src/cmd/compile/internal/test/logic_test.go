@@ -15,7 +15,7 @@ func TestLogic64(t *testing.T) {
 	// golden functions we use repeatedly
 	zero := func(x int64) int64 { return 0 }
 	id := func(x int64) int64 { return x }
-	or := func(x, y int64) int64 { return x | y }
+	oder := func(x, y int64) int64 { return x | y }
 	und := func(x, y int64) int64 { return x & y }
 	y := func(x, y int64) int64 { return y }
 
@@ -51,10 +51,10 @@ func TestLogic64(t *testing.T) {
 		f      func(int64, int64) int64
 		golden func(int64, int64) int64
 	}{
-		{"x|(x|y)", func(x, y int64) int64 { return x | (x | y) }, or},
-		{"x|(y|x)", func(x, y int64) int64 { return x | (y | x) }, or},
-		{"(x|y)|x", func(x, y int64) int64 { return (x | y) | x }, or},
-		{"(y|x)|x", func(x, y int64) int64 { return (y | x) | x }, or},
+		{"x|(x|y)", func(x, y int64) int64 { return x | (x | y) }, oder},
+		{"x|(y|x)", func(x, y int64) int64 { return x | (y | x) }, oder},
+		{"(x|y)|x", func(x, y int64) int64 { return (x | y) | x }, oder},
+		{"(y|x)|x", func(x, y int64) int64 { return (y | x) | x }, oder},
 		{"x&(x&y)", func(x, y int64) int64 { return x & (x & y) }, und},
 		{"x&(y&x)", func(x, y int64) int64 { return x & (y & x) }, und},
 		{"(x&y)&x", func(x, y int64) int64 { return (x & y) & x }, und},
@@ -86,7 +86,7 @@ func TestLogic32(t *testing.T) {
 	// golden functions we use repeatedly
 	zero := func(x int32) int32 { return 0 }
 	id := func(x int32) int32 { return x }
-	or := func(x, y int32) int32 { return x | y }
+	oder := func(x, y int32) int32 { return x | y }
 	und := func(x, y int32) int32 { return x & y }
 	y := func(x, y int32) int32 { return y }
 
@@ -122,10 +122,10 @@ func TestLogic32(t *testing.T) {
 		f      func(int32, int32) int32
 		golden func(int32, int32) int32
 	}{
-		{"x|(x|y)", func(x, y int32) int32 { return x | (x | y) }, or},
-		{"x|(y|x)", func(x, y int32) int32 { return x | (y | x) }, or},
-		{"(x|y)|x", func(x, y int32) int32 { return (x | y) | x }, or},
-		{"(y|x)|x", func(x, y int32) int32 { return (y | x) | x }, or},
+		{"x|(x|y)", func(x, y int32) int32 { return x | (x | y) }, oder},
+		{"x|(y|x)", func(x, y int32) int32 { return x | (y | x) }, oder},
+		{"(x|y)|x", func(x, y int32) int32 { return (x | y) | x }, oder},
+		{"(y|x)|x", func(x, y int32) int32 { return (y | x) | x }, oder},
 		{"x&(x&y)", func(x, y int32) int32 { return x & (x & y) }, und},
 		{"x&(y&x)", func(x, y int32) int32 { return x & (y & x) }, und},
 		{"(x&y)&x", func(x, y int32) int32 { return (x & y) & x }, und},
@@ -157,7 +157,7 @@ func TestLogic16(t *testing.T) {
 	// golden functions we use repeatedly
 	zero := func(x int16) int16 { return 0 }
 	id := func(x int16) int16 { return x }
-	or := func(x, y int16) int16 { return x | y }
+	oder := func(x, y int16) int16 { return x | y }
 	und := func(x, y int16) int16 { return x & y }
 	y := func(x, y int16) int16 { return y }
 
@@ -193,10 +193,10 @@ func TestLogic16(t *testing.T) {
 		f      func(int16, int16) int16
 		golden func(int16, int16) int16
 	}{
-		{"x|(x|y)", func(x, y int16) int16 { return x | (x | y) }, or},
-		{"x|(y|x)", func(x, y int16) int16 { return x | (y | x) }, or},
-		{"(x|y)|x", func(x, y int16) int16 { return (x | y) | x }, or},
-		{"(y|x)|x", func(x, y int16) int16 { return (y | x) | x }, or},
+		{"x|(x|y)", func(x, y int16) int16 { return x | (x | y) }, oder},
+		{"x|(y|x)", func(x, y int16) int16 { return x | (y | x) }, oder},
+		{"(x|y)|x", func(x, y int16) int16 { return (x | y) | x }, oder},
+		{"(y|x)|x", func(x, y int16) int16 { return (y | x) | x }, oder},
 		{"x&(x&y)", func(x, y int16) int16 { return x & (x & y) }, und},
 		{"x&(y&x)", func(x, y int16) int16 { return x & (y & x) }, und},
 		{"(x&y)&x", func(x, y int16) int16 { return (x & y) & x }, und},
@@ -228,7 +228,7 @@ func TestLogic8(t *testing.T) {
 	// golden functions we use repeatedly
 	zero := func(x int8) int8 { return 0 }
 	id := func(x int8) int8 { return x }
-	or := func(x, y int8) int8 { return x | y }
+	oder := func(x, y int8) int8 { return x | y }
 	und := func(x, y int8) int8 { return x & y }
 	y := func(x, y int8) int8 { return y }
 
@@ -264,10 +264,10 @@ func TestLogic8(t *testing.T) {
 		f      func(int8, int8) int8
 		golden func(int8, int8) int8
 	}{
-		{"x|(x|y)", func(x, y int8) int8 { return x | (x | y) }, or},
-		{"x|(y|x)", func(x, y int8) int8 { return x | (y | x) }, or},
-		{"(x|y)|x", func(x, y int8) int8 { return (x | y) | x }, or},
-		{"(y|x)|x", func(x, y int8) int8 { return (y | x) | x }, or},
+		{"x|(x|y)", func(x, y int8) int8 { return x | (x | y) }, oder},
+		{"x|(y|x)", func(x, y int8) int8 { return x | (y | x) }, oder},
+		{"(x|y)|x", func(x, y int8) int8 { return (x | y) | x }, oder},
+		{"(y|x)|x", func(x, y int8) int8 { return (y | x) | x }, oder},
 		{"x&(x&y)", func(x, y int8) int8 { return x & (x & y) }, und},
 		{"x&(y&x)", func(x, y int8) int8 { return x & (y & x) }, und},
 		{"(x&y)&x", func(x, y int8) int8 { return (x & y) & x }, und},

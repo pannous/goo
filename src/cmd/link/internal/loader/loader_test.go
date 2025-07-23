@@ -19,10 +19,10 @@ import (
 // index without creating an associated object reader, so one can't
 // do anything interesting with this symbol (such as look at its
 // data or relocations).
-func addDummyObjSym(t *testing.T, ldr *Loader, or *oReader, name string) Sym {
+func addDummyObjSym(t *testing.T, ldr *Loader, oder *oReader, name string) Sym {
 	idx := uint32(len(ldr.objSyms))
 	st := loadState{l: ldr}
-	return st.addSym(name, 0, or, idx, nonPkgDef, &goobj.Sym{})
+	return st.addSym(name, 0, oder, idx, nonPkgDef, &goobj.Sym{})
 }
 
 func mkLoader() *Loader {
@@ -35,12 +35,12 @@ func mkLoader() *Loader {
 func TestAddMaterializedSymbol(t *testing.T) {
 	ldr := mkLoader()
 	dummyOreader := oReader{version: -1, syms: make([]Sym, 100)}
-	or := &dummyOreader
+	oder := &dummyOreader
 
 	// Create some syms from a dummy object file symbol to get things going.
-	ts1 := addDummyObjSym(t, ldr, or, "type:uint8")
-	ts2 := addDummyObjSym(t, ldr, or, "mumble")
-	ts3 := addDummyObjSym(t, ldr, or, "type:string")
+	ts1 := addDummyObjSym(t, ldr, oder, "type:uint8")
+	ts2 := addDummyObjSym(t, ldr, oder, "mumble")
+	ts3 := addDummyObjSym(t, ldr, oder, "type:string")
 
 	// Create some external symbols.
 	es1 := ldr.LookupOrCreateSym("extnew1", 0)
@@ -248,10 +248,10 @@ func mkReloc(l *Loader, typ objabi.RelocType, off int32, siz uint8, add int64, s
 func TestAddDataMethods(t *testing.T) {
 	ldr := mkLoader()
 	dummyOreader := oReader{version: -1, syms: make([]Sym, 100)}
-	or := &dummyOreader
+	oder := &dummyOreader
 
 	// Populate loader with some symbols.
-	addDummyObjSym(t, ldr, or, "type:uint8")
+	addDummyObjSym(t, ldr, oder, "type:uint8")
 	ldr.LookupOrCreateSym("hello", 0)
 
 	arch := sys.ArchAMD64
@@ -378,10 +378,10 @@ func TestAddDataMethods(t *testing.T) {
 func TestOuterSub(t *testing.T) {
 	ldr := mkLoader()
 	dummyOreader := oReader{version: -1, syms: make([]Sym, 100)}
-	or := &dummyOreader
+	oder := &dummyOreader
 
 	// Populate loader with some symbols.
-	addDummyObjSym(t, ldr, or, "type:uint8")
+	addDummyObjSym(t, ldr, oder, "type:uint8")
 	es1 := ldr.LookupOrCreateSym("outer", 0)
 	ldr.MakeSymbolUpdater(es1).SetSize(101)
 	es2 := ldr.LookupOrCreateSym("sub1", 0)

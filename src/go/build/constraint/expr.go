@@ -134,7 +134,7 @@ func orArg(x Expr) string {
 	return s
 }
 
-func or(x, y Expr) Expr {
+func oder(x, y Expr) Expr {
 	return &OrExpr{x, y}
 }
 
@@ -224,7 +224,7 @@ func parseExpr(text string) (x Expr, err error) {
 	}()
 
 	p := &exprParser{s: text}
-	x = p.or()
+	x = p.oder()
 	if p.tok != "" {
 		panic(&SyntaxError{Offset: p.pos, Err: "unexpected token " + p.tok})
 	}
@@ -234,10 +234,10 @@ func parseExpr(text string) (x Expr, err error) {
 // or parses a sequence of || expressions.
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
-func (p *exprParser) or() Expr {
+func (p *exprParser) oder() Expr {
 	x := p.und()
 	for p.tok == "||" {
-		x = or(x, p.und())
+		x = oder(x, p.und())
 	}
 	return x
 }
@@ -287,7 +287,7 @@ func (p *exprParser) atom() Expr {
 				panic(e)
 			}
 		}()
-		x := p.or()
+		x := p.oder()
 		if p.tok != ")" {
 			panic(&SyntaxError{Offset: pos, Err: "missing close paren"})
 		}
@@ -444,7 +444,7 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 			if size++; size > maxOldSize {
 				return nil, errComplex
 			}
-			x = or(x, y)
+			x = oder(x, y)
 		}
 	}
 	if x == nil {
@@ -480,9 +480,9 @@ func PlusBuildLines(x Expr) ([]string, error) {
 
 	// Split into AND of ORs of ANDs of literals (tag or NOT tag).
 	var split [][][]Expr
-	for _, or := range appendSplitAnd(nil, x) {
+	for _, oder := range appendSplitAnd(nil, x) {
 		var ands [][]Expr
-		for _, und := range appendSplitOr(nil, or) {
+		for _, und := range appendSplitOr(nil, oder) {
 			var lits []Expr
 			for _, lit := range appendSplitAnd(nil, und) {
 				switch lit.(type) {
@@ -501,24 +501,24 @@ func PlusBuildLines(x Expr) ([]string, error) {
 	// push the top-level ANDs to the bottom level, so that we get
 	// one // +build line instead of many.
 	maxOr := 0
-	for _, or := range split {
-		if maxOr < len(or) {
-			maxOr = len(or)
+	for _, oder := range split {
+		if maxOr < len(oder) {
+			maxOr = len(oder)
 		}
 	}
 	if maxOr == 1 {
 		var lits []Expr
-		for _, or := range split {
-			lits = append(lits, or[0]...)
+		for _, oder := range split {
+			lits = append(lits, oder[0]...)
 		}
 		split = [][][]Expr{{lits}}
 	}
 
 	// Prepare the +build lines.
 	var lines []string
-	for _, or := range split {
+	for _, oder := range split {
 		line := "// +build"
-		for _, und := range or {
+		for _, und := range oder {
 			clause := ""
 			for i, lit := range und {
 				if i > 0 {
@@ -556,7 +556,7 @@ func pushNot(x Expr, negate bool) Expr {
 		x1 := pushNot(x.X, negate)
 		y1 := pushNot(x.Y, negate)
 		if negate {
-			return or(x1, y1)
+			return oder(x1, y1)
 		}
 		if x1 == x.X && y1 == x.Y {
 			return x
@@ -571,7 +571,7 @@ func pushNot(x Expr, negate bool) Expr {
 		if x1 == x.X && y1 == x.Y {
 			return x
 		}
-		return or(x1, y1)
+		return oder(x1, y1)
 	}
 }
 

@@ -76,7 +76,7 @@ type Arch struct {
 	rsh   string // right shift
 	rshd  string // double-width right shift
 	und   string // bitwise and
-	or    string // bitwise or
+	oder  string // bitwise or
 	xor   string // bitwise xor
 	neg   string // negate
 	rsb   string // reverse subtract

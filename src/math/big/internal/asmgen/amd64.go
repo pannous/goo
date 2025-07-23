@@ -37,7 +37,7 @@ var ArchAMD64 = &Arch{
 	rsh:      "SHRQ",
 	rshd:     "SHRQ",
 	und:      "ANDQ",
-	or:       "ORQ",
+	oder:     "ORQ",
 	xor:      "XORQ",
 	neg:      "NEGQ",
 	lea:      "LEAQ",

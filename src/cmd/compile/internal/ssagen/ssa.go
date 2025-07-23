@@ -5562,8 +5562,8 @@ func (s *state) slice(v, i, j, k *ssa.Value, bounded bool) (p, l, c *ssa.Value) 
 }
 
 type u642fcvtTab struct {
-	leq, cvt2F, und, rsh, or, add ssa.Op
-	one                           func(*state, *types.Type, int64) *ssa.Value
+	leq, cvt2F, und, rsh, oder, add ssa.Op
+	one                             func(*state, *types.Type, int64) *ssa.Value
 }
 
 var u64_f64 = u642fcvtTab{
@@ -5571,7 +5571,7 @@ var u64_f64 = u642fcvtTab{
 	cvt2F: ssa.OpCvt64to64F,
 	und:   ssa.OpAnd64,
 	rsh:   ssa.OpRsh64Ux64,
-	or:    ssa.OpOr64,
+	oder:  ssa.OpOr64,
 	add:   ssa.OpAdd64F,
 	one:   (*state).constInt64,
 }
@@ -5581,7 +5581,7 @@ var u64_f32 = u642fcvtTab{
 	cvt2F: ssa.OpCvt64to32F,
 	und:   ssa.OpAnd64,
 	rsh:   ssa.OpRsh64Ux64,
-	or:    ssa.OpOr64,
+	oder:  ssa.OpOr64,
 	add:   ssa.OpAdd32F,
 	one:   (*state).constInt64,
 }
@@ -5641,7 +5641,7 @@ func (s *state) uint64Tofloat(cvttab *u642fcvtTab, n ir.Node, x *ssa.Value, ft, 
 	one := cvttab.one(s, ft, 1)
 	y := s.newValue2(cvttab.und, ft, x, one)
 	z := s.newValue2(cvttab.rsh, ft, x, one)
-	z = s.newValue2(cvttab.or, ft, z, y)
+	z = s.newValue2(cvttab.oder, ft, z, y)
 	a := s.newValue1(cvttab.cvt2F, tt, z)
 	a1 := s.newValue2(cvttab.add, tt, a, a)
 	s.vars[n] = a1
@@ -5781,17 +5781,17 @@ func (s *state) referenceTypeBuiltin(n *ir.UnaryExpr, x *ssa.Value) *ssa.Value {
 }
 
 type f2uCvtTab struct {
-	ltf, cvt2U, subf, or ssa.Op
-	floatValue           func(*state, *types.Type, float64) *ssa.Value
-	intValue             func(*state, *types.Type, int64) *ssa.Value
-	cutoff               uint64
+	ltf, cvt2U, subf, oder ssa.Op
+	floatValue             func(*state, *types.Type, float64) *ssa.Value
+	intValue               func(*state, *types.Type, int64) *ssa.Value
+	cutoff                 uint64
 }
 
 var f32_u64 = f2uCvtTab{
 	ltf:        ssa.OpLess32F,
 	cvt2U:      ssa.OpCvt32Fto64,
 	subf:       ssa.OpSub32F,
-	or:         ssa.OpOr64,
+	oder:       ssa.OpOr64,
 	floatValue: (*state).constFloat32,
 	intValue:   (*state).constInt64,
 	cutoff:     1 << 63,
@@ -5801,7 +5801,7 @@ var f64_u64 = f2uCvtTab{
 	ltf:        ssa.OpLess64F,
 	cvt2U:      ssa.OpCvt64Fto64,
 	subf:       ssa.OpSub64F,
-	or:         ssa.OpOr64,
+	oder:       ssa.OpOr64,
 	floatValue: (*state).constFloat64,
 	intValue:   (*state).constInt64,
 	cutoff:     1 << 63,
@@ -5811,7 +5811,7 @@ var f32_u32 = f2uCvtTab{
 	ltf:        ssa.OpLess32F,
 	cvt2U:      ssa.OpCvt32Fto32,
 	subf:       ssa.OpSub32F,
-	or:         ssa.OpOr32,
+	oder:       ssa.OpOr32,
 	floatValue: (*state).constFloat32,
 	intValue:   func(s *state, t *types.Type, v int64) *ssa.Value { return s.constInt32(t, int32(v)) },
 	cutoff:     1 << 31,
@@ -5821,7 +5821,7 @@ var f64_u32 = f2uCvtTab{
 	ltf:        ssa.OpLess64F,
 	cvt2U:      ssa.OpCvt64Fto32,
 	subf:       ssa.OpSub64F,
-	or:         ssa.OpOr32,
+	oder:       ssa.OpOr32,
 	floatValue: (*state).constFloat64,
 	intValue:   func(s *state, t *types.Type, v int64) *ssa.Value { return s.constInt32(t, int32(v)) },
 	cutoff:     1 << 31,
@@ -5874,7 +5874,7 @@ func (s *state) floatToUint(cvttab *f2uCvtTab, n ir.Node, x *ssa.Value, ft, tt *
 	y := s.newValue2(cvttab.subf, ft, x, cutoff)
 	y = s.newValue1(cvttab.cvt2U, tt, y)
 	z := cvttab.intValue(s, tt, int64(-cvttab.cutoff))
-	a1 := s.newValue2(cvttab.or, tt, y, z)
+	a1 := s.newValue2(cvttab.oder, tt, y, z)
 	s.vars[n] = a1
 	s.endBlock()
 	bElse.AddEdgeTo(bAfter)

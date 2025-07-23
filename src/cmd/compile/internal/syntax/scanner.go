@@ -423,6 +423,20 @@ func (s *scanner) ident() {
 		return
 	}
 
+	// special case for 'and' as &&
+	if string(lit) == "and" {
+		s.op, s.prec = AndAnd, precAndAnd
+		s.tok = _Operator
+		return
+	}
+
+	// special case for 'or' as ||
+	if string(lit) == "or" {
+		s.op, s.prec = OrOr, precOrOr
+		s.tok = _Operator
+		return
+	}
+
 	s.nlsemi = true
 	s.lit = string(lit)
 	s.tok = _Name

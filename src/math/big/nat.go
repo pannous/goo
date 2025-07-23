@@ -545,7 +545,7 @@ func (z nat) andNot(x, y nat) nat {
 	return z.norm()
 }
 
-func (z nat) or(x, y nat) nat {
+func (z nat) oder(x, y nat) nat {
 	m := len(x)
 	n := len(y)
 	s := x

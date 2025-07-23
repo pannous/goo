@@ -31,7 +31,7 @@ var ArchARM = &Arch{
 	sbcs: "SBC.S",
 	rsb:  "RSB",
 	und:  "AND",
-	or:   "ORR",
+	oder: "ORR",
 	xor:  "EOR",
 
 	mulWideF: armMulWide,
