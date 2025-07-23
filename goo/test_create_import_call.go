@@ -1,0 +1,70 @@
+// This demonstrates how the Go compiler generates calls to imported functions.
+// The key steps are:
+// 1. Create or look up the package using types.NewPkg() or existing package
+// 2. Look up the function symbol in that package using pkg.Lookup()
+// 3. Create a Name node for the package identifier
+// 4. Create a SelectorExpr for pkg.Function
+// 5. Create a CallExpr with the selector as the function
+// 6. Typecheck the expression
+
+package main
+
+import (
+	"cmd/compile/internal/base"
+	"cmd/compile/internal/ir"
+	"cmd/compile/internal/typecheck"
+	"cmd/compile/internal/types"
+	"cmd/internal/src"
+)
+
+// Example: Creating a call to fmt.Println("hello")
+func createFmtPrintlnCall() ir.Node {
+	// Step 1: Get or create the fmt package
+	fmtPkg := types.NewPkg("fmt", "fmt")
+	
+	// Step 2: Look up the Println symbol in fmt package
+	printlnSym := fmtPkg.Lookup("Println")
+	
+	// Step 3: Create a Name node for the fmt package identifier
+	// This represents the "fmt" in "fmt.Println"
+	fmtIdent := ir.NewIdent(base.Pos, fmtPkg.Lookup("fmt"))
+	fmtIdent.SetType(types.NewPkg("fmt", "fmt").Lookup("fmt").Def.Type())
+	
+	// Step 4: Create a SelectorExpr for fmt.Println
+	// Using OXDOT which will be resolved during typecheck
+	selector := ir.NewSelectorExpr(base.Pos, ir.OXDOT, fmtIdent, printlnSym)
+	
+	// Step 5: Create the string argument
+	arg := ir.NewString(base.Pos, "hello")
+	
+	// Step 6: Create the CallExpr
+	call := ir.NewCallExpr(base.Pos, ir.OCALL, selector, []ir.Node{arg})
+	
+	// Step 7: Typecheck the call (this resolves the selector and types)
+	call = typecheck.Call(base.Pos, selector, []ir.Node{arg}, false)
+	
+	return call
+}
+
+// Alternative approach using runtime function lookup pattern:
+func createRuntimeCall() ir.Node {
+	// For runtime functions, use typecheck.LookupRuntime
+	fn := typecheck.LookupRuntime("printstring")
+	arg := ir.NewString(base.Pos, "hello from runtime")
+	call := ir.NewCallExpr(base.Pos, ir.OCALL, fn, []ir.Node{arg})
+	return typecheck.Expr(call)
+}
+
+// For creating calls during the walk phase (like in builtin handling):
+func createCallDuringWalk() ir.Node {
+	// During walk phase, you might see patterns like:
+	// mkcall("functionName", returnType, initNodes, args...)
+	// This uses typecheck.LookupRuntime internally
+	
+	// Or for more control:
+	// 1. Look up the function
+	// 2. Create the call  
+	// 3. Walk/typecheck it
+	
+	return nil
+}
