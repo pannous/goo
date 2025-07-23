@@ -674,9 +674,10 @@ func (check *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) (
 			check.recordBuiltinType(call.Fun, makeSig(nil, &emptyInterface))
 		}
 
-	case _Print, _Println:
+	case _Print, _Println, _Printf:
 		// print(x, y, ...)
 		// println(x, y, ...)
+		// printf(x, y, ...)
 		var params []Type
 		if nargs > 0 {
 			params = make([]Type, nargs)

@@ -168,6 +168,13 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			n.SetTypecheck(0) // re-typechecking new op is OK, not a loop
 			return typecheck(n, top)
 
+		case ir.OPRINTF:
+			// Handle printf like println for now  
+			n.SetOp(ir.OPRINTLN)
+			n.Fun = nil
+			n.SetTypecheck(0) // re-typechecking new op is OK, not a loop
+			return typecheck(n, top)
+
 		case ir.OCAP, ir.OCLEAR, ir.OCLOSE, ir.OIMAG, ir.OLEN, ir.OPANIC, ir.OREAL, ir.OTYPEOF, ir.OUNSAFESTRINGDATA, ir.OUNSAFESLICEDATA:
 			typecheckargs(n)
 			fallthrough
@@ -709,7 +716,7 @@ func tcTypeof(n *ir.UnaryExpr) ir.Node {
 	return lit
 }
 
-// tcPrint typechecks an OPRINT or OPRINTN node.
+// tcPrint typechecks an OPRINT, OPRINTLN, or OPRINTF node.
 func tcPrint(n *ir.CallExpr) ir.Node {
 	typecheckargs(n)
 	ls := n.Args
