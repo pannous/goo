@@ -53,36 +53,36 @@ func runBuildTag(pass *analysis.Pass) (any, error) {
 }
 
 func checkGoFile(pass *analysis.Pass, f *ast.File) {
-	var check checker
-	check.init(pass)
-	defer check.finish()
+	var checks checker
+	checks.init(pass)
+	defer checks.finish()
 
 	for _, group := range f.Comments {
 		// A +build comment is ignored after or adjoining the package declaration.
 		if group.End()+1 >= f.Package {
-			check.plusBuildOK = false
+			checks.plusBuildOK = false
 		}
 		// A //go:build comment is ignored after the package declaration
 		// (but adjoining it is OK, in contrast to +build comments).
 		if group.Pos() >= f.Package {
-			check.goBuildOK = false
+			checks.goBuildOK = false
 		}
 
 		// Check each line of a //-comment.
 		for _, c := range group.List {
 			// "+build" is ignored within or after a /*...*/ comment.
 			if !strings.HasPrefix(c.Text, "//") {
-				check.plusBuildOK = false
+				checks.plusBuildOK = false
 			}
-			check.comment(c.Slash, c.Text)
+			checks.comment(c.Slash, c.Text)
 		}
 	}
 }
 
 func checkOtherFile(pass *analysis.Pass, filename string) error {
-	var check checker
-	check.init(pass)
-	defer check.finish()
+	var checks checker
+	checks.init(pass)
+	defer checks.finish()
 
 	// We cannot use the Go parser, since this may not be a Go source file.
 	// Read the raw bytes instead.
@@ -91,7 +91,7 @@ func checkOtherFile(pass *analysis.Pass, filename string) error {
 		return err
 	}
 
-	check.file(token.Pos(tf.Base()), string(content))
+	checks.file(token.Pos(tf.Base()), string(content))
 	return nil
 }
 
@@ -107,14 +107,14 @@ type checker struct {
 	plusBuild    constraint.Expr // AND of +build constraints found
 }
 
-func (check *checker) init(pass *analysis.Pass) {
-	check.pass = pass
-	check.goBuildOK = true
-	check.plusBuildOK = true
-	check.crossCheck = true
+func (checks *checker) init(pass *analysis.Pass) {
+	checks.pass = pass
+	checks.goBuildOK = true
+	checks.plusBuildOK = true
+	checks.crossCheck = true
 }
 
-func (check *checker) file(pos token.Pos, text string) {
+func (checks *checker) file(pos token.Pos, text string) {
 	// Determine cutpoint where +build comments are no longer valid.
 	// They are valid in leading // comments in the file followed by
 	// a blank line.
@@ -145,7 +145,7 @@ func (check *checker) file(pos token.Pos, text string) {
 	// Process each line.
 	// Must stop once we hit goBuildOK == false
 	text = fullText
-	check.inStar = false
+	checks.inStar = false
 	for text != "" {
 		i := strings.Index(text, "\n")
 		if i < 0 {
@@ -156,10 +156,10 @@ func (check *checker) file(pos token.Pos, text string) {
 		offset := len(fullText) - len(text)
 		line := text[:i]
 		text = text[i:]
-		check.plusBuildOK = offset < plusBuildCutoff
+		checks.plusBuildOK = offset < plusBuildCutoff
 
 		if strings.HasPrefix(line, "//") {
-			check.comment(pos+token.Pos(offset), line)
+			checks.comment(pos+token.Pos(offset), line)
 			continue
 		}
 
@@ -167,18 +167,18 @@ func (check *checker) file(pos token.Pos, text string) {
 		// stop being allowed. Skip over, cut out any /* */ comments.
 		for {
 			line = strings.TrimSpace(line)
-			if check.inStar {
+			if checks.inStar {
 				i := strings.Index(line, "*/")
 				if i < 0 {
 					line = ""
 					break
 				}
 				line = line[i+len("*/"):]
-				check.inStar = false
+				checks.inStar = false
 				continue
 			}
 			if strings.HasPrefix(line, "/*") {
-				check.inStar = true
+				checks.inStar = true
 				line = line[len("/*"):]
 				continue
 			}
@@ -197,19 +197,19 @@ func (check *checker) file(pos token.Pos, text string) {
 	}
 }
 
-func (check *checker) comment(pos token.Pos, text string) {
+func (checks *checker) comment(pos token.Pos, text string) {
 	if strings.HasPrefix(text, "//") {
 		if strings.Contains(text, "+build") {
-			check.plusBuildLine(pos, text)
+			checks.plusBuildLine(pos, text)
 		}
 		if strings.Contains(text, "//go:build") {
-			check.goBuildLine(pos, text)
+			checks.goBuildLine(pos, text)
 		}
 	}
 	if strings.HasPrefix(text, "/*") {
 		if i := strings.Index(text, "\n"); i >= 0 {
 			// multiline /* */ comment - process interior lines
-			check.inStar = true
+			checks.inStar = true
 			i++
 			pos += token.Pos(i)
 			text = text[i:]
@@ -222,34 +222,34 @@ func (check *checker) comment(pos token.Pos, text string) {
 				}
 				line := text[:i]
 				if strings.HasPrefix(line, "//") {
-					check.comment(pos, line)
+					checks.comment(pos, line)
 				}
 				pos += token.Pos(i)
 				text = text[i:]
 			}
-			check.inStar = false
+			checks.inStar = false
 		}
 	}
 }
 
-func (check *checker) goBuildLine(pos token.Pos, line string) {
+func (checks *checker) goBuildLine(pos token.Pos, line string) {
 	if !constraint.IsGoBuild(line) {
 		if !strings.HasPrefix(line, "//go:build") && constraint.IsGoBuild("//"+strings.TrimSpace(line[len("//"):])) {
-			check.pass.Reportf(pos, "malformed //go:build line (space between // and go:build)")
+			checks.pass.Reportf(pos, "malformed //go:build line (space between // and go:build)")
 		}
 		return
 	}
-	if !check.goBuildOK || check.inStar {
-		check.pass.Reportf(pos, "misplaced //go:build comment")
-		check.crossCheck = false
+	if !checks.goBuildOK || checks.inStar {
+		checks.pass.Reportf(pos, "misplaced //go:build comment")
+		checks.crossCheck = false
 		return
 	}
 
-	if check.goBuildPos == token.NoPos {
-		check.goBuildPos = pos
+	if checks.goBuildPos == token.NoPos {
+		checks.goBuildPos = pos
 	} else {
-		check.pass.Reportf(pos, "unexpected extra //go:build line")
-		check.crossCheck = false
+		checks.pass.Reportf(pos, "unexpected extra //go:build line")
+		checks.crossCheck = false
 	}
 
 	// testing hack: stop at // ERROR
@@ -259,35 +259,35 @@ func (check *checker) goBuildLine(pos token.Pos, line string) {
 
 	x, err := constraint.Parse(line)
 	if err != nil {
-		check.pass.Reportf(pos, "%v", err)
-		check.crossCheck = false
+		checks.pass.Reportf(pos, "%v", err)
+		checks.crossCheck = false
 		return
 	}
 
-	check.tags(pos, x)
+	checks.tags(pos, x)
 
-	if check.goBuild == nil {
-		check.goBuild = x
+	if checks.goBuild == nil {
+		checks.goBuild = x
 	}
 }
 
-func (check *checker) plusBuildLine(pos token.Pos, line string) {
+func (checks *checker) plusBuildLine(pos token.Pos, line string) {
 	line = strings.TrimSpace(line)
 	if !constraint.IsPlusBuild(line) {
 		// Comment with +build but not at beginning.
 		// Only report early in file.
-		if check.plusBuildOK && !strings.HasPrefix(line, "// want") {
-			check.pass.Reportf(pos, "possible malformed +build comment")
+		if checks.plusBuildOK && !strings.HasPrefix(line, "// want") {
+			checks.pass.Reportf(pos, "possible malformed +build comment")
 		}
 		return
 	}
-	if !check.plusBuildOK { // inStar implies !plusBuildOK
-		check.pass.Reportf(pos, "misplaced +build comment")
-		check.crossCheck = false
+	if !checks.plusBuildOK { // inStar implies !plusBuildOK
+		checks.pass.Reportf(pos, "misplaced +build comment")
+		checks.crossCheck = false
 	}
 
-	if check.plusBuildPos == token.NoPos {
-		check.plusBuildPos = pos
+	if checks.plusBuildPos == token.NoPos {
+		checks.plusBuildPos = pos
 	}
 
 	// testing hack: stop at // ERROR
@@ -300,43 +300,43 @@ func (check *checker) plusBuildLine(pos token.Pos, line string) {
 	for _, arg := range fields[1:] {
 		for _, elem := range strings.Split(arg, ",") {
 			if strings.HasPrefix(elem, "!!") {
-				check.pass.Reportf(pos, "invalid double negative in build constraint: %s", arg)
-				check.crossCheck = false
+				checks.pass.Reportf(pos, "invalid double negative in build constraint: %s", arg)
+				checks.crossCheck = false
 				continue
 			}
 			elem = strings.TrimPrefix(elem, "!")
 			for _, c := range elem {
 				if !unicode.IsLetter(c) && !unicode.IsDigit(c) && c != '_' && c != '.' {
-					check.pass.Reportf(pos, "invalid non-alphanumeric build constraint: %s", arg)
-					check.crossCheck = false
+					checks.pass.Reportf(pos, "invalid non-alphanumeric build constraint: %s", arg)
+					checks.crossCheck = false
 					break
 				}
 			}
 		}
 	}
 
-	if check.crossCheck {
+	if checks.crossCheck {
 		y, err := constraint.Parse(line)
 		if err != nil {
 			// Should never happen - constraint.Parse never rejects a // +build line.
 			// Also, we just checked the syntax above.
 			// Even so, report.
-			check.pass.Reportf(pos, "%v", err)
-			check.crossCheck = false
+			checks.pass.Reportf(pos, "%v", err)
+			checks.crossCheck = false
 			return
 		}
-		check.tags(pos, y)
+		checks.tags(pos, y)
 
-		if check.plusBuild == nil {
-			check.plusBuild = y
+		if checks.plusBuild == nil {
+			checks.plusBuild = y
 		} else {
-			check.plusBuild = &constraint.AndExpr{X: check.plusBuild, Y: y}
+			checks.plusBuild = &constraint.AndExpr{X: checks.plusBuild, Y: y}
 		}
 	}
 }
 
-func (check *checker) finish() {
-	if !check.crossCheck || check.plusBuildPos == token.NoPos || check.goBuildPos == token.NoPos {
+func (checks *checker) finish() {
+	if !checks.crossCheck || checks.plusBuildPos == token.NoPos || checks.goBuildPos == token.NoPos {
 		return
 	}
 
@@ -344,9 +344,9 @@ func (check *checker) finish() {
 	// with no errors found (crossCheck still true).
 	// Check they match.
 	var want constraint.Expr
-	lines, err := constraint.PlusBuildLines(check.goBuild)
+	lines, err := constraint.PlusBuildLines(checks.goBuild)
 	if err != nil {
-		check.pass.Reportf(check.goBuildPos, "%v", err)
+		checks.pass.Reportf(checks.goBuildPos, "%v", err)
 		return
 	}
 	for _, line := range lines {
@@ -362,18 +362,18 @@ func (check *checker) finish() {
 			want = &constraint.AndExpr{X: want, Y: y}
 		}
 	}
-	if want.String() != check.plusBuild.String() {
-		check.pass.Reportf(check.plusBuildPos, "+build lines do not match //go:build condition")
+	if want.String() != checks.plusBuild.String() {
+		checks.pass.Reportf(checks.plusBuildPos, "+build lines do not match //go:build condition")
 		return
 	}
 }
 
 // tags reports issues in go versions in tags within the expression e.
-func (check *checker) tags(pos token.Pos, e constraint.Expr) {
+func (checks *checker) tags(pos token.Pos, e constraint.Expr) {
 	// Use Eval to visit each tag.
 	_ = e.Eval(func(tag string) bool {
 		if malformedGoTag(tag) {
-			check.pass.Reportf(pos, "invalid go version %q in build constraint", tag)
+			checks.pass.Reportf(pos, "invalid go version %q in build constraint", tag)
 		}
 		return false // result is immaterial as Eval does not short-circuit
 	})

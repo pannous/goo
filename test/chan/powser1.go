@@ -693,7 +693,7 @@ func main() {
 		for i := 1; i < N; i++ {
 			a[i] = i2tor(1, int64(i))
 		}
-		checka(in, a, "Integ")                               // 0 1 1/2 1/3 1/4 1/5
+		checka(in, a, "Integ")                                // 0 1 1/2 1/3 1/4 1/5
 		checks(Cmul(neg(one), Twos), itor(-2), 10, "CMul")    // -1 -1 -1 -1 -1
 		checks(Sub(Ones, Twos), itor(-1), 0, "Sub Ones Twos") // -1 -1 -1 -1 -1
 		m := Mul(Ones, Ones)

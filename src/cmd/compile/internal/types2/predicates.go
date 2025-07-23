@@ -358,7 +358,7 @@ func (c *comparer) identical(x, y Type, p *ifacePair) bool {
 			}
 			smap := makeSubstMap(ytparams, targs)
 
-			var checks *Checker   // ok to call subst on a nil *Checker
+			var checks *Checker  // ok to call subst on a nil *Checker
 			ctxt := NewContext() // need a non-nil Context for the substitution below
 
 			// Constraints must be pair-wise identical, after substitution.

@@ -773,7 +773,7 @@ func TestWriteStringStringWriter(t *testing.T) {
 		b := NewWriterSize(tw, BufSize)
 		b.WriteString("1234")
 		tw.checks(t, "", "")
-		b.WriteString("56789012")   // longer than BufSize
+		b.WriteString("56789012")    // longer than BufSize
 		tw.checks(t, "12345678", "") // but not enough (after filling the partially-filled buffer)
 		b.Flush()
 		tw.checks(t, "123456789012", "")
@@ -781,7 +781,7 @@ func TestWriteStringStringWriter(t *testing.T) {
 	{
 		tw := &teststringwriter{}
 		b := NewWriterSize(tw, BufSize)
-		b.WriteString("123456789")   // long string, empty buffer:
+		b.WriteString("123456789")    // long string, empty buffer:
 		tw.checks(t, "", "123456789") // use WriteString
 	}
 	{
@@ -789,7 +789,7 @@ func TestWriteStringStringWriter(t *testing.T) {
 		b := NewWriterSize(tw, BufSize)
 		b.WriteString("abc")
 		tw.checks(t, "", "")
-		b.WriteString("123456789012345")      // long string, non-empty buffer
+		b.WriteString("123456789012345")       // long string, non-empty buffer
 		tw.checks(t, "abc12345", "6789012345") // use Write and then WriteString since the remaining part is still longer than BufSize
 	}
 	{

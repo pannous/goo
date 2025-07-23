@@ -299,7 +299,7 @@ func makeOnePass(p *onePassProg) *onePassProg {
 	var (
 		instQueue    = newQueue(len(p.Inst))
 		visitQueue   = newQueue(len(p.Inst))
-		checks        func(uint32, []bool) bool
+		checks       func(uint32, []bool) bool
 		onePassRunes = make([][]rune, len(p.Inst))
 	)
 

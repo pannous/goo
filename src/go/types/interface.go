@@ -15,7 +15,7 @@ import (
 
 // An Interface represents an interface type.
 type Interface struct {
-	checks     *Checker     // for error reporting; nil once type set is computed
+	checks    *Checker     // for error reporting; nil once type set is computed
 	methods   []*Func      // ordered list of explicitly declared methods
 	embeddeds []Type       // ordered list of explicitly embedded elements
 	embedPos  *[]token.Pos // positions of embedded elements; or nil (for error messages) - use pointer to save space

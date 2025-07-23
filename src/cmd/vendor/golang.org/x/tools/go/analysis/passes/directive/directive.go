@@ -67,18 +67,18 @@ func runDirective(pass *analysis.Pass) (any, error) {
 }
 
 func checkGoFile(pass *analysis.Pass, f *ast.File) {
-	check := newChecker(pass, pass.Fset.File(f.Package).Name(), f)
+	checks := newChecker(pass, pass.Fset.File(f.Package).Name(), f)
 
 	for _, group := range f.Comments {
 		// A //go:build or a //go:debug comment is ignored after the package declaration
 		// (but adjoining it is OK, in contrast to +build comments).
 		if group.Pos() >= f.Package {
-			check.inHeader = false
+			checks.inHeader = false
 		}
 
 		// Check each line of a //-comment.
 		for _, c := range group.List {
-			check.comment(c.Slash, c.Text)
+			checks.comment(c.Slash, c.Text)
 		}
 	}
 }
@@ -91,8 +91,8 @@ func checkOtherFile(pass *analysis.Pass, filename string) error {
 		return err
 	}
 
-	check := newChecker(pass, filename, nil)
-	check.nonGoFile(token.Pos(tf.Base()), string(content))
+	checks := newChecker(pass, filename, nil)
+	checks.nonGoFile(token.Pos(tf.Base()), string(content))
 	return nil
 }
 
@@ -112,7 +112,7 @@ func newChecker(pass *analysis.Pass, filename string, file *ast.File) *checker {
 	}
 }
 
-func (check *checker) nonGoFile(pos token.Pos, fullText string) {
+func (checks *checker) nonGoFile(pos token.Pos, fullText string) {
 	// Process each line.
 	text := fullText
 	inStar := false
@@ -122,7 +122,7 @@ func (check *checker) nonGoFile(pos token.Pos, fullText string) {
 		line, text, _ = strings.Cut(text, "\n")
 
 		if !inStar && strings.HasPrefix(line, "//") {
-			check.comment(pos+token.Pos(offset), line)
+			checks.comment(pos+token.Pos(offset), line)
 			continue
 		}
 
@@ -157,7 +157,7 @@ func (check *checker) nonGoFile(pos token.Pos, fullText string) {
 	}
 }
 
-func (check *checker) comment(pos token.Pos, line string) {
+func (checks *checker) comment(pos token.Pos, line string) {
 	if !strings.HasPrefix(line, "//go:") {
 		return
 	}
@@ -171,7 +171,7 @@ func (check *checker) comment(pos token.Pos, line string) {
 		verb = verb[:i]
 		if line[i] != ' ' && line[i] != '\t' && line[i] != '\n' {
 			r, _ := utf8.DecodeRuneInString(line[i:])
-			check.pass.Reportf(pos, "invalid space %#q in %s directive", r, verb)
+			checks.pass.Reportf(pos, "invalid space %#q in %s directive", r, verb)
 		}
 	}
 
@@ -185,12 +185,12 @@ func (check *checker) comment(pos token.Pos, line string) {
 		// Ignore. The buildtag analyzer reports misplaced comments.
 
 	case "//go:debug":
-		if check.file == nil {
-			check.pass.Reportf(pos, "//go:debug directive only valid in Go source files")
-		} else if check.file.Name.Name != "main" && !strings.HasSuffix(check.filename, "_test.go") {
-			check.pass.Reportf(pos, "//go:debug directive only valid in package main or test")
-		} else if !check.inHeader {
-			check.pass.Reportf(pos, "//go:debug directive only valid before package declaration")
+		if checks.file == nil {
+			checks.pass.Reportf(pos, "//go:debug directive only valid in Go source files")
+		} else if checks.file.Name.Name != "main" && !strings.HasSuffix(checks.filename, "_test.go") {
+			checks.pass.Reportf(pos, "//go:debug directive only valid in package main or test")
+		} else if !checks.inHeader {
+			checks.pass.Reportf(pos, "//go:debug directive only valid before package declaration")
 		}
 	}
 }

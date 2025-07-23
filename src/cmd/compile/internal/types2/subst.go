@@ -71,7 +71,7 @@ func (checks *Checker) subst(pos syntax.Pos, typ Type, smap substMap, expanding 
 	subst := subster{
 		pos:       pos,
 		smap:      smap,
-		checks:     checks,
+		checks:    checks,
 		expanding: expanding,
 		ctxt:      ctxt,
 	}
@@ -81,7 +81,7 @@ func (checks *Checker) subst(pos syntax.Pos, typ Type, smap substMap, expanding 
 type subster struct {
 	pos       syntax.Pos
 	smap      substMap
-	checks     *Checker // nil if called via Instantiate
+	checks    *Checker // nil if called via Instantiate
 	expanding *Named   // if non-nil, the instance that is being expanded
 	ctxt      *Context
 }

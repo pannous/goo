@@ -21,10 +21,10 @@ func nextID() uint64 { return uint64(lastID.Add(1)) }
 // its [TypeName] object.
 type TypeParam struct {
 	checks *Checker  // for lazy type bound completion
-	id    uint64    // unique id, for debugging only
-	obj   *TypeName // corresponding type name
-	index int       // type parameter index in source order, starting at 0
-	bound Type      // any type, but underlying is eventually *Interface for correct programs (see TypeParam.iface)
+	id     uint64    // unique id, for debugging only
+	obj    *TypeName // corresponding type name
+	index  int       // type parameter index in source order, starting at 0
+	bound  Type      // any type, but underlying is eventually *Interface for correct programs (see TypeParam.iface)
 }
 
 // NewTypeParam returns a new TypeParam. Type parameters may be set on a Named
