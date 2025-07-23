@@ -4,13 +4,15 @@
 
 package types
 
-import "cmd/compile/internal/base"
+import (
+	"strconv"
+
+	"cmd/compile/internal/base"
+)
 
 // AlgKind describes the kind of algorithms used for comparing and
 // hashing a Type.
 type AlgKind int8
-
-//go:generate stringer -type AlgKind -trimprefix A alg.go
 
 const (
 	AUNK   AlgKind = iota
@@ -32,6 +34,37 @@ const (
 	ACPLX128
 	ASPECIAL // Type needs special comparison/hashing functions.
 )
+
+// AlgKindNames provides string representations for AlgKind constants, replacing stringer-generated algkind_string.go
+var AlgKindNames = [...]string{
+	AUNK:      "UNK",
+	ANOEQ:     "NOEQ",
+	ANOALG:    "NOALG",
+	AMEM:      "MEM",
+	AMEM0:     "MEM0",
+	AMEM8:     "MEM8",
+	AMEM16:    "MEM16",
+	AMEM32:    "MEM32",
+	AMEM64:    "MEM64",
+	AMEM128:   "MEM128",
+	ASTRING:   "STRING",
+	AINTER:    "INTER",
+	ANILINTER: "NILINTER",
+	AFLOAT32:  "FLOAT32",
+	AFLOAT64:  "FLOAT64",
+	ACPLX64:   "CPLX64",
+	ACPLX128:  "CPLX128",
+	ASPECIAL:  "SPECIAL",
+}
+
+// String returns the string representation of the AlgKind.
+// This replaces the stringer-generated String() method.
+func (a AlgKind) String() string {
+	if int(a) < len(AlgKindNames) && AlgKindNames[a] != "" {
+		return AlgKindNames[a]
+	}
+	return "AlgKind(" + strconv.FormatInt(int64(a), 10) + ")"
+}
 
 // Most kinds are priority 0. Higher numbers are higher priority, in that
 // the higher priority kinds override lower priority kinds.
