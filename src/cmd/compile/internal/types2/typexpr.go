@@ -28,7 +28,7 @@ func (check *Checker) ident(x *operand, e *syntax.Name, def *TypeName, wantType 
 		if e.Value == "_" {
 			check.error(e, InvalidBlank, "cannot use _ as value or type")
 		} else if isValidName(e.Value) {
-			check.errorf(e, UndeclaredName, "undefined: %s", e.Value)
+			check.errorf(e, UndeclaredName, "undefined:3 %s", e.Value)
 		}
 		return
 	case universeComparable:

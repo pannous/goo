@@ -23,8 +23,18 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ def as synonym for func, e.g. def main() { ... }  
 ☐ void(!) as synonym for func, e.g. void main(){}
 ☐ assert / check  
-☐ public() -> Public() calls OK  
-☐ silent/implicit error propagation    
+☐ z := map{"a": 1, "b": 2}  // auto-detect map type:
+    as a shorthand for map[any]any{...} (or inferred key/value types if unambiguous).
+☐ z := {"a": 1, "b": 2}  // auto-detect map type:
+	•	{...} is already used for slice literals and struct literals.
+	•	z := {1,2,3} is ambiguous (slice or map?).
+☐ z := map[any]any{"a": 1, "b": 2} or
+☐ z := map[string]int{"a": 1, "b": 2}
+☐ public() -> Public() calls OK // as compiler plugin?
+    Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.
+    Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.
+☐ silent/implicit error propagation
+☐ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?
 ☐ for loops    
 ☐ enums via struct  
 ☐ class via struct  

@@ -305,6 +305,7 @@ const (
 	OTAILCALL    // tail call to another function
 	OGETG        // runtime.getg() (read g pointer)
 	OGETCALLERSP // internal/runtime/sys.GetCallerSP() (stack pointer in caller frame)
+	OTYPEOF      // typeof(X) (compile-time type information)
 
 	OEND
 )

@@ -713,7 +713,7 @@ func (check *Checker) selector(x *operand, e *ast.SelectorExpr, def *TypeName, w
 				}
 				if exp == nil {
 					if isValidName(sel) {
-						check.errorf(e.Sel, UndeclaredImportedName, "undefined: %s", ast.Expr(e)) // cast to ast.Expr to silence vet
+						check.errorf(e.Sel, UndeclaredImportedName, "undefined:4 %s", ast.Expr(e)) // cast to ast.Expr to silence vet
 					}
 					goto Error
 				}
