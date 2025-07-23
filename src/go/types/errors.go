@@ -38,9 +38,9 @@ type errorDesc struct {
 // To report an error_, call error_.report.
 type error_ struct {
 	checks *Checker
-	desc  []errorDesc
-	code  Code
-	soft  bool // TODO(gri) eventually determine this from an error code
+	desc   []errorDesc
+	code   Code
+	soft   bool // TODO(gri) eventually determine this from an error code
 }
 
 // newError returns a new error_ with the given error code.

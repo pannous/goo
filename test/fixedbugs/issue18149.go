@@ -26,8 +26,8 @@ func checks(file string, line int) {
 }
 
 func main() {
-//line /foo/bar.go:123
+	//line /foo/bar.go:123
 	checks(`/foo/bar.go`, 123)
-//line c:/foo/bar.go:987
+	//line c:/foo/bar.go:987
 	checks(`c:/foo/bar.go`, 987)
 }

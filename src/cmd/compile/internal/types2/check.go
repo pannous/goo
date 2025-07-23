@@ -555,7 +555,7 @@ func (checks *Checker) processDelayed(top int) {
 			}
 		}
 		checks.version = a.version // reestablish the effective Go version captured earlier
-		a.f()                     // may append to check.delayed
+		a.f()                      // may append to check.delayed
 		if checks.conf.Trace {
 			fmt.Println()
 		}

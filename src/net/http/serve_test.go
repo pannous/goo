@@ -3788,7 +3788,7 @@ func TestHeaderToWire(t *testing.T) {
 	tests := []struct {
 		name    string
 		handler func(ResponseWriter, *Request)
-		checks   func(got, logs string) error
+		checks  func(got, logs string) error
 	}{
 		{
 			name: "write without Header",

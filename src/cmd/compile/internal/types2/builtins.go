@@ -925,7 +925,7 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 			checks.errorf(x, Test, invalidArg+"%s is not a boolean expression", x)
 			return
 		}
-		
+
 		// If it's a compile-time constant, check it now
 		if x.mode == constant_ {
 			if x.val.Kind() != constant.Bool {
@@ -937,7 +937,7 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 				// compile-time assertion failure - safe to continue
 			}
 		}
-		
+
 		// For runtime expressions, the check will be done by the backend
 		x.mode = novalue
 

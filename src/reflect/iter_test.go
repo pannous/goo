@@ -27,8 +27,8 @@ func TestValueSeq(t *testing.T) {
 	}
 	close(c)
 	tests := []struct {
-		name  string
-		val   Value
+		name   string
+		val    Value
 		checks func(*testing.T, iter.Seq[Value])
 	}{
 		{"int", ValueOf(4), func(t *testing.T, s iter.Seq[Value]) {
@@ -218,8 +218,8 @@ func TestValueSeq2(t *testing.T) {
 		"4": 4,
 	}
 	tests := []struct {
-		name  string
-		val   Value
+		name   string
+		val    Value
 		checks func(*testing.T, iter.Seq2[Value, Value])
 	}{
 		{"*[4]int", ValueOf(&[4]int{1, 2, 3, 4}), func(t *testing.T, s iter.Seq2[Value, Value]) {

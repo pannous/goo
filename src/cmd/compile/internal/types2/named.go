@@ -105,7 +105,7 @@ import (
 // Before type aliases (Go 1.9), the spec called defined types "named types".
 type Named struct {
 	checks *Checker  // non-nil during type-checking; nil otherwise
-	obj   *TypeName // corresponding declared object for declared types; see above for instantiated types
+	obj    *TypeName // corresponding declared object for declared types; see above for instantiated types
 
 	// fromRHS holds the type (on RHS of declaration) this *Named type is derived
 	// from (for cycle reporting). Only used by validType, and therefore does not

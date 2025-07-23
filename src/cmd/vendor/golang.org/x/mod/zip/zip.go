@@ -316,7 +316,7 @@ func checkFiles(files []File) (cf CheckedFiles, validFiles []File, validSizes []
 			addError(p, false, err)
 			continue
 		}
-		if err := collisions.check(p, info.IsDir()); err != nil {
+		if err := collisions.checks(p, info.IsDir()); err != nil {
 			addError(p, false, err)
 			continue
 		}
@@ -467,7 +467,7 @@ func checkZip(m module.Version, f *os.File) (*zip.Reader, CheckedFiles, error) {
 			addError(zf, err)
 			continue
 		}
-		if err := collisions.check(name, isDir); err != nil {
+		if err := collisions.checks(name, isDir); err != nil {
 			addError(zf, err)
 			continue
 		}
@@ -917,7 +917,7 @@ type pathInfo struct {
 	isDir bool
 }
 
-func (cc collisionChecker) check(p string, isDir bool) error {
+func (cc collisionChecker) checks(p string, isDir bool) error {
 	fold := strToFold(p)
 	if other, ok := cc[fold]; ok {
 		if p != other.path {
@@ -937,7 +937,7 @@ func (cc collisionChecker) check(p string, isDir bool) error {
 	}
 
 	if parent := path.Dir(p); parent != "." {
-		return cc.check(parent, true)
+		return cc.checks(parent, true)
 	}
 	return nil
 }

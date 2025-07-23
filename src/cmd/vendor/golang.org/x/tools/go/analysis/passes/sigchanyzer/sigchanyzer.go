@@ -100,16 +100,16 @@ func run(pass *analysis.Pass) (any, error) {
 }
 
 func isSignalNotify(info *types.Info, call *ast.CallExpr) bool {
-	check := func(id *ast.Ident) bool {
+	checks := func(id *ast.Ident) bool {
 		obj := info.ObjectOf(id)
 		return obj.Name() == "Notify" && obj.Pkg().Path() == "os/signal"
 	}
 	switch fun := call.Fun.(type) {
 	case *ast.SelectorExpr:
-		return check(fun.Sel)
+		return checks(fun.Sel)
 	case *ast.Ident:
 		if fun, ok := findDecl(fun).(*ast.SelectorExpr); ok {
-			return check(fun.Sel)
+			return checks(fun.Sel)
 		}
 		return false
 	default:
