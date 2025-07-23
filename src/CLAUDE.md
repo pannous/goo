@@ -110,3 +110,9 @@ NEVER manually touch generated files like op_string.go  token_string.go
 tools requires Go 1.25, but system go is 1.24.5 => 
 there is an option to ignore the go.mod OR  
 use bin/go instead of global go!
+
+## Enum Stability Practices
+ - Never insert in middle of enums
+ - Always append new operations at end
+ - Use external bootstrap for enum changes
+ - Add validation tests for critical constants

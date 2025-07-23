@@ -103,8 +103,6 @@ func TakeInit(n Node) Nodes {
 }
 
 
-//go:generate stringer -type=Op -trimprefix=O node.go
-
 type Op uint8
 
 // Node ops.
