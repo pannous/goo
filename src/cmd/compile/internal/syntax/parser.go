@@ -1093,7 +1093,47 @@ func (p *parser) operand(keep_parens bool) Expr {
 		// Parse map type - could be map[K]V or map{...}
 		return p.mapTypeOrLiteral()
 		
-	case _Lbrack, _Chan, _Struct, _Interface:
+	case _Lbrack:
+		// Handle both [1,2,3] slice literals and [1]Type array types
+		pos := p.pos()
+		p.want(_Lbrack)
+		
+		// Empty brackets [] - this should be followed by type for slice type
+		if p.tok == _Rbrack {
+			p.next()
+			t := new(SliceType)
+			t.pos = pos
+			t.Elem = p.type_()
+			return t
+		}
+		
+		// Check for ellipsis [...] arrays first
+		if p.got(_DotDotDot) {
+			p.want(_Rbrack)
+			t := new(ArrayType)
+			t.pos = pos
+			t.Len = nil // nil means ellipsis
+			t.Elem = p.type_()
+			return t
+		}
+		
+		// Parse first expression
+		first := p.expr()
+		
+		// Disambiguate: if comma follows, it's slice literal [1,2,3]
+		if p.tok == _Comma {
+			return p.sliceLiteral(pos, first)
+		}
+		
+		// Otherwise it's array type [expr]Type
+		p.want(_Rbrack)
+		t := new(ArrayType)
+		t.pos = pos
+		t.Len = first
+		t.Elem = p.type_()
+		return t
+		
+	case _Chan, _Struct, _Interface:
 		return p.type_() // othertype
 
 	default:
@@ -1497,6 +1537,45 @@ func (p *parser) mapTypeOrLiteral() Expr {
 		p.syntaxError("expected '[' or '{'")
 		return p.badExpr()
 	}
+}
+
+
+// sliceLiteral parses [1,2,3] style slice literals
+func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
+	if trace {
+		defer p.trace("sliceLiteral")()
+	}
+	
+	// Create slice type with inferred element type ([]any)
+	sliceType := new(SliceType)
+	sliceType.pos = pos
+	anyName := new(Name)
+	anyName.pos = pos
+	anyName.Value = "any"
+	sliceType.Elem = anyName
+	
+	// Create composite literal
+	lit := new(CompositeLit)
+	lit.pos = pos
+	lit.Type = sliceType
+	
+	// Add first element - for slice literals, elements are just expressions, not key-value pairs
+	lit.ElemList = append(lit.ElemList, first)
+	
+	// Parse remaining elements
+	for p.tok == _Comma {
+		p.next()
+		if p.tok == _Rbrack {
+			break // trailing comma
+		}
+		
+		expr := p.expr()
+		lit.ElemList = append(lit.ElemList, expr)
+	}
+	
+	lit.Rbrace = p.pos()
+	p.want(_Rbrack)
+	return lit
 }
 
 func (p *parser) typeInstance(typ Expr) Expr {
