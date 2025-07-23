@@ -9,22 +9,24 @@ so does adding a little o to Go[o] make everything a little more beautiful
 -->
 🗹 truthy/falsey if  
 🗹 # comment and shebang support  
-🗹 goo file extension
-🗹 not operator keyword for `!`
-🗹 ø keyword for `nil`
-🗹 ≠ operator for `!=`
-🗹 ¬ operator for `!`
+🗹 goo file extension  
+🗹 not operator keyword for `!`  
+🗹 ø keyword for `nil`  
+🗹 ≠ operator for `!=`  
+🗹 ¬ operator for `!`  
+🗹 and or not operators for && ||  
 ☐ return void, e.g. return print("ok")  
-☐ and or not operators for && || !
+☐ go command should default to run, so go test.go should work  
+☐ cross off all done tasks from this list  
 ☐ print := fmt.Println    
-☐ assert / check
-☐ public() -> Public() calls OK
+☐ assert / check  
+☐ public() -> Public() calls OK  
 ☐ silent/implicit error propagation    
 ☐ for loops    
 ☐ enums via struct  
-☐ class via struct
-☐ no Main needed
-☐ any other pain points you and I might have  
+☐ class via struct  
+☐ no Main needed  
+☐ any other pain points you and I might have   
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*
