@@ -1,13 +1,8 @@
 package main
+// ok via go run goo/test_implicit_main.go but not in GoLang :(
 
-import "fmt"
+print("Hello, ")    // writes to stderr
+println("world!")   // adds newline
 
-// This file tests implicit main function generation
-// Without the explicit main function, these statements
-// would be wrapped in an implicit main() function
-
-fmt.Println("Hello from implicit main!")
-fmt.Println("No explicit main function needed")
-
-x := 42
-fmt.Printf("The answer is: %d\n", x)
+x := 421
+print("The answer is: ", x, "\n")

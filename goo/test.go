@@ -3,10 +3,18 @@ package main
 import "fmt"
 
 func main() {
+	write := fmt.Println
 	// Test numeric truthiness
+	//x := tuple[int] (1,2,3)
+	//y := list[int][1,2,3]
+	z := map[string]int{"a": 1, "b": 2}
+	z["a"] = 10
+	//write(z)
+	//printf(z)
+
 	if 0 {
-		fmt.Println("FAIL: 0 should be falsy")
+		write("FAIL: 0 should be falsy")
 	} else {
-		fmt.Println("PASS: 0 is falsy")
+		write("PASS: 0 is falsy")
 	}
 }
