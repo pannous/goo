@@ -4,11 +4,12 @@
 
 package syntax
 
+import "strconv"
+
 type Token uint
 
 type token = Token
 
-//go:generate stringer -type token -linecomment tokens.go
 
 const (
 	_    token = iota
@@ -91,6 +92,69 @@ const _ uint64 = 1 << (tokenCount - 1)
 // contains reports whether tok is in tokset.
 func contains(tokset uint64, tok token) bool {
 	return tokset&(1<<tok) != 0
+}
+
+// TokenNames provides string representations for tokens, indexed by token value.
+// This replaces the stringer-generated token_string.go file.
+// Tokens start at 1, so index 0 is unused.
+var TokenNames = [...]string{
+	0:            "", // unused (token 0)
+	_EOF:         "EOF",
+	_Name:        "name", 
+	_Literal:     "literal",
+	_Operator:    "op",
+	_AssignOp:    "op=",
+	_IncOp:       "opop", 
+	_Assign:      "=",
+	_Define:      ":=",
+	_Arrow:       "<-",
+	_Star:        "*",
+	_Lparen:      "(",
+	_Lbrack:      "[", 
+	_Lbrace:      "{",
+	_Rparen:      ")",
+	_Rbrack:      "]",
+	_Rbrace:      "}",
+	_Comma:       ",",
+	_Semi:        ";",
+	_Colon:       ":",
+	_Dot:         ".",
+	_DotDotDot:   "...",
+	_Break:       "break",
+	_Case:        "case",
+	_Chan:        "chan", 
+	_Check:       "check",
+	_Const:       "const",
+	_Continue:    "continue",
+	_Default:     "default",
+	_Defer:       "defer",
+	_Else:        "else",
+	_Fallthrough: "fallthrough",
+	_For:         "for",
+	_Func:        "func",
+	_Go:          "go",
+	_Goto:        "goto",
+	_If:          "if",
+	_Import:      "import",
+	_Interface:   "interface",
+	_Map:         "map",
+	_Package:     "package",
+	_Range:       "range",
+	_Return:      "return",
+	_Select:      "select",
+	_Struct:      "struct",
+	_Switch:      "switch",
+	_Type:        "type",
+	_Var:         "var",
+}
+
+// String returns the string representation of the token.
+// This replaces the stringer-generated String() method.
+func (tok token) String() string {
+	if int(tok) < len(TokenNames) && TokenNames[tok] != "" {
+		return TokenNames[tok]
+	}
+	return "token(" + strconv.FormatInt(int64(tok), 10) + ")"
 }
 
 type LitKind uint8

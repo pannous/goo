@@ -445,7 +445,7 @@ func (s *scanner) ident() {
 // tokStrFast is a faster version of token.String, which assumes that tok
 // is one of the valid tokens - and can thus skip bounds checks.
 func tokStrFast(tok token) string {
-	return _token_name[_token_index[tok-1]:_token_index[tok]]
+	return TokenNames[tok]
 }
 
 func (s *scanner) atIdentChar(first bool) bool {
