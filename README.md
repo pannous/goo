@@ -5,19 +5,25 @@ Goo is an open source programming language that makes it easy to build simple, r
 Goo is an up-to-date fork of Go with the following modifications:
 <!--
 just like most ugliness in the world appears when you add a five to json(5) 
-so does adding a little o to Go[o] make it a little more beautiful
+so does adding a little o to Go[o] make everything a little more beautiful
 -->
 🗹 truthy/falsey if  
 🗹 # comment and shebang support  
 🗹 goo file extension
 🗹 not operator keyword for `!`
-☐ and or not operators for && || !
-☐ print alias for fmt.Println    
-☐ assert  
+🗹 ø keyword for `nil`
+☐ ≠ operator for `!=`
+☐ ¬ operator for `!`
 ☐ return void, e.g. return print("ok")  
+☐ and or not operators for && || !
+☐ print := fmt.Println    
+☐ assert / check
+☐ public() -> Public() calls OK
 ☐ silent/implicit error propagation    
 ☐ for loops    
-☐ enums  
+☐ enums via struct  
+☐ class via struct
+☐ no Main needed
 ☐ any other pain points you and I might have  
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)

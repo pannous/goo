@@ -400,6 +400,14 @@ func (s *scanner) ident() {
 		return
 	}
 
+	// special case for 'ø' as nil
+	if string(lit) == "ø" {
+		s.nlsemi = true
+		s.lit = "nil"
+		s.tok = _Name
+		return
+	}
+
 	s.nlsemi = true
 	s.lit = string(lit)
 	s.tok = _Name
