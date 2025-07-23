@@ -10,26 +10,28 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 truthy/falsey if  
 🗹 # comment and shebang support  
 🗹 goo file extension  
-🗹 not operator keyword for `!`  
-🗹 ø keyword for `nil`  
+🗹 and or operators for && ||
+🗹 ¬ / not operator keyword for `!`  
 🗹 ≠ operator for `!=`  
-🗹 ¬ operator for `!`  
-🗹 and or not operators for && ||
+🗹 ø keyword for `nil`
+🗹 no Main needed ☐  implicit package main  
 ☐ String methods "abc".contains("a")
 ☐ return void, e.g. return print("ok")  
 ☐ go command should default to run, so go test.go should work  
-☐ cross off all done tasks from this list  
-☐ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
+🗹 printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
 ☐ def as synonym for func, e.g. def main() { ... }  
 ☐ void(!) as synonym for func, e.g. void main(){}
 ☐ assert / check  
-☐ z := map{"a": 1, "b": 2}  // auto-detect map type:
+☐ assert 1>2 // panic if false, otherwise do nothing
+☐ assert $condition => if(not truthy($condition)) panic($condition.text)
+🗹 z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
+☐ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed 
+🗹 z := map{"a": 1, "b": 2}  // auto-detect map type:
     as a shorthand for map[any]any{...} (or inferred key/value types if unambiguous).
+☐ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
 ☐ z := {"a": 1, "b": 2}  // auto-detect map type:
 	•	{...} is already used for slice literals and struct literals.
 	•	z := {1,2,3} is ambiguous (slice or map?).
-☐ z := map[any]any{"a": 1, "b": 2} or
-☐ z := map[string]int{"a": 1, "b": 2}
 ☐ public() -> Public() calls OK // as compiler plugin?
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.
@@ -39,8 +41,9 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ enums via struct  
 ☐ class via struct  
 ☐ imported and not used only warning 
-☐ no Main needed, implicit package main  
+☐ cross off all done tasks from this list  
 ☐ any other pain points you and I might have   
+
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*

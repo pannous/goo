@@ -1,21 +1,23 @@
 package main
 
+import "fmt"
 func main() {
+	printf := fmt.Printf
 	// Test [1,2,3] slice literal syntax
 	z := [1, 2, 3]
-	printf("Slice z:", z)
-	printf("Type of z:", typeof(z))
+	printf("Slice z: %v\n", z)
+	printf("Type of z: %v\n", typeof(z))
 	
 	// Test accessing elements
-	printf("First element:", z[0])
-	printf("Second element:", z[1])
+	printf("First element:%v\n", z[0])
+	printf("Second element:%v\n", z[1])
 	
 	// Test mixed types
 	mixed := ["hello", 42, true]
-	printf("Mixed slice:", mixed)
-	printf("Type of mixed:", typeof(mixed))
+	printf("Mixed slice:%v\n", mixed)
+	printf("Type of mixed:%v\n", typeof(mixed))
 	
 	// Test empty slice (needs explicit type)
 	empty := []int{}
-	printf("Empty slice:", empty)
+	printf("Empty slice:%v\n", empty)
 }
