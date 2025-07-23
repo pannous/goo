@@ -1357,8 +1357,8 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			// out = (b & 1) == 1
 
 			one := s.constInt64(types.Types[types.TUINT64], 1)
-			and := s.newValue2(ssa.OpAnd64, types.Types[types.TUINT64], b, one)
-			return s.newValue2(ssa.OpEq64, types.Types[types.TBOOL], and, one)
+			und := s.newValue2(ssa.OpAnd64, types.Types[types.TUINT64], b, one)
+			return s.newValue2(ssa.OpEq64, types.Types[types.TBOOL], und, one)
 		},
 		sys.AMD64)
 

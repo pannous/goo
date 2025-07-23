@@ -36,7 +36,7 @@ var ArchLoong64 = &Arch{
 	mulhi: "MULHVU",
 	lsh:   "SLLV",
 	rsh:   "SRLV",
-	and:   "AND",
+	und:   "AND",
 	or:    "OR",
 	xor:   "XOR",
 

@@ -173,7 +173,7 @@ func EqStruct(t *types.Type, np, nq ir.Node) ([]ir.Node, bool) {
 	// within each inner list. The outer lists must be evaluated in order.
 	var conds [][]ir.Node
 	conds = append(conds, []ir.Node{})
-	and := func(n ir.Node) {
+	und := func(n ir.Node) {
 		i := len(conds) - 1
 		conds[i] = append(conds[i], n)
 	}
@@ -202,10 +202,10 @@ func EqStruct(t *types.Type, np, nq ir.Node) ([]ir.Node, bool) {
 				p := typecheck.DotField(base.Pos, typecheck.Expr(np), i)
 				q := typecheck.DotField(base.Pos, typecheck.Expr(nq), i)
 				eqlen, eqmem := EqString(p, q)
-				and(eqlen)
-				and(eqmem)
+				und(eqlen)
+				und(eqmem)
 			default:
-				and(eqfield(np, nq, i))
+				und(eqfield(np, nq, i))
 			}
 			if typeCanPanic {
 				// Also enforce ordering after something that can panic.
@@ -219,12 +219,12 @@ func EqStruct(t *types.Type, np, nq ir.Node) ([]ir.Node, bool) {
 		if cost <= 4 {
 			// Cost of 4 or less: use plain field equality.
 			for j := i; j < next; j++ {
-				and(eqfield(np, nq, j))
+				und(eqfield(np, nq, j))
 			}
 		} else {
 			// Higher cost: use memequal.
 			cc := eqmem(np, nq, i, size)
-			and(cc)
+			und(cc)
 		}
 		i = next
 	}

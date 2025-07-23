@@ -30,7 +30,7 @@ var ArchARM = &Arch{
 	sbc:  "SBC",
 	sbcs: "SBC.S",
 	rsb:  "RSB",
-	and:  "AND",
+	und:  "AND",
 	or:   "ORR",
 	xor:  "EOR",
 

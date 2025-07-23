@@ -228,7 +228,7 @@ func walkCompare(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 			expr = ir.NewLogicalExpr(base.Pos, andor, expr, a)
 		}
 	}
-	and := func(cond ir.Node) {
+	und := func(cond ir.Node) {
 		if expr == nil {
 			expr = cond
 		} else {
@@ -241,12 +241,12 @@ func walkCompare(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 		conds, _ := compare.EqStruct(t, cmpl, cmpr)
 		if n.Op() == ir.OEQ {
 			for _, cond := range conds {
-				and(cond)
+				und(cond)
 			}
 		} else {
 			for _, cond := range conds {
 				notCond := ir.NewUnaryExpr(base.Pos, ir.ONOT, cond)
-				and(notCond)
+				und(notCond)
 			}
 		}
 	} else {
@@ -385,12 +385,12 @@ func walkCompareString(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 			combine64bit = ssagen.Arch.LinkArch.RegSize >= 8
 		}
 
-		var and ir.Op
+		var und ir.Op
 		switch cmp {
 		case ir.OEQ:
-			and = ir.OANDAND
+			und = ir.OANDAND
 		case ir.ONE:
-			and = ir.OOROR
+			und = ir.OOROR
 		default:
 			// Don't do byte-wise comparisons for <, <=, etc.
 			// They're fairly complicated.
@@ -407,7 +407,7 @@ func walkCompareString(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 				if remains == 1 || !canCombineLoads {
 					cb := ir.NewInt(base.Pos, int64(s[i]))
 					ncb := ir.NewIndexExpr(base.Pos, ncs, ir.NewInt(base.Pos, int64(i)))
-					r = ir.NewLogicalExpr(base.Pos, and, r, ir.NewBinaryExpr(base.Pos, cmp, ncb, cb))
+					r = ir.NewLogicalExpr(base.Pos, und, r, ir.NewBinaryExpr(base.Pos, cmp, ncb, cb))
 					remains--
 					i++
 					continue
@@ -438,7 +438,7 @@ func walkCompareString(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 				}
 				csubstrPart := ir.NewInt(base.Pos, csubstr)
 				// Compare "step" bytes as once
-				r = ir.NewLogicalExpr(base.Pos, and, r, ir.NewBinaryExpr(base.Pos, cmp, csubstrPart, ncsubstr))
+				r = ir.NewLogicalExpr(base.Pos, und, r, ir.NewBinaryExpr(base.Pos, cmp, csubstrPart, ncsubstr))
 				remains -= step
 				i += step
 			}

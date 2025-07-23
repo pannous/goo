@@ -104,7 +104,7 @@ func andArg(x Expr) string {
 	return s
 }
 
-func and(x, y Expr) Expr {
+func und(x, y Expr) Expr {
 	return &AndExpr{x, y}
 }
 
@@ -235,9 +235,9 @@ func parseExpr(text string) (x Expr, err error) {
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
 func (p *exprParser) or() Expr {
-	x := p.and()
+	x := p.und()
 	for p.tok == "||" {
-		x = or(x, p.and())
+		x = or(x, p.und())
 	}
 	return x
 }
@@ -245,10 +245,10 @@ func (p *exprParser) or() Expr {
 // and parses a sequence of && expressions.
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
-func (p *exprParser) and() Expr {
+func (p *exprParser) und() Expr {
 	x := p.negationExpr()
 	for p.tok == "&&" {
-		x = and(x, p.negationExpr())
+		x = und(x, p.negationExpr())
 	}
 	return x
 }
@@ -435,7 +435,7 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 				if size++; size > maxOldSize {
 					return nil, errComplex
 				}
-				y = and(y, z)
+				y = und(y, z)
 			}
 		}
 		if x == nil {
@@ -482,9 +482,9 @@ func PlusBuildLines(x Expr) ([]string, error) {
 	var split [][][]Expr
 	for _, or := range appendSplitAnd(nil, x) {
 		var ands [][]Expr
-		for _, and := range appendSplitOr(nil, or) {
+		for _, und := range appendSplitOr(nil, or) {
 			var lits []Expr
-			for _, lit := range appendSplitAnd(nil, and) {
+			for _, lit := range appendSplitAnd(nil, und) {
 				switch lit.(type) {
 				case *TagExpr, *NotExpr:
 					lits = append(lits, lit)
@@ -518,9 +518,9 @@ func PlusBuildLines(x Expr) ([]string, error) {
 	var lines []string
 	for _, or := range split {
 		line := "// +build"
-		for _, and := range or {
+		for _, und := range or {
 			clause := ""
-			for i, lit := range and {
+			for i, lit := range und {
 				if i > 0 {
 					clause += ","
 				}
@@ -561,12 +561,12 @@ func pushNot(x Expr, negate bool) Expr {
 		if x1 == x.X && y1 == x.Y {
 			return x
 		}
-		return and(x1, y1)
+		return und(x1, y1)
 	case *OrExpr:
 		x1 := pushNot(x.X, negate)
 		y1 := pushNot(x.Y, negate)
 		if negate {
-			return and(x1, y1)
+			return und(x1, y1)
 		}
 		if x1 == x.X && y1 == x.Y {
 			return x

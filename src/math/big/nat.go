@@ -498,7 +498,7 @@ func (x nat) sticky(i uint) uint {
 	return 0
 }
 
-func (z nat) and(x, y nat) nat {
+func (z nat) und(x, y nat) nat {
 	m := len(x)
 	n := len(y)
 	if m > n {

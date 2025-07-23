@@ -35,7 +35,7 @@ var ArchARM64 = &Arch{
 	mulhi: "UMULH",
 	lsh:   "LSL",
 	rsh:   "LSR",
-	and:   "AND",
+	und:   "AND",
 	or:    "ORR",
 	xor:   "EOR",
 

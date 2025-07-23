@@ -38,7 +38,7 @@ type FuncMap map[string]any
 // TODO: revert this back to a global map once golang.org/issue/2559 is fixed.
 func builtins() FuncMap {
 	return FuncMap{
-		"and":      and,
+		"and":      und,
 		"call":     emptyCall,
 		"html":     HTMLEscaper,
 		"index":    index,
@@ -388,7 +388,7 @@ func truth(arg reflect.Value) bool {
 
 // and computes the Boolean AND of its arguments, returning
 // the first false argument it encounters, or the last argument.
-func and(arg0 reflect.Value, args ...reflect.Value) reflect.Value {
+func und(arg0 reflect.Value, args ...reflect.Value) reflect.Value {
 	panic("unreachable") // implemented as a special case in evalCall
 }
 

@@ -28,7 +28,7 @@ func mul(x, y uint) uint             { return x * y }
 func mulWide(x, y uint) (uint, uint) { return bits.Mul(x, y) }
 func lsh(x, s uint) uint             { return x << s }
 func rsh(x, s uint) uint             { return x >> s }
-func and(x, y uint) uint             { return x & y }
+func und(x, y uint) uint             { return x & y }
 func or(x, y uint) uint              { return x | y }
 func xor(x, y uint) uint             { return x ^ y }
 func neg(x uint) uint                { return -x }

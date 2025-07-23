@@ -1054,7 +1054,7 @@ func sliceBCE2(p []string, h int) string {
 	return p[i] // ERROR "Proved IsInBounds$"
 }
 
-func and(p []byte) ([]byte, []byte) { // issue #52563
+func und(p []byte) ([]byte, []byte) { // issue #52563
 	const blocksize = 16
 	fullBlocks := len(p) &^ (blocksize - 1)
 	blk := p[:fullBlocks] // ERROR "Proved IsSliceInBounds$"

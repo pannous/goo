@@ -692,7 +692,7 @@ func (ip Addr) Prefix(b int) (Prefix, error) {
 			return Prefix{}, errors.New("prefix length " + itoa.Itoa(b) + " too large for IPv6")
 		}
 	}
-	ip.addr = ip.addr.and(mask6(effectiveBits))
+	ip.addr = ip.addr.und(mask6(effectiveBits))
 	return PrefixFrom(ip, b), nil
 }
 
@@ -1446,7 +1446,7 @@ func (p Prefix) Contains(ip Addr) bool {
 		// xor the IP addresses together.
 		// Mask away the bits we don't care about.
 		// If all the bits we care about are equal, the result will be zero.
-		return ip.addr.xor(p.ip.addr).and(mask6(p.Bits())).isZero()
+		return ip.addr.xor(p.ip.addr).und(mask6(p.Bits())).isZero()
 	}
 }
 

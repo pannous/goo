@@ -35,7 +35,7 @@ var ArchMIPS64x = &Arch{
 	mulWideF: mips64MulWide,
 	lsh:      "SLLV",
 	rsh:      "SRLV",
-	and:      "AND",
+	und:      "AND",
 	or:       "OR",
 	xor:      "XOR",
 

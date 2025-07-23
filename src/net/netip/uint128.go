@@ -29,7 +29,7 @@ func mask6(n int) uint128 {
 func (u uint128) isZero() bool { return u.hi|u.lo == 0 }
 
 // and returns the bitwise AND of u and m (u&m).
-func (u uint128) and(m uint128) uint128 {
+func (u uint128) und(m uint128) uint128 {
 	return uint128{u.hi & m.hi, u.lo & m.lo}
 }
 
@@ -77,5 +77,5 @@ func (u uint128) bitsSetFrom(bit uint8) uint128 {
 // bitsClearedFrom returns a copy of u with the given bit
 // and all subsequent ones cleared.
 func (u uint128) bitsClearedFrom(bit uint8) uint128 {
-	return u.and(mask6(int(bit)))
+	return u.und(mask6(int(bit)))
 }

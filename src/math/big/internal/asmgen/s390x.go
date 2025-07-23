@@ -40,7 +40,7 @@ var ArchS390X = &Arch{
 	mulWideF: s390MulWide,
 	lsh:      "SLD",
 	rsh:      "SRD",
-	and:      "AND",
+	und:      "AND",
 	or:       "OR",
 	xor:      "XOR",
 	neg:      "NEG",
