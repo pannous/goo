@@ -12,7 +12,7 @@ func main() {
 	z["a"] = 10
 	write(z)
 	write(typeof(z))
-	//printf(z)
+	printf("Map z:", z)
 
 	if 0 {
 		write("FAIL: 0 should be falsy")
