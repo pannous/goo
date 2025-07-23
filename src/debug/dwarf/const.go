@@ -6,6 +6,8 @@
 
 package dwarf
 
+import "strconv"
+
 //go:generate stringer -type Attr -trimprefix=Attr
 
 // An Attr identifies the attribute type in a DWARF [Entry.Field].
@@ -138,10 +140,13 @@ const (
 	AttrLoclistsBase         Attr = 0x8C
 )
 
+// String returns the string representation of the Attr.
+// This replaces the stringer-generated String() method.
+func (a Attr) String() string {
+	return "Attr(" + strconv.FormatUint(uint64(a), 16) + ")"
+}
+
 func (a Attr) GoString() string {
-	if str, ok := _Attr_map[a]; ok {
-		return "dwarf.Attr" + str
-	}
 	return "dwarf." + a.String()
 }
 
@@ -280,6 +285,12 @@ const (
 	TagSkeletonUnit      Tag = 0x4A
 	TagImmutableType     Tag = 0x4B
 )
+
+// String returns the string representation of the Tag.
+// This replaces the stringer-generated String() method.
+func (t Tag) String() string {
+	return "Tag(" + strconv.FormatUint(uint64(t), 16) + ")"
+}
 
 func (t Tag) GoString() string {
 	if t <= TagTemplateAlias {

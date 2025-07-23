@@ -30,7 +30,10 @@
 
 package sym
 
-import "cmd/internal/objabi"
+import (
+	"cmd/internal/objabi"
+	"strconv"
+)
 
 // A SymKind describes the kind of memory represented by a symbol.
 type SymKind uint8
@@ -236,4 +239,174 @@ func (t SymKind) IsNOPTRDATA() bool {
 
 func (t SymKind) IsDWARF() bool {
 	return SDWARFSECT <= t && t <= SDWARFADDR
+}
+
+// String returns the string representation of SymKind
+func (s SymKind) String() string {
+	switch s {
+	case Sxxx:
+		return "Sxxx"
+	case STEXT:
+		return "STEXT"
+	case STEXTFIPSSTART:
+		return "STEXTFIPSSTART"
+	case STEXTFIPS:
+		return "STEXTFIPS"
+	case STEXTFIPSEND:
+		return "STEXTFIPSEND"
+	case STEXTEND:
+		return "STEXTEND"
+	case SELFRXSECT:
+		return "SELFRXSECT"
+	case SMACHOPLT:
+		return "SMACHOPLT"
+	case STYPE:
+		return "STYPE"
+	case SSTRING:
+		return "SSTRING"
+	case SGOSTRING:
+		return "SGOSTRING"
+	case SGOFUNC:
+		return "SGOFUNC"
+	case SGCBITS:
+		return "SGCBITS"
+	case SRODATA:
+		return "SRODATA"
+	case SRODATAFIPSSTART:
+		return "SRODATAFIPSSTART"
+	case SRODATAFIPS:
+		return "SRODATAFIPS"
+	case SRODATAFIPSEND:
+		return "SRODATAFIPSEND"
+	case SRODATAEND:
+		return "SRODATAEND"
+	case SFUNCTAB:
+		return "SFUNCTAB"
+	case SELFROSECT:
+		return "SELFROSECT"
+	case STYPERELRO:
+		return "STYPERELRO"
+	case SSTRINGRELRO:
+		return "SSTRINGRELRO"
+	case SGOSTRINGRELRO:
+		return "SGOSTRINGRELRO"
+	case SGOFUNCRELRO:
+		return "SGOFUNCRELRO"
+	case SGCBITSRELRO:
+		return "SGCBITSRELRO"
+	case SRODATARELRO:
+		return "SRODATARELRO"
+	case SFUNCTABRELRO:
+		return "SFUNCTABRELRO"
+	case SELFRELROSECT:
+		return "SELFRELROSECT"
+	case SMACHORELROSECT:
+		return "SMACHORELROSECT"
+	case STYPELINK:
+		return "STYPELINK"
+	case SITABLINK:
+		return "SITABLINK"
+	case SSYMTAB:
+		return "SSYMTAB"
+	case SPCLNTAB:
+		return "SPCLNTAB"
+	case SFirstWritable:
+		return "SFirstWritable"
+	case SBUILDINFO:
+		return "SBUILDINFO"
+	case SFIPSINFO:
+		return "SFIPSINFO"
+	case SELFSECT:
+		return "SELFSECT"
+	case SMACHO:
+		return "SMACHO"
+	case SMACHOGOT:
+		return "SMACHOGOT"
+	case SWINDOWS:
+		return "SWINDOWS"
+	case SELFGOT:
+		return "SELFGOT"
+	case SNOPTRDATA:
+		return "SNOPTRDATA"
+	case SNOPTRDATAFIPSSTART:
+		return "SNOPTRDATAFIPSSTART"
+	case SNOPTRDATAFIPS:
+		return "SNOPTRDATAFIPS"
+	case SNOPTRDATAFIPSEND:
+		return "SNOPTRDATAFIPSEND"
+	case SNOPTRDATAEND:
+		return "SNOPTRDATAEND"
+	case SINITARR:
+		return "SINITARR"
+	case SDATA:
+		return "SDATA"
+	case SDATAFIPSSTART:
+		return "SDATAFIPSSTART"
+	case SDATAFIPS:
+		return "SDATAFIPS"
+	case SDATAFIPSEND:
+		return "SDATAFIPSEND"
+	case SDATAEND:
+		return "SDATAEND"
+	case SXCOFFTOC:
+		return "SXCOFFTOC"
+	case SBSS:
+		return "SBSS"
+	case SNOPTRBSS:
+		return "SNOPTRBSS"
+	case SLIBFUZZER_8BIT_COUNTER:
+		return "SLIBFUZZER_8BIT_COUNTER"
+	case SCOVERAGE_COUNTER:
+		return "SCOVERAGE_COUNTER"
+	case SCOVERAGE_AUXVAR:
+		return "SCOVERAGE_AUXVAR"
+	case STLSBSS:
+		return "STLSBSS"
+	case SXREF:
+		return "SXREF"
+	case SMACHOSYMSTR:
+		return "SMACHOSYMSTR"
+	case SMACHOSYMTAB:
+		return "SMACHOSYMTAB"
+	case SMACHOINDIRECTPLT:
+		return "SMACHOINDIRECTPLT"
+	case SMACHOINDIRECTGOT:
+		return "SMACHOINDIRECTGOT"
+	case SFILEPATH:
+		return "SFILEPATH"
+	case SDYNIMPORT:
+		return "SDYNIMPORT"
+	case SHOSTOBJ:
+		return "SHOSTOBJ"
+	case SUNDEFEXT:
+		return "SUNDEFEXT"
+	case SDWARFSECT:
+		return "SDWARFSECT"
+	case SDWARFCUINFO:
+		return "SDWARFCUINFO"
+	case SDWARFCONST:
+		return "SDWARFCONST"
+	case SDWARFFCN:
+		return "SDWARFFCN"
+	case SDWARFABSFCN:
+		return "SDWARFABSFCN"
+	case SDWARFTYPE:
+		return "SDWARFTYPE"
+	case SDWARFVAR:
+		return "SDWARFVAR"
+	case SDWARFRANGE:
+		return "SDWARFRANGE"
+	case SDWARFLOC:
+		return "SDWARFLOC"
+	case SDWARFLINES:
+		return "SDWARFLINES"
+	case SDWARFADDR:
+		return "SDWARFADDR"
+	case SSEHUNWINDINFO:
+		return "SSEHUNWINDINFO"
+	case SSEHSECT:
+		return "SSEHSECT"
+	default:
+		return "SymKind(" + strconv.Itoa(int(s)) + ")"
+	}
 }

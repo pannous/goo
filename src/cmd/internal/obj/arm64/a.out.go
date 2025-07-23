@@ -30,6 +30,10 @@
 
 package arm64
 
+import (
+	"strconv"
+)
+
 import "cmd/internal/obj"
 
 const (
@@ -1215,3 +1219,79 @@ const (
 
 	SPOP_END
 )
+
+// String returns the string representation of SpecialOperand
+func (s SpecialOperand) String() string {
+	switch s {
+	case SPOP_PLDL1KEEP:
+		return "PLDL1KEEP"
+	case SPOP_PLDL1STRM:
+		return "PLDL1STRM" 
+	case SPOP_PLDL2KEEP:
+		return "PLDL2KEEP"
+	case SPOP_PLDL2STRM:
+		return "PLDL2STRM"
+	case SPOP_PLDL3KEEP:
+		return "PLDL3KEEP"
+	case SPOP_PLDL3STRM:
+		return "PLDL3STRM"
+	case SPOP_PLIL1KEEP:
+		return "PLIL1KEEP"
+	case SPOP_PLIL1STRM:
+		return "PLIL1STRM"
+	case SPOP_PLIL2KEEP:
+		return "PLIL2KEEP"
+	case SPOP_PLIL2STRM:
+		return "PLIL2STRM"
+	case SPOP_PLIL3KEEP:
+		return "PLIL3KEEP"
+	case SPOP_PLIL3STRM:
+		return "PLIL3STRM"
+	case SPOP_PSTL1KEEP:
+		return "PSTL1KEEP"
+	case SPOP_PSTL1STRM:
+		return "PSTL1STRM"
+	case SPOP_PSTL2KEEP:
+		return "PSTL2KEEP"
+	case SPOP_PSTL2STRM:
+		return "PSTL2STRM"
+	case SPOP_PSTL3KEEP:
+		return "PSTL3KEEP"
+	case SPOP_PSTL3STRM:
+		return "PSTL3STRM"
+	case SPOP_EQ:
+		return "EQ"
+	case SPOP_NE:
+		return "NE"
+	case SPOP_HS:
+		return "HS"
+	case SPOP_LO:
+		return "LO"
+	case SPOP_MI:
+		return "MI"
+	case SPOP_PL:
+		return "PL"
+	case SPOP_VS:
+		return "VS"
+	case SPOP_VC:
+		return "VC"
+	case SPOP_HI:
+		return "HI"
+	case SPOP_LS:
+		return "LS"
+	case SPOP_GE:
+		return "GE"
+	case SPOP_LT:
+		return "LT"
+	case SPOP_GT:
+		return "GT"
+	case SPOP_LE:
+		return "LE"
+	case SPOP_AL:
+		return "AL"
+	case SPOP_NV:
+		return "NV"
+	default:
+		return "SpecialOperand(" + strconv.Itoa(int(s)) + ")"
+	}
+}

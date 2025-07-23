@@ -370,7 +370,54 @@ const (
 	ClassStrOffsetsPtr
 )
 
-//go:generate stringer -type=Class
+// String returns the string representation of the Class.
+// This replaces the stringer-generated String() method.
+func (i Class) String() string {
+	switch i {
+	case ClassUnknown:
+		return "ClassUnknown"
+	case ClassAddress:
+		return "ClassAddress"
+	case ClassBlock:
+		return "ClassBlock"
+	case ClassConstant:
+		return "ClassConstant"
+	case ClassExprLoc:
+		return "ClassExprLoc"
+	case ClassFlag:
+		return "ClassFlag"
+	case ClassLinePtr:
+		return "ClassLinePtr"
+	case ClassLocListPtr:
+		return "ClassLocListPtr"
+	case ClassMacPtr:
+		return "ClassMacPtr"
+	case ClassRangeListPtr:
+		return "ClassRangeListPtr"
+	case ClassReference:
+		return "ClassReference"
+	case ClassReferenceSig:
+		return "ClassReferenceSig"
+	case ClassString:
+		return "ClassString"
+	case ClassReferenceAlt:
+		return "ClassReferenceAlt"
+	case ClassStringAlt:
+		return "ClassStringAlt"
+	case ClassAddrPtr:
+		return "ClassAddrPtr"
+	case ClassLocList:
+		return "ClassLocList"
+	case ClassRngList:
+		return "ClassRngList"
+	case ClassRngListsPtr:
+		return "ClassRngListsPtr"
+	case ClassStrOffsetsPtr:
+		return "ClassStrOffsetsPtr"
+	default:
+		return "Class(" + strconv.Itoa(int(i)) + ")"
+	}
+}
 
 func (i Class) GoString() string {
 	return "dwarf." + i.String()

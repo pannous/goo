@@ -92,6 +92,60 @@ var adjValues = map[scoreAdjustTyp]int{
 	returnFeedsConcreteToInterfaceCallAdj: -25,
 }
 
+// String returns the string representation of scoreAdjustTyp
+func (s scoreAdjustTyp) String() string {
+	var parts []string
+	if s&panicPathAdj != 0 {
+		parts = append(parts, "panicPathAdj")
+	}
+	if s&initFuncAdj != 0 {
+		parts = append(parts, "initFuncAdj")
+	}
+	if s&inLoopAdj != 0 {
+		parts = append(parts, "inLoopAdj")
+	}
+	if s&passConstToIfAdj != 0 {
+		parts = append(parts, "passConstToIfAdj")
+	}
+	if s&passConstToNestedIfAdj != 0 {
+		parts = append(parts, "passConstToNestedIfAdj")
+	}
+	if s&passConcreteToItfCallAdj != 0 {
+		parts = append(parts, "passConcreteToItfCallAdj")
+	}
+	if s&passConcreteToNestedItfCallAdj != 0 {
+		parts = append(parts, "passConcreteToNestedItfCallAdj")
+	}
+	if s&passFuncToIndCallAdj != 0 {
+		parts = append(parts, "passFuncToIndCallAdj")
+	}
+	if s&passFuncToNestedIndCallAdj != 0 {
+		parts = append(parts, "passFuncToNestedIndCallAdj")
+	}
+	if s&passInlinableFuncToIndCallAdj != 0 {
+		parts = append(parts, "passInlinableFuncToIndCallAdj")
+	}
+	if s&passInlinableFuncToNestedIndCallAdj != 0 {
+		parts = append(parts, "passInlinableFuncToNestedIndCallAdj")
+	}
+	if s&returnFeedsConstToIfAdj != 0 {
+		parts = append(parts, "returnFeedsConstToIfAdj")
+	}
+	if s&returnFeedsFuncToIndCallAdj != 0 {
+		parts = append(parts, "returnFeedsFuncToIndCallAdj")
+	}
+	if s&returnFeedsInlinableFuncToIndCallAdj != 0 {
+		parts = append(parts, "returnFeedsInlinableFuncToIndCallAdj")
+	}
+	if s&returnFeedsConcreteToInterfaceCallAdj != 0 {
+		parts = append(parts, "returnFeedsConcreteToInterfaceCallAdj")
+	}
+	if len(parts) == 0 {
+		return "0"
+	}
+	return strings.Join(parts, "|")
+}
+
 // SetupScoreAdjustments interprets the value of the -d=inlscoreadj
 // debugging option, if set. The value of this flag is expected to be
 // a series of "/"-separated clauses of the form adj1:value1. Example:

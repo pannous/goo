@@ -21,8 +21,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 z := map{"a": 1, "b": 2}  => map[any]any{…}
 🗹 z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
 🗹 z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
-☐ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed 
-☐ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer tool 🤮🦀🤮 
+☐ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed vs # comment with whitespace / tab / newline / semicolon / comma / start of line
+🗹 Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer tool 🤮🦀🤮 
 ☐ String methods "abc".contains("a")
 ☐ return void, e.g. return print("ok")  
 ☐ go command should default to run, so go test.go should work  

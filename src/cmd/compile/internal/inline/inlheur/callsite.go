@@ -56,6 +56,27 @@ const (
 	ActualExprIsInlinableFunc
 )
 
+// actualExprPropBitsNames provides string representations, replacing stringer-generated actualexprpropbits_string.go
+func (a ActualExprPropBits) String() string {
+	var parts []string
+	if a&ActualExprConstant != 0 {
+		parts = append(parts, "ActualExprConstant")
+	}
+	if a&ActualExprIsConcreteConvIface != 0 {
+		parts = append(parts, "ActualExprIsConcreteConvIface")
+	}
+	if a&ActualExprIsFunc != 0 {
+		parts = append(parts, "ActualExprIsFunc")
+	}
+	if a&ActualExprIsInlinableFunc != 0 {
+		parts = append(parts, "ActualExprIsInlinableFunc")
+	}
+	if len(parts) == 0 {
+		return "0"
+	}
+	return strings.Join(parts, "|")
+}
+
 type CSPropBits uint32
 
 const (
@@ -63,6 +84,24 @@ const (
 	CallSiteOnPanicPath
 	CallSiteInInitFunc
 )
+
+// csPropBitsNames provides string representations, replacing stringer-generated cspropbits_string.go
+func (c CSPropBits) String() string {
+	var parts []string
+	if c&CallSiteInLoop != 0 {
+		parts = append(parts, "CallSiteInLoop")
+	}
+	if c&CallSiteOnPanicPath != 0 {
+		parts = append(parts, "CallSiteOnPanicPath")
+	}
+	if c&CallSiteInInitFunc != 0 {
+		parts = append(parts, "CallSiteInInitFunc")
+	}
+	if len(parts) == 0 {
+		return "0"
+	}
+	return strings.Join(parts, "|")
+}
 
 type csAuxBits uint8
 

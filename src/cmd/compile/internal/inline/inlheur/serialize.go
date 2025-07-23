@@ -4,7 +4,10 @@
 
 package inlheur
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func (funcProps *FuncProps) SerializeToString() string {
 	if funcProps == nil {
@@ -77,4 +80,39 @@ func writeUleb128(sb *strings.Builder, v uint64) {
 		}
 		sb.WriteByte(c)
 	}
+}
+
+// ToString returns a string representation of FuncProps for debug dumps
+func (funcProps *FuncProps) ToString(prefix string) string {
+	if funcProps == nil {
+		return ""
+	}
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%sFlags: %s\n", prefix, funcProps.Flags.String()))
+	if len(funcProps.ParamFlags) > 0 {
+		sb.WriteString(fmt.Sprintf("%sParamFlags: [", prefix))
+		for i, pf := range funcProps.ParamFlags {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(pf.String())
+		}
+		sb.WriteString("]\n")
+	}
+	if len(funcProps.ResultFlags) > 0 {
+		sb.WriteString(fmt.Sprintf("%sResultFlags: [", prefix))
+		for i, rf := range funcProps.ResultFlags {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(rf.String())
+		}
+		sb.WriteString("]\n")
+	}
+	return sb.String()
+}
+
+// String returns a string representation of FuncProps for debug dumps
+func (funcProps *FuncProps) String() string {
+	return funcProps.ToString("")
 }
