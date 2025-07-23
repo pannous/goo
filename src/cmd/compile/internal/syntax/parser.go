@@ -1089,7 +1089,11 @@ func (p *parser) operand(keep_parens bool) Expr {
 		}
 		return ftyp
 
-	case _Lbrack, _Chan, _Map, _Struct, _Interface:
+	case _Map:
+		// Parse map type - could be map[K]V or map{...}
+		return p.mapTypeOrLiteral()
+		
+	case _Lbrack, _Chan, _Struct, _Interface:
 		return p.type_() // othertype
 
 	default:
@@ -1458,6 +1462,41 @@ func (p *parser) typeOrNil() Expr {
 	}
 
 	return nil
+}
+
+// mapTypeOrLiteral parses either map[K]V or map{...} (auto-detect map literal)
+func (p *parser) mapTypeOrLiteral() Expr {
+	if trace {
+		defer p.trace("mapTypeOrLiteral")()
+	}
+
+	pos := p.pos()
+	p.next() // consume 'map'
+	
+	if p.tok == _Lbrack {
+		// Regular map[K]V syntax
+		p.want(_Lbrack)
+		t := new(MapType)
+		t.pos = pos
+		t.Key = p.type_()
+		p.want(_Rbrack)
+		t.Value = p.type_()
+		return t
+	} else if p.tok == _Lbrace {
+		// map{...} syntax - create MapType with any key/value types (map[any]any)
+		t := new(MapType)
+		t.pos = pos
+		// Use 'any' as placeholder for both key and value types
+		anyName := new(Name)
+		anyName.pos = pos
+		anyName.Value = "any"
+		t.Key = anyName
+		t.Value = anyName
+		return t
+	} else {
+		p.syntaxError("expected '[' or '{'")
+		return p.badExpr()
+	}
 }
 
 func (p *parser) typeInstance(typ Expr) Expr {
