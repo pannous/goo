@@ -9,5 +9,4 @@ func main() {
 	} else {
 		fmt.Println("PASS: 0 is falsy")
 	}
-
 }
