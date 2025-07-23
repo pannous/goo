@@ -45,9 +45,9 @@ func run(pass *analysis.Pass) (any, error) {
 		var op boolOp
 		switch e.Op {
 		case token.LOR:
-			op = or
+			op = oder
 		case token.LAND:
-			op = and
+			op = und
 		default:
 			return
 		}
@@ -68,8 +68,8 @@ type boolOp struct {
 }
 
 var (
-	or  = boolOp{"or", token.LOR, token.NEQ}
-	and = boolOp{"and", token.LAND, token.EQL}
+	oder  = boolOp{"or", token.LOR, token.NEQ}
+	und = boolOp{"and", token.LAND, token.EQL}
 )
 
 // commutativeSets returns all side effect free sets of

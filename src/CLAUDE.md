@@ -6,6 +6,8 @@ Do NOT explore the whole codebase structure and architecture
 We are trying to achieve small modifications to the compiler only and nothing else thus we only want to recompile the compiler and not the whole toolchain.
 
 
+!!! Important! Never do destructive commands like remove, rm, git clean, etc without explicit user confirmation, even in YOLO mode!!!
+
 # To compile go, use the following command:
 
 cd /opt/other/go/src
@@ -21,7 +23,7 @@ So far incremental building does not work like this :(
 
 # Go Compiler Lexer/Scanner Summary
 
-## Main Files: 
+## Main Files:
 - Project root folder `/opt/other/go/`
 - Claude root folder `/opt/other/go/src/`
 - Core lexical analysis for Go compiler
