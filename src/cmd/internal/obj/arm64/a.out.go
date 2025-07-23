@@ -1055,7 +1055,6 @@ const (
 	ARNG_D
 )
 
-//go:generate stringer -type SpecialOperand -trimprefix SPOP_
 type SpecialOperand int
 
 const (

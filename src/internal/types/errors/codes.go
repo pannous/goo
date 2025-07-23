@@ -6,7 +6,6 @@ package errors
 
 import "strconv"
 
-//go:generate go run golang.org/x/tools/cmd/stringer@latest -type Code codes.go
 
 type Code int
 

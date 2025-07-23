@@ -6,7 +6,6 @@ package macho
 
 import "strconv"
 
-//go:generate stringer -type=RelocTypeGeneric,RelocTypeX86_64,RelocTypeARM,RelocTypeARM64 -output reloctype_string.go
 
 type RelocTypeGeneric int
 

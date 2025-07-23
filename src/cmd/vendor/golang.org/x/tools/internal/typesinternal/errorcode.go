@@ -6,7 +6,6 @@ package typesinternal
 
 import "strconv"
 
-//go:generate stringer -type=ErrorCode
 
 type ErrorCode int
 
