@@ -25,7 +25,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ for loops    
 ☐ enums via struct  
 ☐ class via struct  
-☐ no Main needed  
+☐ no Main needed, implicit package main  
 ☐ any other pain points you and I might have   
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)
