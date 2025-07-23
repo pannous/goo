@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"math"
 	"math/bits"
+	"strconv"
 )
 
 const debugFloat = false // enable for debugging
@@ -141,7 +142,25 @@ const (
 	ToPositiveInf                     // == IEEE 754-2008 roundTowardPositive
 )
 
-//go:generate stringer -type=RoundingMode
+// RoundingModeNames provides string representations for RoundingMode constants, replacing stringer-generated roundingmode_string.go
+var RoundingModeNames = [...]string{
+	ToNearestEven: "ToNearestEven",
+	ToNearestAway: "ToNearestAway",
+	ToZero:        "ToZero",
+	AwayFromZero:  "AwayFromZero",
+	ToNegativeInf: "ToNegativeInf",
+	ToPositiveInf: "ToPositiveInf",
+}
+
+// String returns the string representation of the RoundingMode.
+// This replaces the stringer-generated String() method.
+func (r RoundingMode) String() string {
+	if int(r) < len(RoundingModeNames) && RoundingModeNames[r] != "" {
+		return RoundingModeNames[r]
+	}
+	return "RoundingMode(" + strconv.FormatInt(int64(r), 10) + ")"
+}
+
 
 // Accuracy describes the rounding error produced by the most recent
 // operation that generated a [Float] value, relative to the exact value.
@@ -154,7 +173,22 @@ const (
 	Above Accuracy = +1
 )
 
-//go:generate stringer -type=Accuracy
+// AccuracyNames provides string representations for Accuracy constants, replacing stringer-generated accuracy_string.go
+var AccuracyNames = map[Accuracy]string{
+	Below: "Below",
+	Exact: "Exact",
+	Above: "Above",
+}
+
+// String returns the string representation of the Accuracy.
+// This replaces the stringer-generated String() method.
+func (a Accuracy) String() string {
+	if s, ok := AccuracyNames[a]; ok {
+		return s
+	}
+	return "Accuracy(" + strconv.FormatInt(int64(a), 10) + ")"
+}
+
 
 // SetPrec sets z's precision to prec and returns the (possibly) rounded
 // value of z. Rounding occurs according to z's rounding mode if the mantissa

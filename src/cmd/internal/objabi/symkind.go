@@ -30,6 +30,8 @@
 
 package objabi
 
+import "strconv"
+
 // A SymKind describes the kind of memory represented by a symbol.
 type SymKind uint8
 
@@ -38,7 +40,6 @@ type SymKind uint8
 //
 // TODO(rsc): Give idiomatic Go names.
 //
-//go:generate stringer -type=SymKind
 const (
 	// An otherwise invalid zero value for the type
 	Sxxx SymKind = iota
@@ -80,6 +81,45 @@ const (
 	SSEHUNWINDINFO
 	// Update cmd/link/internal/sym/AbiSymKindToSymKind for new SymKind values.
 )
+
+// SymKindNames provides string representations for SymKind constants, replacing stringer-generated symkind_string.go
+var SymKindNames = [...]string{
+	Sxxx:                    "Sxxx",
+	STEXT:                   "STEXT",
+	STEXTFIPS:               "STEXTFIPS",
+	SRODATA:                 "SRODATA",
+	SRODATAFIPS:             "SRODATAFIPS",
+	SNOPTRDATA:              "SNOPTRDATA",
+	SNOPTRDATAFIPS:          "SNOPTRDATAFIPS",
+	SDATA:                   "SDATA",
+	SDATAFIPS:               "SDATAFIPS",
+	SBSS:                    "SBSS",
+	SNOPTRBSS:               "SNOPTRBSS",
+	STLSBSS:                 "STLSBSS",
+	SDWARFCUINFO:            "SDWARFCUINFO",
+	SDWARFCONST:             "SDWARFCONST",
+	SDWARFFCN:               "SDWARFFCN",
+	SDWARFABSFCN:            "SDWARFABSFCN",
+	SDWARFTYPE:              "SDWARFTYPE",
+	SDWARFVAR:               "SDWARFVAR",
+	SDWARFRANGE:             "SDWARFRANGE",
+	SDWARFLOC:               "SDWARFLOC",
+	SDWARFLINES:             "SDWARFLINES",
+	SDWARFADDR:              "SDWARFADDR",
+	SLIBFUZZER_8BIT_COUNTER: "SLIBFUZZER_8BIT_COUNTER",
+	SCOVERAGE_COUNTER:       "SCOVERAGE_COUNTER",
+	SCOVERAGE_AUXVAR:        "SCOVERAGE_AUXVAR",
+	SSEHUNWINDINFO:          "SSEHUNWINDINFO",
+}
+
+// String returns the string representation of the SymKind.
+// This replaces the stringer-generated String() method.
+func (s SymKind) String() string {
+	if int(s) < len(SymKindNames) && SymKindNames[s] != "" {
+		return SymKindNames[s]
+	}
+	return "SymKind(" + strconv.FormatInt(int64(s), 10) + ")"
+}
 
 // IsText reports whether t is one of the text kinds.
 func (t SymKind) IsText() bool {

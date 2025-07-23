@@ -6,6 +6,7 @@ package template
 
 import (
 	"fmt"
+	"strconv"
 	"text/template/parse"
 )
 
@@ -90,7 +91,6 @@ func (c context) mangle(templateName string) string {
 // is a single token in HTML's grammar but in a template spans several nodes.
 type state uint8
 
-//go:generate stringer -type state
 
 const (
 	// stateText is parsed character data. An HTML parser is in
@@ -160,6 +160,48 @@ const (
 	stateDead
 )
 
+// stateNames provides string representations for state constants, replacing stringer-generated state_string.go
+var stateNames = [...]string{
+	stateText:           "stateText",
+	stateTag:            "stateTag",
+	stateAttrName:       "stateAttrName",
+	stateAfterName:      "stateAfterName",
+	stateBeforeValue:    "stateBeforeValue",
+	stateHTMLCmt:        "stateHTMLCmt",
+	stateRCDATA:         "stateRCDATA",
+	stateAttr:           "stateAttr",
+	stateURL:            "stateURL",
+	stateSrcset:         "stateSrcset",
+	stateJS:             "stateJS",
+	stateJSDqStr:        "stateJSDqStr",
+	stateJSSqStr:        "stateJSSqStr",
+	stateJSTmplLit:      "stateJSTmplLit",
+	stateJSRegexp:       "stateJSRegexp",
+	stateJSBlockCmt:     "stateJSBlockCmt",
+	stateJSLineCmt:      "stateJSLineCmt",
+	stateJSHTMLOpenCmt:  "stateJSHTMLOpenCmt",
+	stateJSHTMLCloseCmt: "stateJSHTMLCloseCmt",
+	stateCSS:            "stateCSS",
+	stateCSSDqStr:       "stateCSSDqStr",
+	stateCSSSqStr:       "stateCSSSqStr",
+	stateCSSDqURL:       "stateCSSDqURL",
+	stateCSSSqURL:       "stateCSSSqURL",
+	stateCSSURL:         "stateCSSURL",
+	stateCSSBlockCmt:    "stateCSSBlockCmt",
+	stateCSSLineCmt:     "stateCSSLineCmt",
+	stateError:          "stateError",
+	stateDead:           "stateDead",
+}
+
+// String returns the string representation of the state.
+// This replaces the stringer-generated String() method.
+func (s state) String() string {
+	if int(s) < len(stateNames) && stateNames[s] != "" {
+		return stateNames[s]
+	}
+	return "state(" + strconv.FormatInt(int64(s), 10) + ")"
+}
+
 // isComment is true for any state that contains content meant for template
 // authors & maintainers, not for end-users or machines.
 func isComment(s state) bool {
@@ -196,7 +238,6 @@ func isInScriptLiteral(s state) bool {
 // delim is the delimiter that will end the current HTML attribute.
 type delim uint8
 
-//go:generate stringer -type delim
 
 const (
 	// delimNone occurs outside any attribute.
@@ -210,11 +251,27 @@ const (
 	delimSpaceOrTagEnd
 )
 
+// delimNames provides string representations for delim constants, replacing stringer-generated delim_string.go
+var delimNames = [...]string{
+	delimNone:          "delimNone",
+	delimDoubleQuote:   "delimDoubleQuote",
+	delimSingleQuote:   "delimSingleQuote",
+	delimSpaceOrTagEnd: "delimSpaceOrTagEnd",
+}
+
+// String returns the string representation of the delim.
+// This replaces the stringer-generated String() method.
+func (d delim) String() string {
+	if int(d) < len(delimNames) && delimNames[d] != "" {
+		return delimNames[d]
+	}
+	return "delim(" + strconv.FormatInt(int64(d), 10) + ")"
+}
+
 // urlPart identifies a part in an RFC 3986 hierarchical URL to allow different
 // encoding strategies.
 type urlPart uint8
 
-//go:generate stringer -type urlPart
 
 const (
 	// urlPartNone occurs when not in a URL, or possibly at the start:
@@ -231,11 +288,27 @@ const (
 	urlPartUnknown
 )
 
+// urlPartNames provides string representations for urlPart constants, replacing stringer-generated urlpart_string.go
+var urlPartNames = [...]string{
+	urlPartNone:        "urlPartNone",
+	urlPartPreQuery:    "urlPartPreQuery",
+	urlPartQueryOrFrag: "urlPartQueryOrFrag",
+	urlPartUnknown:     "urlPartUnknown",
+}
+
+// String returns the string representation of the urlPart.
+// This replaces the stringer-generated String() method.
+func (u urlPart) String() string {
+	if int(u) < len(urlPartNames) && urlPartNames[u] != "" {
+		return urlPartNames[u]
+	}
+	return "urlPart(" + strconv.FormatInt(int64(u), 10) + ")"
+}
+
 // jsCtx determines whether a '/' starts a regular expression literal or a
 // division operator.
 type jsCtx uint8
 
-//go:generate stringer -type jsCtx
 
 const (
 	// jsCtxRegexp occurs where a '/' would start a regexp literal.
@@ -246,6 +319,22 @@ const (
 	jsCtxUnknown
 )
 
+// jsCtxNames provides string representations for jsCtx constants, replacing stringer-generated jsctx_string.go
+var jsCtxNames = [...]string{
+	jsCtxRegexp:  "jsCtxRegexp",
+	jsCtxDivOp:   "jsCtxDivOp",
+	jsCtxUnknown: "jsCtxUnknown",
+}
+
+// String returns the string representation of the jsCtx.
+// This replaces the stringer-generated String() method.
+func (j jsCtx) String() string {
+	if int(j) < len(jsCtxNames) && jsCtxNames[j] != "" {
+		return jsCtxNames[j]
+	}
+	return "jsCtx(" + strconv.FormatInt(int64(j), 10) + ")"
+}
+
 // element identifies the HTML element when inside a start tag or special body.
 // Certain HTML element (for example <script> and <style>) have bodies that are
 // treated differently from stateText so the element type is necessary to
@@ -253,7 +342,6 @@ const (
 // end delimiter for the body.
 type element uint8
 
-//go:generate stringer -type element
 
 const (
 	// elementNone occurs outside a special tag or special element body.
@@ -269,7 +357,24 @@ const (
 	elementTitle
 )
 
-//go:generate stringer -type attr
+// elementNames provides string representations for element constants, replacing stringer-generated element_string.go
+var elementNames = [...]string{
+	elementNone:     "elementNone",
+	elementScript:   "elementScript",
+	elementStyle:    "elementStyle",
+	elementTextarea: "elementTextarea",
+	elementTitle:    "elementTitle",
+}
+
+// String returns the string representation of the element.
+// This replaces the stringer-generated String() method.
+func (e element) String() string {
+	if int(e) < len(elementNames) && elementNames[e] != "" {
+		return elementNames[e]
+	}
+	return "element(" + strconv.FormatInt(int64(e), 10) + ")"
+}
+
 
 // attr identifies the current HTML attribute when inside the attribute,
 // that is, starting from stateAttrName until stateTag/stateText (exclusive).
@@ -289,3 +394,22 @@ const (
 	// attrSrcset corresponds to a srcset attribute.
 	attrSrcset
 )
+
+// attrNames provides string representations for attr constants, replacing stringer-generated attr_string.go
+var attrNames = [...]string{
+	attrNone:       "attrNone",
+	attrScript:     "attrScript",
+	attrScriptType: "attrScriptType",
+	attrStyle:      "attrStyle",
+	attrURL:        "attrURL",
+	attrSrcset:     "attrSrcset",
+}
+
+// String returns the string representation of the attr.
+// This replaces the stringer-generated String() method.
+func (a attr) String() string {
+	if int(a) < len(attrNames) && attrNames[a] != "" {
+		return attrNames[a]
+	}
+	return "attr(" + strconv.FormatInt(int64(a), 10) + ")"
+}
