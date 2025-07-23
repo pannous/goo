@@ -441,10 +441,6 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.CallExpr)
 		return tcPrint(n)
 
-	case ir.OASSERT:
-		n := n.(*ir.UnaryExpr)
-		return tcAssert(n)
-
 	case ir.OPANIC:
 		n := n.(*ir.UnaryExpr)
 		return tcPanic(n)
