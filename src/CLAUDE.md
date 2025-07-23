@@ -23,7 +23,7 @@ Always replace interface{} with any
 To compile go, use the following command:
 
 cd /opt/other/go/src
-./make.bash 
+./make.bash 2>&1 | tail -10
 
 # Go Compiler Lexer/Scanner Summary
 
