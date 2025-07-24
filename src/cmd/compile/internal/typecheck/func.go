@@ -169,32 +169,13 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			return typecheck(n, top)
 
 		case ir.OPRINTF:
-			// Rewrite printf(args...) to fmt.Printf(args...) directly
+			// Simple approach: rewrite printf to fmt.Printf but handle it in walk phase
+			// This avoids the complex package identifier issues in typecheck
+			n.SetOp(l.BuiltinOp)
+			n.Fun = nil
 			typecheckargs(n)
-			
-			// Create the AST as if user wrote: fmt.Printf(args...)
-			// This is much simpler than runtime forwarding!
-			
-			// Create "fmt" identifier
-			fmtPkg := types.NewPkg("fmt", "fmt") 
-			fmtPkg.Direct = true
-			Target.Imports = append(Target.Imports, fmtPkg)
-			
-			// Create fmt identifier node  
-			fmtSym := fmtPkg.Lookup("")  // Empty string for package name
-			fmtIdent := ir.NewIdent(n.Pos(), fmtSym)
-			
-			// Create Printf symbol
-			printfSym := fmtPkg.Lookup("Printf")
-			
-			// Create fmt.Printf selector
-			selector := ir.NewSelectorExpr(n.Pos(), ir.OXDOT, fmtIdent, printfSym)
-			
-			// Replace this printf call with fmt.Printf call
-			call := ir.NewCallExpr(n.Pos(), ir.OCALLFUNC, selector, n.Args)
-			call.IsDDD = n.IsDDD
-			
-			return typecheck(call, top)
+			n.SetType(nil) // printf doesn't return a value
+			return n
 
 		case ir.OCAP, ir.OCLEAR, ir.OCLOSE, ir.OIMAG, ir.OLEN, ir.OPANIC, ir.OREAL, ir.OTYPEOF, ir.OUNSAFESTRINGDATA, ir.OUNSAFESLICEDATA:
 			typecheckargs(n)

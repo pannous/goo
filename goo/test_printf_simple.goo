@@ -1,6 +1,1 @@
-#\!/usr/bin/env goo
-package main
-
-func main() {
-	printf("Hello %%v", 42)
-}
+package main; func main() { printf("Hello", 42, true) }
