@@ -60,7 +60,7 @@ func FDumpAny(w io.Writer, root interface{}, filter string, depth int) {
 	}
 
 	p.dump(reflect.ValueOf(root), depth)
-	p.printf("\n")
+	p.fprintf("\n")
 }
 
 type dumper struct {
@@ -109,8 +109,8 @@ func (p *dumper) Write(data []byte) (n int, err error) {
 	return
 }
 
-// printf is a convenience wrapper.
-func (p *dumper) printf(format string, args ...interface{}) {
+// fprintf is a convenience wrapper.
+func (p *dumper) fprintf(format string, args ...interface{}) {
 	if _, err := fmt.Fprintf(p, format, args...); err != nil {
 		panic(err)
 	}
@@ -136,36 +136,36 @@ func (p *dumper) addr(x reflect.Value) string {
 // dump prints the contents of x.
 func (p *dumper) dump(x reflect.Value, depth int) {
 	if depth == 0 {
-		p.printf("…")
+		p.fprintf("…")
 		return
 	}
 
 	if pos, ok := x.Interface().(src.XPos); ok {
-		p.printf("%s", base.FmtPos(pos))
+		p.fprintf("%s", base.FmtPos(pos))
 		return
 	}
 
 	switch x.Kind() {
 	case reflect.String:
-		p.printf("%q", x.Interface()) // print strings in quotes
+		p.fprintf("%q", x.Interface()) // print strings in quotes
 
 	case reflect.Interface:
 		if x.IsNil() {
-			p.printf("nil")
+			p.fprintf("nil")
 			return
 		}
 		p.dump(x.Elem(), depth-1)
 
 	case reflect.Ptr:
 		if x.IsNil() {
-			p.printf("nil")
+			p.fprintf("nil")
 			return
 		}
 
-		p.printf("*")
+		p.fprintf("*")
 		ptr := x.Pointer()
 		if line, exists := p.ptrmap[ptr]; exists {
-			p.printf("(@%d)", line)
+			p.fprintf("(@%d)", line)
 			return
 		}
 		p.ptrmap[ptr] = p.line
@@ -173,21 +173,21 @@ func (p *dumper) dump(x reflect.Value, depth int) {
 
 	case reflect.Slice:
 		if x.IsNil() {
-			p.printf("nil")
+			p.fprintf("nil")
 			return
 		}
-		p.printf("%s (%d entries) {", x.Type(), x.Len())
+		p.fprintf("%s (%d entries) {", x.Type(), x.Len())
 		if x.Len() > 0 {
 			p.indent++
-			p.printf("\n")
+			p.fprintf("\n")
 			for i, n := 0, x.Len(); i < n; i++ {
-				p.printf("%d: ", i)
+				p.fprintf("%d: ", i)
 				p.dump(x.Index(i), depth-1)
-				p.printf("\n")
+				p.fprintf("\n")
 			}
 			p.indent--
 		}
-		p.printf("}")
+		p.fprintf("}")
 
 	case reflect.Struct:
 		typ := x.Type()
@@ -195,9 +195,9 @@ func (p *dumper) dump(x reflect.Value, depth int) {
 		isNode := false
 		if n, ok := x.Interface().(Node); ok {
 			isNode = true
-			p.printf("%s %s {", n.Op().String(), p.addr(x))
+			p.fprintf("%s %s {", n.Op().String(), p.addr(x))
 		} else {
-			p.printf("%s {", typ)
+			p.fprintf("%s {", typ)
 		}
 		p.indent++
 
@@ -228,23 +228,23 @@ func (p *dumper) dump(x reflect.Value, depth int) {
 				}
 
 				if first {
-					p.printf("\n")
+					p.fprintf("\n")
 					first = false
 				}
-				p.printf("%s: ", name)
+				p.fprintf("%s: ", name)
 				p.dump(x, depth-1)
-				p.printf("\n")
+				p.fprintf("\n")
 			}
 		}
 		if omitted {
-			p.printf("…\n")
+			p.fprintf("…\n")
 		}
 
 		p.indent--
-		p.printf("}")
+		p.fprintf("}")
 
 	default:
-		p.printf("%v", x.Interface())
+		p.fprintf("%v", x.Interface())
 	}
 }
 

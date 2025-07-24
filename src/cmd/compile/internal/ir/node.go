@@ -102,7 +102,6 @@ func TakeInit(n Node) Nodes {
 	return init
 }
 
-
 type Op uint8
 
 // Node ops.
@@ -223,7 +222,7 @@ const (
 	OPANIC            // panic(X)
 	OPRINT            // print(List)
 	OPRINTLN          // println(List)
-	OPRINTF           // printf(List) - fmt.Println with auto-import
+	OPRINTF           // UNUSED - printf forwarded to fmt.Println during typecheck
 	OPAREN            // (X)
 	OSEND             // Chan <- Value
 	OSLICE            // X[Low : High] (X is untypechecked or slice)
@@ -311,7 +310,6 @@ const (
 
 	OEND
 )
-
 
 // IsCmp reports whether op is a comparison operation (==, !=, <, <=,
 // >, or >=).

@@ -237,6 +237,10 @@ func (checks *Checker) collectObjects() {
 		// we get "." as the directory which is what we would want.
 		fileDir := dir(file.PkgName.Pos().RelFilename()) // TODO(gri) should this be filename?
 
+		// TODO: Auto-inject import "fmt" if file uses printf but doesn't import fmt
+		// injectFmtImportIfNeeded(file, fileDir, checks, fileScope)
+
+
 		first := -1                // index of first ConstDecl in the current group, or -1
 		var last *syntax.ConstDecl // last ConstDecl with init expressions, or nil
 		for index, decl := range file.DeclList {
@@ -748,4 +752,86 @@ func dir(path string) string {
 	}
 	// i <= 0
 	return "."
+}
+
+// injectFmtImportIfNeeded scans the file for printf usage and automatically
+// injects import "fmt" if printf is used but fmt is not already imported.
+func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker, fileScope *Scope) {
+	needsFmtImport := false
+	hasFmtImport := false
+	
+	// First check if fmt is already imported
+	for _, decl := range file.DeclList {
+		if imp, ok := decl.(*syntax.ImportDecl); ok && imp.Path != nil {
+			if path, _ := strconv.Unquote(imp.Path.Value); path == "fmt" {
+				hasFmtImport = true
+				break
+			}
+		}
+	}
+	
+	// If fmt not imported, scan for printf usage
+	if !hasFmtImport {
+		syntax.Inspect(file, func(n syntax.Node) bool {
+			if call, ok := n.(*syntax.CallExpr); ok {
+				if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "printf" {
+					needsFmtImport = true
+					return false // found printf, stop searching
+				}
+			}
+			return true
+		})
+	}
+	
+	// Inject import "fmt" by processing it exactly like a regular import
+	if needsFmtImport {
+		// Create synthetic import declaration
+		importPath := &syntax.BasicLit{
+			Value: `"fmt"`,
+			Kind:  syntax.StringLit,
+		}
+		importPath.SetPos(file.PkgName.Pos())
+		
+		fmtImport := &syntax.ImportDecl{
+			Path: importPath,
+		}
+		fmtImport.SetPos(importPath.Pos())
+		
+		// Process this import using the exact same logic as regular imports
+		path, err := validatedImportPath(importPath.Value)
+		if err != nil {
+			checks.errorf(importPath, BadImportPath, "auto-import failed: invalid path (%s)", err)
+			return
+		}
+
+		imp := checks.importPackage(importPath.Pos(), path, fileDir)
+		if imp == nil {
+			// Import failed - don't inject the import declaration
+			return
+		}
+
+		// Create package name - use the imported package name
+		pkgName := NewPkgName(fmtImport.Pos(), checks.pkg, imp.name, imp)
+
+		// Declare the imported package in file scope
+		checks.declare(fileScope, nil, pkgName, nopos)
+
+		// Add to package imports list (avoid duplicates)
+		found := false
+		for _, existing := range checks.pkg.imports {
+			if existing == imp {
+				found = true
+				break
+			}
+		}
+		if !found {
+			checks.pkg.imports = append(checks.pkg.imports, imp)
+		}
+
+		// Add to checks.imports for consistency
+		checks.imports = append(checks.imports, pkgName)
+		
+		// NOTE: Don't add to file.DeclList - just handle the import programmatically
+		// The AST transformation in call.go will handle the printf -> fmt.Println conversion
+	}
 }

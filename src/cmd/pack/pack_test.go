@@ -212,22 +212,22 @@ func TestLargeDefs(t *testing.T) {
 	}
 	b := bufio.NewWriter(f)
 
-	printf := func(format string, args ...any) {
+	fprintf := func(format string, args ...any) {
 		_, err := fmt.Fprintf(b, format, args...)
 		if err != nil {
 			t.Fatalf("Writing to %s: %v", large, err)
 		}
 	}
 
-	printf("package large\n\ntype T struct {\n")
+	fprintf("package large\n\ntype T struct {\n")
 	for i := 0; i < 1000; i++ {
-		printf("f%d int `tag:\"", i)
+		fprintf("f%d int `tag:\"", i)
 		for j := 0; j < 100; j++ {
-			printf("t%d=%d,", j, j)
+			fprintf("t%d=%d,", j, j)
 		}
-		printf("\"`\n")
+		fprintf("\"`\n")
 	}
-	printf("}\n")
+	fprintf("}\n")
 	if err = b.Flush(); err != nil {
 		t.Fatal(err)
 	}

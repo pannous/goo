@@ -674,10 +674,14 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 			checks.recordBuiltinType(call.Fun, makeSig(nil, &emptyInterface))
 		}
 
-	case _Print, _Println, _Printf:
+	case _Printf:
+		// printf is handled by AST transformation in callExpr, not as a builtin
+		// This case should never be reached due to early transformation
+		checks.errorf(call, InvalidSyntaxTree, "printf should have been transformed to fmt.Println")
+
+	case _Print, _Println:
 		// print(x, y, ...)
 		// println(x, y, ...)
-		// printf(x, y, ...)
 		var params []Type
 		if nargs > 0 {
 			params = make([]Type, nargs)

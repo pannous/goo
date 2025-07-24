@@ -5,13 +5,10 @@
 package typecheck
 
 import (
-	"fmt"
-	"go/constant"
-	"os"
-
 	"cmd/compile/internal/ir"
 	"cmd/compile/internal/types"
 	"cmd/internal/src"
+	"go/constant"
 )
 
 var (
@@ -49,7 +46,6 @@ var builtinFuncs = [...]struct {
 	{"panic", ir.OPANIC},
 	{"print", ir.OPRINT},
 	{"println", ir.OPRINTLN},
-	{"printf", ir.OPRINTF},
 	{"real", ir.OREAL},
 	{"recover", ir.ORECOVER},
 	{"typeof", ir.OTYPEOF},
@@ -77,9 +73,6 @@ func InitUniverse() {
 	})
 
 	for _, s := range &builtinFuncs {
-		if s.name == "printf" {
-			fmt.Fprintf(os.Stderr, "DEBUG: Registering printf builtin with op %v\n", s.op)
-		}
 		ir.NewBuiltin(types.BuiltinPkg.Lookup(s.name), s.op)
 	}
 

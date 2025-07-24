@@ -10,6 +10,7 @@ import (
 	"internal/types/errors"
 	"regexp"
 	"sort"
+	"strconv"
 
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/rangefunc"
@@ -35,6 +36,10 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	fileBaseMap := make(map[*syntax.PosBase]*syntax.File)
 	for i, p := range noders {
 		files[i] = p.file
+		
+		// TODO: Auto-inject import "fmt" if file uses printf but doesn't import fmt
+		// injectFmtImportIfNeeded(p.file)
+		
 		// The file.Pos() is the position of the package clause.
 		// If there's a //line directive before that, file.Pos().Base()
 		// refers to that directive, not the file itself.
@@ -269,5 +274,60 @@ func (f *cycleFinder) visit(typ0 types2.Type) bool {
 			}
 			return false
 		}
+	}
+}
+
+// injectFmtImportIfNeeded scans the file for printf usage and automatically
+// injects import "fmt" if printf is used but fmt is not already imported.
+func injectFmtImportIfNeeded(file *syntax.File) {
+	needsFmtImport := false
+	hasFmtImport := false
+	
+	// First check if fmt is already imported
+	for _, decl := range file.DeclList {
+		if imp, ok := decl.(*syntax.ImportDecl); ok && imp.Path != nil {
+			if path, _ := strconv.Unquote(imp.Path.Value); path == "fmt" {
+				hasFmtImport = true
+				break
+			}
+		}
+	}
+	
+	// If fmt not imported, scan for printf usage
+	if !hasFmtImport {
+		syntax.Inspect(file, func(n syntax.Node) bool {
+			if call, ok := n.(*syntax.CallExpr); ok {
+				if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "printf" {
+					needsFmtImport = true
+					return false // found printf, stop searching
+				}
+			}
+			return true
+		})
+	}
+	
+	// Inject import "fmt" if needed
+	if needsFmtImport {
+		// Create import path literal exactly like the parser would
+		importPath := &syntax.BasicLit{
+			Value: `"fmt"`,
+			Kind:  syntax.StringLit,
+		}
+		// Use the package name position for the import
+		pos := file.PkgName.Pos()
+		if len(file.DeclList) > 0 {
+			// If there are existing declarations, use their position
+			pos = file.DeclList[0].Pos()
+		}
+		importPath.SetPos(pos)
+		
+		// Create import declaration
+		fmtImport := &syntax.ImportDecl{
+			Path: importPath,
+		}
+		fmtImport.SetPos(pos)
+		
+		// Insert at the beginning of declaration list
+		file.DeclList = append([]syntax.Decl{fmtImport}, file.DeclList...)
 	}
 }

@@ -7,7 +7,6 @@ package typecheck
 import (
 	"fmt"
 	"go/constant"
-	"os"
 	"strings"
 
 	"cmd/compile/internal/base"
@@ -224,10 +223,6 @@ func typecheck1(n ir.Node, top int) ir.Node {
 
 	case ir.ONAME:
 		n := n.(*ir.Name)
-		// Debug: check all names for printf
-		if n.Sym() != nil && n.Sym().Name == "printf" {
-			fmt.Fprintf(os.Stderr, "DEBUG: typecheck1 ONAME printf, BuiltinOp=%v, sym.Def=%v\n", n.BuiltinOp, n.Sym().Def)
-		}
 		if n.BuiltinOp != 0 {
 			if top&ctxCallee == 0 {
 				base.Errorf("use of builtin %v not in function call", n.Sym())
@@ -442,9 +437,10 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return tcNew(n)
 
-	case ir.OPRINT, ir.OPRINTLN, ir.OPRINTF:
+	case ir.OPRINT, ir.OPRINTLN:
 		n := n.(*ir.CallExpr)
 		return tcPrint(n)
+
 
 	case ir.OPANIC:
 		n := n.(*ir.UnaryExpr)

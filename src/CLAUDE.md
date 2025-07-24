@@ -119,12 +119,24 @@ use bin/go instead of global go!
  - 
 To avoid code duplication do a quick git history search (grep?) to see if there have been related changes
 
-I don't understand why it's so hard to just rewrite printf as fmt.Println
-Remove the old 'backup' mechanism to make printf use builtin print!!
+I don't understand why it's so hard to just 
+Rewrite printf as fmt.Println in the AST (via keyword/token/builtin??)
 You should just forward everything via the compiler to fmt.Println, not through the runtime!
+so treat it very differently(!) than the other builtins print, println 
+Do NOT treat it as case ir.OPRINT, ir.OPRINTLN
+Do NOT forward to builtin println, forward to fmt.Println instead!!!
 For this to work you need to automatically import fmt in the file where you use printf.                          │
 But let's skip this for later and always include fmt (might break the compiler boot-strapping?)
-# Test
+
+### current todo:
+/opt/other/go/src/cmd/compile/internal/typecheck/func.go
+
+### Test printf :
 cd /opt/other/go/src/
+GOROOT=/opt/other/go ../bin/go ../goo/test_printf.go
 GOROOT=/opt/other/go ../bin/go ../goo/test_printf_fmt.go
 Do not modify the test do not create new tests for now 
+
+
+may conflict with package printf!
+"For details of a specific checker such as 'printf', see 'go tool vet help printf'."

@@ -52,7 +52,6 @@ func walkStmt(n ir.Node) ir.Node {
 		ir.OSEND,
 		ir.OPRINT,
 		ir.OPRINTLN,
-		ir.OPRINTF,
 		ir.OPANIC,
 		ir.ORECOVERFP,
 		ir.OGETG:
@@ -68,6 +67,7 @@ func walkStmt(n ir.Node) ir.Node {
 			n = ir.NewBlockStmt(n.Pos(), init)
 			init = nil
 		}
+		
 		if len(init) > 0 {
 			switch n.Op() {
 			case ir.OAS, ir.OAS2, ir.OBLOCK:

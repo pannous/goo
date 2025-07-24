@@ -220,7 +220,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	internalError := func(err error) {
 		rw.WriteHeader(http.StatusInternalServerError)
-		h.printf("CGI error: %v", err)
+		h.fprintf("CGI error: %v", err)
 	}
 
 	cmd := &exec.Cmd{
@@ -259,7 +259,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		line, isPrefix, err := linebody.ReadLine()
 		if isPrefix {
 			rw.WriteHeader(http.StatusInternalServerError)
-			h.printf("cgi: long header line from subprocess.")
+			h.fprintf("cgi: long header line from subprocess.")
 			return
 		}
 		if err == io.EOF {
@@ -267,7 +267,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			h.printf("cgi: error reading headers: %v", err)
+			h.fprintf("cgi: error reading headers: %v", err)
 			return
 		}
 		if len(line) == 0 {
@@ -277,24 +277,24 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		headerLines++
 		header, val, ok := strings.Cut(string(line), ":")
 		if !ok {
-			h.printf("cgi: bogus header line: %s", line)
+			h.fprintf("cgi: bogus header line: %s", line)
 			continue
 		}
 		if !httpguts.ValidHeaderFieldName(header) {
-			h.printf("cgi: invalid header name: %q", header)
+			h.fprintf("cgi: invalid header name: %q", header)
 			continue
 		}
 		val = textproto.TrimString(val)
 		switch {
 		case header == "Status":
 			if len(val) < 3 {
-				h.printf("cgi: bogus status (short): %q", val)
+				h.fprintf("cgi: bogus status (short): %q", val)
 				return
 			}
 			code, err := strconv.Atoi(val[0:3])
 			if err != nil {
-				h.printf("cgi: bogus status: %q", val)
-				h.printf("cgi: line was %q", line)
+				h.fprintf("cgi: bogus status: %q", val)
+				h.fprintf("cgi: line was %q", line)
 				return
 			}
 			statusCode = code
@@ -304,7 +304,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 	if headerLines == 0 || !sawBlankLine {
 		rw.WriteHeader(http.StatusInternalServerError)
-		h.printf("cgi: no headers")
+		h.fprintf("cgi: no headers")
 		return
 	}
 
@@ -320,7 +320,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	if statusCode == 0 && headers.Get("Content-Type") == "" {
 		rw.WriteHeader(http.StatusInternalServerError)
-		h.printf("cgi: missing required Content-Type in headers")
+		h.fprintf("cgi: missing required Content-Type in headers")
 		return
 	}
 
@@ -341,7 +341,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	_, err = io.Copy(rw, linebody)
 	if err != nil {
-		h.printf("cgi: copy error: %v", err)
+		h.fprintf("cgi: copy error: %v", err)
 		// And kill the child CGI process so we don't hang on
 		// the deferred cmd.Wait above if the error was just
 		// the client (rw) going away. If it was a read error
@@ -352,7 +352,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) printf(format string, v ...any) {
+func (h *Handler) fprintf(format string, v ...any) {
 	if h.Logger != nil {
 		h.Logger.Printf(format, v...)
 	} else {
@@ -364,7 +364,7 @@ func (h *Handler) handleInternalRedirect(rw http.ResponseWriter, req *http.Reque
 	url, err := req.URL.Parse(path)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
-		h.printf("cgi: error resolving local URI path %q: %v", path, err)
+		h.fprintf("cgi: error resolving local URI path %q: %v", path, err)
 		return
 	}
 	// TODO: RFC 3875 isn't clear if only GET is supported, but it
