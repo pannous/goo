@@ -7,6 +7,8 @@ package walk
 import (
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/ir"
+	"cmd/compile/internal/types"
+	"go/constant"
 )
 
 // The result of walkStmt MUST be assigned back to n, e.g.
@@ -92,6 +94,9 @@ func walkStmt(n ir.Node) ir.Node {
 		ir.ODCL,
 		ir.OCHECKNIL:
 		return n
+
+	case ir.OCHECK:
+		return walkCheck(n.(*ir.CheckStmt))
 
 	case ir.OBLOCK:
 		n := n.(*ir.BlockStmt)
@@ -226,4 +231,27 @@ func walkIf(n *ir.IfStmt) ir.Node {
 	walkStmtList(n.Body)
 	walkStmtList(n.Else)
 	return n
+}
+
+// walkCheck walks an OCHECK node.
+func walkCheck(n *ir.CheckStmt) ir.Node {
+	// Convert check condition to: if !condition { panic("check failed") }
+	var init ir.Nodes
+	cond := walkExpr(n.Cond, &init)
+	
+	// Create NOT expression and typecheck it
+	notCond := ir.NewUnaryExpr(n.Pos(), ir.ONOT, cond)
+	notCond.SetType(types.Types[types.TBOOL])
+	notCond.SetTypecheck(1)
+	
+	// Create panic call
+	condStr := ir.NewBasicLit(n.Pos(), types.Types[types.TSTRING], constant.MakeString("check failed"))
+	panicCall := mkcall("gopanic", nil, &init, condStr)
+	
+	// Create if statement: if !condition { panic(...) }
+	ifStmt := ir.NewIfStmt(n.Pos(), notCond, []ir.Node{panicCall}, nil)
+	if len(init) > 0 {
+		ifStmt.PtrInit().Prepend(init...)
+	}
+	return walkIf(ifStmt)
 }

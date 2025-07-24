@@ -17,7 +17,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 no Main needed ☐  implicit package main  
 🗹 printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
 🗹 typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?
-🗹 assert / check 1>2 // panic if false, otherwise do nothing
+🗹 check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } 
 🗹 z := map{"a": 1, "b": 2}  => map[any]any{…}
 🗹 z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
 🗹 z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
@@ -34,7 +34,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.
 ☐ silent/implicit error propagation
 ☐ for loops    
-☐ enums via struct  
+☐ enums via struct or const ( ILLEGAL Token = iota
 ☐ class via struct  
 ☐ imported and not used only warning 
 ☐ cross off all done tasks from this list  

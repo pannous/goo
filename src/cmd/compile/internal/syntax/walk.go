@@ -308,6 +308,9 @@ func (w walker) node(n Node) {
 		}
 		w.stmtList(n.Body)
 
+	case *CheckStmt:
+		w.node(n.Cond)
+
 	default:
 		panic(fmt.Sprintf("internal error: unknown node type %T", n))
 	}

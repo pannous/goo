@@ -78,6 +78,10 @@ func (e *escape) stmt(n ir.Node) {
 		n := n.(*ir.UnaryExpr)
 		e.discard(n.X)
 
+	case ir.OCHECK:
+		n := n.(*ir.CheckStmt)
+		e.discard(n.Cond)
+
 	case ir.OFOR:
 		n := n.(*ir.ForStmt)
 		base.Assert(!n.DistinctVars) // Should all be rewritten before escape analysis

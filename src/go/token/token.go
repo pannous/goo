@@ -16,6 +16,8 @@ import (
 type Token int
 
 // The list of tokens.
+// ⚠️ Is it safe to insert new tokens in the middle? NO :
+// New operations - always add at end to maintain bootstrap compatibility
 const (
 	// Special tokens
 	ILLEGAL Token = iota
@@ -97,6 +99,7 @@ const (
 	BREAK
 	CASE
 	CHAN
+	CHECK // like assert: check 1 > 0
 	CONST
 	CONTINUE
 
@@ -203,6 +206,7 @@ var tokens = [...]string{
 	BREAK:    "break",
 	CASE:     "case",
 	CHAN:     "chan",
+	CHECK:    "check",
 	CONST:    "const",
 	CONTINUE: "continue",
 
