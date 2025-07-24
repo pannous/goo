@@ -1,11 +1,6 @@
-package main
+name := "Go"
+version := 1.25.5
+printf("Welcome to %s version %.2f!\n", name, version)
 
-func main() {
-	// This tests that fmt is auto-imported when printf is used
-	name := "Go"
-	version := 1.25
-	printf("Welcome to %s version %.2f!\n", name, version)
-	
-	// This should also work because fmt was auto-imported
-	fmt.Println("fmt.Println also works now!")
-}
+// This should also work because fmt was auto-imported
+fmt.Println("fmt.Println also works now!")

@@ -35,8 +35,11 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	fileBaseMap := make(map[*syntax.PosBase]*syntax.File)
 	for i, p := range noders {
 		files[i] = p.file
-		
-		
+
+		// if file uses printf but doesn't import fmt => auto-inject import "fmt"
+		// removed after de5ce568ce 2025-07-25 00:17 because we always import "fmt"
+		// injectFmtImportIfNeeded(p.file)
+
 		// The file.Pos() is the position of the package clause.
 		// If there's a //line directive before that, file.Pos().Base()
 		// refers to that directive, not the file itself.
@@ -77,13 +80,13 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	conf.Error = func(err error) {
 		terr := err.(types2.Error)
 		msg := terr.Msg
-		
+
 		// Convert unused import errors to warnings
 		if terr.Code == errors.UnusedImport {
 			base.WarnfAt(m.makeXPos(terr.Pos), "%s", msg)
 			return
 		}
-		
+
 		if versionErrorRx.MatchString(msg) {
 			fileBase := terr.Pos.FileBase()
 			fileVersion := info.FileVersions[fileBase]
@@ -106,7 +109,6 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	if err != nil {
 		base.FatalfAt(src.NoXPos, "conf.Check error: %v", err)
 	}
-
 
 	// Check for anonymous interface cycles (#56103).
 	// TODO(gri) move this code into the type checkers (types2 and go/types)
@@ -281,5 +283,3 @@ func (f *cycleFinder) visit(typ0 types2.Type) bool {
 		}
 	}
 }
-
-
