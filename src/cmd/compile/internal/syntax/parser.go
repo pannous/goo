@@ -407,12 +407,14 @@ func (p *parser) fileOrNil() *File {
 	f.GoVersion = p.goVersion
 	p.top = false
 	if !p.got(_Package) {
-		p.syntaxError("package statement must be first")
-		return nil
+		// Auto-inject "package main" if no package declaration found
+		f.Pragma = nil
+		f.PkgName = NewName(p.pos(), "main")
+	} else {
+		f.Pragma = p.takePragma()
+		f.PkgName = p.name()
+		p.want(_Semi)
 	}
-	f.Pragma = p.takePragma()
-	f.PkgName = p.name()
-	p.want(_Semi)
 
 	// don't bother continuing if package clause has errors
 	if p.first != nil {

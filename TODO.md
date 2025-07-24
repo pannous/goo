@@ -25,3 +25,8 @@ malformed go.sum:
      hint: run "git revert --abort".
      hint: Disable this message with "git config set advice.mergeConflict false"
      Recorded preimage for 'src/CLAUDE.md'
+
+haha 
+       ../goo/test_printf.go:7:2: printf("OK") (no value) is not used
+   ../goo/test_printf_discard.go:4:6: printf("OK") (no value) used as value
+  yeah Let me sleep about that     

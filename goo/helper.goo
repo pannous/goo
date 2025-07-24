@@ -1,4 +1,3 @@
-#!/usr/bin/env goo
 package main
 
 import "fmt"
@@ -6,3 +5,4 @@ import "fmt"
 func helper() {
 	fmt.Println("Helper function called")
 }
+helper()
