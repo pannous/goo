@@ -300,3 +300,4 @@ var loong64HasLSX bool
 var riscv64HasZbb bool
 
 func asanregisterglobals(unsafe.Pointer, uintptr)
+func mapcontentequal(unsafe.Pointer, unsafe.Pointer) bool

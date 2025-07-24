@@ -339,10 +339,8 @@ func geneq(t *types.Type) *obj.LSym {
 		objw.Global(closure, int32(ot), obj.DUPOK|obj.RODATA)
 		return closure
 	case types.ASPECIAL:
-		// Check if this is a map type
-		if t.IsMap() {
-			return sysClosure("mapequal")
-		}
+		// Maps temporarily fall through to generate custom equality
+		// TODO: Use sysClosure("mapcontentequal") when linkage is resolved
 		break
 	}
 
@@ -400,6 +398,19 @@ func eqFunc(t *types.Type) *ir.Func {
 	switch t.Kind() {
 	default:
 		base.Fatalf("geneq %v", t)
+
+	case types.TMAP:
+		// For now, generate simple reference equality for maps
+		// TODO: Implement full content comparison when linkage is resolved
+		
+		// return *p == *q (reference equality)
+		np_deref := ir.NewStarExpr(base.Pos, np)
+		nq_deref := ir.NewStarExpr(base.Pos, nq)
+		eq := ir.NewBinaryExpr(base.Pos, ir.OEQ, np_deref, nq_deref)
+		eq.SetType(types.Types[types.TBOOL])
+		
+		ret := ir.NewReturnStmt(base.Pos, []ir.Node{eq})
+		fn.Body.Append(ret)
 
 	case types.TARRAY:
 		nelem := t.NumElem()
