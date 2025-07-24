@@ -2894,14 +2894,25 @@ func (p *parser) parseFile() *ast.File {
 
 	// package clause
 	doc := p.leadComment
-	pos := p.expect(token.PACKAGE)
-	// Go spec: The package clause is not a declaration;
-	// the package name does not appear in any scope.
-	ident := p.parseIdent()
-	if ident.Name == "_" && p.mode&DeclarationErrors != 0 {
-		p.error(p.pos, "invalid package name _")
+	var pos token.Pos
+	var ident *ast.Ident
+	if p.tok == token.PACKAGE {
+		pos = p.expect(token.PACKAGE)
+		// Go spec: The package clause is not a declaration;
+		// the package name does not appear in any scope.
+		ident = p.parseIdent()
+		if ident.Name == "_" && p.mode&DeclarationErrors != 0 {
+			p.error(p.pos, "invalid package name _")
+		}
+		p.expectSemi()
+	} else {
+		// Auto-inject "package main" if no package declaration found
+		pos = p.pos
+		ident = &ast.Ident{
+			NamePos: pos,
+			Name:     "main",
+		}
 	}
-	p.expectSemi()
 
 	// Don't bother parsing the rest if we had errors parsing the package clause.
 	// Likely not a Go source file at all.
