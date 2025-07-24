@@ -24,10 +24,10 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator
 ✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮
 ✅ go command should default to run, so go test.go should work  
+✅ def as synonym for func, e.g. def main() { ... }  
 ☐ for keyword := keywords  => for _, keyword := range keywords { __
 ☐ String methods "abc".contains("a")
-☐ return void, e.g. return print("ok")  
-☐ def as synonym for func, e.g. def main() { ... }  
+☐ return void, e.g. return print("ok") HARD  
 ☐ void(!) as synonym for func, e.g. void main(){}
 ☐ public() -> Public() calls OK // as compiler plugin?
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.
