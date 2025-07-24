@@ -477,6 +477,16 @@ func (p *parser) fileOrNil() *File {
 				f.DeclList = append(f.DeclList, d)
 			}
 
+		case _Name:
+			if p.lit == "def" {
+				p.next()
+				if d := p.funcDeclOrNil(); d != nil {
+					f.DeclList = append(f.DeclList, d)
+				}
+				break
+			}
+			fallthrough
+
 		default:
 			if p.tok == _Lbrace && len(f.DeclList) > 0 && isEmptyFuncDecl(f.DeclList[len(f.DeclList)-1]) {
 				// opening { of function declaration on next line
@@ -1494,6 +1504,7 @@ func (p *parser) typeOrNil() Expr {
 		p.next()
 		_, t := p.funcType("function type")
 		return t
+
 
 	case _Lbrack:
 		// '[' oexpr ']' ntype
