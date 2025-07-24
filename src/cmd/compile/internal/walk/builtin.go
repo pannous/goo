@@ -1078,133 +1078,49 @@ func isChanLenCap(n ir.Node) bool {
 	return (n.Op() == ir.OLEN || n.Op() == ir.OCAP) && n.(*ir.UnaryExpr).X.Type().IsChan()
 }
 
-// walkPrintf walks an OPRINTF node to behave like fmt.Println with better formatting.
+// walkPrintf walks an OPRINTF node to forward directly to fmt.Println.
 func walkPrintf(nn *ir.CallExpr, init *ir.Nodes) ir.Node {
 	// Walk arguments first
 	walkExprListCheap(nn.Args, init)
 	
-	// Check if fmt package is imported
-	var fmtPkg *types.Pkg
+	// Always ensure fmt package is available
+	fmtPkg := types.NewPkg("fmt", "fmt")
+	if fmtPkg == nil {
+		base.Fatalf("cannot create fmt package for printf")
+	}
+	
+	// Add fmt to imports if not already present
+	found := false
 	for _, pkg := range typecheck.Target.Imports {
 		if pkg.Path == "fmt" {
 			fmtPkg = pkg
+			found = true
 			break
 		}
 	}
-	
-	if fmtPkg != nil {
-		// fmt is imported, try to use fmt.Println
-		printlnSym := fmtPkg.Lookup("Println")
-		if printlnSym != nil && printlnSym.Def != nil {
-			// Create package identifier
-			pkgName := ir.NewIdent(base.Pos, fmtPkg.Lookup(fmtPkg.Name))
-			pkgName.SetType(types.Types[types.TINTER]) // placeholder type
-			pkgName.SetTypecheck(1)
-			
-			// Create selector expression for fmt.Println  
-			sel := ir.NewSelectorExpr(base.Pos, ir.OXDOT, pkgName, printlnSym)
-			
-			// Create call to fmt.Println
-			call := ir.NewCallExpr(base.Pos, ir.OCALL, sel, nn.Args)
-			call = typecheck.Expr(call).(*ir.CallExpr)
-			
-			return walkExpr(call, init)
-		}
+	if !found {
+		typecheck.Target.Imports = append(typecheck.Target.Imports, fmtPkg)
 	}
 	
-	// For printf, we'll format like fmt.Println - space-separated with newline
-	// This is similar to println but with more formatting
-	s := nn.Args
-	t := make([]ir.Node, 0, len(s)*2)
-	for i, n := range s {
-		if i != 0 {
-			// Add space between arguments like fmt.Println
-			t = append(t, ir.NewString(base.Pos, " "))
-		}
-		t = append(t, n)
+	// Get fmt.Println symbol
+	printlnSym := fmtPkg.Lookup("Println")
+	if printlnSym == nil {
+		base.Fatalf("cannot find fmt.Println")
 	}
-	// Add newline at the end like fmt.Println
-	t = append(t, ir.NewString(base.Pos, "\n"))
-	nn.Args = t
 	
-	// Collapse runs of constant strings
-	s = nn.Args
-	args := make([]ir.Node, 0, len(s))
-	for i := 0; i < len(s); {
-		var strs []string
-		for i < len(s) && ir.IsConst(s[i], constant.String) {
-			strs = append(strs, ir.StringVal(s[i]))
-			i++
-		}
-		if len(strs) > 0 {
-			args = append(args, ir.NewString(base.Pos, strings.Join(strs, "")))
-		}
-		if i < len(s) {
-			args = append(args, s[i])
-			i++
-		}
-	}
-	nn.Args = args
+	// Create package identifier for fmt
+	pkgName := ir.NewIdent(base.Pos, fmtPkg.Lookup("fmt"))
+	pkgName.SetType(types.Types[types.TINTER])
+	pkgName.SetTypecheck(1)
 	
-	// Use the same runtime calls as print/println but with printf formatting
-	calls := []ir.Node{mkcall("printlock", nil, init)}
-	for _, n := range nn.Args {
-		if n.Op() == ir.OLITERAL {
-			if n.Type() == types.UntypedRune {
-				n = typecheck.DefaultLit(n, types.RuneType)
-			}
-			
-			switch n.Val().Kind() {
-			case constant.Int:
-				n = typecheck.DefaultLit(n, types.Types[types.TINT64])
-			case constant.Float:
-				n = typecheck.DefaultLit(n, types.Types[types.TFLOAT64])
-			}
-		}
-		
-		var on *ir.Name
-		switch n.Type().Kind() {
-		case types.TINT8, types.TINT16, types.TINT32, types.TINT64, types.TINT, types.TUINT8, types.TUINT16, types.TUINT32, types.TUINT64, types.TUINT, types.TUINTPTR:
-			if n.Type().IsSigned() {
-				on = typecheck.LookupRuntime("printint")
-			} else {
-				on = typecheck.LookupRuntime("printuint")
-			}
-		case types.TFLOAT32, types.TFLOAT64:
-			on = typecheck.LookupRuntime("printfloat")
-		case types.TCOMPLEX64, types.TCOMPLEX128:
-			on = typecheck.LookupRuntime("printcomplex")
-		case types.TBOOL:
-			on = typecheck.LookupRuntime("printbool")
-		case types.TSTRING:
-			cs := ""
-			if ir.IsConst(n, constant.String) {
-				cs = ir.StringVal(n)
-			}
-			switch cs {
-			case " ":
-				on = typecheck.LookupRuntime("printsp")
-			case "\n":
-				on = typecheck.LookupRuntime("printnl")
-			default:
-				on = typecheck.LookupRuntime("printstring")
-			}
-		default:
-			badtype(ir.OPRINTF, n.Type(), nil)
-			continue
-		}
-		
-		r := ir.NewCallExpr(base.Pos, ir.OCALL, on, []ir.Node{n})
-		calls = append(calls, r)
-	}
-	calls = append(calls, mkcall("printunlock", nil, init))
+	// Create selector expression for fmt.Println
+	sel := ir.NewSelectorExpr(base.Pos, ir.OXDOT, pkgName, printlnSym)
 	
-	typecheck.Stmts(calls)
-	walkExprList(calls, init)
+	// Create call to fmt.Println with the same arguments
+	call := ir.NewCallExpr(base.Pos, ir.OCALL, sel, nn.Args)
+	call = typecheck.Expr(call).(*ir.CallExpr)
 	
-	r := ir.NewBlockStmt(base.Pos, nil)
-	r.List = calls
-	return walkStmt(typecheck.Stmt(r))
+	return walkExpr(call, init)
 }
 
 // walkAssert walks an OASSERT node.
