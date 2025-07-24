@@ -1,0 +1,6 @@
+#!/usr/bin/env goo
+package main
+
+func main() {
+	printf("Hello", "world", 42, true)
+}

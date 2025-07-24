@@ -1,0 +1,6 @@
+#!/usr/bin/env goo
+package main
+
+func main() {
+	printf("Testing %%v with struct: %v", struct{a int}{1})
+}
