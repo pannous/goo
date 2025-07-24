@@ -1,6 +1,6 @@
 #!/usr/bin/env goo
 package main
-
+#import "fmt"
 func main() {
 	// Test 1-indexed array access
 	z := []rune{'a', 'b', 'c'}
@@ -36,4 +36,5 @@ func main() {
 	check z #1 == 'a'
 	check z# 1 == 'a'  
 	check z # 1 == 'a'
+	printf("All checks passed successfully!\n")
 }

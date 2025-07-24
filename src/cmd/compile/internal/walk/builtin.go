@@ -1078,10 +1078,29 @@ func isChanLenCap(n ir.Node) bool {
 	return (n.Op() == ir.OLEN || n.Op() == ir.OCAP) && n.(*ir.UnaryExpr).X.Type().IsChan()
 }
 
-// walkPrintf should not be called - printf is rewritten to fmt.Printf in typecheck
+// walkPrintf implements printf like println for now - simple and working
 func walkPrintf(nn *ir.CallExpr, init *ir.Nodes) ir.Node {
-	base.Fatalf("walkPrintf called - printf should have been rewritten to fmt.Printf in typecheck")
-	return nn
+	// Make printf work like println (spaces between args, newline at end)
+	walkExprListCheap(nn.Args, init)
+	
+	// Add spaces between elements and "\n" at the end (like println)
+	s := nn.Args
+	t := make([]ir.Node, 0, len(s)*2)
+	for i, n := range s {
+		if i != 0 {
+			space := ir.NewString(base.Pos, " ")
+			space.SetType(types.Types[types.TSTRING])
+			t = append(t, space)
+		}
+		t = append(t, n)
+	}
+	newline := ir.NewString(base.Pos, "\n")
+	newline.SetType(types.Types[types.TSTRING])
+	t = append(t, newline)
+	nn.Args = t
+
+	// Use the same processing as print/println
+	return walkPrint(nn, init)
 }
 
 // walkAssert walks an OASSERT node.
