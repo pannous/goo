@@ -1,0 +1,5 @@
+check [1,2] == [1,2]
+a := [1, 2, 3]
+b := [1, 2, 3]
+check a == b
+printf("Test passed: a and b are equal")

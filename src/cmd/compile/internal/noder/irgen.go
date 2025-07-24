@@ -37,8 +37,8 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	for i, p := range noders {
 		files[i] = p.file
 		
-		// TODO: Auto-inject import "fmt" if file uses printf but doesn't import fmt
-		// injectFmtImportIfNeeded(p.file)
+		// Auto-inject import "fmt" if file uses printf but doesn't import fmt
+		injectFmtImportIfNeeded(p.file)
 		
 		// The file.Pos() is the position of the package clause.
 		// If there's a //line directive before that, file.Pos().Base()
