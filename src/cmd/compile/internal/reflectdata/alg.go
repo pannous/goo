@@ -339,6 +339,10 @@ func geneq(t *types.Type) *obj.LSym {
 		objw.Global(closure, int32(ot), obj.DUPOK|obj.RODATA)
 		return closure
 	case types.ASPECIAL:
+		// Check if this is a map type
+		if t.IsMap() {
+			return sysClosure("mapequal")
+		}
 		break
 	}
 

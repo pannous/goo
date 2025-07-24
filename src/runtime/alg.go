@@ -298,6 +298,29 @@ func nilinterequal(p, q unsafe.Pointer) bool {
 	y := *(*eface)(q)
 	return x._type == y._type && efaceeq(x._type, x.data, y.data)
 }
+func mapequal(p, q unsafe.Pointer) bool {
+	// For now, implement basic reference equality for maps
+	// Maps are stored as pointers to internal structures
+	mp1 := *(*unsafe.Pointer)(p)
+	mp2 := *(*unsafe.Pointer)(q)
+	
+	// Handle nil maps
+	if mp1 == nil && mp2 == nil {
+		return true
+	}
+	if mp1 == nil || mp2 == nil {
+		return false
+	}
+	
+	// Same reference check
+	if mp1 == mp2 {
+		return true
+	}
+	
+	// For now, different instances are not equal
+	// TODO: implement full content comparison
+	return false
+}
 func efaceeq(t *_type, x, y unsafe.Pointer) bool {
 	if t == nil {
 		return true

@@ -365,7 +365,7 @@ func CalcSize(t *Type) {
 		t.intRegs = 1
 		CheckSize(t.Elem())
 		CheckSize(t.Key())
-		t.setAlg(ANOEQ)
+		t.setAlg(ASPECIAL) // Maps now use special equality comparison
 		t.ptrBytes = int64(PtrSize)
 
 	case TFORW: // should have been filled in
