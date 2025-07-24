@@ -46,13 +46,13 @@ func ParseLangFlag() {
 		log.Fatalf("invalid value %q for -lang: %v", base.Flag.Lang, err)
 	}
 
-	if def := currentLang(); base.Flag.Lang != def {
-		defVers, err := parseLang(def)
+	if defi := currentLang(); base.Flag.Lang != defi {
+		defVers, err := parseLang(defi)
 		if err != nil {
-			log.Fatalf("internal error parsing default lang %q: %v", def, err)
+			log.Fatalf("internal error parsing default lang %q: %v", defi, err)
 		}
 		if langWant.major > defVers.major || (langWant.major == defVers.major && langWant.minor > defVers.minor) {
-			log.Fatalf("invalid value %q for -lang: max known version is %q", base.Flag.Lang, def)
+			log.Fatalf("invalid value %q for -lang: max known version is %q", base.Flag.Lang, defi)
 		}
 	}
 }

@@ -140,11 +140,11 @@ func godebugForGoVersion(v string) map[string]string {
 		return nil
 	}
 
-	def := make(map[string]string)
+	defi := make(map[string]string)
 	for _, info := range godebugs.All {
 		if n < info.Changed {
-			def[info.Name] = info.Old
+			defi[info.Name] = info.Old
 		}
 	}
-	return def
+	return defi
 }

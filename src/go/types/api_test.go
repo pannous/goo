@@ -857,19 +857,19 @@ func TestDefsInfo(t *testing.T) {
 		name := mustTypecheck(test.src, nil, &info).Name()
 
 		// find object
-		var def Object
+		var defi Object
 		for id, obj := range info.Defs {
 			if id.Name == test.obj {
-				def = obj
+				defi = obj
 				break
 			}
 		}
-		if def == nil {
+		if defi == nil {
 			t.Errorf("package %s: %s not found", name, test.obj)
 			continue
 		}
 
-		if got := def.String(); got != test.want {
+		if got := defi.String(); got != test.want {
 			t.Errorf("package %s: got %s; want %s", name, got, test.want)
 		}
 	}
@@ -988,10 +988,10 @@ func (r *N[C]) n() {  }
 		if !ok {
 			continue
 		}
-		def := info.Defs[fdecl.Name].(*Func)
+		defi := info.Defs[fdecl.Name].(*Func)
 		switch fdecl.Name.Name {
 		case "m":
-			dm = def
+			dm = defi
 			ast.Inspect(fdecl.Body, func(n ast.Node) bool {
 				if call, ok := n.(*ast.CallExpr); ok {
 					sel := call.Fun.(*ast.SelectorExpr)
@@ -1013,7 +1013,7 @@ func (r *N[C]) n() {  }
 				return true
 			})
 		case "n":
-			dn = def
+			dn = defi
 		}
 	}
 
@@ -2619,30 +2619,30 @@ func fn() {
 				t.Fatalf("found %d identifiers named %s, want 1", got, test.name)
 			}
 			ident := idents[test.name][0]
-			def := info.Defs[ident]
-			if def == test.obj {
+			defi := info.Defs[ident]
+			if defi == test.obj {
 				t.Fatalf("info.Defs[%s] contains the test object", test.name)
 			}
-			if orig := originObject(test.obj); def != orig {
+			if orig := originObject(test.obj); defi != orig {
 				t.Errorf("info.Defs[%s] does not match obj.Origin()", test.name)
 			}
-			if def.Pkg() != test.obj.Pkg() {
-				t.Errorf("Pkg() = %v, want %v", def.Pkg(), test.obj.Pkg())
+			if defi.Pkg() != test.obj.Pkg() {
+				t.Errorf("Pkg() = %v, want %v", defi.Pkg(), test.obj.Pkg())
 			}
-			if def.Name() != test.obj.Name() {
-				t.Errorf("Name() = %v, want %v", def.Name(), test.obj.Name())
+			if defi.Name() != test.obj.Name() {
+				t.Errorf("Name() = %v, want %v", defi.Name(), test.obj.Name())
 			}
-			if def.Pos() != test.obj.Pos() {
-				t.Errorf("Pos() = %v, want %v", def.Pos(), test.obj.Pos())
+			if defi.Pos() != test.obj.Pos() {
+				t.Errorf("Pos() = %v, want %v", defi.Pos(), test.obj.Pos())
 			}
-			if def.Parent() != test.obj.Parent() {
-				t.Fatalf("Parent() = %v, want %v", def.Parent(), test.obj.Parent())
+			if defi.Parent() != test.obj.Parent() {
+				t.Fatalf("Parent() = %v, want %v", defi.Parent(), test.obj.Parent())
 			}
-			if def.Exported() != test.obj.Exported() {
-				t.Fatalf("Exported() = %v, want %v", def.Exported(), test.obj.Exported())
+			if defi.Exported() != test.obj.Exported() {
+				t.Fatalf("Exported() = %v, want %v", defi.Exported(), test.obj.Exported())
 			}
-			if def.Id() != test.obj.Id() {
-				t.Fatalf("Id() = %v, want %v", def.Id(), test.obj.Id())
+			if defi.Id() != test.obj.Id() {
+				t.Fatalf("Id() = %v, want %v", defi.Id(), test.obj.Id())
 			}
 			// String and Type are expected to differ.
 		})

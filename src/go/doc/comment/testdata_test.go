@@ -114,9 +114,9 @@ func dumpTo(out *bytes.Buffer, indent int, x any) {
 		fmt.Fprintf(out, "\n")
 
 	case []*LinkDef:
-		for _, def := range x {
+		for _, defi := range x {
 			dumpNL(out, indent)
-			dumpTo(out, indent, def)
+			dumpTo(out, indent, defi)
 		}
 
 	case *LinkDef:

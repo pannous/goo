@@ -346,9 +346,9 @@ func TestIssue28005(t *testing.T) {
 
 		// look for interface object X
 		var obj Object
-		for name, def := range info.Defs {
+		for name, defi := range info.Defs {
 			if name.Value == "X" {
-				obj = def
+				obj = defi
 				break
 			}
 		}

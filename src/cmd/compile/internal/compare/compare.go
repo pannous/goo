@@ -279,10 +279,10 @@ func EqString(s, t ir.Node) (eqlen *ir.BinaryExpr, eqmem *ir.CallExpr) {
 		if name.Class != ir.PAUTO {
 			return false
 		}
-		if def := name.Defn; def == nil {
+		if defi := name.Defn; defi == nil {
 			// n starts out as the empty string
 			return true
-		} else if def.Op() == ir.OAS && (def.(*ir.AssignStmt).Y == nil || def.(*ir.AssignStmt).Y.Op() == ir.OLITERAL) {
+		} else if defi.Op() == ir.OAS && (defi.(*ir.AssignStmt).Y == nil || defi.(*ir.AssignStmt).Y.Op() == ir.OLITERAL) {
 			// n starts out as a constant string
 			return true
 		}

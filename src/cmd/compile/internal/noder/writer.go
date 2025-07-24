@@ -1483,8 +1483,8 @@ func (w *writer) assignStmt(pos poser, lhs0, rhs0 syntax.Expr) {
 		if name, ok := syntax.Unparen(dst).(*syntax.Name); ok {
 			if name.Value == "_" {
 				return nil // ok: no implicit conversion
-			} else if def, ok := w.p.info.Defs[name].(*types2.Var); ok {
-				return def.Type()
+			} else if defi, ok := w.p.info.Defs[name].(*types2.Var); ok {
+				return defi.Type()
 			} else if use, ok := w.p.info.Uses[name].(*types2.Var); ok {
 				return use.Type()
 			} else {

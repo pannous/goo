@@ -170,16 +170,16 @@ func (p *Printer) Comment(d *Doc) []byte {
 	for i := 0; i < 2; i++ {
 		used := i == 0
 		first := true
-		for _, def := range d.Links {
-			if def.Used == used {
+		for _, defi := range d.Links {
+			if defi.Used == used {
 				if first {
 					out.WriteString("\n")
 					first = false
 				}
 				out.WriteString("[")
-				out.WriteString(def.Text)
+				out.WriteString(defi.Text)
 				out.WriteString("]: ")
-				out.WriteString(def.URL)
+				out.WriteString(defi.URL)
 				out.WriteString("\n")
 			}
 		}

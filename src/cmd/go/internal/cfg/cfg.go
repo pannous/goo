@@ -488,18 +488,18 @@ var (
 
 // EnvOrAndChanged returns the environment variable value
 // and reports whether it differs from the default value.
-func EnvOrAndChanged(name, def string) (v string, changed bool) {
+func EnvOrAndChanged(name, defi string) (v string, changed bool) {
 	val := Getenv(name)
 	if val != "" {
 		v = val
 		if g, ok := envCache.goroot[name]; ok {
 			changed = val != g
 		} else {
-			changed = val != def
+			changed = val != defi
 		}
 		return v, changed
 	}
-	return def, false
+	return defi, false
 }
 
 var SumdbDir = gopathDir("pkg/sumdb")
@@ -533,10 +533,10 @@ func GetArchEnv() (key, val string, changed bool) {
 }
 
 // envOr returns Getenv(key) if set, or else def.
-func envOr(key, def string) string {
+func envOr(key, defi string) string {
 	val := Getenv(key)
 	if val == "" {
-		val = def
+		val = defi
 	}
 	return val
 }
@@ -561,22 +561,22 @@ func findGOROOT(env string) string {
 	if env != "" {
 		return filepath.Clean(env)
 	}
-	def := ""
+	defi := ""
 	if r := runtime.GOROOT(); r != "" {
-		def = filepath.Clean(r)
+		defi = filepath.Clean(r)
 	}
 	if runtime.Compiler == "gccgo" {
 		// gccgo has no real GOROOT, and it certainly doesn't
 		// depend on the executable's location.
-		return def
+		return defi
 	}
 
 	// canonical returns a directory path that represents
 	// the same directory as dir,
 	// preferring the spelling in def if the two are the same.
 	canonical := func(dir string) string {
-		if isSameDir(def, dir) {
-			return def
+		if isSameDir(defi, dir) {
+			return defi
 		}
 		return dir
 	}
@@ -611,7 +611,7 @@ func findGOROOT(env string) string {
 			}
 		}
 	}
-	return def
+	return defi
 }
 
 // isSameDir reports whether dir1 and dir2 are the same directory.
@@ -659,8 +659,8 @@ func gopath(ctxt build.Context) string {
 		env = "home"
 	}
 	if home := os.Getenv(env); home != "" {
-		def := filepath.Join(home, "go")
-		if filepath.Clean(def) == filepath.Clean(runtime.GOROOT()) {
+		defi := filepath.Join(home, "go")
+		if filepath.Clean(defi) == filepath.Clean(runtime.GOROOT()) {
 			GoPathError = "cannot set GOROOT as GOPATH"
 		}
 		return ""

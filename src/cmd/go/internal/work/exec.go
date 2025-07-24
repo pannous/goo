@@ -2619,10 +2619,10 @@ func (b *Builder) gccArchArgs() []string {
 // The environment variable must be quoted correctly for
 // quoted.Split. This should be done before building
 // anything, for example, in BuildInit.
-func envList(key, def string) []string {
+func envList(key, defi string) []string {
 	v := cfg.Getenv(key)
 	if v == "" {
-		v = def
+		v = defi
 	}
 	args, err := quoted.Split(v)
 	if err != nil {

@@ -156,7 +156,7 @@ func (t *Interface) cleanup() {
 	t.embedPos = nil
 }
 
-func (checks *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, def *TypeName) {
+func (checks *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, defi *TypeName) {
 	addEmbedded := func(pos token.Pos, typ Type) {
 		ityp.embeddeds = append(ityp.embeddeds, typ)
 		if ityp.embedPos == nil {
@@ -199,8 +199,8 @@ func (checks *Checker) interfaceType(ityp *Interface, iface *ast.InterfaceType, 
 
 		// use named receiver type if available (for better error messages)
 		var recvTyp Type = ityp
-		if def != nil {
-			if named := asNamed(def.typ); named != nil {
+		if defi != nil {
+			if named := asNamed(defi.typ); named != nil {
 				recvTyp = named
 			}
 		}

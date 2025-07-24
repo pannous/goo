@@ -29,12 +29,12 @@ func toJson(v any) string {
 }
 
 func testLookup(t *testing.T, fn func(*testing.T, *Resolver, string)) {
-	for _, def := range []bool{true, false} {
-		def := def
+	for _, defi := range []bool{true, false} {
+		defi := defi
 		for _, server := range nslookupTestServers {
 			server := server
 			var name string
-			if def {
+			if defi {
 				name = "default/"
 			} else {
 				name = "go/"
@@ -42,7 +42,7 @@ func testLookup(t *testing.T, fn func(*testing.T, *Resolver, string)) {
 			t.Run(name+server, func(t *testing.T) {
 				t.Parallel()
 				r := DefaultResolver
-				if !def {
+				if !defi {
 					r = &Resolver{PreferGo: true}
 				}
 				fn(t, r, server)

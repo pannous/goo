@@ -122,7 +122,7 @@ func (p *Package) writeDefs() {
 	}
 	sort.Strings(typedefNames)
 	for _, name := range typedefNames {
-		def := typedef[name]
+		defi := typedef[name]
 		fmt.Fprintf(fgo2, "type %s ", name)
 		// We don't have source info for these types, so write them out without source info.
 		// Otherwise types would look like:
@@ -137,7 +137,7 @@ func (p *Package) writeDefs() {
 		// so subsequent source code uses the same source info.
 		// Moreover, empty file name makes compile emit no source debug info at all.
 		var buf bytes.Buffer
-		noSourceConf.Fprint(&buf, fset, def.Go)
+		noSourceConf.Fprint(&buf, fset, defi.Go)
 		if bytes.HasPrefix(buf.Bytes(), []byte("_Ctype_")) ||
 			strings.HasPrefix(name, "_Ctype_enum_") ||
 			strings.HasPrefix(name, "_Ctype_union_") {
@@ -1492,8 +1492,8 @@ func (p *Package) doCgoType(e ast.Expr, m map[ast.Expr]bool) *Type {
 				}
 			}
 		}
-		if def := typedef[t.Name]; def != nil {
-			if defgo, ok := def.Go.(*ast.Ident); ok {
+		if defi := typedef[t.Name]; defi != nil {
+			if defgo, ok := defi.Go.(*ast.Ident); ok {
 				switch defgo.Name {
 				case "complex64", "complex128":
 					// MSVC does not support the _Complex keyword
@@ -1504,7 +1504,7 @@ func (p *Package) doCgoType(e ast.Expr, m map[ast.Expr]bool) *Type {
 					return goTypesFixup(goTypes[defgo.Name])
 				}
 			}
-			return def
+			return defi
 		}
 		if t.Name == "uintptr" {
 			return &Type{Size: p.PtrSize, Align: p.PtrSize, C: c("GoUintptr")}

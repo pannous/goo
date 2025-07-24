@@ -645,16 +645,16 @@ func (d *parseDoc) paragraph(lines []string) Block {
 	// Is this a block of known links? Handle.
 	var defs []*LinkDef
 	for _, line := range lines {
-		def, ok := parseLink(line)
+		defi, ok := parseLink(line)
 		if !ok {
 			goto NoDefs
 		}
-		defs = append(defs, def)
+		defs = append(defs, defi)
 	}
-	for _, def := range defs {
-		d.Links = append(d.Links, def)
-		if d.links[def.Text] == nil {
-			d.links[def.Text] = def
+	for _, defi := range defs {
+		d.Links = append(d.Links, defi)
+		if d.links[defi.Text] == nil {
+			d.links[defi.Text] = defi
 		}
 	}
 	return nil
@@ -803,12 +803,12 @@ func (d *parseDoc) parseLinkedText(text string) []Text {
 			start = i
 		case ']':
 			if start >= 0 {
-				if def, ok := d.links[string(buf)]; ok {
-					def.Used = true
+				if defi, ok := d.links[string(buf)]; ok {
+					defi.Used = true
 					flush(start)
 					out = append(out, &Link{
 						Text: d.parseText(nil, text[start+1:i], false),
-						URL:  def.URL,
+						URL:  defi.URL,
 					})
 					wrote = i + 1
 				} else if link, ok := d.docLink(text[start+1:i], text[:start], text[i+1:]); ok {
