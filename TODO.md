@@ -30,3 +30,17 @@ haha
        ../goo/test_printf.go:7:2: printf("OK") (no value) is not used
    ../goo/test_printf_discard.go:4:6: printf("OK") (no value) used as value
   yeah Let me sleep about that     
+
+
+
+errors.UnusedImport
+
+  ⏺ I found it! Looking at line 421, the handleBailout function sets *err = checks.firstErr. /* And in the Files 
+  method at line 447, the defer checks.handleBailout(&err) statement at line 459 will set the return error to
+  checks.firstErr.
+
+  So even if I handle unused imports as warnings instead of errors, if they are the first error encountered, they
+   will still cause the Check method to return an error.
+
+  The solution is to modify the types2 system to not set checks.firstErr for soft errors like unused imports. Let
+   me check where firstErr is set:

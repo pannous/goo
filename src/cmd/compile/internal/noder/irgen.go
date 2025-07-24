@@ -77,6 +77,13 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	conf.Error = func(err error) {
 		terr := err.(types2.Error)
 		msg := terr.Msg
+		
+		// Convert unused import errors to warnings
+		if terr.Code == errors.UnusedImport {
+			base.WarnfAt(m.makeXPos(terr.Pos), "%s", msg)
+			return
+		}
+		
 		if versionErrorRx.MatchString(msg) {
 			fileBase := terr.Pos.FileBase()
 			fileVersion := info.FileVersions[fileBase]
@@ -99,6 +106,7 @@ func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info, map[*
 	if err != nil {
 		base.FatalfAt(src.NoXPos, "conf.Check error: %v", err)
 	}
+
 
 	// Check for anonymous interface cycles (#56103).
 	// TODO(gri) move this code into the type checkers (types2 and go/types)
@@ -273,4 +281,5 @@ func (f *cycleFinder) visit(typ0 types2.Type) bool {
 		}
 	}
 }
+
 

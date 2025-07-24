@@ -195,7 +195,7 @@ func (checks *Checker) handleError(index int, pos syntax.Pos, code Code, msg str
 		Code: code,
 	}
 
-	if checks.firstErr == nil {
+	if checks.firstErr == nil && !soft {
 		checks.firstErr = e
 	}
 
