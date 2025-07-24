@@ -25,6 +25,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮
 ✅ go command should default to run, so go test.go should work  
 ✅ def as synonym for func, e.g. def main() { ... }
+☐ allow unused imports as warning!
 ☐ map[active:true age:30 name:Alice] 
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}
 test_list_comparison.goo
