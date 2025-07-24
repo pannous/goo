@@ -11,6 +11,7 @@ var OpStringNames = map[Op]string{
 	OXXX:                "XXX",
 	ONAME:               "NAME",
 	ONONAME:             "NONAME",
+	OCHECK:              "CHECK",
 	OTYPE:               "TYPE",
 	OLITERAL:            "LITERAL",
 	ONIL:                "NIL",

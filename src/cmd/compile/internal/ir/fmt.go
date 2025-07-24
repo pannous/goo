@@ -37,6 +37,7 @@ var OpNames = []string{
 	OCALL:             "function call", // not actual syntax
 	OCAP:              "cap",
 	OCASE:             "case",
+	OCHECK:            "check",
 	OCLEAR:            "clear",
 	OCLOSE:            "close",
 	OCOMPLEX:          "complex",
@@ -274,6 +275,7 @@ var OpPrec = []int{
 	OBLOCK:      -1,
 	OBREAK:      -1,
 	OCASE:       -1,
+	OCHECK:      -1,
 	OCONTINUE:   -1,
 	ODCL:        -1,
 	ODEFER:      -1,
@@ -493,6 +495,10 @@ func stmtFmt(n Node, s fmt.State) {
 		} else {
 			fmt.Fprintf(s, "%v", n.Op())
 		}
+
+	case OCHECK:
+		n := n.(*CheckStmt)
+		fmt.Fprintf(s, "check %v", n.Cond)
 
 	case OLABEL:
 		n := n.(*LabelStmt)

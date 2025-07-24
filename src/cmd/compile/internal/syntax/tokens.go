@@ -46,6 +46,7 @@ const (
 	_Break       // break
 	_Case        // case
 	_Chan        // chan
+	_Check       // check
 	_Const       // const
 	_Continue    // continue
 	_Default     // default
@@ -122,6 +123,7 @@ var TokenNames = [...]string{
 	_Break:       "break",
 	_Case:        "case",
 	_Chan:        "chan",
+	_Check:       "check",
 	_Const:       "const",
 	_Continue:    "continue",
 	_Default:     "default",

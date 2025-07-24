@@ -1355,6 +1355,11 @@ func (w *writer) stmt1(stmt syntax.Stmt) {
 			w.optExpr(stmt.DeferAt)
 		}
 
+	case *syntax.CheckStmt:
+		w.Code(stmtCheck)
+		w.pos(stmt)
+		w.expr(stmt.Cond)
+
 	case *syntax.DeclStmt:
 		for _, decl := range stmt.DeclList {
 			w.declStmt(decl)

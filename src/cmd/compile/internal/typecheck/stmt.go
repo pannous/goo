@@ -182,6 +182,12 @@ func tcCheckNil(n *ir.UnaryExpr) ir.Node {
 	return n
 }
 
+func tcCheck(n *ir.CheckStmt) ir.Node {
+	n.Cond = Expr(n.Cond)
+	// Just validate the condition for now
+	return n
+}
+
 // tcFor typechecks an OFOR node.
 func tcFor(n *ir.ForStmt) ir.Node {
 	Stmts(n.Init())

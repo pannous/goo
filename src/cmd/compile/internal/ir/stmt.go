@@ -9,6 +9,7 @@ import (
 	"cmd/compile/internal/types"
 	"cmd/internal/obj"
 	"cmd/internal/src"
+	"fmt"
 	"go/constant"
 )
 
@@ -174,6 +175,56 @@ func (n *BranchStmt) SetOp(op Op) {
 }
 
 func (n *BranchStmt) Sym() *types.Sym { return n.Label }
+
+// A CheckStmt is a check statement: check Cond.
+type CheckStmt struct {
+	miniStmt
+	Cond Node
+}
+
+func NewCheckStmt(pos src.XPos, cond Node) *CheckStmt {
+	n := &CheckStmt{Cond: cond}
+	n.pos = pos
+	n.op = OCHECK
+	return n
+}
+
+func (n *CheckStmt) Format(s fmt.State, verb rune) { fmtNode(n, s, verb) }
+func (n *CheckStmt) copy() Node {
+	c := *n
+	c.init = copyNodes(c.init)
+	return &c
+}
+func (n *CheckStmt) doChildren(do func(Node) bool) bool {
+	if doNodes(n.init, do) {
+		return true
+	}
+	if n.Cond != nil && do(n.Cond) {
+		return true
+	}
+	return false
+}
+func (n *CheckStmt) doChildrenWithHidden(do func(Node) bool) bool {
+	if doNodes(n.init, do) {
+		return true
+	}
+	if n.Cond != nil && do(n.Cond) {
+		return true
+	}
+	return false
+}
+func (n *CheckStmt) editChildren(edit func(Node) Node) {
+	editNodes(n.init, edit)
+	if n.Cond != nil {
+		n.Cond = edit(n.Cond)
+	}
+}
+func (n *CheckStmt) editChildrenWithHidden(edit func(Node) Node) {
+	editNodes(n.init, edit)
+	if n.Cond != nil {
+		n.Cond = edit(n.Cond)
+	}
+}
 
 // A CaseClause is a case statement in a switch or select: case List: Body.
 type CaseClause struct {

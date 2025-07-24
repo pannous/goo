@@ -116,3 +116,5 @@ use bin/go instead of global go!
  - Always append new operations at end
  - Use external bootstrap for enum changes
  - Add validation tests for critical constants
+ - 
+To avoid code duplication do a quick git history search (grep?) to see if there have been related changes

@@ -306,6 +306,9 @@ const (
 	OGETCALLERSP // internal/runtime/sys.GetCallerSP() (stack pointer in caller frame)
 	OTYPEOF      // typeof(X) (compile-time type information)
 
+	// New operations - always add at end to maintain bootstrap compatibility
+	OCHECK // check Cond
+
 	OEND
 )
 

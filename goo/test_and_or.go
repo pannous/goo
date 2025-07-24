@@ -6,7 +6,6 @@ func main() {
 	a := true
 	b := false
 	c := true
-	
 	// Test 'and' operator (should work like &&)
 	if a and c {
 		fmt.Println("a and c works!")

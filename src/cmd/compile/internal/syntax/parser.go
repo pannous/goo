@@ -2882,6 +2882,13 @@ func (p *parser) stmtOrNil() Stmt {
 		}
 		return s
 
+	case _Check:
+		s := new(CheckStmt)
+		s.pos = p.pos()
+		p.next()
+		s.Cond = p.expr()
+		return s
+
 	case _Go, _Defer:
 		return p.callStmt()
 

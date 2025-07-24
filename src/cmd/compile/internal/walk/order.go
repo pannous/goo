@@ -838,6 +838,13 @@ func (o *orderState) stmt(n ir.Node) {
 		o.out = append(o.out, n)
 		o.popTemp(t)
 
+	case ir.OCHECK:
+		n := n.(*ir.CheckStmt)
+		t := o.markTemp()
+		n.Cond = o.expr(n.Cond, nil)
+		o.out = append(o.out, n)
+		o.popTemp(t)
+
 	case ir.OCOPY:
 		n := n.(*ir.BinaryExpr)
 		t := o.markTemp()

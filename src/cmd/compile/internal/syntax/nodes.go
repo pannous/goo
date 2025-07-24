@@ -403,6 +403,11 @@ type (
 		stmt
 	}
 
+	CheckStmt struct {
+		Cond Expr
+		stmt
+	}
+
 	IfStmt struct {
 		Init SimpleStmt
 		Cond Expr
