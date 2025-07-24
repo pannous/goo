@@ -1280,7 +1280,7 @@ loop:
 		case _Hash:
 			// 1-indexed array access: x#i becomes x[i-1]
 			p.next()
-			i := p.expr()
+			i := p.unaryExpr()
 			// Create IndexExpr with subtraction to convert 1-indexed to 0-indexed
 			t := new(IndexExpr)
 			t.pos = pos

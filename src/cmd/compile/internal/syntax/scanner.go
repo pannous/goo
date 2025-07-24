@@ -940,12 +940,10 @@ func (s *scanner) escape(quote rune) bool {
 }
 
 func (s *scanner) canBeIndexOperator() bool {
-	// Hash is an index operator if it follows an expression that can be indexed
-	// We'll be more liberal and assume # is an operator unless it clearly starts a comment
-	// Check if we're at the start of a line or after whitespace (comment context)
+	// For now, be permissive with # as operator except at start of line
+	// Comments at start of line are preserved, others are treated as operators
 	if s.col == 1 {
-		return false // Start of line - likely a comment
+		return false // Start of line - definitely a comment
 	}
-	// For now, be aggressive and treat all # as operators in expression context
-	return true
+	return true // Assume it's an operator in all other contexts
 }
