@@ -293,9 +293,9 @@ func lookupCmd(args []string) (cmd *base.Command, used int) {
 		break
 	}
 	
-	// If no command was found and the first argument ends with .go, default to run
+	// If no command was found and the first argument ends with .go or .goo, default to run
 	if used == 0 && len(args) > 0 {
-		if strings.HasSuffix(args[0], ".go") {
+		if strings.HasSuffix(args[0], ".go") || strings.HasSuffix(args[0], ".goo") {
 			cmd = run.CmdRun
 			used = 0 // Keep used as 0 so we pass all args to run
 		}
