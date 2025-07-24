@@ -64,7 +64,6 @@ func printnl()
 func printsp()
 func printlock()
 func printunlock()
-func fmtprintf([]any)
 
 func concatstring2(*[32]byte, string, string) string
 func concatstring3(*[32]byte, string, string, string) string
