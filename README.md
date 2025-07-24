@@ -7,26 +7,26 @@ Goo is an up-to-date fork of Go with the following modifications:
 just like most ugliness in the world appears when you add a five to json(5) 
 so does adding a little o to Go[o] make everything a little more beautiful
 -->
-🗹 truthy/falsey if  
-🗹 # comment and shebang support  
-🗹 goo file extension  
-🗹 and or operators for && ||
-🗹 ¬ / not operator keyword for `!`  
-🗹 ≠ operator for `!=`  
-🗹 ø keyword for `nil`
-🗹 no Main needed ☐  implicit package main  
-🗹 printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
-🗹 typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?
-🗹 check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } 
-🗹 z := map{"a": 1, "b": 2}  => map[any]any{…}
-🗹 z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
-🗹 z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
-🗹 z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator
-🗹 Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer tool 🤮🦀🤮
+✅ truthy/falsey if  
+✅ # comment and shebang support  
+✅ goo file extension  
+✅ and or operators for && ||
+✅ ¬ / not operator keyword for `!`  
+✅ ≠ operator for `!=`  
+✅ ø keyword for `nil`
+✅ no Main needed ☐  implicit package main  
+✅ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
+✅ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?
+✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } 
+✅ z := map{"a": 1, "b": 2}  => map[any]any{…}
+✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
+✅ z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
+✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator
+✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮
+☐ go command should default to run, so go test.go should work  
 ☐ for keyword := keywords  => for _, keyword := range keywords {
 ☐ String methods "abc".contains("a")
 ☐ return void, e.g. return print("ok")  
-☐ go command should default to run, so go test.go should work  
 ☐ def as synonym for func, e.g. def main() { ... }  
 ☐ void(!) as synonym for func, e.g. void main(){}
 ☐ public() -> Public() calls OK // as compiler plugin?
