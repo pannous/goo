@@ -169,7 +169,7 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			return typecheck(n, top)
 
 		case ir.OPRINTF:
-			// Keep printf as OPRINTF so it can be handled properly in walk phase
+			// Keep printf as OPRINTF and handle fmt.Printf forwarding in walk phase
 			n.SetOp(l.BuiltinOp)
 			n.Fun = nil
 			typecheckargs(n)
