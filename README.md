@@ -20,13 +20,13 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }
 ✅ z := map{"a": 1, "b": 2}  => map[any]any{…}
 ✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
+☐ map[active:true age:30 name:Alice] 
 ✅ z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
 ✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator
 ✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮
 ✅ go command should default to run, so go test.go should work  
 ✅ def as synonym for func, e.g. def main() { ... }
-☐ allow unused imports: as warning!
-☐ map[active:true age:30 name:Alice] 
+✅ allow unused imports: as warning!
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}
 test_list_comparison.goo [1,2]==[1,2]
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println
