@@ -24,11 +24,15 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator
 ✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮
 ✅ go command should default to run, so go test.go should work  
-✅ def as synonym for func, e.g. def main() { ... }  
+✅ def as synonym for func, e.g. def main() { ... }
+☐ map[active:true age:30 name:Alice] 
+☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}
+test_list_comparison.goo
+☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println
 ☐ for keyword := keywords  => for _, keyword := range keywords { __
 ☐ String methods "abc".contains("a")
 ☐ return void, e.g. return print("ok") HARD  
-☐ void(!) as synonym for func, e.g. void main(){}
+☐ void(!) as synonym for func, e.g. void main(){} BAD
 ☐ public() -> Public() calls OK // as compiler plugin?
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.
@@ -39,7 +43,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ imported and not used only warning 
 ☐ cross off all done tasks from this list  
 ☐ any other pain points you and I might have   
-☐ map can only be compared to nil
+
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*

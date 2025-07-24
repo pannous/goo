@@ -1,9 +1,3 @@
-#!/usr/bin/env goo
-package main
-
-func main() {
-	z := []rune{'a', 'b', 'c'}
-	if z#1 == 'a' {
-		println("success")
-	}
-}
+z := ['a', 'b', 'c']
+check z#1 == 'a'
+printf("success")
