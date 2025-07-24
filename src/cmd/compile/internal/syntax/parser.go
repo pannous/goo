@@ -1277,6 +1277,28 @@ loop:
 			p.want(_Rbrack)
 			x = t
 
+		case _Hash:
+			// 1-indexed array access: x#i becomes x[i-1]
+			p.next()
+			i := p.expr()
+			// Create IndexExpr with subtraction to convert 1-indexed to 0-indexed
+			t := new(IndexExpr)
+			t.pos = pos
+			t.X = x
+			// Create literal 1
+			one := new(BasicLit)
+			one.pos = pos
+			one.Value = "1"
+			one.Kind = IntLit
+			// Create subtraction: i - 1
+			sub := new(Operation)
+			sub.pos = pos
+			sub.Op = Sub
+			sub.X = i
+			sub.Y = one
+			t.Index = sub
+			x = t
+
 		case _Lparen:
 			t := new(CallExpr)
 			t.pos = pos

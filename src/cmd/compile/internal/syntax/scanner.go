@@ -349,9 +349,17 @@ redo:
 		s.tok = _Operator
 
 	case '#':
-		s.nextch()
-		s.lineComment()
-		goto redo
+		// Check if this is a 1-indexed array access operator or a comment
+		// Comments start at beginning of line or after whitespace
+		// 1-indexed access follows an identifier/expression
+		if s.canBeIndexOperator() {
+			s.tok = _Hash
+			s.nextch()
+		} else {
+			s.nextch()
+			s.lineComment()
+			goto redo
+		}
 
 	default:
 		s.errorf("invalid character %#U", s.ch)
@@ -928,5 +936,16 @@ func (s *scanner) escape(quote rune) bool {
 		return false
 	}
 
+	return true
+}
+
+func (s *scanner) canBeIndexOperator() bool {
+	// Hash is an index operator if it follows an expression that can be indexed
+	// We'll be more liberal and assume # is an operator unless it clearly starts a comment
+	// Check if we're at the start of a line or after whitespace (comment context)
+	if s.col == 1 {
+		return false // Start of line - likely a comment
+	}
+	// For now, be aggressive and treat all # as operators in expression context
 	return true
 }
