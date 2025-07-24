@@ -1561,7 +1561,7 @@ func (p *parser) typeOrNil() Expr {
 	return nil
 }
 
-// mapTypeOrLiteral parses either map[K]V or map{...} (auto-detect map literal)
+// mapTypeOrLiteral parses either map[K]V, map{...}, or map[key:value] (auto-detect map literal)
 func (p *parser) mapTypeOrLiteral() Expr {
 	if trace {
 		defer p.trace("mapTypeOrLiteral")()
@@ -1571,14 +1571,29 @@ func (p *parser) mapTypeOrLiteral() Expr {
 	p.next() // consume 'map'
 
 	if p.tok == _Lbrack {
-		// Regular map[K]V syntax
 		p.want(_Lbrack)
-		t := new(MapType)
-		t.pos = pos
-		t.Key = p.type_()
-		p.want(_Rbrack)
-		t.Value = p.type_()
-		return t
+		
+		// Check for empty map[] case
+		if p.tok == _Rbrack {
+			// Empty map literal map[]
+			return p.mapLiteralFromBracket(pos, nil)
+		}
+		
+		// Look ahead to determine if this is map[key:value] or map[K]V
+		firstExpr := p.expr()
+		
+		if p.tok == _Colon {
+			// This is map[key:value key:value...] literal syntax
+			return p.mapLiteralFromBracket(pos, firstExpr)
+		} else {
+			// Regular map[K]V syntax - firstExpr is the key type
+			t := new(MapType)
+			t.pos = pos
+			t.Key = firstExpr
+			p.want(_Rbrack)
+			t.Value = p.type_()
+			return t
+		}
 	} else if p.tok == _Lbrace {
 		// map{...} syntax - create MapType with any key/value types (map[any]any)
 		t := new(MapType)
@@ -1634,6 +1649,84 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	return lit
 }
 
+// convertSymbolKeyToString converts unquoted identifiers to string literals for map keys
+func (p *parser) convertSymbolKeyToString(keyExpr Expr) Expr {
+	if nameExpr, ok := keyExpr.(*Name); ok {
+		// Convert identifier 'a' to string literal "a"
+		stringLit := new(BasicLit)
+		stringLit.pos = nameExpr.pos
+		stringLit.Value = `"` + nameExpr.Value + `"`
+		stringLit.Kind = StringLit
+		return stringLit
+	}
+	return keyExpr
+}
+
+// mapLiteralFromBracket parses map[key:value key:value...] style map literals
+func (p *parser) mapLiteralFromBracket(pos Pos, firstKey Expr) Expr {
+	if trace {
+		defer p.trace("mapLiteralFromBracket")()
+	}
+
+	// Create map type with any key/value types (map[any]any)
+	mapType := new(MapType)
+	mapType.pos = pos
+	anyName := new(Name)
+	anyName.pos = pos
+	anyName.Value = "any"
+	mapType.Key = anyName
+	mapType.Value = anyName
+
+	// Create composite literal
+	lit := new(CompositeLit)
+	lit.pos = pos
+	lit.Type = mapType
+
+	// Process first key:value pair if not empty
+	if firstKey != nil {
+		keyExpr := p.convertSymbolKeyToString(firstKey)
+		p.want(_Colon)
+		valueExpr := p.expr()
+
+		kvExpr := new(KeyValueExpr)
+		kvExpr.pos = keyExpr.Pos()
+		kvExpr.Key = keyExpr
+		kvExpr.Value = valueExpr
+		lit.ElemList = append(lit.ElemList, kvExpr)
+		lit.NKeys++
+	}
+
+	// Parse remaining elements
+	for p.tok != _Rbrack && p.tok != _EOF {
+		// For non-empty maps, expect comma between elements
+		if firstKey != nil || len(lit.ElemList) > 0 {
+			if !p.got(_Comma) {
+				break
+			}
+		}
+		if p.tok == _Rbrack {
+			break // trailing comma or empty map
+		}
+
+		keyExpr := p.expr()
+		keyExpr = p.convertSymbolKeyToString(keyExpr)
+
+		p.want(_Colon)
+		valueExpr := p.expr()
+
+		kvExpr := new(KeyValueExpr)
+		kvExpr.pos = keyExpr.Pos()
+		kvExpr.Key = keyExpr
+		kvExpr.Value = valueExpr
+		lit.ElemList = append(lit.ElemList, kvExpr)
+		lit.NKeys++
+	}
+
+	lit.Rbrace = p.pos()
+	p.want(_Rbrack)
+	return lit
+}
+
 // mapLiteralFromBrace parses {a: 1, b: 2} style map literals with symbol key conversion
 func (p *parser) mapLiteralFromBrace() Expr {
 	if trace {
@@ -1660,16 +1753,7 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	// Parse elements
 	for p.tok != _Rbrace && p.tok != _EOF {
 		keyExpr := p.expr()
-
-		// Convert unquoted identifiers to string literals
-		if nameExpr, ok := keyExpr.(*Name); ok {
-			// Convert identifier 'a' to string literal "a"
-			stringLit := new(BasicLit)
-			stringLit.pos = nameExpr.pos
-			stringLit.Value = `"` + nameExpr.Value + `"`
-			stringLit.Kind = StringLit
-			keyExpr = stringLit
-		}
+		keyExpr = p.convertSymbolKeyToString(keyExpr)
 
 		p.want(_Colon)
 		valueExpr := p.expr()
