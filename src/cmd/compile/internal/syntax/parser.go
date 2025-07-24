@@ -1698,14 +1698,12 @@ func (p *parser) mapLiteralFromBracket(pos Pos, firstKey Expr) Expr {
 
 	// Parse remaining elements
 	for p.tok != _Rbrack && p.tok != _EOF {
-		// For non-empty maps, expect comma between elements
+		// For non-empty maps, optionally consume comma
 		if firstKey != nil || len(lit.ElemList) > 0 {
-			if !p.got(_Comma) {
-				break
-			}
+			p.got(_Comma) // Optional comma - don't break if missing
 		}
 		if p.tok == _Rbrack {
-			break // trailing comma or empty map
+			break // closing bracket or empty map
 		}
 
 		keyExpr := p.expr()
