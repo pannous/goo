@@ -5,7 +5,9 @@
 package typecheck
 
 import (
+	"fmt"
 	"go/constant"
+	"os"
 
 	"cmd/compile/internal/ir"
 	"cmd/compile/internal/types"
@@ -75,6 +77,9 @@ func InitUniverse() {
 	})
 
 	for _, s := range &builtinFuncs {
+		if s.name == "printf" {
+			fmt.Fprintf(os.Stderr, "DEBUG: Registering printf builtin with op %v\n", s.op)
+		}
 		ir.NewBuiltin(types.BuiltinPkg.Lookup(s.name), s.op)
 	}
 

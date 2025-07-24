@@ -118,3 +118,13 @@ use bin/go instead of global go!
  - Add validation tests for critical constants
  - 
 To avoid code duplication do a quick git history search (grep?) to see if there have been related changes
+
+I don't understand why it's so hard to just rewrite printf as fmt.Println
+Remove the old 'backup' mechanism to make printf use builtin print!!
+You should just forward everything via the compiler to fmt.Println, not through the runtime!
+For this to work you need to automatically import fmt in the file where you use printf.                          │
+But let's skip this for later and always include fmt (might break the compiler boot-strapping?)
+# Test
+cd /opt/other/go/src/
+GOROOT=/opt/other/go ../bin/go ../goo/test_printf_fmt.go
+Do not modify the test do not create new tests for now 

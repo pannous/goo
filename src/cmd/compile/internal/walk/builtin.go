@@ -1083,43 +1083,36 @@ func walkPrintf(nn *ir.CallExpr, init *ir.Nodes) ir.Node {
 	// Walk arguments first
 	walkExprListCheap(nn.Args, init)
 	
-	// Always ensure fmt package is available
-	fmtPkg := types.NewPkg("fmt", "fmt")
-	if fmtPkg == nil {
-		base.Fatalf("cannot create fmt package for printf")
-	}
-	
-	// Add fmt to imports if not already present
-	found := false
+	// Find fmt package in imports 
+	var fmtPkg *types.Pkg
 	for _, pkg := range typecheck.Target.Imports {
 		if pkg.Path == "fmt" {
 			fmtPkg = pkg
-			found = true
 			break
 		}
 	}
-	if !found {
-		typecheck.Target.Imports = append(typecheck.Target.Imports, fmtPkg)
+	
+	if fmtPkg == nil {
+		base.Fatalf("printf requires fmt package to be imported")
 	}
 	
-	// Get fmt.Println symbol
+	// Look up the Println symbol in the fmt package
 	printlnSym := fmtPkg.Lookup("Println")
 	if printlnSym == nil {
-		base.Fatalf("cannot find fmt.Println")
+		base.Fatalf("cannot find fmt.Println symbol")
 	}
 	
-	// Create package identifier for fmt
-	pkgName := ir.NewIdent(base.Pos, fmtPkg.Lookup("fmt"))
-	pkgName.SetType(types.Types[types.TINTER])
-	pkgName.SetTypecheck(1)
+	// Create a simple direct call to fmt.Println
+	// Use the symbol's definition if available
+	if printlnSym.Def == nil {
+		base.Fatalf("fmt.Println symbol has no definition")
+	}
 	
-	// Create selector expression for fmt.Println
-	sel := ir.NewSelectorExpr(base.Pos, ir.OXDOT, pkgName, printlnSym)
+	printlnName := printlnSym.Def.(*ir.Name)
+	call := ir.NewCallExpr(base.Pos, ir.OCALL, printlnName, nn.Args)
 	
-	// Create call to fmt.Println with the same arguments
-	call := ir.NewCallExpr(base.Pos, ir.OCALL, sel, nn.Args)
+	// Type check and walk the call
 	call = typecheck.Expr(call).(*ir.CallExpr)
-	
 	return walkExpr(call, init)
 }
 

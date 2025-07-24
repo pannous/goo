@@ -2,5 +2,5 @@
 package main
 
 func main() {
-	printf("Hello world")
+	printf("Hello world", 42, "test")
 }
