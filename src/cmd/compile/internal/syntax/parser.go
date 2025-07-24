@@ -424,6 +424,29 @@ func (p *parser) fileOrNil() *File {
 
 	// Accept import declarations anywhere for error tolerance, but complain.
 	// { ( ImportDecl | TopLevelDecl ) ";" }
+	
+	// Check if we need to auto-inject fmt import for .goo files
+	hasImports := false
+	if p.tok == _Import {
+		hasImports = true
+	}
+	
+	// Auto-inject fmt import if no imports found and it's a .goo file
+	if !hasImports && strings.HasSuffix(p.file.filename, ".goo") {
+		fmtLit := &BasicLit{
+			Value: `"fmt"`,
+			Kind:  StringLit,
+		}
+		fmtLit.pos = p.pos()
+		
+		fmtImport := &ImportDecl{
+			Path: fmtLit,
+		}
+		fmtImport.pos = p.pos()
+		
+		f.DeclList = append(f.DeclList, fmtImport)
+	}
+	
 	prev := _Import
 	for p.tok != _EOF {
 		if p.tok == _Import && prev != _Import {

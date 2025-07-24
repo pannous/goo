@@ -2923,8 +2923,26 @@ func (p *parser) parseFile() *ast.File {
 	var decls []ast.Decl
 	if p.mode&PackageClauseOnly == 0 {
 		// import decls
+		hasImports := false
 		for p.tok == token.IMPORT {
 			decls = append(decls, p.parseGenDecl(token.IMPORT, p.parseImportSpec))
+			hasImports = true
+		}
+		
+		// Auto-inject fmt import if no imports found and it's a .goo file
+		if !hasImports && strings.HasSuffix(p.file.Name(), ".goo") {
+			fmtImport := &ast.GenDecl{
+				Tok: token.IMPORT,
+				Specs: []ast.Spec{
+					&ast.ImportSpec{
+						Path: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: `"fmt"`,
+						},
+					},
+				},
+			}
+			decls = append(decls, fmtImport)
 		}
 
 		if p.mode&ImportsOnly == 0 {
