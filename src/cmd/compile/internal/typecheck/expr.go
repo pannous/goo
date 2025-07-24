@@ -137,10 +137,7 @@ func tcArith(n ir.Node, op ir.Op, l, r ir.Node) (ir.Node, ir.Node, *types.Type) 
 		return l, r, nil
 	}
 
-	if l.Type().IsMap() && !ir.IsNil(l) && !ir.IsNil(r) {
-		base.Errorf("invalid operation: %v (map can only be compared to nil)", n)
-		return l, r, nil
-	}
+	// Maps are now comparable - remove restriction
 
 	if l.Type().Kind() == types.TFUNC && !ir.IsNil(l) && !ir.IsNil(r) {
 		base.Errorf("invalid operation: %v (func can only be compared to nil)", n)

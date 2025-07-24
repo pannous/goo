@@ -200,6 +200,16 @@ func comparableType(T Type, dynamic bool, seen map[Type]bool) *typeError {
 		}
 		return typeErrorf(cause)
 
+	case *Map:
+		// Maps are now comparable if key and element types are comparable
+		if comparableType(t.key, dynamic, seen) != nil {
+			return typeErrorf("map with non-comparable key type %s", t.key)
+		}
+		if comparableType(t.elem, dynamic, seen) != nil {
+			return typeErrorf("map with non-comparable element type %s", t.elem)
+		}
+		return nil
+
 	default:
 		return typeErrorf("")
 	}
