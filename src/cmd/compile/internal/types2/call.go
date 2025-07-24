@@ -169,6 +169,32 @@ func (checks *Checker) instantiateSignature(pos syntax.Pos, expr syntax.Expr, ty
 }
 
 func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
+	// Transform printf calls to fmt.Println calls
+	if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "printf" {
+		// Check if this is the builtin printf (not a user-defined function)
+		_, obj := checks.lookupScope("printf")
+		if obj != nil && obj.Parent() == Universe {
+			// For now, require manual fmt import until auto-import is working
+			if checks.lookup("fmt") != nil {
+				// Transform printf(...) to fmt.Println(...) by modifying call in place
+				fmtName := syntax.NewName(name.Pos(), "fmt")
+				printlnName := syntax.NewName(name.Pos(), "Println")
+				selector := &syntax.SelectorExpr{
+					X:   fmtName,
+					Sel: printlnName,
+				}
+				selector.SetPos(name.Pos())
+				
+				// Replace the function in the original call
+				call.Fun = selector
+			} else {
+				// Provide helpful error message
+				checks.errorf(name, UndeclaredName, "printf requires 'import \"fmt\"' - automatic import not yet supported")
+				return expression
+			}
+		}
+	}
+	
 	var inst *syntax.IndexExpr // function instantiation, if any
 	if iexpr, _ := call.Fun.(*syntax.IndexExpr); iexpr != nil {
 		if checks.indexExpr(x, iexpr) {

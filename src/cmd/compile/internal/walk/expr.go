@@ -178,10 +178,6 @@ func walkExpr1(n ir.Node, init *ir.Nodes) ir.Node {
 	case ir.OPRINT, ir.OPRINTLN:
 		return walkPrint(n.(*ir.CallExpr), init)
 
-	case ir.OPRINTF:
-		// Handle printf by calling fmt.Println
-		return walkPrintf(n.(*ir.CallExpr), init)
-
 	case ir.OPANIC:
 		n := n.(*ir.UnaryExpr)
 		return mkcall("gopanic", nil, init, n.X)

@@ -23,6 +23,8 @@ func (checks *Checker) ident(x *operand, e *syntax.Name, defi *TypeName, wantTyp
 	x.expr = e
 
 	scope, obj := checks.lookupScope(e.Value)
+	
+	
 	switch obj {
 	case nil:
 		if e.Value == "_" {

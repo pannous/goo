@@ -31,11 +31,11 @@ func Fdump(w io.Writer, n Node) (err error) {
 	}()
 
 	if n == nil {
-		p.printf("nil\n")
+		p.fprintf("nil\n")
 		return
 	}
 	p.dump(reflect.ValueOf(n), n)
-	p.printf("\n")
+	p.fprintf("\n")
 
 	return
 }
@@ -88,8 +88,8 @@ type writeError struct {
 	err error
 }
 
-// printf is a convenience wrapper that takes care of print errors.
-func (p *dumper) printf(format string, args ...interface{}) {
+// fprintf is a convenience wrapper that takes care of print errors.
+func (p *dumper) fprintf(format string, args ...interface{}) {
 	if _, err := fmt.Fprintf(p, format, args...); err != nil {
 		panic(writeError{err})
 	}
@@ -106,30 +106,30 @@ func (p *dumper) dump(x reflect.Value, n Node) {
 	switch x.Kind() {
 	case reflect.Interface:
 		if x.IsNil() {
-			p.printf("nil")
+			p.fprintf("nil")
 			return
 		}
 		p.dump(x.Elem(), nil)
 
 	case reflect.Ptr:
 		if x.IsNil() {
-			p.printf("nil")
+			p.fprintf("nil")
 			return
 		}
 
 		// special cases for identifiers w/o attached comments (common case)
 		if x, ok := x.Interface().(*Name); ok {
-			p.printf("%s @ %v", x.Value, x.Pos())
+			p.fprintf("%s @ %v", x.Value, x.Pos())
 			return
 		}
 
-		p.printf("*")
+		p.fprintf("*")
 		// Fields may share type expressions, and declarations
 		// may share the same group - use ptrmap to keep track
 		// of nodes that have been printed already.
 		if ptr, ok := x.Interface().(Node); ok {
 			if line, exists := p.ptrmap[ptr]; exists {
-				p.printf("(Node @ %d)", line)
+				p.fprintf("(Node @ %d)", line)
 				return
 			}
 			p.ptrmap[ptr] = p.line
@@ -139,42 +139,42 @@ func (p *dumper) dump(x reflect.Value, n Node) {
 
 	case reflect.Slice:
 		if x.IsNil() {
-			p.printf("nil")
+			p.fprintf("nil")
 			return
 		}
-		p.printf("%s (%d entries) {", x.Type(), x.Len())
+		p.fprintf("%s (%d entries) {", x.Type(), x.Len())
 		if x.Len() > 0 {
 			p.indent++
-			p.printf("\n")
+			p.fprintf("\n")
 			for i, n := 0, x.Len(); i < n; i++ {
-				p.printf("%d: ", i)
+				p.fprintf("%d: ", i)
 				p.dump(x.Index(i), nil)
-				p.printf("\n")
+				p.fprintf("\n")
 			}
 			p.indent--
 		}
-		p.printf("}")
+		p.fprintf("}")
 
 	case reflect.Struct:
 		typ := x.Type()
 
 		// if span, ok := x.Interface().(lexical.Span); ok {
-		// 	p.printf("%s", &span)
+		// 	p.fprintf("%s", &span)
 		// 	return
 		// }
 
-		p.printf("%s {", typ)
+		p.fprintf("%s {", typ)
 		p.indent++
 
 		first := true
 		if n != nil {
-			p.printf("\n")
+			p.fprintf("\n")
 			first = false
-			// p.printf("Span: %s\n", n.Span())
+			// p.fprintf("Span: %s\n", n.Span())
 			// if c := *n.Comments(); c != nil {
-			// 	p.printf("Comments: ")
+			// 	p.fprintf("Comments: ")
 			// 	p.dump(reflect.ValueOf(c), nil) // a Comment is not a Node
-			// 	p.printf("\n")
+			// 	p.fprintf("\n")
 			// }
 		}
 
@@ -183,25 +183,25 @@ func (p *dumper) dump(x reflect.Value, n Node) {
 			// values cannot be accessed via reflection.
 			if name := typ.Field(i).Name; isExported(name) {
 				if first {
-					p.printf("\n")
+					p.fprintf("\n")
 					first = false
 				}
-				p.printf("%s: ", name)
+				p.fprintf("%s: ", name)
 				p.dump(x.Field(i), nil)
-				p.printf("\n")
+				p.fprintf("\n")
 			}
 		}
 
 		p.indent--
-		p.printf("}")
+		p.fprintf("}")
 
 	default:
 		switch x := x.Interface().(type) {
 		case string:
 			// print strings in quotes
-			p.printf("%q", x)
+			p.fprintf("%q", x)
 		default:
-			p.printf("%v", x)
+			p.fprintf("%v", x)
 		}
 	}
 }
