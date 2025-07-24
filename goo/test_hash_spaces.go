@@ -1,0 +1,7 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	result := z#1  ==  'a'
+	println(result)
+}

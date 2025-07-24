@@ -41,6 +41,7 @@ const (
 	_Colon     // :
 	_Dot       // .
 	_DotDotDot // ...
+	_Hash      // #
 
 	// keywords
 	_Break       // break
