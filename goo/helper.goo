@@ -1,8 +1,4 @@
-package main
-
-import "fmt"
-
-func helper() {
-	fmt.Println("Helper function called")
+def helper() {
+	printf("Helper function called")
 }
 helper()

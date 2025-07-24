@@ -408,7 +408,6 @@ func (s *scanner) ident() {
 		return
 	}
 
-
 	// special case for 'ø' as nil
 	if string(lit) == "ø" {
 		s.nlsemi = true
@@ -506,12 +505,12 @@ func isHex(ch rune) bool     { return '0' <= ch && ch <= '9' || 'a' <= lower(ch)
 // digits (bit 0 is set), or separators '_' (bit 1 is set).
 func (s *scanner) digits(base int, invalid *int) (digsep int) {
 	if base <= 10 {
-		max := rune('0' + base)
+		maxi := rune('0' + base)
 		for isDecimal(s.ch) || s.ch == '_' {
 			ds := 1
 			if s.ch == '_' {
 				ds = 2
-			} else if s.ch >= max && *invalid < 0 {
+			} else if s.ch >= maxi && *invalid < 0 {
 				_, col := s.pos()
 				*invalid = int(col - s.col) // record invalid rune index
 			}
@@ -881,23 +880,23 @@ func (s *scanner) fullComment() {
 
 func (s *scanner) escape(quote rune) bool {
 	var n int
-	var base, max uint32
+	var base, maxi uint32
 
 	switch s.ch {
 	case quote, 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\':
 		s.nextch()
 		return true
 	case '0', '1', '2', '3', '4', '5', '6', '7':
-		n, base, max = 3, 8, 255
+		n, base, maxi = 3, 8, 255
 	case 'x':
 		s.nextch()
-		n, base, max = 2, 16, 255
+		n, base, maxi = 2, 16, 255
 	case 'u':
 		s.nextch()
-		n, base, max = 4, 16, unicode.MaxRune
+		n, base, maxi = 4, 16, unicode.MaxRune
 	case 'U':
 		s.nextch()
-		n, base, max = 8, 16, unicode.MaxRune
+		n, base, maxi = 8, 16, unicode.MaxRune
 	default:
 		if s.ch < 0 {
 			return true // complain in caller about EOF
@@ -926,12 +925,12 @@ func (s *scanner) escape(quote rune) bool {
 		s.nextch()
 	}
 
-	if x > max && base == 8 {
+	if x > maxi && base == 8 {
 		s.errorf("octal escape value %d > 255", x)
 		return false
 	}
 
-	if x > max || 0xD800 <= x && x < 0xE000 /* surrogate range */ {
+	if x > maxi || 0xD800 <= x && x < 0xE000 /* surrogate range */ {
 		s.errorf("escape is invalid Unicode code point %#U", x)
 		return false
 	}

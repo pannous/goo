@@ -1,6 +1,5 @@
-#!/usr/bin/env goo
-package main
+def hello() {
+}
 
-func main() {
-	println("test")
+def main(){
 }
