@@ -169,11 +169,12 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			return typecheck(n, top)
 
 		case ir.OPRINTF:
-			// Handle printf like println for now  
-			n.SetOp(ir.OPRINTLN)
+			// Keep printf as OPRINTF so it can be handled properly in walk phase
+			n.SetOp(l.BuiltinOp)
 			n.Fun = nil
-			n.SetTypecheck(0) // re-typechecking new op is OK, not a loop
-			return typecheck(n, top)
+			typecheckargs(n)
+			n.SetType(nil) // printf doesn't return a value
+			return n
 
 		case ir.OCAP, ir.OCLEAR, ir.OCLOSE, ir.OIMAG, ir.OLEN, ir.OPANIC, ir.OREAL, ir.OTYPEOF, ir.OUNSAFESTRINGDATA, ir.OUNSAFESLICEDATA:
 			typecheckargs(n)
