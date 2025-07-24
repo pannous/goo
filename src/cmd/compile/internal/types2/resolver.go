@@ -832,6 +832,6 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 		checks.imports = append(checks.imports, pkgName)
 		
 		// NOTE: Don't add to file.DeclList - just handle the import programmatically
-		// The AST transformation in call.go will handle the printf -> fmt.Println conversion
+		// The AST transformation in call.go will handle the printf -> fmt.Printf conversion
 	}
 }

@@ -222,7 +222,7 @@ const (
 	OPANIC            // panic(X)
 	OPRINT            // print(List)
 	OPRINTLN          // println(List)
-	OPRINTF           // UNUSED - printf forwarded to fmt.Println during typecheck
+	OPRINTF           // UNUSED - printf forwarded to fmt.Printf during typecheck
 	OPAREN            // (X)
 	OSEND             // Chan <- Value
 	OSLICE            // X[Low : High] (X is untypechecked or slice)
