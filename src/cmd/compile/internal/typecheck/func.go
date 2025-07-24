@@ -723,7 +723,7 @@ func tcTypeof(n *ir.UnaryExpr) ir.Node {
 	return lit
 }
 
-// tcPrint typechecks an OPRINT, OPRINTLN
+// tcPrint typechecks an OPRINT, OPRINTLN, or OPRINTF node.
 func tcPrint(n *ir.CallExpr) ir.Node {
 	typecheckargs(n)
 	ls := n.Args
@@ -737,7 +737,6 @@ func tcPrint(n *ir.CallExpr) ir.Node {
 	}
 	return n
 }
-
 
 // tcMinMax typechecks an OMIN or OMAX node.
 func tcMinMax(n *ir.CallExpr) ir.Node {
