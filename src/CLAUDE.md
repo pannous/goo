@@ -118,3 +118,11 @@ use bin/go instead of global go!
  - Add validation tests for critical constants
  - 
 To avoid code duplication do a quick git history search (grep?) to see if there have been related changes
+
+
+### printf => fmt.Print
+I don't understand why it's so hard to just rewrite printf as fmt.Print!? Maybe you can't even hack the lexer but that's too much ;)
+
+func fmtprintf(args []any) should be func fmtprintf(args ...any)?
+Why are you creating a function like this you should just forward the thing through the compiler, Not through the runtime!?!
+

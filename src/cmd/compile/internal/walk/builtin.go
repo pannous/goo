@@ -1078,18 +1078,10 @@ func isChanLenCap(n ir.Node) bool {
 	return (n.Op() == ir.OLEN || n.Op() == ir.OCAP) && n.(*ir.UnaryExpr).X.Type().IsChan()
 }
 
-// walkPrintf walks OPRINTF by creating a call that forwards to fmt.Printf
+// walkPrintf should not be called - printf is rewritten to fmt.Printf in typecheck
 func walkPrintf(nn *ir.CallExpr, init *ir.Nodes) ir.Node {
-	walkExprListCheap(nn.Args, init)
-	
-	// Create a slice with the arguments
-	argsSlice := ir.NewCompLitExpr(nn.Pos(), ir.OSLICELIT, types.NewSlice(types.Types[types.TINTER]), nn.Args)
-	argsSlice = typecheck.Expr(argsSlice).(*ir.CompLitExpr)
-	
-	// Create a runtime call to fmtprintf with slice argument
-	fmtPrintfFn := typecheck.LookupRuntime("fmtprintf")
-	
-	return mkcall1(fmtPrintfFn, nil, init, argsSlice)
+	base.Fatalf("walkPrintf called - printf should have been rewritten to fmt.Printf in typecheck")
+	return nn
 }
 
 // walkAssert walks an OASSERT node.

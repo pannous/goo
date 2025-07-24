@@ -300,18 +300,3 @@ func hexdumpWords(p, end uintptr, mark func(uintptr) byte) {
 	printunlock()
 }
 
-// fmtprintf forwards to fmt.Printf behavior using runtime print
-func fmtprintf(args []any) {
-	// This is a simplified printf that forwards to print  
-	// without format string processing for now
-	printlock()
-	for i, arg := range args {
-		if i > 0 {
-			printsp()
-		}
-		// Use print which handles interface{} values
-		print(arg)
-	}
-	printnl()
-	printunlock()
-}
