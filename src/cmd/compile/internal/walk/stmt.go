@@ -52,6 +52,7 @@ func walkStmt(n ir.Node) ir.Node {
 		ir.OSEND,
 		ir.OPRINT,
 		ir.OPRINTLN,
+		ir.OPRINTF,
 		ir.OPANIC,
 		ir.ORECOVERFP,
 		ir.OGETG:

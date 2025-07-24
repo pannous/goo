@@ -1,0 +1,28 @@
+#!/usr/bin/env goo
+package main
+
+import "fmt"
+
+func main() {
+	// Ensure fmt is imported
+	_ = fmt.Sprint
+	
+	// Test various format specifiers
+	printf("String: %s\n", "hello")
+	printf("Integer: %d\n", 42)
+	printf("Hex: %x\n", 255)
+	printf("Variable: %v\n", true)
+	
+	// Test without format specifiers (should act like print)
+	printf("No format", 123, "test")
+	printf("\n")
+	
+	// Test complex types
+	m := map{"key": "value"}
+		printf("Map: %v\n", m)
+	fmt.Printf("%v\n", m)
+
+	// Test comparison with fmt.Printf
+	fmt.Printf("fmt.Printf: %s %d\n", "test", 99)
+	printf("printf: %s %d\n", "test", 99)
+}
