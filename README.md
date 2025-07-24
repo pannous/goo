@@ -21,7 +21,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 🗹 z := map{"a": 1, "b": 2}  => map[any]any{…}
 🗹 z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
 🗹 z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
-☐ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed vs # comment with whitespace / tab / newline / semicolon / comma / start of line
+🗹 z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator
 🗹 Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer tool 🤮🦀🤮
 ☐ for keyword := keywords  => for _, keyword := range keywords {
 ☐ String methods "abc".contains("a")
@@ -40,6 +40,35 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ cross off all done tasks from this list  
 ☐ any other pain points you and I might have   
 ☐ map can only be compared to nil
+
+## New Features
+
+### 1-Indexed Array Access (`#` operator)
+
+Goo supports 1-indexed array access using the `#` operator as an alternative to traditional 0-indexed bracket notation:
+
+```go
+z := []rune{'a', 'b', 'c'}
+first := z#1   // Gets 'a' (first element)
+second := z#2  // Gets 'b' (second element) 
+third := z#3   // Gets 'c' (third element)
+
+// Works with any expression as index
+idx := 2
+char := z#idx  // Gets 'b'
+char := z#(1+1) // Gets 'b'
+
+// Correct precedence with operators
+check z#1 == 'a'        // Parses as (z#1) == 'a'
+result := z#1 + 5       // Works with arithmetic
+valid := z#1 < 'z'      // Works with comparisons
+```
+
+**Implementation:** The `#` operator is converted at parse time to `[index-1]`, so `z#1` becomes `z[0]`, maintaining full compatibility with Go's type system and performance characteristics.
+
+**Context-sensitive parsing:** The `#` character is treated as:
+- **1-indexed operator** when following an identifier/expression: `z#1`
+- **Comment start** when at beginning of line: `# This is a comment`
 
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*
