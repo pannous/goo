@@ -1,0 +1,138 @@
+#!/usr/bin/env goo
+
+# Comprehensive Goo test demonstrating all language features
+# This file tests the enhanced IntelliJ plugin capabilities
+
+# Multi-line comment block
+# that should be foldable
+# in the IDE
+
+package main
+
+printf("=== Goo Language Comprehensive Test ===")
+
+# Test basic variable declarations
+x := 42
+y := 0
+name := "Goo Developer"
+ptr := ø
+
+# Test Goo-specific operators
+printf("\n--- Testing Goo Operators ---")
+
+# Test 'and' / 'or' operators
+if x and y == 0 {
+    printf("✓ 'and' operator works: x is truthy and y is zero")
+}
+
+if x > 0 or y > 0 {
+    printf("✓ 'or' operator works: at least one is positive")
+}
+
+# Test 'not' and unicode '¬' operators
+if not (x < 0) {
+    printf("✓ 'not' operator works: x is not negative")
+}
+
+if ¬(x == y) {
+    printf("✓ Unicode '¬' operator works: x is not equal to y")
+}
+
+# Test '≠' operator
+if x ≠ y {
+    printf("✓ Unicode '≠' operator works: x ≠ y")
+}
+
+# Test 'ø' nil keyword
+if ptr == ø {
+    printf("✓ 'ø' nil keyword works: ptr is nil")
+}
+
+# Test check keyword
+printf("\n--- Testing 'check' Keyword ---")
+check x > 0  // Should pass
+printf("✓ check keyword works: x > 0 passed")
+
+# Test typeof function
+printf("\n--- Testing 'typeof' Function ---")
+printf("Type of x:", typeof(x))
+printf("Type of name:", typeof(name))
+printf("Type of ptr:", typeof(ptr))
+
+# Test collections with enhanced syntax
+printf("\n--- Testing Collections ---")
+numbers := [1, 2, 3, 4, 5]
+printf("Numbers array:", numbers)
+
+# Test map with brace syntax
+person := {
+    name: "Alice",
+    age: 30,
+    city: "Gooville"
+}
+printf("Person map:", person)
+
+# Test function definitions with 'def' keyword
+printf("\n--- Testing Function Definitions ---")
+
+def greet(greeting string, target string) {
+    printf(greeting + ",", target + "!")
+}
+
+def calculate(a int, b int) int {
+    if a > b {
+        return a + b
+    } else {
+        return a - b
+    }
+}
+
+# Test 'void' function keyword
+void displayInfo() {
+    printf("This is a void function")
+    printf("It doesn't return a value")
+}
+
+# Call the functions
+greet("Hello", name)
+result := calculate(x, 10)
+printf("Calculation result:", result)
+displayInfo()
+
+# Test truthy/falsey conditions
+printf("\n--- Testing Truthy/Falsey ---")
+
+if x {
+    printf("✓ Non-zero number is truthy:", x)
+}
+
+if name {
+    printf("✓ Non-empty string is truthy:", name)
+}
+
+if numbers {
+    printf("✓ Non-empty array is truthy")
+}
+
+emptyString := ""
+if emptyString {
+    printf("✗ This shouldn't print")
+} else {
+    printf("✓ Empty string is falsey")
+}
+
+# Test complex expressions
+printf("\n--- Testing Complex Expressions ---")
+
+if (x > 0 and name ≠ "") or (ptr == ø and ¬(y > x)) {
+    printf("✓ Complex boolean expression works")
+}
+
+# Test loop with enhanced syntax (if supported)
+printf("\n--- Testing Enhanced Loops ---")
+for i := 0; i < 3; i++ {
+    printf("Loop iteration:", i)
+}
+
+printf("\n=== Test Complete ===")
+printf("All Goo language features demonstrated!")

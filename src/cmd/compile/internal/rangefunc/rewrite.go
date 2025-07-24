@@ -1135,7 +1135,7 @@ func (r *rewriter) setStateAt(index int, stateVal abi.RF_State) *syntax.AssignSt
 // ftyp is the type of the function we are creating
 // start and end are the syntax positions to use for new nodes
 // that should be at the start or end of the loop.
-func (r *rewriter) bodyFunc(body []syntax.Stmt, lhs []syntax.Expr, def bool, ftyp *types2.Signature, start, end syntax.Pos) *syntax.FuncLit {
+func (r *rewriter) bodyFunc(body []syntax.Stmt, lhs []syntax.Expr, defi bool, ftyp *types2.Signature, start, end syntax.Pos) *syntax.FuncLit {
 	// Starting X(bodyFunc); build up bodyFunc first.
 	var params, results []*types2.Var
 	results = append(results, types2.NewVar(start, nil, "#r", r.bool.Type()))
@@ -1153,7 +1153,7 @@ func (r *rewriter) bodyFunc(body []syntax.Stmt, lhs []syntax.Expr, def bool, fty
 	for i := 0; i < ftyp.Params().Len(); i++ {
 		typ := ftyp.Params().At(i).Type()
 		var paramVar *types2.Var
-		if i < len(lhs) && def {
+		if i < len(lhs) && defi {
 			// Reuse range variable as parameter.
 			x := lhs[i]
 			paramVar = r.info.Defs[x.(*syntax.Name)].(*types2.Var)

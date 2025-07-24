@@ -450,14 +450,14 @@ func checkBuildConfig(add map[string]string, del map[string]bool) error {
 	// reports whether it changed. cur should be the current value
 	// (i.e., before applying changes) and def should be the default
 	// value (i.e., when no environment variables are provided at all).
-	get := func(key, cur, def string) (string, bool) {
+	get := func(key, cur, defi string) (string, bool) {
 		if val, ok := add[key]; ok {
 			return val, true
 		}
 		if del[key] {
 			val := getOrigEnv(key)
 			if val == "" {
-				val = def
+				val = defi
 			}
 			return val, true
 		}

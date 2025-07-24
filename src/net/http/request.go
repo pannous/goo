@@ -531,11 +531,11 @@ func (r *Request) isH2Upgrade() bool {
 }
 
 // Return value if nonempty, def otherwise.
-func valueOrDefault(value, def string) string {
+func valueOrDefault(value, defi string) string {
 	if value != "" {
 		return value
 	}
-	return def
+	return defi
 }
 
 // NOTE: This is not intended to reflect the actual Go version being used.

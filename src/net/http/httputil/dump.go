@@ -186,11 +186,11 @@ func (r *delegateReader) Read(p []byte) (int, error) {
 }
 
 // Return value if nonempty, def otherwise.
-func valueOrDefault(value, def string) string {
+func valueOrDefault(value, defi string) string {
 	if value != "" {
 		return value
 	}
-	return def
+	return defi
 }
 
 var reqWriteExcludeHeaderDump = map[string]bool{

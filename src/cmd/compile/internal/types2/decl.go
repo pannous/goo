@@ -47,7 +47,7 @@ func pathString(path []Object) string {
 
 // objDecl type-checks the declaration of obj in its respective (file) environment.
 // For the meaning of def, see Checker.definedType, in typexpr.go.
-func (checks *Checker) objDecl(obj Object, def *TypeName) {
+func (checks *Checker) objDecl(obj Object, defi *TypeName) {
 	if tracePos {
 		checks.pushPos(obj.Pos())
 		defer func() {
@@ -197,7 +197,7 @@ func (checks *Checker) objDecl(obj Object, def *TypeName) {
 		checks.varDecl(obj, d.lhs, d.vtyp, d.init)
 	case *TypeName:
 		// invalid recursive types are detected via path
-		checks.typeDecl(obj, d.tdecl, def)
+		checks.typeDecl(obj, d.tdecl, defi)
 		checks.collectMethods(obj) // methods can only be added to top-level types
 	case *Func:
 		// functions may be recursive - no need to track dependencies
@@ -474,7 +474,7 @@ func (checks *Checker) isImportedConstraint(typ Type) bool {
 	return u != nil && !u.IsMethodSet()
 }
 
-func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, def *TypeName) {
+func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, defi *TypeName) {
 	assert(obj.typ == nil)
 
 	// Only report a version error if we have not reported one already.
@@ -516,7 +516,7 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, def *Type
 			// Unalias does not memoize if Invalid. Perhaps we should use a
 			// special sentinel distinct from Invalid.
 			alias := checks.newAlias(obj, Typ[Invalid])
-			setDefType(def, alias)
+			setDefType(defi, alias)
 
 			// handle type parameters even if not allowed (Alias type is supported)
 			if tparam0 != nil {
@@ -552,7 +552,7 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, def *Type
 	}
 
 	named := checks.newNamed(obj, nil, nil)
-	setDefType(def, named)
+	setDefType(defi, named)
 
 	if tdecl.TParamList != nil {
 		checks.openScope(tdecl, "type parameters")

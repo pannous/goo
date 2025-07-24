@@ -1811,9 +1811,9 @@ func (r *reader) assignList() ([]*ir.Name, []ir.Node) {
 	var names []*ir.Name
 
 	for i := range lhs {
-		expr, def := r.assign()
+		expr, defi := r.assign()
 		lhs[i] = expr
-		if def {
+		if defi {
 			names = append(names, expr.(*ir.Name))
 		}
 	}

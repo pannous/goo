@@ -346,8 +346,8 @@ func (d *dwctxt) walksymtypedef(symIdx loader.Sym) loader.Sym {
 	// FIXME: this seems clunky, maybe there is a better way to do this.
 
 	if ts, ok := d.rtmap[symIdx]; ok {
-		if def, ok := d.tdmap[ts]; ok {
-			return def
+		if defi, ok := d.tdmap[ts]; ok {
+			return defi
 		}
 		d.linkctxt.Errorf(ts, "internal error: no entry for sym %d in tdmap\n", ts)
 		return 0
@@ -467,7 +467,7 @@ func (d *dwctxt) lookupOrDiag(n string) loader.Sym {
 	return symIdx
 }
 
-func (d *dwctxt) dotypedef(parent *dwarf.DWDie, name string, def *dwarf.DWDie) *dwarf.DWDie {
+func (d *dwctxt) dotypedef(parent *dwarf.DWDie, name string, defi *dwarf.DWDie) *dwarf.DWDie {
 	// Only emit typedefs for real names.
 	if strings.HasPrefix(name, "map[") {
 		return nil
@@ -486,7 +486,7 @@ func (d *dwctxt) dotypedef(parent *dwarf.DWDie, name string, def *dwarf.DWDie) *
 	if name[0] == '[' || name[0] == '*' {
 		return nil
 	}
-	if def == nil {
+	if defi == nil {
 		Errorf("dwarf: bad def in dotypedef")
 	}
 
@@ -496,7 +496,7 @@ func (d *dwctxt) dotypedef(parent *dwarf.DWDie, name string, def *dwarf.DWDie) *
 	tds := d.ldr.CreateExtSym("", 0)
 	tdsu := d.ldr.MakeSymbolUpdater(tds)
 	tdsu.SetType(sym.SDWARFTYPE)
-	def.Sym = dwSym(tds)
+	defi.Sym = dwSym(tds)
 	d.ldr.SetAttrNotInSymbolTable(tds, true)
 	d.ldr.SetAttrReachable(tds, true)
 

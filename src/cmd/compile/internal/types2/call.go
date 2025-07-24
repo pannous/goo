@@ -669,7 +669,7 @@ var cgoPrefixes = [...]string{
 	"_Cmacro_", // function to evaluate the expanded expression
 }
 
-func (checks *Checker) selector(x *operand, e *syntax.SelectorExpr, def *TypeName, wantType bool) {
+func (checks *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeName, wantType bool) {
 	// these must be declared before the "goto Error" statements
 	var (
 		obj      Object
@@ -779,8 +779,8 @@ func (checks *Checker) selector(x *operand, e *syntax.SelectorExpr, def *TypeNam
 	switch x.mode {
 	case typexpr:
 		// don't crash for "type T T.x" (was go.dev/issue/51509)
-		if def != nil && def.typ == x.typ {
-			checks.cycleError([]Object{def}, 0)
+		if defi != nil && defi.typ == x.typ {
+			checks.cycleError([]Object{defi}, 0)
 			goto Error
 		}
 	case builtin:

@@ -154,7 +154,7 @@ func TestLico(t *testing.T) {
 }
 
 func TestIsStmt(t *testing.T) {
-	def := fmt.Sprintf(":%d", PosDefaultStmt)
+	defi := fmt.Sprintf(":%d", PosDefaultStmt)
 	is := fmt.Sprintf(":%d", PosIsStmt)
 	negate := fmt.Sprintf(":%d", PosNotStmt)
 
@@ -165,16 +165,16 @@ func TestIsStmt(t *testing.T) {
 	}{
 		{0, ":0" + negate, 0, 0},
 		{makeLico(0, 0), ":0" + negate, 0, 0},
-		{makeLico(0, 1), ":0:1" + def, 0, 1},
-		{makeLico(1, 0), ":1" + def, 1, 0},
-		{makeLico(1, 1), ":1:1" + def, 1, 1},
+		{makeLico(0, 1), ":0:1" + defi, 0, 1},
+		{makeLico(1, 0), ":1" + defi, 1, 0},
+		{makeLico(1, 1), ":1:1" + defi, 1, 1},
 		{makeLico(1, 1).withIsStmt(), ":1:1" + is, 1, 1},
 		{makeLico(1, 1).withNotStmt(), ":1:1" + negate, 1, 1},
-		{makeLico(lineMax, 1), fmt.Sprintf(":%d", lineMax) + def, lineMax, 1},
-		{makeLico(lineMax+1, 1), fmt.Sprintf(":%d", lineMax) + def, lineMax, 1}, // line too large, stick with max. line
-		{makeLico(1, colMax), ":1" + def, 1, colMax},
-		{makeLico(1, colMax+1), ":1" + def, 1, 0}, // column too large
-		{makeLico(lineMax+1, colMax+1), fmt.Sprintf(":%d", lineMax) + def, lineMax, 0},
+		{makeLico(lineMax, 1), fmt.Sprintf(":%d", lineMax) + defi, lineMax, 1},
+		{makeLico(lineMax+1, 1), fmt.Sprintf(":%d", lineMax) + defi, lineMax, 1}, // line too large, stick with max. line
+		{makeLico(1, colMax), ":1" + defi, 1, colMax},
+		{makeLico(1, colMax+1), ":1" + defi, 1, 0}, // column too large
+		{makeLico(lineMax+1, colMax+1), fmt.Sprintf(":%d", lineMax) + defi, lineMax, 0},
 		{makeLico(lineMax+1, colMax+1).withIsStmt(), fmt.Sprintf(":%d", lineMax) + is, lineMax, 0},
 		{makeLico(lineMax+1, colMax+1).withNotStmt(), fmt.Sprintf(":%d", lineMax) + negate, lineMax, 0},
 	} {

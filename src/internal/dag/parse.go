@@ -113,13 +113,13 @@ func Parse(dag string) (*Graph, error) {
 			disallowed = append(disallowed, r)
 			continue
 		}
-		for _, def := range r.def {
-			if def == "NONE" {
+		for _, defi := range r.defi {
+			if defi == "NONE" {
 				errorf("NONE cannot be a predecessor")
 				continue
 			}
-			if !g.addNode(def) {
-				errorf("multiple definitions for %s", def)
+			if !g.addNode(defi) {
+				errorf("multiple definitions for %s", defi)
 			}
 			for _, less := range r.less {
 				if less == "NONE" {
@@ -128,7 +128,7 @@ func Parse(dag string) (*Graph, error) {
 				if _, ok := g.byLabel[less]; !ok {
 					errorf("use of %s before its definition", less)
 				} else {
-					g.AddEdge(def, less)
+					g.AddEdge(defi, less)
 				}
 			}
 		}
@@ -163,9 +163,9 @@ func Parse(dag string) (*Graph, error) {
 	// Check negative assertions against completed allowed graph.
 	for _, bad := range disallowed {
 		for _, less := range bad.less {
-			for _, def := range bad.def {
-				if g.HasEdge(def, less) {
-					errorf("graph edge assertion failed: %s !< %s", less, def)
+			for _, defi := range bad.defi {
+				if g.HasEdge(defi, less) {
+					errorf("graph edge assertion failed: %s !< %s", less, defi)
 				}
 			}
 		}
@@ -182,7 +182,7 @@ func Parse(dag string) (*Graph, error) {
 type rule struct {
 	less []string
 	op   string // Either "<" or "!<"
-	def  []string
+	defi []string
 }
 
 type syntaxError string

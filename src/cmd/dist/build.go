@@ -295,8 +295,8 @@ func xinit() {
 // but is overridden by the following.
 // If gohostos=goos and gohostarch=goarch, then $CC_FOR_TARGET applies even for gohostos/gohostarch.
 // $CC_FOR_goos_goarch, if set, applies only to goos/goarch.
-func compilerEnv(envName, def string) map[string]string {
-	m := map[string]string{"": def}
+func compilerEnv(envName, defi string) map[string]string {
+	m := map[string]string{"": defi}
 
 	if env := os.Getenv(envName); env != "" {
 		m[""] = env

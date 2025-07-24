@@ -230,7 +230,7 @@ var updateMu sync.Mutex
 // update records an updated GODEBUG setting.
 // def is the default GODEBUG setting for the running binary,
 // and env is the current value of the $GODEBUG environment variable.
-func update(def, env string) {
+func update(defi, env string) {
 	updateMu.Lock()
 	defer updateMu.Unlock()
 
@@ -246,7 +246,7 @@ func update(def, env string) {
 		return true
 	})
 	parse(did, env)
-	parse(did, def)
+	parse(did, defi)
 
 	// Clear any cached values that are no longer present.
 	cache.Range(func(name, s any) bool {

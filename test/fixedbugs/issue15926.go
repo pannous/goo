@@ -11,10 +11,10 @@ package main
 
 type S struct{}
 
-func (s S) def() {}
+func (s S) defi() {}
 
-var I = S.def
+var I = S.defi
 
 func main() {
-    I(S{})
+	I(S{})
 }

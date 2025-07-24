@@ -74,10 +74,10 @@ var basicAliases = [...]*Basic{
 
 func defPredeclaredTypes() {
 	for _, t := range Typ {
-		def(NewTypeName(nopos, nil, t.name, t))
+		defi(NewTypeName(nopos, nil, t.name, t))
 	}
 	for _, t := range basicAliases {
-		def(NewTypeName(nopos, nil, t.name, t))
+		defi(NewTypeName(nopos, nil, t.name, t))
 	}
 
 	// type any = interface{}
@@ -109,7 +109,7 @@ func defPredeclaredTypes() {
 		universeAnyAlias = NewTypeName(nopos, nil, "any", nil)
 		universeAnyAlias.setColor(black)
 		_ = NewAlias(universeAnyAlias, universeAnyNoAlias.Type().Underlying()) // Link TypeName and Alias
-		def(universeAnyAlias)
+		defi(universeAnyAlias)
 	}
 
 	// type error interface{ Error() string }
@@ -129,7 +129,7 @@ func defPredeclaredTypes() {
 		computeInterfaceTypeSet(nil, nopos, ityp) // prevent races due to lazy computation of tset
 
 		typ.SetUnderlying(ityp)
-		def(obj)
+		defi(obj)
 	}
 
 	// type comparable interface{} // marked as comparable
@@ -142,7 +142,7 @@ func defPredeclaredTypes() {
 		ityp := &Interface{complete: true, tset: &_TypeSet{nil, allTermlist, true}}
 
 		typ.SetUnderlying(ityp)
-		def(obj)
+		defi(obj)
 	}
 }
 
@@ -158,12 +158,12 @@ var predeclaredConsts = [...]struct {
 
 func defPredeclaredConsts() {
 	for _, c := range predeclaredConsts {
-		def(NewConst(nopos, nil, c.name, Typ[c.kind], c.val))
+		defi(NewConst(nopos, nil, c.name, Typ[c.kind], c.val))
 	}
 }
 
 func defPredeclaredNil() {
-	def(&Nil{object{name: "nil", typ: Typ[UntypedNil], color_: black}})
+	defi(&Nil{object{name: "nil", typ: Typ[UntypedNil], color_: black}})
 }
 
 // A builtinId is the id of a builtin function.
@@ -254,7 +254,7 @@ func defPredeclaredFuncs() {
 		if id == _Trace {
 			continue // only define these in testing environment
 		}
-		def(newBuiltin(id))
+		defi(newBuiltin(id))
 	}
 }
 
@@ -265,8 +265,8 @@ func DefPredeclaredTestFuncs() {
 	if Universe.Lookup("assert") != nil {
 		return // already defined
 	}
-	def(newBuiltin(_Assert))
-	def(newBuiltin(_Trace))
+	defi(newBuiltin(_Assert))
+	defi(newBuiltin(_Trace))
 }
 
 func init() {
@@ -290,7 +290,7 @@ func init() {
 // Objects with names containing blanks are internal and not entered into
 // a scope. Objects with exported names are inserted in the unsafe package
 // scope; other objects are inserted in the universe scope.
-func def(obj Object) {
+func defi(obj Object) {
 	assert(obj.color() == black)
 	name := obj.Name()
 	if strings.Contains(name, " ") {

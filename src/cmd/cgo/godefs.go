@@ -78,9 +78,9 @@ func (p *Package) godefs(f *File, args []string) string {
 	// Extend overrides using typedefs:
 	// If we know that C.xxx should format as T
 	// and xxx is a typedef for yyy, make C.yyy format as T.
-	for typ, def := range typedef {
+	for typ, defi := range typedef {
 		if new := override[typ]; new != "" {
-			if id, ok := def.Go.(*ast.Ident); ok {
+			if id, ok := defi.Go.(*ast.Ident); ok {
 				override[id.Name] = new
 			}
 		}
@@ -103,8 +103,8 @@ func (p *Package) godefs(f *File, args []string) string {
 	// Substitute those union types with byte arrays.
 	for name, id := range goIdent {
 		if id.Name == name && strings.Contains(name, "_Ctype_union") {
-			if def := typedef[name]; def != nil {
-				id.Name = gofmt(def)
+			if defi := typedef[name]; defi != nil {
+				id.Name = gofmt(defi)
 			}
 		}
 	}

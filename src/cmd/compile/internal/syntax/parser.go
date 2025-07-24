@@ -489,7 +489,7 @@ func (p *parser) fileOrNil() *File {
 				break
 			}
 		}
-		
+
 		if !hasMain {
 			// Create synthetic main function
 			mainFunc := &FuncDecl{
@@ -1092,12 +1092,12 @@ func (p *parser) operand(keep_parens bool) Expr {
 	case _Map:
 		// Parse map type - could be map[K]V or map{...}
 		return p.mapTypeOrLiteral()
-		
+
 	case _Lbrack:
 		// Handle both [1,2,3] slice literals and [1]Type array types
 		pos := p.pos()
 		p.want(_Lbrack)
-		
+
 		// Empty brackets [] - this should be followed by type for slice type
 		if p.tok == _Rbrack {
 			p.next()
@@ -1106,7 +1106,7 @@ func (p *parser) operand(keep_parens bool) Expr {
 			t.Elem = p.type_()
 			return t
 		}
-		
+
 		// Check for ellipsis [...] arrays first
 		if p.got(_DotDotDot) {
 			p.want(_Rbrack)
@@ -1116,15 +1116,15 @@ func (p *parser) operand(keep_parens bool) Expr {
 			t.Elem = p.type_()
 			return t
 		}
-		
+
 		// Parse first expression
 		first := p.expr()
-		
+
 		// Disambiguate: if comma follows, it's slice literal [1,2,3]
 		if p.tok == _Comma {
 			return p.sliceLiteral(pos, first)
 		}
-		
+
 		// Otherwise it's array type [expr]Type
 		p.want(_Rbrack)
 		t := new(ArrayType)
@@ -1132,11 +1132,11 @@ func (p *parser) operand(keep_parens bool) Expr {
 		t.Len = first
 		t.Elem = p.type_()
 		return t
-		
+
 	case _Lbrace:
 		// Handle {a: 1, b: 2} map literals with symbol keys
 		return p.mapLiteralFromBrace()
-		
+
 	case _Chan, _Struct, _Interface:
 		return p.type_() // othertype
 
@@ -1538,7 +1538,7 @@ func (p *parser) mapTypeOrLiteral() Expr {
 
 	pos := p.pos()
 	p.next() // consume 'map'
-	
+
 	if p.tok == _Lbrack {
 		// Regular map[K]V syntax
 		p.want(_Lbrack)
@@ -1565,13 +1565,12 @@ func (p *parser) mapTypeOrLiteral() Expr {
 	}
 }
 
-
 // sliceLiteral parses [1,2,3] style slice literals
 func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	if trace {
 		defer p.trace("sliceLiteral")()
 	}
-	
+
 	// Create slice type with inferred element type ([]any)
 	sliceType := new(SliceType)
 	sliceType.pos = pos
@@ -1579,26 +1578,26 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	anyName.pos = pos
 	anyName.Value = "any"
 	sliceType.Elem = anyName
-	
+
 	// Create composite literal
 	lit := new(CompositeLit)
 	lit.pos = pos
 	lit.Type = sliceType
-	
+
 	// Add first element - for slice literals, elements are just expressions, not key-value pairs
 	lit.ElemList = append(lit.ElemList, first)
-	
+
 	// Parse remaining elements
 	for p.tok == _Comma {
 		p.next()
 		if p.tok == _Rbrack {
 			break // trailing comma
 		}
-		
+
 		expr := p.expr()
 		lit.ElemList = append(lit.ElemList, expr)
 	}
-	
+
 	lit.Rbrace = p.pos()
 	p.want(_Rbrack)
 	return lit
@@ -1630,7 +1629,7 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	// Parse elements
 	for p.tok != _Rbrace && p.tok != _EOF {
 		keyExpr := p.expr()
-		
+
 		// Convert unquoted identifiers to string literals
 		if nameExpr, ok := keyExpr.(*Name); ok {
 			// Convert identifier 'a' to string literal "a"
@@ -1640,10 +1639,10 @@ func (p *parser) mapLiteralFromBrace() Expr {
 			stringLit.Kind = StringLit
 			keyExpr = stringLit
 		}
-		
+
 		p.want(_Colon)
 		valueExpr := p.expr()
-		
+
 		// Create key-value pair
 		kvExpr := new(KeyValueExpr)
 		kvExpr.pos = keyExpr.Pos()
@@ -1651,7 +1650,7 @@ func (p *parser) mapLiteralFromBrace() Expr {
 		kvExpr.Value = valueExpr
 		lit.ElemList = append(lit.ElemList, kvExpr)
 		lit.NKeys++
-		
+
 		if !p.got(_Comma) {
 			break
 		}
@@ -2468,12 +2467,12 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 	}
 }
 
-func (p *parser) newRangeClause(lhs Expr, def bool) *RangeClause {
+func (p *parser) newRangeClause(lhs Expr, defi bool) *RangeClause {
 	r := new(RangeClause)
 	r.pos = p.pos()
 	p.next() // consume _Range
 	r.Lhs = lhs
-	r.Def = def
+	r.Def = defi
 	r.X = p.expr()
 	return r
 }
