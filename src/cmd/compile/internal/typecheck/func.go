@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"go/constant"
 	"go/token"
+	"os"
 )
 
 // MakeDotArgs package all the arguments that match a ... T parameter into a []T.
@@ -147,9 +148,41 @@ func tcFunc(n *ir.Func) {
 // tcCall typechecks an OCALL node.
 func tcCall(n *ir.CallExpr, top int) ir.Node {
 	Stmts(n.Init()) // imported rewritten f(g()) calls (#30907)
+	
+	// Debug: check the original function before typecheck
+	if n.Fun.Op() == ir.ONONAME {
+		if ident, ok := n.Fun.(*ir.Ident); ok && ident.Sym() != nil && ident.Sym().Name == "printf" {
+			fmt.Fprintf(os.Stderr, "DEBUG: Before typecheck - printf as ONONAME, sym.Def=%v\n", ident.Sym().Def)
+		}
+	}
+	
 	n.Fun = typecheck(n.Fun, ctxExpr|ctxType|ctxCallee)
 
 	l := n.Fun
+
+	// Debug: check what we get for function name
+	if l.Op() == ir.ONAME {
+		name := l.(*ir.Name)
+		if name.Sym() != nil && name.Sym().Name == "printf" {
+			fmt.Fprintf(os.Stderr, "DEBUG: Found printf name node, BuiltinOp=%v\n", name.BuiltinOp)
+		}
+	} else {
+		// Check for printf in other node types
+		switch l.Op() {
+		case ir.ONONAME:
+			if ident, ok := l.(*ir.Ident); ok && ident.Sym() != nil && ident.Sym().Name == "printf" {
+				fmt.Fprintf(os.Stderr, "DEBUG: Found printf as ONONAME (unresolved), sym.Def=%v\n", ident.Sym().Def)
+			}
+		default:
+			// Check if it has a symbol with name printf
+			switch ln := l.(type) {
+			case interface{ Sym() *types.Sym }:
+				if ln.Sym() != nil && ln.Sym().Name == "printf" {
+					fmt.Fprintf(os.Stderr, "DEBUG: Found printf as %v node\n", l.Op())
+				}
+			}
+		}
+	}
 
 	if l.Op() == ir.ONAME && l.(*ir.Name).BuiltinOp != 0 {
 		l := l.(*ir.Name)
@@ -169,8 +202,10 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			return typecheck(n, top)
 
 		case ir.OPRINTF:
-			// Handle printf like println for now  
-			n.SetOp(ir.OPRINTLN)
+			// Debug: print to stderr to see if this case is reached
+			fmt.Fprintf(os.Stderr, "OPRINTF case reached in typecheck\n")
+			// Convert the call to OPRINTF operation like other builtins
+			n.SetOp(l.BuiltinOp)
 			n.Fun = nil
 			n.SetTypecheck(0) // re-typechecking new op is OK, not a loop
 			return typecheck(n, top)
