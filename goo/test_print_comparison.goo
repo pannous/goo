@@ -1,0 +1,8 @@
+#!/usr/bin/env goo
+package main
+
+func main() {
+	print("print:", "hello", 42, true)
+	println("println:", "world", 123, false) 
+	printf("printf:", "test", 99, true)
+}

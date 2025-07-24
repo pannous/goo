@@ -1,0 +1,5 @@
+package main
+
+func main() {
+	printf("Hello %s, you are %d years old!\n", "world", 42)
+}
