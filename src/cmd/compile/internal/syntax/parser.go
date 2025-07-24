@@ -406,11 +406,12 @@ func (p *parser) fileOrNil() *File {
 	// PackageClause
 	f.GoVersion = p.goVersion
 	p.top = false
-	if !p.got(_Package) {
+	if p.tok != _Package {
 		// Auto-inject "package main" if no package declaration found
 		f.Pragma = nil
 		f.PkgName = NewName(p.pos(), "main")
 	} else {
+		p.next() // consume the package token
 		f.Pragma = p.takePragma()
 		f.PkgName = p.name()
 		p.want(_Semi)
