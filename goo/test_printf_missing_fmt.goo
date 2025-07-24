@@ -1,7 +1,0 @@
-package main
-
-func main() {
-	name := "world" 
-	num := 42
-	printf("Hello %s, number is %d!\n", name, num)
-}

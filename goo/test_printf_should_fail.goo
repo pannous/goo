@@ -1,8 +1,0 @@
-package main
-
-func main() {
-	// This should fail because printf needs fmt import but we don't have it
-	printf("Hello %s!\n", "world")
-	// Try to use fmt directly to show it's not imported
-	fmt.Println("This should fail")
-}

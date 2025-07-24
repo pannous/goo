@@ -17,7 +17,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ no Main needed ☐  implicit package main  
 ✅ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)
 ✅ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?
-✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } 
+✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }
 ✅ z := map{"a": 1, "b": 2}  => map[any]any{…}
 ✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
 ✅ z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}
@@ -29,6 +29,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}
 test_list_comparison.goo
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println
+☐ 
 ☐ for keyword := keywords  => for _, keyword := range keywords { __
 ☐ String methods "abc".contains("a")
 ☐ return void, e.g. return print("ok") HARD  
