@@ -1,7 +1,0 @@
-package main
-
-func main() {
-	z := []int{10, 20, 30}
-	a := z#1
-	check a == 10
-}

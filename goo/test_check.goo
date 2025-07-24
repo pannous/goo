@@ -1,0 +1,26 @@
+#!/usr/bin/env goo
+package main
+
+func main() {
+	// Basic tests
+	check true
+	check 2 > 1
+	check 42 // non-zero is truthy
+	check "hello" // non-empty string is truthy
+	
+	// Variable comparison
+	x := 10
+	check x == 10
+	
+	// Panic test with recovery
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				println("✅ check correctly panicked for falsy condition")
+			}
+		}()
+		check 1 > 2 // This should panic
+	}()
+	
+	println("✅ All check tests passed!")
+}
