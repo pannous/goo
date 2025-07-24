@@ -217,7 +217,14 @@ func main() {
 		counter.Inc("go/subcommand:" + strings.ReplaceAll(cfg.CmdName, " ", "-"))
 	}
 	telemetrystats.Increment()
-	invoke(cmd, args[used-1:])
+	// Special case: if used == 0 and cmd is run.CmdRun, we're defaulting to run for a .go file
+	if used == 0 && cmd == run.CmdRun {
+		// Create args as if user typed "go run file.go ..."
+		runArgs := append([]string{"run"}, args...)
+		invoke(cmd, runArgs)
+	} else {
+		invoke(cmd, args[used-1:])
+	}
 	base.Exit()
 }
 
@@ -285,6 +292,15 @@ func lookupCmd(args []string) (cmd *base.Command, used int) {
 		// len(c.Commands) == 0 && !c.Runnable() => help text; stop at "help"
 		break
 	}
+	
+	// If no command was found and the first argument ends with .go, default to run
+	if used == 0 && len(args) > 0 {
+		if strings.HasSuffix(args[0], ".go") {
+			cmd = run.CmdRun
+			used = 0 // Keep used as 0 so we pass all args to run
+		}
+	}
+	
 	return cmd, used
 }
 
