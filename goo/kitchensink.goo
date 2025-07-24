@@ -1,4 +1,5 @@
 #!/usr/bin/env goo
+#!/usr/bin/env goo run
 
 # Comprehensive Goo test demonstrating all language features
 # This file tests the enhanced IntelliJ plugin capabilities
@@ -15,7 +16,7 @@ printf("=== Goo Language Comprehensive Test ===")
 x := 42
 y := 0
 name := "Goo Developer"
-ptr := ø
+#ptr := ø
 
 # Test Goo-specific operators
 printf("\n--- Testing Goo Operators ---")
@@ -63,6 +64,7 @@ printf("Type of ptr:", typeof(ptr))
 printf("\n--- Testing Collections ---")
 numbers := [1, 2, 3, 4, 5]
 printf("Numbers array:", numbers)
+
 
 # Test map with brace syntax
 person := {

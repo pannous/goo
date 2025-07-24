@@ -1,0 +1,23 @@
+#!/usr/bin/env goo
+#!../bin/go run
+package main
+
+import "fmt"
+
+# This is a hash comment at the beginning of a line
+func main() {
+	# Indented hash comment
+	fmt.Println("Hash comments test")
+	
+	# Test multiple lines with hash comments
+	x := 42
+	y := "test"
+	
+	# Test that strings with # inside still work
+	z := "string with # symbol inside"
+	raw := `raw string with # inside`
+	
+	fmt.Println(x, y, z, raw)
+}
+
+# Comment at the end of file

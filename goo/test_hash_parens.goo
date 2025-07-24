@@ -1,0 +1,11 @@
+#!/usr/bin/env goo
+package main
+import "fmt"
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	check (z#1) == 'a'
+	printf("z[1]: %c\n", z#1)
+	fmt.Printf("z#2: %c\n", z#1)
+
+}

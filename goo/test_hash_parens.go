@@ -1,6 +1,0 @@
-package main
-
-func main() {
-	z := []rune{'a', 'b', 'c'}
-	check (z#1) == 'a'
-}
