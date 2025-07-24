@@ -1,0 +1,3 @@
+z := ['a', 'b', 'c']
+check z#1 == 'a'
+printf("success")

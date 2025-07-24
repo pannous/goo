@@ -2719,40 +2719,26 @@ func emphasize(x Expr) string {
 
 // needsFmtImport checks if the file uses printf and doesn't already import fmt
 func (p *parser) needsFmtImport(f *File) bool {
-	hasFmtImport := false
-	hasPrintf := false
-	
 	// Check if fmt is already imported
 	for _, decl := range f.DeclList {
 		if imp, ok := decl.(*ImportDecl); ok && imp.Path != nil {
 			if imp.Path.Value == `"fmt"` {
-				hasFmtImport = true
-				break
+				return false // Already has fmt import
 			}
 		}
 	}
 	
-	if hasFmtImport {
-		return false // Already has fmt import
-	}
-	
-	// Check if printf is used by scanning the source text directly
-	// This avoids the AST inspection that includes commented code
-	text := string(p.scanner.source.buf)
-	// Look for printf calls that are not commented out
-	lines := strings.Split(text, "\n")
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		// Skip comment lines starting with #
-		if strings.HasPrefix(trimmed, "#") {
-			continue
+	// Walk the AST to find printf calls
+	var hasPrintf bool
+	Inspect(f, func(n Node) bool {
+		if call, ok := n.(*CallExpr); ok {
+			if name, ok := call.Fun.(*Name); ok && name.Value == "printf" {
+				hasPrintf = true
+				return false // found printf, stop searching
+			}
 		}
-		// Look for printf function calls
-		if strings.Contains(line, "printf(") {
-			hasPrintf = true
-			break
-		}
-	}
+		return true
+	})
 	
 	return hasPrintf
 }
