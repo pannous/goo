@@ -1,6 +1,6 @@
 #!/usr/bin/env goo
 package main
+import "fmt"
 
-func main() {
-	check 1>0
-}
+check 1>0
+printf("Test passed: 1 is greater than 0")
