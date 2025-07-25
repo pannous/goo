@@ -418,13 +418,13 @@ func (p *parser) fileOrNil() *File {
 	}
 
 	// don't bother continuing if package clause has errors
-	if p.first != nil {
+	if p.first /*error*/ != nil {
 		return nil
 	}
 
 	// Accept import declarations anywhere for error tolerance, but complain.
 	// { ( ImportDecl | TopLevelDecl ) ";" }
-	
+
 	// Auto-inject fmt import for .goo files that use printf but don't import fmt
 	if strings.HasSuffix(p.file.filename, ".goo") && p.needsFmtImport(f) {
 		fmtLit := &BasicLit{
@@ -432,15 +432,14 @@ func (p *parser) fileOrNil() *File {
 			Kind:  StringLit,
 		}
 		fmtLit.pos = p.pos()
-		
+
 		fmtImport := &ImportDecl{
 			Path: fmtLit,
 		}
 		fmtImport.pos = p.pos()
-		
 		f.DeclList = append(f.DeclList, fmtImport)
 	}
-	
+
 	prev := _Import
 	for p.tok != _EOF {
 		if p.tok == _Import && prev != _Import {
@@ -1499,7 +1498,6 @@ func (p *parser) typeOrNil() Expr {
 		_, t := p.funcType("function type")
 		return t
 
-
 	case _Lbrack:
 		// '[' oexpr ']' ntype
 		// '[' _DotDotDot ']' ntype
@@ -1572,16 +1570,16 @@ func (p *parser) mapTypeOrLiteral() Expr {
 
 	if p.tok == _Lbrack {
 		p.want(_Lbrack)
-		
+
 		// Check for empty map[] case
 		if p.tok == _Rbrack {
 			// Empty map literal map[]
 			return p.mapLiteralFromBracket(pos, nil)
 		}
-		
+
 		// Look ahead to determine if this is map[key:value] or map[K]V
 		firstExpr := p.expr()
-		
+
 		if p.tok == _Colon {
 			// This is map[key:value key:value...] literal syntax
 			return p.mapLiteralFromBracket(pos, firstExpr)
@@ -2801,25 +2799,18 @@ func emphasize(x Expr) string {
 
 // needsFmtImport checks if the file uses printf and doesn't already import fmt
 func (p *parser) needsFmtImport(f *File) bool {
-	hasFmtImport := false
-	hasPrintf := false
-	
 	// Check if fmt is already imported
 	for _, decl := range f.DeclList {
 		if imp, ok := decl.(*ImportDecl); ok && imp.Path != nil {
 			if imp.Path.Value == `"fmt"` {
-				hasFmtImport = true
-				break
+				return false
 			}
 		}
 	}
-	
-	if hasFmtImport {
-		return false // Already has fmt import
-	}
-	
+
 	// Check if printf is used by scanning the source text directly
 	// This avoids the AST inspection that includes commented code
+	// Todo why avoid AST inspection? Too late?
 	text := string(p.scanner.source.buf)
 	// Look for printf calls that are not commented out
 	lines := strings.Split(text, "\n")
@@ -2831,12 +2822,10 @@ func (p *parser) needsFmtImport(f *File) bool {
 		}
 		// Look for printf function calls
 		if strings.Contains(line, "printf(") {
-			hasPrintf = true
-			break
+			return true
 		}
 	}
-	
-	return hasPrintf
+	return false
 }
 
 func (p *parser) ifStmt() *IfStmt {
