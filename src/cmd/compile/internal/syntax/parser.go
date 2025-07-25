@@ -448,7 +448,7 @@ func (p *parser) fileOrNil() *File {
 
 		case _Enum:
 			p.next()
-			f.DeclList = append(f.DeclList, p.enumDecl()...)
+			f.DeclList = p.enumDeclGroup(f.DeclList)
 
 		case _Var:
 			p.next()
@@ -764,11 +764,11 @@ func (p *parser) enumDecl() []Decl {
 	}
 	typeDecl.SetPos(pos)
 
-	// Create const declarations with shared group for const block behavior
+	// Simulate what appendGroup does for const ( OK Status = iota; ERROR; ... )
 	group := &Group{}
 	var constDecls []Decl
 
-	// First constant gets "= iota"
+	// First const declaration: OK Status = iota
 	firstConst := &ConstDecl{
 		Group:    group,
 		NameList: []*Name{enumValues[0]},
@@ -778,13 +778,13 @@ func (p *parser) enumDecl() []Decl {
 	firstConst.SetPos(enumValues[0].Pos())
 	constDecls = append(constDecls, firstConst)
 
-	// Remaining constants inherit iota (no explicit value, same group)
+	// Remaining const declarations inherit iota value
 	for i := 1; i < len(enumValues); i++ {
 		constDecl := &ConstDecl{
-			Group:    group,
+			Group:    group, // Same group for inheritance
 			NameList: []*Name{enumValues[i]},
 			Type:     enumName,
-			// No Values means it inherits from previous constant in same group
+			// No Values - inherits from previous const in same group
 		}
 		constDecl.SetPos(enumValues[i].Pos())
 		constDecls = append(constDecls, constDecl)
@@ -793,6 +793,63 @@ func (p *parser) enumDecl() []Decl {
 	result := []Decl{typeDecl}
 	result = append(result, constDecls...)
 	return result
+}
+
+// enumDeclGroup handles enum declarations in file context using appendGroup pattern
+func (p *parser) enumDeclGroup(list []Decl) []Decl {
+	if trace {
+		defer p.trace("enumDeclGroup")()
+	}
+
+	pos := p.pos()
+	enumName := p.name()
+	
+	p.want(_Lbrace)
+	
+	if p.tok != _Name {
+		p.syntaxError("expected enum value name")
+		return list
+	}
+	
+	enumValues := p.nameList(p.name())
+	p.want(_Rbrace)
+	
+	if len(enumValues) == 0 {
+		p.syntaxErrorAt(pos, "enum must have at least one value")
+		return list
+	}
+
+	// Create type declaration: type EnumName int
+	typeDecl := &TypeDecl{
+		Name: enumName,
+		Type: &Name{Value: "int"},
+	}
+	typeDecl.SetPos(pos)
+	list = append(list, typeDecl)
+
+	// Create a single const declaration with all names like: const ( OK, ERROR Status = iota )
+	// But this doesn't work correctly for iota, so create separate ones with shared group
+	group := &Group{}
+	
+	// Create individual const declarations for each enum value with same group
+	for i, enumValue := range enumValues {
+		constDecl := &ConstDecl{
+			Group:    group,
+			NameList: []*Name{enumValue},
+			Type:     enumName,
+		}
+		if i == 0 {
+			// Only first constant gets explicit iota value
+			constDecl.Values = &Name{Value: "iota"}
+		} else {
+			// Others inherit (nil Values)
+			constDecl.Values = nil
+		}
+		constDecl.SetPos(enumValue.Pos())
+		list = append(list, constDecl)
+	}
+	
+	return list
 }
 
 // enumStmt handles enum declarations in statement context
@@ -805,7 +862,7 @@ func (p *parser) enumStmt() *DeclStmt {
 	s.pos = p.pos()
 
 	p.next() // consume _Enum
-	s.DeclList = p.enumDecl()
+	s.DeclList = p.enumDeclGroup(nil)
 
 	return s
 }
