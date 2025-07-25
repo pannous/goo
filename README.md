@@ -36,44 +36,20 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1} HARD  
 ☐ for loops  :    
 ☐ for keyword := keywords  => for _, keyword := range keywords { __
-☐ String methods "abc".contains("a")  
+☐ String methods "abc".contains("a")  1. real 2. by compiler 
 ☐ return void, e.g. return print("ok") HARD    
 ☐ void(!) as synonym for func, e.g. void main(){} BAD  
 ☐ public() -> Public() calls OK // as compiler plugin?  
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
-☐ a is Type => a.(Type) for type assertion, e.g. if a is int => if _, ok := a.(int); ok { ... }
+☐ a is Type for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }
 ☐ func test() int { 42 } => func test() int { return 42 }  auto return 
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
 ☐ Avoid struct-based enums unless modeling algebraic data types manually (e.g., tagged unions)
-enum Status { OK, BAD }
-is transformed by compiler to =>
-type Status int
-const (
-	OK Status = 0
-    BAD Status = 1
-)
-func (s Status) String() string { return "TEST" }
-func (s Status) String() string { return [...]string{"OK", "BAD"}[s] }
-func (s Status) String() string {
-    switch s {
-    case OK:
-        return "OK"
-    case ERROR:
-        return "ERROR"
-    default: // can it ever be reached?
-        return "UNKNOWN"
-    }
-}
-
-if s, ok := value.(fmt.Stringer); ok {
-    // call s.String()
-} else {
-    // default formatting
-}
-☐ 
+☐ enum Status { OK, BAD } with generated .String() method 
 ☐ class via struct (!)    
+☐ plugin.Open() is for loading .so files at runtime
 ☐ imported and not used only warning   
 ☐ cross off all done tasks from this list    
 ☐ any other pain points you and I might have     
@@ -88,7 +64,7 @@ myTemplate := `The value of x is ${x} and the value of y is ${y}!`
 
   
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)  
-*Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*  
+*Gopher image by Renee French, licensed under Creative Commons 4.0 Attribution license  
   
 Go's canonical Git repository is located at https://go.googlesource.com/go.  
 There is a mirror of the repository at https://github.com/golang/go.  
@@ -112,6 +88,7 @@ Add `/usr/local/goo/bin` to your PATH environment variable. You can do this by a
   
 ```  
 export PATH=$PATH:/usr/local/goo/bin  
+export GOROOT=/usr/local/goo/  
 ```  
   
 #### Install From Source  
@@ -120,8 +97,14 @@ export PATH=$PATH:/usr/local/goo/bin
 git clone --recursive https://github.com/pannous/goo  
 cd goo/src  
 ./make.bash  
-```  
-  
+```
+
 https://go.dev/doc/install/source for more source installation instructions.  
-  
-[cc4-by]: https://creativecommons.org/licenses/by/4.0/  
+
+### Test new features  
+```  
+./bin/go run goo/test.goo
+```
+All new features tested in goo [folder](https://github.com/pannous/goo/tree/master/goo)
+
+Todo: Web Demo  
