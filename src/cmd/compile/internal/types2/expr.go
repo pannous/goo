@@ -817,6 +817,31 @@ func (checks *Checker) binary(x *operand, e syntax.Expr, lhs, rhs syntax.Expr, o
 		return
 	}
 
+	// Special handling for string + number concatenation
+	if op == syntax.Add && !Identical(x.typ, y.typ) {
+		if allString(x.typ) && allNumeric(y.typ) {
+			// String + Number: "text" + 123 -> "text123"
+			if x.mode == constant_ && y.mode == constant_ {
+				// Convert numeric constant to string representation
+				numStr := y.val.String()
+				y.val = constant.MakeString(numStr)
+				y.typ = x.typ // Use the same string type as left operand
+			} else {
+				checks.convertUntyped(&y, Typ[String])
+			}
+		} else if allNumeric(x.typ) && allString(y.typ) {
+			// Number + String: 123 + "text" -> "123text"  
+			if x.mode == constant_ && y.mode == constant_ {
+				// Convert numeric constant to string representation
+				numStr := x.val.String()
+				x.val = constant.MakeString(numStr)
+				x.typ = y.typ // Use the same string type as right operand
+			} else {
+				checks.convertUntyped(x, Typ[String])
+			}
+		}
+	}
+
 	if !Identical(x.typ, y.typ) {
 		// only report an error if we have valid types
 		// (otherwise we had an error reported elsewhere already)
