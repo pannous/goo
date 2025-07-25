@@ -6,7 +6,7 @@
 
 package p
 
-func f(x interface{}) {
+func f(x any) {
 	switch x.(type) {
 	}
 

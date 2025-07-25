@@ -65,7 +65,7 @@ func main() {
 	v.V()
 
 	//	p = t	// ERROR
-	var i interface{} = t
+	var i any = t
 	if _, ok := i.(P); ok {
 		println("dynamic i.(P) succeeded incorrectly")
 		panic("fail")
@@ -88,7 +88,7 @@ func main() {
 	v.V()
 
 	//	p = s	// ERROR
-	var j interface{} = s
+	var j any = s
 	if _, ok := j.(P); ok {
 		println("dynamic j.(P) succeeded incorrectly")
 		panic("fail")

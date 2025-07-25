@@ -49,7 +49,7 @@ func main() {
 	out.Flush()
 }
 
-func run(t *template.Template, a interface{}, out io.Writer) {
+func run(t *template.Template, a any, out io.Writer) {
 	if err := t.Execute(out, a); err != nil {
 		panic(err)
 	}
@@ -92,7 +92,7 @@ var c = make(chan int, 1)
 var nilch chan int
 var n = 1
 var x int
-var i interface{}
+var i any
 var dummy = make(chan int)
 var m = make(map[int]int)
 var order = 0

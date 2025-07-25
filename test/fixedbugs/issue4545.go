@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file.
 
 // Issue 4545: untyped constants are incorrectly coerced
-// to concrete types when used in interface{} context.
+// to concrete types when used in any context.
 
 package main
 

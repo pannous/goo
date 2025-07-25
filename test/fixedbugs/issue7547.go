@@ -6,8 +6,8 @@
 
 package main
 
-func f() map[string]interface{} {
-	var p *map[string]map[string]interface{}
+func f() map[string]any {
+	var p *map[string]map[string]any
 	_ = p
 	return nil
 }

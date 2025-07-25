@@ -31,18 +31,17 @@ func asString(String) {}
 
 func (Map) M() {}
 
-
 // These functions check at run time that the default type
 // (in the absence of any implicit conversion hints)
 // is the given type.
-func isArray(x interface{})  { _ = x.(Array) }
-func isBool(x interface{})   { _ = x.(Bool) }
-func isChan(x interface{})   { _ = x.(Chan) }
-func isFloat(x interface{})  { _ = x.(Float) }
-func isInt(x interface{})    { _ = x.(Int) }
-func isMap(x interface{})    { _ = x.(Map) }
-func isSlice(x interface{})  { _ = x.(Slice) }
-func isString(x interface{}) { _ = x.(String) }
+func isArray(x any)  { _ = x.(Array) }
+func isBool(x any)   { _ = x.(Bool) }
+func isChan(x any)   { _ = x.(Chan) }
+func isFloat(x any)  { _ = x.(Float) }
+func isInt(x any)    { _ = x.(Int) }
+func isMap(x any)    { _ = x.(Map) }
+func isSlice(x any)  { _ = x.(Slice) }
+func isString(x any) { _ = x.(String) }
 
 func main() {
 	var (

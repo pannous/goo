@@ -6,10 +6,10 @@
 
 package main
 
-func f[T any](x interface{}) T {
+func f[T any](x any) T {
 	return x.(T)
 }
-func f2[T any](x interface{}) (T, bool) {
+func f2[T any](x any) (T, bool) {
 	t, ok := x.(T)
 	return t, ok
 }
@@ -36,11 +36,11 @@ func g2[T I](x I) (T, bool) {
 	return t, ok
 }
 
-func h[T any](x interface{}) struct{ a, b T } {
+func h[T any](x any) struct{ a, b T } {
 	return x.(struct{ a, b T })
 }
 
-func k[T any](x interface{}) interface{ bar() T } {
+func k[T any](x any) interface{ bar() T } {
 	return x.(interface{ bar() T })
 }
 
@@ -51,9 +51,9 @@ func (x mybar) bar() int {
 }
 
 func main() {
-	var i interface{} = int(3)
+	var i any = int(3)
 	var j I = myint(3)
-	var x interface{} = float64(3)
+	var x any = float64(3)
 	var y I = myfloat(3)
 
 	println(f[int](i))
@@ -70,7 +70,7 @@ func main() {
 
 	println(k[int](mybar(3)).bar())
 
-	type large struct {a,b,c,d,e,f int}
+	type large struct{ a, b, c, d, e, f int }
 	println(f[large](large{}).a)
 	l2, ok := f2[large](large{})
 	println(l2.a, ok)

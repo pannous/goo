@@ -6,57 +6,57 @@
 
 package p
 
-func assertptr(x interface{}) *int {
+func assertptr(x any) *int {
 	return x.(*int) // ERROR "type assertion inlined"
 }
 
-func assertptr2(x interface{}) (*int, bool) {
+func assertptr2(x any) (*int, bool) {
 	z, ok := x.(*int) // ERROR "type assertion inlined"
 	return z, ok
 }
 
-func assertfunc(x interface{}) func() {
+func assertfunc(x any) func() {
 	return x.(func()) // ERROR "type assertion inlined"
 }
 
-func assertfunc2(x interface{}) (func(), bool) {
+func assertfunc2(x any) (func(), bool) {
 	z, ok := x.(func()) // ERROR "type assertion inlined"
 	return z, ok
 }
 
-func assertstruct(x interface{}) struct{ *int } {
+func assertstruct(x any) struct{ *int } {
 	return x.(struct{ *int }) // ERROR "type assertion inlined"
 }
 
-func assertstruct2(x interface{}) (struct{ *int }, bool) {
+func assertstruct2(x any) (struct{ *int }, bool) {
 	z, ok := x.(struct{ *int }) // ERROR "type assertion inlined"
 	return z, ok
 }
 
-func assertbig(x interface{}) complex128 {
+func assertbig(x any) complex128 {
 	return x.(complex128) // ERROR "type assertion inlined"
 }
 
-func assertbig2(x interface{}) (complex128, bool) {
+func assertbig2(x any) (complex128, bool) {
 	z, ok := x.(complex128) // ERROR "type assertion inlined"
 	return z, ok
 }
 
-func assertbig2ok(x interface{}) (complex128, bool) {
+func assertbig2ok(x any) (complex128, bool) {
 	_, ok := x.(complex128) // ERROR "type assertion inlined"
 	return 0, ok
 }
 
-func assertslice(x interface{}) []int {
+func assertslice(x any) []int {
 	return x.([]int) // ERROR "type assertion inlined"
 }
 
-func assertslice2(x interface{}) ([]int, bool) {
+func assertslice2(x any) ([]int, bool) {
 	z, ok := x.([]int) // ERROR "type assertion inlined"
 	return z, ok
 }
 
-func assertslice2ok(x interface{}) ([]int, bool) {
+func assertslice2ok(x any) ([]int, bool) {
 	_, ok := x.([]int) // ERROR "type assertion inlined"
 	return nil, ok
 }
@@ -65,10 +65,10 @@ type I interface {
 	foo()
 }
 
-func assertInter(x interface{}) I {
+func assertInter(x any) I {
 	return x.(I) // ERROR "type assertion not inlined"
 }
-func assertInter2(x interface{}) (I, bool) {
+func assertInter2(x any) (I, bool) {
 	z, ok := x.(I) // ERROR "type assertion not inlined"
 	return z, ok
 }

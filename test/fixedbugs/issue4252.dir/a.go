@@ -12,9 +12,9 @@ var nil = 1
 const append = 42
 
 type error bool
-type int interface{}
+type int any
 
-func len(interface{}) int32 { return 42 }
+func len(any) int32 { return 42 }
 
 func Test() {
 	var array [append]int

@@ -14,7 +14,7 @@ var B = []uint64{0x0807060504030201, 0x8877665544332211}
 
 var errors int
 
-func logf(f string, args ...interface{}) {
+func logf(f string, args ...any) {
 	errors++
 	fmt.Printf(f, args...)
 	if errors > 100 { // 100 is enough spewage

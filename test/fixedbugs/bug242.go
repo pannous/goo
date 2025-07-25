@@ -36,7 +36,7 @@ func e1(c chan byte, expected byte) chan byte {
 	return c
 }
 
-type Empty interface{}
+type Empty any
 type I interface {
 	Get() byte
 }

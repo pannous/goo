@@ -24,8 +24,8 @@ func panicmakeslicecap()
 func throwinit()
 func panicwrap()
 
-func gopanic(interface{})
-func gorecover(*int32) interface{}
+func gopanic(any)
+func gorecover(*int32) any
 func goschedguarded()
 
 // Note: these declarations are just for wasm port.
@@ -127,13 +127,13 @@ func efaceeq(typ *uintptr, x, y unsafe.Pointer) (ret bool)
 func panicrangestate(state int)
 
 // defer in range over func
-func deferrangefunc() interface{}
+func deferrangefunc() any
 
 func rand() uint64
 func rand32() uint32
 
 // truthiness conversion for if statements
-func truthy(interface{}) bool
+func truthy(any) bool
 
 // *byte is really *runtime.Type
 func makemap64(mapType *byte, hint int64, mapbuf *any) (hmap map[any]any)

@@ -29,7 +29,7 @@ func proxy() (x int, a A) {
 	return 1, newA(2, "3")
 }
 
-func consume(x int, a interface{}) {
+func consume(x int, a any) {
 	fmt.Println(x)
 	fmt.Println(a) // used to panic here
 }

@@ -6,10 +6,10 @@ package b
 
 import "./a"
 
-func F() interface{} {
+func F() any {
 	return a.F()
 }
 
-func P() interface{} {
+func P() any {
 	return a.P()
 }

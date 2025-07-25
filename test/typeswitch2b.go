@@ -9,7 +9,7 @@
 
 package main
 
-func notused(x interface{}) {
+func notused(x any) {
 	// The first t is in a different scope than the 2nd t; it cannot
 	// be accessed (=> declared and not used error); but it is legal
 	// to declare it.

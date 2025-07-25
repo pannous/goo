@@ -31,7 +31,7 @@ var (
 	doParseGo = flag.Bool("parsego", true, "stress parsing Go (generates garbage)")
 )
 
-func Println(a ...interface{}) {
+func Println(a ...any) {
 	if *v {
 		log.Println(a...)
 	}

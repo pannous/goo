@@ -11,7 +11,7 @@
 
 package q
 
-var S interface{}
+var S any
 
 func F(n int) {
 	fun := func(x int) int {

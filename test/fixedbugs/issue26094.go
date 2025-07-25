@@ -8,7 +8,7 @@ package main
 
 import "strings"
 
-var X interface{}
+var X any
 
 type T struct{}
 

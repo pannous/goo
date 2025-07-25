@@ -11,7 +11,7 @@ import (
 	"reflect"
 )
 
-func test(got, want interface{}) {
+func test(got, want any) {
 	if !reflect.DeepEqual(got, want) {
 		log.Fatalf("got %v, want %v", got, want)
 	}
@@ -20,7 +20,7 @@ func test(got, want interface{}) {
 func main() {
 	var i int
 	var ip *int
-	var ok interface{}
+	var ok any
 
 	// Channel receives.
 	c := make(chan int, 1)
@@ -109,7 +109,7 @@ func main() {
 	test(ok, true)
 
 	// Type assertions.
-	var u interface{}
+	var u any
 
 	i, ok = u.(int)
 	test(i, 0)

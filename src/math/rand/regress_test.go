@@ -32,7 +32,7 @@ func TestRegress(t *testing.T) {
 	n := rv.NumMethod()
 	p := 0
 	if *printgolden {
-		fmt.Printf("var regressGolden = []interface{}{\n")
+		fmt.Printf("var regressGolden = []any{\n")
 	}
 	for i := 0; i < n; i++ {
 		m := rv.Type().Method(i)

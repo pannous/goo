@@ -12,12 +12,12 @@ type E[T any] interface {
 }
 
 //go:noinline
-func f[T any](x E[T]) interface{} {
+func f[T any](x E[T]) any {
 	return x
 }
 
 //go:noinline
-func g[T any](x interface{}) E[T] {
+func g[T any](x any) E[T] {
 	return x
 }
 
@@ -43,7 +43,7 @@ func main() {
 	if f[int](1) != 1 {
 		println("test 1 failed")
 	}
-	if f[int](2) != (interface{})(2) {
+	if f[int](2) != (any)(2) {
 		println("test 2 failed")
 	}
 	if g[int](3) != 3 {

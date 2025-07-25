@@ -4,28 +4,28 @@
 
 package a
 
-func Conv(v interface{}) string {
+func Conv(v any) string {
 	return conv[string](v)
 }
 
-func conv[T any](v interface{}) T {
+func conv[T any](v any) T {
 	return v.(T)
 }
 
-func Conv2(v interface{}) (string, bool) {
+func Conv2(v any) (string, bool) {
 	return conv2[string](v)
 }
 
-func conv2[T any](v interface{}) (T, bool) {
+func conv2[T any](v any) (T, bool) {
 	x, ok := v.(T)
 	return x, ok
 }
 
-func Conv3(v interface{}) string {
+func Conv3(v any) string {
 	return conv3[string](v)
 }
 
-func conv3[T any](v interface{}) T {
+func conv3[T any](v any) T {
 	switch v := v.(type) {
 	case T:
 		return v
@@ -40,11 +40,11 @@ type Mystring string
 func (Mystring) Foo() {
 }
 
-func Conv4(v interface{Foo()}) Mystring {
+func Conv4(v interface{ Foo() }) Mystring {
 	return conv4[Mystring](v)
 }
 
-func conv4[T interface{Foo()}](v interface{Foo()}) T {
+func conv4[T interface{ Foo() }](v interface{ Foo() }) T {
 	switch v := v.(type) {
 	case T:
 		return v

@@ -76,7 +76,7 @@ func main() {
 
 	// Comparison with interface that cannot return true
 	// (would panic).
-	var i interface{}
+	var i any
 	use(i == x) // ERROR "invalid operation"
 	use(x == i) // ERROR "invalid operation"
 	use(i == f) // ERROR "invalid operation"

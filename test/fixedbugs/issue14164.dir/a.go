@@ -8,7 +8,7 @@ package a
 // It defines a local interface with an unexported method
 // f, which will appear with a package-qualified method
 // name in the export data.
-func F(x interface{}) bool {
+func F(x any) bool {
 	_, ok := x.(interface {
 		f()
 	})
@@ -21,7 +21,7 @@ func F(x interface{}) bool {
 // be no difference between F and G. Alas, currently
 // G is not inlineable (at least via export data), so
 // the issue is moot, here.
-func G(x interface{}) bool {
+func G(x any) bool {
 	type t0 interface {
 		f()
 	}
@@ -35,7 +35,7 @@ func G(x interface{}) bool {
 // at package level. This function is inlineable via
 // export data. The export data representation is like
 // for F.
-func H(x interface{}) bool {
+func H(x any) bool {
 	_, ok := x.(interface {
 		t1
 	})

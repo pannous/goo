@@ -4,7 +4,7 @@ package main
 
 var sp = ""
 
-func f(name string, _ ...interface{}) int {
+func f(name string, _ ...any) int {
 	print(sp, name)
 	sp = " "
 	return 0

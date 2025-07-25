@@ -758,7 +758,7 @@ var marshalTests = []struct {
 			`<parent2><c>C</c></parent2>` +
 			`</parent1>` +
 			`</NilTest>`,
-		MarshalOnly: true, // Uses interface{}
+		MarshalOnly: true, // Uses any
 	},
 	{
 		Value: &MixedNested{A: "A", B: "B", C: "C", D: "D"},

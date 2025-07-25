@@ -6,7 +6,7 @@
 
 package main
 
-func f[T any](i interface{}) {
+func f[T any](i any) {
 	switch i.(type) {
 	case T:
 		println("T")
@@ -18,13 +18,14 @@ func f[T any](i interface{}) {
 }
 
 type myint int
+
 func (myint) foo() {
 }
 
 func main() {
-	f[interface{}](nil)
-	f[interface{}](6)
-	f[interface{foo()}](nil)
-	f[interface{foo()}](7)
-	f[interface{foo()}](myint(8))
+	f[any](nil)
+	f[any](6)
+	f[interface{ foo() }](nil)
+	f[interface{ foo() }](7)
+	f[interface{ foo() }](myint(8))
 }

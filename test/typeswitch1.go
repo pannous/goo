@@ -24,7 +24,7 @@ func f(x int, len *byte) {
 	*len = byte(x)
 }
 
-func whatis(x interface{}) string {
+func whatis(x any) string {
 	switch xx := x.(type) {
 	default:
 		return fmt.Sprint("default ", xx)
@@ -42,7 +42,7 @@ func whatis(x interface{}) string {
 	panic("not reached")
 }
 
-func whatis1(x interface{}) string {
+func whatis1(x any) string {
 	xx := x
 	switch xx.(type) {
 	default:
@@ -61,7 +61,7 @@ func whatis1(x interface{}) string {
 	panic("not reached")
 }
 
-func checks(x interface{}, s string) {
+func checks(x any, s string) {
 	w := whatis(x)
 	if w != s {
 		fmt.Println("whatis", x, "=>", w, "!=", s)

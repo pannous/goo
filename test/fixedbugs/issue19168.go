@@ -13,7 +13,7 @@ import (
 	reflect2 "reflect"
 )
 
-func sink(e interface{})
+func sink(e any)
 
 func a(hdr *reflect.SliceHeader, p *byte) {
 	hdr.Data = uintptr(unsafe.Pointer(p)) // ERROR "write barrier"

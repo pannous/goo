@@ -6,7 +6,7 @@
 
 package foo
 
-func f(x []interface{}) (err error) {
+func f(x []any) (err error) {
 	for _, d := range x {
 		_, ok := d.(*int)
 		if ok {

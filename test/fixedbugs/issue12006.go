@@ -64,7 +64,7 @@ func TFooNz() {
 
 var isink *int32
 
-func FooI(args ...interface{}) { // ERROR "leaking param content: args"
+func FooI(args ...any) { // ERROR "leaking param content: args"
 	for i := 0; i < len(args); i++ {
 		switch x := args[i].(type) {
 		case nil:
@@ -87,7 +87,7 @@ func TFooI() {
 	FooI(a, b, c) // ERROR "a escapes to heap" ".cat. escapes to heap" "... argument does not escape"
 }
 
-func FooJ(args ...interface{}) *int32 { // ERROR "leaking param: args to result ~r0 level=1"
+func FooJ(args ...any) *int32 { // ERROR "leaking param: args to result ~r0 level=1"
 	for i := 0; i < len(args); i++ {
 		switch x := args[i].(type) {
 		case nil:
@@ -120,7 +120,7 @@ func TFooJ2() {
 
 type fakeSlice struct {
 	l int
-	a *[4]interface{}
+	a *[4]any
 }
 
 func FooK(args fakeSlice) *int32 { // ERROR "leaking param: args to result ~r0 level=1"
@@ -144,11 +144,11 @@ func TFooK2() {
 	a := int32(1) // ERROR "moved to heap: a"
 	b := "cat"
 	c := &a
-	fs := fakeSlice{3, &[4]interface{}{a, b, c, nil}} // ERROR "a escapes to heap" ".cat. escapes to heap" "&\[4\]interface {}{...} does not escape"
+	fs := fakeSlice{3, &[4]any{a, b, c, nil}} // ERROR "a escapes to heap" ".cat. escapes to heap" "&\[4\]interface {}{...} does not escape"
 	isink = FooK(fs)
 }
 
-func FooL(args []interface{}) *int32 { // ERROR "leaking param: args to result ~r0 level=1"
+func FooL(args []any) *int32 { // ERROR "leaking param: args to result ~r0 level=1"
 	for i := 0; i < len(args); i++ {
 		switch x := args[i].(type) {
 		case nil:
@@ -169,6 +169,6 @@ func TFooL2() {
 	a := int32(1) // ERROR "moved to heap: a"
 	b := "cat"
 	c := &a
-	s := []interface{}{a, b, c} // ERROR "a escapes to heap" ".cat. escapes to heap" "\[\]interface {}{...} does not escape"
+	s := []any{a, b, c} // ERROR "a escapes to heap" ".cat. escapes to heap" "\[\]interface {}{...} does not escape"
 	isink = FooL(s)
 }

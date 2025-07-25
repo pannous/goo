@@ -12,7 +12,7 @@ import "runtime"
 
 type T [62]int // DUFFZERO with non-zero adjustment on AMD64
 
-var sink interface{}
+var sink any
 
 //go:noinline
 func zero(x *T) {
@@ -26,15 +26,19 @@ func zero(x *T) {
 	*x = T{} // DUFFZERO again
 }
 
-//go:noinline
 // a function with large frame
+//
+//go:noinline
 func g() {
 	var x [1000]int
 	_ = x
 }
 
 func main() {
-	var s struct { a T; b [8192-62]int } // allocate 64K, hopefully it's in a new span and a few bytes before it is garbage
+	var s struct {
+		a T
+		b [8192 - 62]int
+	} // allocate 64K, hopefully it's in a new span and a few bytes before it is garbage
 	sink = &s // force heap allocation
 	s.a[0] = 2
 	zero(&s.a)

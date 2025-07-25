@@ -38,7 +38,7 @@ func main() {
 
 	for range ch1 {
 		ch2 := make(chan struct{}, 1)
-		f := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		f := js.FuncOf(func(this js.Value, args []js.Value) any {
 			ch2 <- struct{}{}
 			return nil
 		})

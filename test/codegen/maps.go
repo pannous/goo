@@ -127,7 +127,7 @@ func MapClearNotReflexive(m map[float64]int) {
 	}
 }
 
-func MapClearInterface(m map[interface{}]int) {
+func MapClearInterface(m map[any]int) {
 	// amd64:`.*runtime\.(mapiterinit|mapIterStart)`
 	// amd64:-`.*runtime\.mapclear`
 	for k := range m {

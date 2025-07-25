@@ -11,8 +11,8 @@
 package main
 
 func main() {
-	println((interface{})(nil)) // printeface
-	println((interface {        // printiface
+	println((any)(nil))  // printeface
+	println((interface { // printiface
 		f()
 	})(nil))
 	println((map[int]int)(nil)) // printpointer
@@ -32,7 +32,7 @@ func main() {
 	println("one", "two")       // printsp
 
 	// test goprintf
-	defer println((interface{})(nil))
+	defer println((any)(nil))
 	defer println((interface {
 		f()
 	})(nil))

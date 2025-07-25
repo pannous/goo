@@ -86,7 +86,7 @@ func main() {
 
 	// ~6ms on a 1.6GHz Zeon.
 	checkLinear("eface", 10000, func(n int) {
-		m := map[interface{}]int{}
+		m := map[any]int{}
 		for i := 0; i < n; i++ {
 			m[i] = 1
 		}

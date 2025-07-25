@@ -218,7 +218,7 @@ func (f *F) Fuzz(ff any) {
 	}
 	f.Helper()
 
-	// ff should be in the form func(*testing.T, ...interface{})
+	// ff should be in the form func(*testing.T, ...any)
 	fn := reflect.ValueOf(ff)
 	fnType := fn.Type()
 	if fnType.Kind() != reflect.Func {

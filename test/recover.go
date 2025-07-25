@@ -71,7 +71,7 @@ func die() {
 	runtime.Breakpoint() // can't depend on panic
 }
 
-func mustRecoverBody(v1, v2, v3, x interface{}) {
+func mustRecoverBody(v1, v2, v3, x any) {
 	v := v1
 	if v != nil {
 		println("spurious recover", v)
@@ -95,11 +95,11 @@ func mustRecoverBody(v1, v2, v3, x interface{}) {
 	}
 }
 
-func doubleRecover() interface{} {
+func doubleRecover() any {
 	return recover()
 }
 
-func mustRecover(x interface{}) {
+func mustRecover(x any) {
 	mustRecoverBody(doubleRecover(), recover(), recover(), x)
 }
 
@@ -148,7 +148,7 @@ func test1WithClosures() {
 			die()
 		}
 	}()
-	defer func(x interface{}) {
+	defer func(x any) {
 		mustNotRecover()
 		v := recover()
 		if v == nil {
@@ -195,7 +195,7 @@ func test4() {
 
 // Check that closures can set output arguments.
 // Run g().  If it panics, return x; else return deflt.
-func try(g func(), deflt interface{}) (x interface{}) {
+func try(g func(), deflt any) (x any) {
 	defer func() {
 		if v := recover(); v != nil {
 			x = v
@@ -207,7 +207,7 @@ func try(g func(), deflt interface{}) (x interface{}) {
 
 // Check that closures can set output arguments.
 // Run g().  If it panics, return x; else return deflt.
-func try1(g func(), deflt interface{}) (x interface{}) {
+func try1(g func(), deflt any) (x any) {
 	defer func() {
 		if v := recover(); v != nil {
 			x = v

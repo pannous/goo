@@ -12,44 +12,48 @@ import (
 )
 
 type G[T any] interface {
-	g() func()(*T)
+	g() func() *T
 }
 type Foo[T any] struct {
-
 }
+
 // OCALL
-func (l *Foo[T]) f1() (*T) {
+func (l *Foo[T]) f1() *T {
 	return g[T]()()
 }
+
 // OCALLFUNC
-func (l *Foo[T]) f2() (*T) {
+func (l *Foo[T]) f2() *T {
 	var f = g[T]
 	return f()()
 }
+
 // OCALLMETH
-func (l *Foo[T]) f3() (*T) {
+func (l *Foo[T]) f3() *T {
 	return l.g()()
 }
+
 // OCALLINTER
-func (l *Foo[T]) f4() (*T) {
+func (l *Foo[T]) f4() *T {
 	var g G[T] = l
 	return g.g()()
 }
+
 // ODYNAMICDOTTYPE
-func (l *Foo[T]) f5() (*T) {
-	var x interface{}
+func (l *Foo[T]) f5() *T {
+	var x any
 	x = g[T]
-	return x.(func()func()(*T))()()
+	return x.(func() func() *T)()()
 }
-func (l *Foo[T]) g() func() (*T) {
-	return func() (*T) {
+func (l *Foo[T]) g() func() *T {
+	return func() *T {
 		t := new(T)
 		reflect.ValueOf(t).Elem().SetInt(100)
 		return t
 	}
 }
-func g[T any]() func() (*T) {
-	return func() (*T) {
+func g[T any]() func() *T {
+	return func() *T {
 		t := new(T)
 		reflect.ValueOf(t).Elem().SetInt(100)
 		return t
@@ -59,19 +63,19 @@ func g[T any]() func() (*T) {
 func main() {
 	foo := Foo[int]{}
 	// Make sure the function conversion is correct
-	if n := *(foo.f1()) ; n != 100{
-		panic(fmt.Sprintf("%v",n))
+	if n := *(foo.f1()); n != 100 {
+		panic(fmt.Sprintf("%v", n))
 	}
-	if n := *(foo.f2()) ; n != 100{
-		panic(fmt.Sprintf("%v",n))
+	if n := *(foo.f2()); n != 100 {
+		panic(fmt.Sprintf("%v", n))
 	}
-	if n := *(foo.f3()) ; n != 100{
-		panic(fmt.Sprintf("%v",n))
+	if n := *(foo.f3()); n != 100 {
+		panic(fmt.Sprintf("%v", n))
 	}
-	if n := *(foo.f4()) ; n != 100{
-		panic(fmt.Sprintf("%v",n))
+	if n := *(foo.f4()); n != 100 {
+		panic(fmt.Sprintf("%v", n))
 	}
-	if n := *(foo.f5()) ; n != 100{
-		panic(fmt.Sprintf("%v",n))
+	if n := *(foo.f5()); n != 100 {
+		panic(fmt.Sprintf("%v", n))
 	}
 }

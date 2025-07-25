@@ -11,7 +11,7 @@ import (
 )
 
 var nilp *int
-var forceHeap interface{}
+var forceHeap any
 
 func main() {
 	// x is a pointer on the stack to heap-allocated memory.

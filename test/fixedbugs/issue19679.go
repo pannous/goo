@@ -10,7 +10,7 @@
 package p
 
 func Then() {
-	var i interface{}
+	var i any
 	if false {
 		switch i.(type) {
 		}
@@ -18,7 +18,7 @@ func Then() {
 }
 
 func Else() {
-	var i interface{}
+	var i any
 	if true {
 		_ = i
 	} else {
@@ -28,7 +28,7 @@ func Else() {
 }
 
 func Switch() {
-	var i interface{}
+	var i any
 	switch 5 {
 	case 3:
 		switch i.(type) {

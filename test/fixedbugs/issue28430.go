@@ -9,7 +9,7 @@
 
 package main
 
-func g(_ interface{}, e error)
+func g(_ any, e error)
 func h() (int, error)
 
 func f() {

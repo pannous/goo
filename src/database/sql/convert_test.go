@@ -165,7 +165,7 @@ func conversionTests() []conversionTest {
 		{s: any(nil), d: &scanptr, wantnil: true},
 		{s: int64(42), d: &scanptr, wantptr: &answer},
 
-		// To interface{}
+		// To any
 		{s: float64(1.5), d: &scaniface, wantiface: float64(1.5)},
 		{s: int64(1), d: &scaniface, wantiface: int64(1)},
 		{s: "str", d: &scaniface, wantiface: "str"},
@@ -269,7 +269,7 @@ func TestConversions(t *testing.T) {
 			if srcBytes, ok := ct.s.([]byte); ok {
 				dstBytes := (*ifptr).([]byte)
 				if len(srcBytes) > 0 && &dstBytes[0] == &srcBytes[0] {
-					errf("copy into interface{} didn't copy []byte data")
+					errf("copy into any didn't copy []byte data")
 				}
 			}
 		}
@@ -399,7 +399,7 @@ func TestRawBytesAllocs(t *testing.T) {
 		t.Fatalf("allocs = %v; want 0", n)
 	}
 
-	// This one involves a convT2E allocation, string -> interface{}
+	// This one involves a convT2E allocation, string -> any
 	n = testing.AllocsPerRun(100, func() {
 		test("string", "foo", "foo")
 	})

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-var sink interface{}
+var sink any
 
 func slice0() {
 	var s []*int

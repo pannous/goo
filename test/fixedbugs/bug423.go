@@ -14,7 +14,7 @@ func main() {
 }
 
 func F(arg int) {
-	var X interface{}
+	var X any
 	_ = X // used once
 	X = 0
 	X = 0

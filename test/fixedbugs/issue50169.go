@@ -21,4 +21,4 @@ func NewScanner() Scanner {
 
 type t struct{}
 
-func (*t) Scan(interface{}) error { return nil }
+func (*t) Scan(any) error { return nil }

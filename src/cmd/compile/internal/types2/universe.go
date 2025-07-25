@@ -80,7 +80,7 @@ func defPredeclaredTypes() {
 		defi(NewTypeName(nopos, nil, t.name, t))
 	}
 
-	// type any = interface{}
+	// type any = any
 	//
 	// Implement two representations of any: one for the legacy gotypesalias=0,
 	// and one for gotypesalias=1. This is necessary for consistent
@@ -89,7 +89,7 @@ func defPredeclaredTypes() {
 	//
 	// Both representations use the same distinguished pointer for their RHS
 	// interface type, allowing us to detect any (even with the legacy
-	// representation), and format it as "any" rather than interface{}, which
+	// representation), and format it as "any" rather than any, which
 	// clarifies user-facing error messages significantly.
 	//
 	// TODO(rfindley): once the gotypesalias GODEBUG variable is obsolete (and we
@@ -132,13 +132,13 @@ func defPredeclaredTypes() {
 		defi(obj)
 	}
 
-	// type comparable interface{} // marked as comparable
+	// type comparable any // marked as comparable
 	{
 		obj := NewTypeName(nopos, nil, "comparable", nil)
 		obj.setColor(black)
 		typ := NewNamed(obj, nil, nil)
 
-		// interface{} // marked as comparable
+		// any // marked as comparable
 		ityp := &Interface{complete: true, tset: &_TypeSet{nil, allTermlist, true}}
 
 		typ.SetUnderlying(ityp)

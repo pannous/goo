@@ -17,4 +17,4 @@ func F(t T) {
 	G(t)
 }
 
-func G(...interface{})
+func G(...any)

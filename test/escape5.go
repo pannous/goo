@@ -122,7 +122,7 @@ func leakrecursive2(p, q *int) (*int, *int) { // ERROR "leaking param: p" "leaki
 	return p, q
 }
 
-var global interface{}
+var global any
 
 type T1 struct {
 	X *int
@@ -210,7 +210,7 @@ var sink []byte
 var sink2 []int
 var sink3 []*int
 
-func f15730a(args ...interface{}) { // ERROR "args does not escape"
+func f15730a(args ...any) { // ERROR "args does not escape"
 	for _, arg := range args {
 		switch a := arg.(type) {
 		case string:
@@ -219,7 +219,7 @@ func f15730a(args ...interface{}) { // ERROR "args does not escape"
 	}
 }
 
-func f15730b(args ...interface{}) { // ERROR "args does not escape"
+func f15730b(args ...any) { // ERROR "args does not escape"
 	for _, arg := range args {
 		switch a := arg.(type) {
 		case []int:
@@ -228,7 +228,7 @@ func f15730b(args ...interface{}) { // ERROR "args does not escape"
 	}
 }
 
-func f15730c(args ...interface{}) { // ERROR "leaking param content: args"
+func f15730c(args ...any) { // ERROR "leaking param content: args"
 	for _, arg := range args {
 		switch a := arg.(type) {
 		case []*int:
@@ -240,10 +240,10 @@ func f15730c(args ...interface{}) { // ERROR "leaking param content: args"
 
 // Issue 29000: unnamed parameter is not handled correctly
 
-var sink4 interface{}
+var sink4 any
 var alwaysFalse = false
 
-func f29000(_ int, x interface{}) { // ERROR "leaking param: x"
+func f29000(_ int, x any) { // ERROR "leaking param: x"
 	sink4 = x
 	if alwaysFalse {
 		g29000()

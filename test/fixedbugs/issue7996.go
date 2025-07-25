@@ -8,7 +8,7 @@
 
 package p
 
-var m = map[interface{}]struct{}{
+var m = map[any]struct{}{
 	nil:  {},
 	true: {},
 }

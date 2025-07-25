@@ -6,12 +6,12 @@
 
 package main
 
-func F[T, U int]() interface{} {
-	switch interface{}(nil) {
+func F[T, U int]() any {
+	switch any(nil) {
 	case int(0), T(0), U(0):
 	}
 
-	return map[interface{}]int{int(0): 0, T(0): 0, U(0): 0}
+	return map[any]int{int(0): 0, T(0): 0, U(0): 0}
 }
 
 func main() {

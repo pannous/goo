@@ -9,8 +9,8 @@
 
 package main
 
-var p map[string]interface{}
-var v interface{}
+var p map[string]any
+var v any
 
 func F() {
 	p["hello"] = v.(complex128) * v.(complex128)

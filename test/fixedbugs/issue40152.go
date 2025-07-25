@@ -8,9 +8,9 @@
 
 package main
 
-func t(args ...interface{}) bool {
-        x := true
-        return x == args[0]
+func t(args ...any) bool {
+	x := true
+	return x == args[0]
 }
 
 func main() {

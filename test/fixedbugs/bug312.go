@@ -9,7 +9,7 @@
 package main
 
 func main() {
-	var i interface{}
+	var i any
 	c := make(chan int, 1)
 	c <- 1
 	select {

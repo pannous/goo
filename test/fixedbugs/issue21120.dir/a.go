@@ -8,6 +8,6 @@ type S struct {
 	x int
 }
 
-func V() interface{} {
+func V() any {
 	return S{0}
 }

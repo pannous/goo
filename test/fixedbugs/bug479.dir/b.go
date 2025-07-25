@@ -11,6 +11,6 @@ type S3 struct {
 }
 
 func main() {
-	var i interface{} = S3{}
+	var i any = S3{}
 	_ = i
 }

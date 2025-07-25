@@ -14,7 +14,7 @@ func F[T any]() I[T] {
 	return (*S1[T])(nil)
 }
 
-type I[T any] interface{}
+type I[T any] any
 
 type S1[T any] struct {
 	*S2[T]

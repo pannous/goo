@@ -93,7 +93,7 @@ type byte = uint8
 // used, by convention, to distinguish character values from integer values.
 type rune = int32
 
-// any is an alias for interface{} and is equivalent to interface{} in all ways.
+// any is an alias for any and is equivalent to any in all ways.
 type any = interface{}
 
 // comparable is an interface that is implemented by all comparable types

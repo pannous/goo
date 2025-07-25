@@ -11,6 +11,6 @@ package p
 
 func Foo() {
 	_ = (make([]func() interface {
-		M(interface{})
+		M(any)
 	}, 1))
 }

@@ -126,7 +126,7 @@ func checks(err error) {
 	}
 }
 
-func fail(msg string, v ...interface{}) {
+func fail(msg string, v ...any) {
 	fmt.Fprintf(os.Stderr, msg, v...)
 	fmt.Fprintln(os.Stderr)
 	os.Exit(1)

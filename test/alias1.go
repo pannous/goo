@@ -10,7 +10,7 @@
 package main
 
 func main() {
-	var x interface{}
+	var x any
 
 	x = byte(1)
 	switch x.(type) {

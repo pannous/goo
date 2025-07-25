@@ -13,7 +13,7 @@ package main
 const a = 0
 
 func main() {
-	switch i := (interface{})(a); i.(type) {
+	switch i := (any)(a); i.(type) {
 	case [0]string:
 	}
 }

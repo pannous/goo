@@ -10,7 +10,7 @@ import "fmt"
 
 // Overriding the predeclare "any", so it can be used as a type constraint or a type
 // argument
-type any interface{}
+type any any
 
 type Function[a, b any] interface {
 	Apply(x a) b

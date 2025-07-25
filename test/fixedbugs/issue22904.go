@@ -12,7 +12,7 @@ package p
 type a struct{ b } // ERROR "invalid recursive type"
 type b struct{ a } // GCCGO_ERROR "invalid recursive type"
 
-var x interface{}
+var x any
 
 func f() {
 	x = a{}

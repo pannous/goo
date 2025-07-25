@@ -253,7 +253,7 @@ func (t *CommonType) name() string { return t.Name }
 
 var (
 	// Primordial types, needed during initialization.
-	// Always passed as pointers so the interface{} type
+	// Always passed as pointers so the any type
 	// goes through without losing its interfaceness.
 	tBool      = bootstrapType("bool", (*bool)(nil))
 	tInt       = bootstrapType("int", (*int)(nil))

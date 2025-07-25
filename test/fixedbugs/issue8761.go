@@ -16,7 +16,7 @@ func f1() {
 }
 
 func f2() {
-	type C interface{}
+	type C any
 	_ = [1][]C{[]C{recover()}}
 }
 

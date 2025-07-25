@@ -18,7 +18,7 @@ type uc interface {
 
 var q int
 
-func RS(svcd *ServiceDesc, server interface{}, qq uint8) *Service {
+func RS(svcd *ServiceDesc, server any, qq uint8) *Service {
 	defer func() { q += int(qq) }()
 	return nil
 }

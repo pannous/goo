@@ -22,12 +22,12 @@ func f() {
 	case uintptr(unsafe.Pointer(nil)):
 	}
 
-	switch interface{}(nil) {
+	switch any(nil) {
 	case nil:
 	case nil:
 	}
 
-	_ = map[interface{}]int{
+	_ = map[any]int{
 		nil: 0,
 		nil: 0,
 	}

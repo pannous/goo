@@ -6,24 +6,24 @@
 
 package p
 
-var _ = map[interface{}]int{
+var _ = map[any]int{
 	0: 0,
 	0: 0, // ERROR "duplicate"
 }
 
-var _ = map[interface{}]int{
-	interface{}(0): 0,
-	interface{}(0): 0, // ok
+var _ = map[any]int{
+	any(0): 0,
+	any(0): 0, // ok
 }
 
 func _() {
-	switch interface{}(0) {
+	switch any(0) {
 	case 0:
 	case 0: // ERROR "duplicate"
 	}
 
-	switch interface{}(0) {
-	case interface{}(0):
-	case interface{}(0): // ok
+	switch any(0) {
+	case any(0):
+	case any(0): // ok
 	}
 }

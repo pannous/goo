@@ -14,8 +14,8 @@ func Zero[T any]() (_ T) {
 type AnyInt[X any] int
 
 func (AnyInt[X]) M() {
-	var have interface{} = Zero[X]()
-	var want interface{} = Zero[MyInt]()
+	var have any = Zero[X]()
+	var want any = Zero[MyInt]()
 
 	if have != want {
 		println("FAIL")

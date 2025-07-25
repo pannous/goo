@@ -21,7 +21,7 @@ func (a matrix) equal() bool {
 
 func main() {
 	var a matrix
-	var i interface{}
+	var i any
 	i = true && a.equal()
 	_ = i
 }

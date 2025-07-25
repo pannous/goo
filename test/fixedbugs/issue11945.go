@@ -52,7 +52,7 @@ const (
 
 var tests = []struct {
 	code      string
-	got, want interface{}
+	got, want any
 }{
 	{"real(1)", real(1), 1.0},
 	{"real('a')", real('a'), float64('a')},

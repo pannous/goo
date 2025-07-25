@@ -9,7 +9,7 @@
 
 package dataword
 
-var sink interface{}
+var sink any
 
 func string1() {
 	sink = "abc" // ERROR "using global for interface value"
@@ -264,14 +264,14 @@ func Printf(format string, args ...any) {
 
 var enabled = true
 
-func debugf(format string, args ...interface{}) {
+func debugf(format string, args ...any) {
 	if enabled {
 		Printf(format, args...)
 	}
 }
 
 //go:noinline
-func debugf2(format string, args ...interface{}) {
+func debugf2(format string, args ...any) {
 	if enabled {
 		Printf(format, args...)
 	}

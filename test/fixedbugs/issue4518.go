@@ -11,7 +11,7 @@
 package main
 
 //go:noinline
-func F(e interface{}) (int, int) {
+func F(e any) (int, int) {
 	return 3, 7
 }
 
@@ -20,7 +20,7 @@ func G() (int, int) {
 	return 3, 7
 }
 
-func bogus1(d interface{}) (int, int) {
+func bogus1(d any) (int, int) {
 	switch {
 	default:
 		return F(d)
@@ -36,7 +36,7 @@ func bogus2() (int, int) {
 	return 0, 0
 }
 
-func bogus3(d interface{}) (int, int) {
+func bogus3(d any) (int, int) {
 	switch {
 	default:
 		return G()

@@ -285,7 +285,7 @@ func main() {
 	}
 
 	// switch on interface.
-	switch i := interface{}("hello"); i {
+	switch i := any("hello"); i {
 	case 42:
 		assert(false, `i should be "hello"`)
 	case "hello":
@@ -296,7 +296,7 @@ func main() {
 
 	// switch on implicit bool converted to interface
 	// was broken: see issue 3980
-	switch i := interface{}(true); {
+	switch i := any(true); {
 	case i:
 		assert(true, "true")
 	case false:
@@ -311,7 +311,7 @@ func main() {
 	type B bool
 	type F float64
 	type S string
-	switch i := interface{}(float64(1.0)); i {
+	switch i := any(float64(1.0)); i {
 	case nil:
 		assert(false, "i should be float64(1.0)")
 	case (*int)(nil):

@@ -9,7 +9,7 @@ package main
 import "fmt"
 
 func main() {
-	var ii interface{} = 5
-	zz, err := ii.(interface{})
+	var ii any = 5
+	zz, err := ii.(any)
 	fmt.Println(zz, err)
 }

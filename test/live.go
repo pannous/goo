@@ -140,13 +140,13 @@ func g8() (string, string)
 // ignoring block assignments used to cause "live at entry to f9: x"
 // issue 7205
 
-var i9 interface{}
+var i9 any
 
 func f9() bool {
 	g8()
 	x := i9
-	y := interface{}(g18()) // ERROR "live at call to convT: x.data$" "live at call to g18: x.data$" "stack object .autotmp_[0-9]+ \[2\]string$"
-	i9 = y                  // make y escape so the line above has to call convT
+	y := any(g18()) // ERROR "live at call to convT: x.data$" "live at call to g18: x.data$" "stack object .autotmp_[0-9]+ \[2\]string$"
+	i9 = y          // make y escape so the line above has to call convT
 	return x != y
 }
 
@@ -250,11 +250,11 @@ func g14() string
 // and also that none show up in "ambiguously live" messages.
 
 var m map[string]int
-var mi map[interface{}]int
+var mi map[any]int
 
 // str and iface are used to ensure that a temp is required for runtime calls below.
 func str() string
-func iface() interface{}
+func iface() any
 
 func f16() {
 	if b {
@@ -436,7 +436,7 @@ func f26(b bool) {
 }
 
 //go:noescape
-func print26(...interface{})
+func print26(...any)
 
 // non-escaping closures passed to function call should die on return
 
@@ -546,8 +546,8 @@ func f31(b1, b2, b3 bool) {
 	print(b3)
 }
 
-func g31(interface{})
-func h31(...interface{})
+func g31(any)
+func h31(...any)
 
 // non-escaping partial functions passed to function call should die on return
 
@@ -573,7 +573,7 @@ func call32(func())
 // temporaries introduced during if conditions and && || expressions
 // should die once the condition has been acted upon.
 
-var m33 map[interface{}]int
+var m33 map[any]int
 
 func f33() {
 	if m33[byteptr()] == 0 { // ERROR "stack object .autotmp_[0-9]+ interface \{\}$"
@@ -749,7 +749,7 @@ func f43(a []*int)
 
 // Assigning to a sub-element that makes up an entire local variable
 // should clobber that variable.
-func f44(f func() [2]*int) interface{} { // ERROR "live at entry to f44: f"
+func f44(f func() [2]*int) any { // ERROR "live at entry to f44: f"
 	type T struct {
 		s [1][2]*int
 	}

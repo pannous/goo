@@ -9,7 +9,7 @@ package main
 import "fmt"
 
 var x any
-var y interface{}
+var y any
 
 var _ = &x == &y // assert x and y have identical types
 

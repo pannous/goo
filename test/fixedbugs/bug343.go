@@ -8,23 +8,23 @@
 
 package main
 
-func getArgs(data map[string]interface{}, keys ...string) map[string]string {
-       ret := map[string]string{}
-       var ok bool
-       for _, k := range keys {
-               ret[k], ok = data[k].(string)
-               if !ok {}
-       }
-       return ret
+func getArgs(data map[string]any, keys ...string) map[string]string {
+	ret := map[string]string{}
+	var ok bool
+	for _, k := range keys {
+		ret[k], ok = data[k].(string)
+		if !ok {
+		}
+	}
+	return ret
 }
 
 func main() {
-	x := getArgs(map[string]interface{}{"x":"y"}, "x")
+	x := getArgs(map[string]any{"x": "y"}, "x")
 	if x["x"] != "y" {
 		println("BUG bug343", x)
 	}
 }
-	
 
 /*
 typecheck [1008592b0]

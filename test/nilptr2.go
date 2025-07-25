@@ -27,7 +27,7 @@ func main() {
 var intp *int
 var slicep *[]byte
 var a10p *[10]int
-var a10Mp *[1<<20]int
+var a10Mp *[1 << 20]int
 var structp *Struct
 var bigstructp *BigStruct
 var i int
@@ -35,15 +35,15 @@ var m *M
 var m1 *M1
 var m2 *M2
 
-var V interface{}
+var V any
 
-func use(x interface{}) {
+func use(x any) {
 	V = x
 }
 
-var tests = []struct{
+var tests = []struct {
 	name string
-	fn func()
+	fn   func()
 }{
 	// Edit .+1,/^}/s/^[^	].+/	{"&", func() { println(&) }},\n	{"\&&", func() { println(\&&) }},/g
 	{"*intp", func() { println(*intp) }},
@@ -112,14 +112,14 @@ type BigStruct struct {
 	i int
 	j float64
 	k string
-	x [128<<20]byte
+	x [128 << 20]byte
 	l []byte
 }
 
 type M struct {
 }
 
-func (m *M) F() int {return 0}
+func (m *M) F() int { return 0 }
 
 type M1 struct {
 	M

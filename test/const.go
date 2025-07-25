@@ -129,36 +129,36 @@ func floats() {
 
 func interfaces() {
 	var (
-		nilN interface{}
+		nilN any
 		nilI *int
 		five = 5
 
-		_ = nil == interface{}(nil)
-		_ = interface{}(nil) == nil
+		_ = nil == any(nil)
+		_ = any(nil) == nil
 	)
-	ii := func(i1 interface{}, i2 interface{}) bool { return i1 == i2 }
-	ni := func(n interface{}, i int) bool { return n == i }
-	in := func(i int, n interface{}) bool { return i == n }
-	pi := func(p *int, i interface{}) bool { return p == i }
-	ip := func(i interface{}, p *int) bool { return i == p }
+	ii := func(i1 any, i2 any) bool { return i1 == i2 }
+	ni := func(n any, i int) bool { return n == i }
+	in := func(i int, n any) bool { return i == n }
+	pi := func(p *int, i any) bool { return p == i }
+	ip := func(i any, p *int) bool { return i == p }
 
-	assert((interface{}(nil) == interface{}(nil)) == ii(nilN, nilN),
-		"for interface{}==interface{} compiler == runtime")
+	assert((any(nil) == any(nil)) == ii(nilN, nilN),
+		"for any==any compiler == runtime")
 
-	assert(((*int)(nil) == interface{}(nil)) == pi(nilI, nilN),
-		"for *int==interface{} compiler == runtime")
-	assert((interface{}(nil) == (*int)(nil)) == ip(nilN, nilI),
-		"for interface{}==*int compiler == runtime")
+	assert(((*int)(nil) == any(nil)) == pi(nilI, nilN),
+		"for *int==any compiler == runtime")
+	assert((any(nil) == (*int)(nil)) == ip(nilN, nilI),
+		"for any==*int compiler == runtime")
 
-	assert((&five == interface{}(nil)) == pi(&five, nilN),
-		"for interface{}==*int compiler == runtime")
-	assert((interface{}(nil) == &five) == ip(nilN, &five),
-		"for interface{}==*int compiler == runtime")
+	assert((&five == any(nil)) == pi(&five, nilN),
+		"for any==*int compiler == runtime")
+	assert((any(nil) == &five) == ip(nilN, &five),
+		"for any==*int compiler == runtime")
 
-	assert((5 == interface{}(5)) == ni(five, five),
-		"for int==interface{} compiler == runtime")
-	assert((interface{}(5) == 5) == in(five, five),
-		"for interface{}==int comipiler == runtime")
+	assert((5 == any(5)) == ni(five, five),
+		"for int==any compiler == runtime")
+	assert((any(5) == 5) == in(five, five),
+		"for any==int comipiler == runtime")
 }
 
 // Test that typed floating-point and complex arithmetic
@@ -168,9 +168,9 @@ func truncate() {
 		x30 = 1 << 30
 		x60 = 1 << 60
 
-		staticF32 = float32(x30) + 1 - x30
-		staticF64 = float64(x60) + 1 - x60
-		staticC64 = complex64(x30) + 1 - x30
+		staticF32  = float32(x30) + 1 - x30
+		staticF64  = float64(x60) + 1 - x60
+		staticC64  = complex64(x30) + 1 - x30
 		staticC128 = complex128(x60) + 1 - x60
 	)
 	dynamicF32 := float32(x30)

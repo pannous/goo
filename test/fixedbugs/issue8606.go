@@ -11,24 +11,24 @@ package main
 import "fmt"
 
 func main() {
-	type A [2]interface{}
-	type A2 [6]interface{}
-	type S struct{ x, y interface{} }
-	type S2 struct{ x, y, z, a, b, c interface{} }
+	type A [2]any
+	type A2 [6]any
+	type S struct{ x, y any }
+	type S2 struct{ x, y, z, a, b, c any }
 	type T1 struct {
-		i interface{}
+		i any
 		a int64
-		j interface{}
+		j any
 	}
 	type T2 struct {
-		i       interface{}
+		i       any
 		a, b, c int64
-		j       interface{}
+		j       any
 	}
 	type T3 struct {
-		i interface{}
+		i any
 		s string
-		j interface{}
+		j any
 	}
 	type S3 struct {
 		f any
@@ -44,7 +44,7 @@ func main() {
 
 	for _, test := range []struct {
 		panic bool
-		a, b  interface{}
+		a, b  any
 	}{
 		{false, A{1, b}, A{2, b}},
 		{true, A{b, 1}, A{b, 2}},

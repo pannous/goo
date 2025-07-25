@@ -1,3 +1,3 @@
 package a
 
-type W = map[int32]interface{}
+type W = map[int32]any

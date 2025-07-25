@@ -9,7 +9,7 @@
 
 package main
 
-func F(a ...interface{}) interface{} {
+func F(a ...any) any {
 	s := 0
 	for _, v := range a {
 		s += v.(int)
@@ -45,7 +45,7 @@ var V13 = F(7)
 
 var V14 = F(8)
 
-func expect(name string, a interface{}, b int) {
+func expect(name string, a any, b int) {
 	if a.(int) != b {
 		panic(name)
 	}

@@ -14,7 +14,7 @@ func main() {
 	var ok mybool
 	_ = ok
 
-	var i interface{}
+	var i any
 	_, ok = i.(int)
 
 	var m map[int]int

@@ -56,11 +56,11 @@ func main() {
 
 	var e = make(chan int)
 
-	var ia interface{} = a
-	var ib interface{} = b
-	var ic interface{} = c
-	var id interface{} = d
-	var ie interface{} = e
+	var ia any = a
+	var ib any = b
+	var ic any = c
+	var id any = d
+	var ie any = e
 
 	// these comparisons are okay because
 	// string compare is okay and the others
@@ -118,14 +118,14 @@ func main() {
 	// gc used to let this go through as true.
 	var g uint64 = 123
 	var h int64 = 123
-	var ig interface{} = g
-	var ih interface{} = h
+	var ig any = g
+	var ih any = h
 	isfalse(ig == ih)
 	istrue(ig != ih)
 
 	// map of interface should use == on interface values,
 	// not memory.
-	var m = make(map[interface{}]int)
+	var m = make(map[any]int)
 	m[ic] = 1
 	m[id] = 2
 	if m[c] != 2 {
@@ -147,7 +147,7 @@ func main() {
 		b2 := I2(X(1))
 		a3 := I1(a2)
 		a4 := I2(a1)
-		var e interface{} = X(0)
+		var e any = X(0)
 		a5 := e.(I1)
 		a6 := e.(I2)
 		isfalse(a1 == b1)
@@ -289,7 +289,7 @@ func main() {
 		isfalse(m1[z] != z)
 		isfalse(m1[x] != x)
 
-		var ix, iy, iz interface{} = x, y, z
+		var ix, iy, iz any = x, y, z
 
 		isfalse(ix == iy)
 		isfalse(iy == ix)
@@ -345,7 +345,7 @@ func main() {
 		}{
 			x: 1, y: 2, z: 3,
 		}
-		var ix interface{} = x
+		var ix any = x
 
 		istrue(x == x)
 		istrue(x == ix)
@@ -384,7 +384,7 @@ func main() {
 		isfalse(m[y] != 20)
 		isfalse(m[z] != 30)
 
-		var ix, iy, iz interface{} = x, y, z
+		var ix, iy, iz any = x, y, z
 
 		isfalse(ix == iy)
 		isfalse(iy == ix)
@@ -440,7 +440,7 @@ func main() {
 		istrue(x == y)
 		istrue(bool(b))
 
-		m := make(map[string][10]interface{})
+		m := make(map[string][10]any)
 		b = m["x"] == m["y"]
 		istrue(m["x"] == m["y"])
 		istrue(bool(b))
@@ -454,27 +454,27 @@ func main() {
 
 func p1() {
 	var a []int
-	var ia interface{} = a
+	var ia any = a
 	use(ia == ia)
 }
 
 func p2() {
 	var b []int
-	var ib interface{} = b
+	var ib any = b
 	use(ib == ib)
 }
 
 func p3() {
 	var a []int
-	var ia interface{} = a
-	var m = make(map[interface{}]int)
+	var ia any = a
+	var m = make(map[any]int)
 	m[ia] = 1
 }
 
 func p4() {
 	var b []int
-	var ib interface{} = b
-	var m = make(map[interface{}]int)
+	var ib any = b
+	var m = make(map[any]int)
 	m[ib] = 1
 }
 

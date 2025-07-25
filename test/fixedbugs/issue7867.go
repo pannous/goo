@@ -34,7 +34,7 @@ func main() {
 		"string",
 		"[4]byte",
 		"[]byte",
-		"interface{}", "error",
+		"any", "error",
 	}
 	for i, typ := range types {
 		fmt.Printf(tpl, i, typ)

@@ -19,7 +19,7 @@ type M interface {
 	M()
 }
 
-var e interface{} = T{}
+var e any = T{}
 var i M = T{}
 var b bool
 

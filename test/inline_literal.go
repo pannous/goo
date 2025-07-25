@@ -28,7 +28,7 @@ func bar() string {
 }
 
 // funcPC returns the PC for the func value f.
-func funcPC(f interface{}) uintptr {
+func funcPC(f any) uintptr {
 	return reflect.ValueOf(f).Pointer()
 }
 

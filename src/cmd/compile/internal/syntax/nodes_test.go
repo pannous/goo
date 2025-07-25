@@ -126,7 +126,7 @@ var types = []test{
 	{"SliceType", `@[]T`},
 	{"DotsType", `@...T`},
 	{"StructType", `@struct{}`},
-	{"InterfaceType", `@interface{}`},
+	{"InterfaceType", `@any`},
 	{"FuncType", `func@()`},
 	{"MapType", `@map[T]T`},
 

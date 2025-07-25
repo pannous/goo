@@ -136,7 +136,7 @@ func p9() {
 	checkOAS2XXX(x, "x, x = m[0]")
 
 	// OAS2DOTTYPE
-	var i interface{} = false
+	var i any = false
 	x, x = i.(bool)
 	checkOAS2XXX(x, "x, x = i.(bool)")
 }
@@ -161,7 +161,7 @@ func p10() {
 }
 
 func p11() {
-	var i interface{}
+	var i any
 	p := new(bool)
 	p, *p = i.(*bool)
 }

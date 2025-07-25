@@ -8,6 +8,6 @@ package main
 
 import "runtime"
 
-func f(x interface{}) {
+func f(x any) {
 	runtime.KeepAlive(x)
 }

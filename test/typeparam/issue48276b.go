@@ -7,9 +7,9 @@
 package main
 
 func main() {
-	f[interface{}](nil)
+	f[any](nil)
 }
 
 func f[T any](x T) {
-	var _ interface{} = x
+	var _ any = x
 }

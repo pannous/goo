@@ -59,7 +59,7 @@ func F[T *U, U any](param1, param2 int) /*param1=undef*/ (res1 /*res1=undef*/, r
 	var a []int
 	for i, x := range a /*i=undef*/ /*x=var:16*/ { _ = i; _ = x }
 
-	var i interface{}
+	var i any
 	switch y := i.(type) { /*y=undef*/
 	case /*y=undef*/ int /*y=undef*/ : /*y=var:23*/ ;
 	case float32, /*y=undef*/ float64 /*y=undef*/ : /*y=var:23*/ ;

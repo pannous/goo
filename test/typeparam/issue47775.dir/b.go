@@ -15,5 +15,5 @@ func New[T any]() {
 	z(c.reset)
 }
 
-func z(interface{}) {
+func z(any) {
 }

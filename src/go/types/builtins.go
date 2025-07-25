@@ -698,7 +698,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		}
 
 	case _Recover:
-		// recover() interface{}
+		// recover() any
 		x.mode = value
 		x.typ = &emptyInterface
 		if checks.recordTypes() {

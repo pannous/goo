@@ -10,6 +10,6 @@
 package main
 
 func main() {
-	var x interface{} = "abc"[0] == 'a'
+	var x any = "abc"[0] == 'a'
 	_ = x
 }

@@ -9,7 +9,7 @@ package p
 var s string
 var b bool
 var i int
-var iface interface{}
+var iface any
 
 var (
 	_ = "" + b   // ERROR "invalid operation.*mismatched types.*untyped string and bool"

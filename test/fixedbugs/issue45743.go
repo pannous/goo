@@ -6,8 +6,8 @@
 
 package main
 
-func fn() func(interface{}) {
-	return func(o interface{}) {
+func fn() func(any) {
+	return func(o any) {
 		switch v := o.(type) {
 		case *int:
 			*v = 1

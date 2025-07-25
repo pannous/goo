@@ -90,7 +90,7 @@ type Func struct {
 	Marks []Mark
 
 	FieldTrack map[*obj.LSym]struct{}
-	DebugInfo  interface{}
+	DebugInfo  any
 	LSym       *obj.LSym // Linker object in this function's native ABI (Func.ABI)
 
 	Inl *Inline
@@ -556,7 +556,7 @@ func IsIfaceOfFunc(n Node) *Func {
 // n should be a Node of an interface type, as is passed to
 // internal/abi.FuncPC{ABI0,ABIInternal}.
 //
-// TODO(prattmic): Since n is simply an interface{} there is no assertion that
+// TODO(prattmic): Since n is simply an any there is no assertion that
 // it is actually a function at all. Perhaps we should emit a runtime type
 // assertion?
 func FuncPC(pos src.XPos, n Node, wantABI obj.ABI) Node {

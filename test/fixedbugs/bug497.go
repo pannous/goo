@@ -17,7 +17,7 @@ type s struct{}
 
 var X T
 
-func F(_ T, c interface{}) int {
+func F(_ T, c any) int {
 	return len(c.(string))
 }
 

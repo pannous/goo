@@ -12,7 +12,7 @@ type A = struct{ int }
 type B = struct{ Int }
 
 func main() {
-	var x, y interface{} = A{}, B{}
+	var x, y any = A{}, B{}
 	if x == y {
 		panic("FAIL")
 	}

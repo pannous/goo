@@ -9,6 +9,6 @@
 package main
 
 func main() {
-	var f func(int, interface{})
+	var f func(int, any)
 	go f(0, recover())
 }

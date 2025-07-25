@@ -11,7 +11,7 @@ package main
 
 func main() {
 	type t int
-	var p interface{}
+	var p any
 	switch t := p.(type) {
 	case t:
 		_ = t

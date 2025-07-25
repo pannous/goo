@@ -187,7 +187,7 @@ func BackIntoGo() {
 	}
 }
 
-func xvariadic(x ...interface{}) {
+func xvariadic(x ...any) {
 }
 
 func test1328(t *testing.T) {

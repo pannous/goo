@@ -7,7 +7,7 @@ package p1
 type Magic int
 
 type T struct {
-	x interface{}
+	x any
 }
 
 func (t *T) M() bool {

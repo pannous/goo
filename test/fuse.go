@@ -143,19 +143,19 @@ func fNeqPtrNeqPtr(a, b *int, f float64) bool {
 	return a != b && f > Cf2 || a != b && f < -Cf2 // ERROR "Redirect NeqPtr based on NeqPtr$"
 }
 
-func fEqInterEqInter(a interface{}, f float64) bool {
+func fEqInterEqInter(a any, f float64) bool {
 	return a == nil && f > Cf2 || a == nil && f < -Cf2 // ERROR "Redirect IsNonNil based on IsNonNil$"
 }
 
-func fEqInterNeqInter(a interface{}, f float64) bool {
+func fEqInterNeqInter(a any, f float64) bool {
 	return a == nil && f > Cf2 || a != nil && f < -Cf2 // ERROR "Redirect IsNonNil based on IsNonNil"
 }
 
-func fNeqInterEqInter(a interface{}, f float64) bool {
+func fNeqInterEqInter(a any, f float64) bool {
 	return a != nil && f > Cf2 || a == nil && f < -Cf2 // ERROR "Redirect IsNonNil based on IsNonNil"
 }
 
-func fNeqInterNeqInter(a interface{}, f float64) bool {
+func fNeqInterNeqInter(a any, f float64) bool {
 	return a != nil && f > Cf2 || a != nil && f < -Cf2 // ERROR "Redirect IsNonNil based on IsNonNil$"
 }
 

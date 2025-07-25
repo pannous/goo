@@ -9,7 +9,7 @@
 package p
 
 type S struct {
-	f interface{}
+	f any
 }
 
 func F(p *S) bool {

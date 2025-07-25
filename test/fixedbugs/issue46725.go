@@ -20,7 +20,7 @@ func main() {
 	done := make(chan struct{})
 	runtime.SetFinalizer(s[0], func(p *T) { close(done) })
 
-	var h, _ interface{} = g(s[:])
+	var h, _ any = g(s[:])
 
 	if wait(done) {
 		panic("GC'd early")

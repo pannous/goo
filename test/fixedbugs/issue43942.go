@@ -41,7 +41,7 @@ func main() {
 	}()
 }
 
-func expect(want, have interface{}) {
+func expect(want, have any) {
 	if want != have {
 		log.Fatalf("want %v, have %v", want, have)
 	}

@@ -597,7 +597,7 @@ func (checks *Checker) collectTypeParams(dst **TypeParamList, list []*syntax.Fie
 
 	// Set the type parameters before collecting the type constraints because
 	// the parameterized type may be used by the constraints (go.dev/issue/47887).
-	// Example: type T[P T[P]] interface{}
+	// Example: type T[P T[P]] any
 	*dst = bindTParams(tparams)
 
 	// Signal to cycle detection that we are in a type parameter list.

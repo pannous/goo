@@ -19,8 +19,8 @@ func f(m map[[8]string]int) int {
 }
 
 //go:noinline
-func g(m map[[8]interface{}]int) int {
-	var k [8]interface{}
+func g(m map[[8]any]int) int {
+	var k [8]any
 	return m[k]
 }
 
@@ -30,7 +30,7 @@ func h(m map[[2]string]int) int {
 	return m[k]
 }
 
-type T map[string]interface{}
+type T map[string]any
 
 func v(x ...string) string {
 	return x[0] + x[1]
@@ -39,7 +39,7 @@ func v(x ...string) string {
 func main() {
 	fmt.Println(
 		f(map[[8]string]int{}),
-		g(map[[8]interface{}]int{}),
+		g(map[[8]any]int{}),
 		h(map[[2]string]int{}),
 		v("a", "b"),
 	)

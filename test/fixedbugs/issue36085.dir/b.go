@@ -3,6 +3,6 @@ package main
 import "./a"
 
 var w a.W
-var X interface{} = &w
+var X any = &w
 
 func main() {}

@@ -10,7 +10,7 @@ type T struct { // big enough to be an unSSAable type
 	a, b, c, d, e, f int
 }
 
-func f(x interface{}, p *int) {
+func f(x any, p *int) {
 	_ = *p // trigger nil check here, removing it from below
 	switch x := x.(type) {
 	case *T:

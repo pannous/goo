@@ -7,7 +7,7 @@
 package main
 
 type Value struct {
-	X interface{}
+	X any
 	Y int
 }
 

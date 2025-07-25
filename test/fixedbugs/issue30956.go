@@ -12,7 +12,7 @@ package main
 import "fmt"
 
 type X struct {
-	V interface{}
+	V any
 
 	a int
 	b int

@@ -26,7 +26,7 @@ func G() I {
 }
 
 //go:noinline
-func Use(interface{}) {}
+func Use(any) {}
 
 func main() {
 	x := G().M

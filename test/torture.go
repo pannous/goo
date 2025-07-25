@@ -158,7 +158,7 @@ type T struct {
 	Next I
 }
 
-type I interface{}
+type I any
 
 // A chains of type assertions.
 func ChainT(t *T) *T {

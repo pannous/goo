@@ -8,4 +8,4 @@
 
 package p
 
-type _ interface{}
+type _ any

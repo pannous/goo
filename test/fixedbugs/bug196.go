@@ -19,7 +19,7 @@ func xxx() {
 	var m map[int]int
 	x, ok = m[1]
 
-	var i interface{}
+	var i any
 	var xx int
 	xx, ok = i.(int)
 

@@ -104,10 +104,10 @@ func NotCalled() {
 	e128 += 1 + 1i
 }
 
-var tmp interface{}
+var tmp any
 
 // We could assign to _ but the compiler optimizes it too easily.
-func use(v interface{}) {
+func use(v any) {
 	tmp = v
 }
 

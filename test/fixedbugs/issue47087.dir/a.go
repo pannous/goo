@@ -4,6 +4,6 @@
 
 package a
 
-func F() interface{} { return struct{ _ []int }{} }
+func F() any { return struct{ _ []int }{} }
 
 var X = F()

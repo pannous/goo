@@ -12,7 +12,7 @@ import (
 // truthy implements truthiness conversion for if and for statements.
 // This function is called by the compiler when non-boolean values
 // are used in conditional contexts.
-func truthy(i interface{}) bool {
+func truthy(i any) bool {
 	if i == nil {
 		return false
 	}

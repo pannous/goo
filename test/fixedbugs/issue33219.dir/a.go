@@ -5,13 +5,13 @@
 package a
 
 type A interface {
-	M(i interface{}) interface{}
+	M(i any) any
 }
 
 var a1 A
 var a2 A
 
-func V(p A, k, v interface{}) A {
+func V(p A, k, v any) A {
 	defer func() { a1, a2 = a2, a1 }()
 	return a1
 }

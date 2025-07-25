@@ -12,14 +12,14 @@ type EmbedImported struct {
 
 func Test() []string {
 	bad := []string{}
-	x := interface{}(new(a.NoitfStruct))
+	x := any(new(a.NoitfStruct))
 	if _, ok := x.(interface {
 		NoInterfaceMethod()
 	}); ok {
 		bad = append(bad, "fail 1")
 	}
 
-	x = interface{}(new(EmbedImported))
+	x = any(new(EmbedImported))
 	if _, ok := x.(interface {
 		NoInterfaceMethod()
 	}); ok {

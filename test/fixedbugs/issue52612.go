@@ -11,7 +11,7 @@ import (
 	"unsafe"
 )
 
-var one interface{} = 1
+var one any = 1
 
 type eface struct {
 	typ  unsafe.Pointer

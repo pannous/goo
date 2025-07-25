@@ -113,8 +113,8 @@ var builtinCalls = []struct {
 	{"new", `_ = new(int)`, `func(int) *int`},
 	{"new", `type T struct{}; _ = new(T)`, `func(p.T) *p.T`},
 
-	{"panic", `panic(0)`, `func(interface{})`},
-	{"panic", `panic("foo")`, `func(interface{})`},
+	{"panic", `panic(0)`, `func(any)`},
+	{"panic", `panic("foo")`, `func(any)`},
 
 	{"print", `print()`, `func()`},
 	{"print", `print(0)`, `func(int)`},
@@ -124,8 +124,8 @@ var builtinCalls = []struct {
 	{"println", `println(0)`, `func(int)`},
 	{"println", `println(1, 2.0, "foo", true)`, `func(int, float64, string, bool)`},
 
-	{"recover", `recover()`, `func() interface{}`},
-	{"recover", `_ = recover()`, `func() interface{}`},
+	{"recover", `recover()`, `func() any`},
+	{"recover", `_ = recover()`, `func() any`},
 
 	{"Add", `var p unsafe.Pointer; _ = unsafe.Add(p, -1.0)`, `func(unsafe.Pointer, int) unsafe.Pointer`},
 	{"Add", `var p unsafe.Pointer; var n uintptr; _ = unsafe.Add(p, n)`, `func(unsafe.Pointer, uintptr) unsafe.Pointer`},

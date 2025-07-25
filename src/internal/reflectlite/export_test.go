@@ -76,10 +76,10 @@ func Zero(typ Type) Value {
 	return Value{t, nil, fl}
 }
 
-// ToInterface returns v's current value as an interface{}.
+// ToInterface returns v's current value as an any.
 // It is equivalent to:
 //
-//	var i interface{} = (v's underlying value)
+//	var i any = (v's underlying value)
 //
 // It panics if the Value was obtained by accessing
 // unexported struct fields.

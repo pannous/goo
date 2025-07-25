@@ -10,7 +10,7 @@ package main
 
 type myint int
 type mystring string
-type I0 interface{}
+type I0 any
 
 func f() {
 	var ia, ib I0

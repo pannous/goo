@@ -92,7 +92,7 @@ type E struct{}
 var e E
 
 func interfacetest() {
-	var i interface{}
+	var i any
 
 	i = a
 	a1 := i.([]int)

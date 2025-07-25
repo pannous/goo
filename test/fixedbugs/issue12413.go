@@ -12,7 +12,7 @@ package main
 
 func main() {
 	const x = 42
-	switch x := interface{}(nil).(type) {
+	switch x := any(nil).(type) {
 	default:
 		_ = x
 	}

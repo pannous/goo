@@ -9,7 +9,7 @@
 
 package p
 
-type E interface{}
+type E any
 
 type I interface {
 	E

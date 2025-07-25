@@ -314,7 +314,7 @@ import "fmt"
 
 // Force the creation of a lot of type descriptors that will go into
 // the .data.rel.ro section.
-{{range $index, $element := .}}var V{{$index}} interface{} = [{{$index}}]int{}
+{{range $index, $element := .}}var V{{$index}} any = [{{$index}}]int{}
 {{end}}
 
 func main() {

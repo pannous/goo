@@ -9,8 +9,8 @@
 package main
 
 func main() {
-	var i interface{}
-	switch (i.(type)) { // ERROR "outside type switch"
+	var i any
+	switch i.(type) { // ERROR "outside type switch"
 	default:
 	}
 	_ = i

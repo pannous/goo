@@ -67,7 +67,7 @@ func f3(m map[int]int) {
 }
 
 func f4(m map[int]int) {
-	var p *interface{}
+	var p *any
 	m[0], sink = (*p).(int)
 }
 

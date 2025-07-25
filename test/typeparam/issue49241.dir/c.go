@@ -7,11 +7,11 @@ package c
 import "./a"
 
 //go:noinline
-func F() interface{} {
+func F() any {
 	return a.T[int]{}
 }
 
 //go:noinline
-func G() interface{} {
+func G() any {
 	return struct{ X, Y a.U }{}
 }

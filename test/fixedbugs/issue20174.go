@@ -9,7 +9,7 @@
 package p
 
 func f() {
-	_ = (*interface{})(nil) // interface{} here used to not have its width calculated going into backend
+	_ = (*any)(nil) // any here used to not have its width calculated going into backend
 	select {
 	case _ = <-make(chan interface {
 		M()

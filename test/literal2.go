@@ -18,7 +18,7 @@ func assert(cond bool) {
 	}
 }
 
-func equal(x, y interface{}) bool {
+func equal(x, y any) bool {
 	if x != y {
 		fmt.Printf("%g != %g\n", x, y)
 		return false

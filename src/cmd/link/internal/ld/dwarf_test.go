@@ -899,7 +899,7 @@ import "unsafe"
 type X struct{ _ int }
 
 func main() {
-	var x interface{} = &X{}
+	var x any = &X{}
 	p := *(*uintptr)(unsafe.Pointer(&x))
 	print(p)
 }

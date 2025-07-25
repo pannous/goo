@@ -305,11 +305,11 @@ func TestABIUtilsMethod(t *testing.T) {
 func TestABIUtilsInterfaces(t *testing.T) {
 	// type s1 { f1 int16; f2 int16; f3 bool)
 	// type nei interface { ...() string }
-	// func(p1 s1, p2 interface{}, p3 interface{}, p4 nei,
-	//      p5 *interface{}, p6 nei, p7 int64)
-	//    (r1 interface{}, r2 nei, r3 bool)
-	ei := types.Types[types.TINTER] // interface{}
-	pei := types.NewPtr(ei)         // *interface{}
+	// func(p1 s1, p2 any, p3 any, p4 nei,
+	//      p5 *any, p6 nei, p7 int64)
+	//    (r1 any, r2 nei, r3 bool)
+	ei := types.Types[types.TINTER] // any
+	pei := types.NewPtr(ei)         // *any
 	fldt := mkFuncType(types.FakeRecvType(), []*types.Type{},
 		[]*types.Type{types.Types[types.TSTRING]})
 	field := types.NewField(src.NoXPos, typecheck.Lookup("F"), fldt)

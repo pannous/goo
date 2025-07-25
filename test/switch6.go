@@ -20,7 +20,7 @@ func f0(e error) {
 }
 
 // Verify that the compiler rejects multiple default cases.
-func f1(e interface{}) {
+func f1(e any) {
 	switch e {
 	default:
 	default: // ERROR "multiple defaults( in switch)?"

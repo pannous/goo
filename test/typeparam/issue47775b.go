@@ -18,9 +18,9 @@ func New[T any]() {
 	z(c.reset)
 }
 
-var i interface{}
+var i any
 
-func z(interface{}) {
+func z(any) {
 }
 
 func main() {

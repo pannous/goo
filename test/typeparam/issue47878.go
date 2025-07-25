@@ -34,7 +34,7 @@ func (s Src4[T]) Next() {
 type Src5[T any] func() Src5[T]
 
 func (s Src5[T]) Next() {
-	var x interface{} = s
+	var x any = s
 	_ = (x.(Src5[T]))()
 }
 

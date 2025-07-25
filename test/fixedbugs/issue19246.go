@@ -14,7 +14,7 @@ import "os"
 type B struct{}
 
 //go:noinline
-func f(i interface{}) {}
+func f(i any) {}
 
 func main() {
 	defer func() {

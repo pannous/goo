@@ -69,7 +69,7 @@ var a15 = f15([]rune("hello"))
 var a16 = f15([]rune{1, 2, 3})
 
 type Same struct {
-	a, b interface{}
+	a, b any
 }
 
 var same = []Same{

@@ -9,7 +9,7 @@ package p
 type intAlias = int
 
 func f() {
-	switch interface{}(nil) {
+	switch any(nil) {
 	case uint8(0):
 	case byte(0): // ERROR "duplicate case"
 	case int32(0):

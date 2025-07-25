@@ -40,7 +40,7 @@ func sum3(args ...int) int { return 3 * sumA(args) }
 
 func sum4(args ...int) int { return 4 * sumB(args) }
 
-func intersum(args ...interface{}) int {
+func intersum(args ...any) int {
 	s := 0
 	for _, v := range args {
 		s += v.(int)

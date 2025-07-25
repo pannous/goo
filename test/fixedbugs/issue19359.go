@@ -8,7 +8,7 @@ package main
 
 import "fmt"
 
-func set(m map[interface{}]interface{}, key interface{}) (err error) {
+func set(m map[any]any, key any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("set failed: %v", r)
@@ -18,7 +18,7 @@ func set(m map[interface{}]interface{}, key interface{}) (err error) {
 	return nil
 }
 
-func del(m map[interface{}]interface{}, key interface{}) (err error) {
+func del(m map[any]any, key any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("del failed: %v", r)
@@ -28,7 +28,7 @@ func del(m map[interface{}]interface{}, key interface{}) (err error) {
 	return nil
 }
 
-func addInt(m map[interface{}]int, key interface{}) (err error) {
+func addInt(m map[any]int, key any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("addInt failed: %v", r)
@@ -38,7 +38,7 @@ func addInt(m map[interface{}]int, key interface{}) (err error) {
 	return nil
 }
 
-func addStr(m map[interface{}]string, key interface{}) (err error) {
+func addStr(m map[any]string, key any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("addStr failed: %v", r)
@@ -48,7 +48,7 @@ func addStr(m map[interface{}]string, key interface{}) (err error) {
 	return nil
 }
 
-func appendInt(m map[interface{}][]int, key interface{}) (err error) {
+func appendInt(m map[any][]int, key any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("appendInt failed: %v", r)
@@ -58,7 +58,7 @@ func appendInt(m map[interface{}][]int, key interface{}) (err error) {
 	return nil
 }
 
-func appendStr(m map[interface{}][]string, key interface{}) (err error) {
+func appendStr(m map[any][]string, key any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("addStr failed: %v", r)
@@ -69,23 +69,23 @@ func appendStr(m map[interface{}][]string, key interface{}) (err error) {
 }
 
 func main() {
-	m := make(map[interface{}]interface{})
+	m := make(map[any]any)
 	set(m, []int{1, 2, 3})
 	set(m, "abc") // used to throw
 	del(m, []int{1, 2, 3})
 	del(m, "abc") // used to throw
 
-	mi := make(map[interface{}]int)
+	mi := make(map[any]int)
 	addInt(mi, []int{1, 2, 3})
 	addInt(mi, "abc") // used to throw
 
-	ms := make(map[interface{}]string)
+	ms := make(map[any]string)
 	addStr(ms, []int{1, 2, 3})
 	addStr(ms, "abc") // used to throw
 
-	mia := make(map[interface{}][]int)
+	mia := make(map[any][]int)
 	appendInt(mia, []int{1, 2, 3})
 
-	msa := make(map[interface{}][]string)
+	msa := make(map[any][]string)
 	appendStr(msa, "abc") // used to throw
 }

@@ -12,16 +12,16 @@ type fooer interface {
 	foo()
 }
 
-func Works(v interface{}) {
+func Works(v any) {
 	switch v.(type) {
-	case interface{}:
+	case any:
 		v.(fooer).foo()
 	}
 }
 
-func Panics(v interface{}) {
+func Panics(v any) {
 	switch v.(type) {
-	case interface{}:
+	case any:
 		v.(fooer).foo()
 		v.(interface{ foo() }).foo()
 	}

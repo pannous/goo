@@ -4,7 +4,7 @@
 
 package a
 
-func F() interface{} { return new(T[int]) }
+func F() any { return new(T[int]) }
 
 type T[P any] int
 

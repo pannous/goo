@@ -8,7 +8,7 @@ package main
 
 func main() { F() }
 
-func F() interface{} {
+func F() any {
 	g := G
 	g(1)
 	return G

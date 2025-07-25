@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// check that dynamic interface check doesn't get confused
-	var i interface{} = t0(0)
+	var i any = t0(0)
 	if _, ok := i.(I1); ok {
 		println("used t0 as i1")
 		panic("fail")

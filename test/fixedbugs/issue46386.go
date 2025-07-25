@@ -7,16 +7,16 @@
 package main
 
 type I interface {
-	M() interface{}
+	M() any
 }
 
 type S1 struct{}
 
-func (S1) M() interface{} {
+func (S1) M() any {
 	return nil
 }
 
-type EI interface{}
+type EI any
 
 type S struct{}
 

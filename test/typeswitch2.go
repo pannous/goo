@@ -11,7 +11,7 @@ package main
 
 import "io"
 
-func whatis(x interface{}) string {
+func whatis(x any) string {
 	switch x.(type) {
 	case int:
 		return "int"
@@ -26,7 +26,7 @@ func whatis(x interface{}) string {
 		w()
 	}:
 		return "rw"
-	case interface {	// ERROR "duplicate"
+	case interface { // ERROR "duplicate"
 		w()
 		r()
 	}:

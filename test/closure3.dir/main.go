@@ -151,7 +151,7 @@ func main() {
 		y := func(x int) int { // ERROR "can inline main.func17" "func literal does not escape"
 			return x + 2
 		}
-		y, ok = interface{}(func(x int) int { // ERROR "can inline main.func18" "does not escape"
+		y, ok = any(func(x int) int { // ERROR "can inline main.func18" "does not escape"
 			return x + 1
 		}).(func(int) int)
 		if y(40) != 41 {
@@ -164,7 +164,7 @@ func main() {
 			y := func(x int) int { // ERROR "can inline main.func19.1" "func literal does not escape"
 				return x + 2
 			}
-			y, ok = interface{}(func(x int) int { // ERROR "can inline main.func19.2" "does not escape"
+			y, ok = any(func(x int) int { // ERROR "can inline main.func19.2" "does not escape"
 				return x + 1
 			}).(func(int) int)
 			if y(40) != 41 {

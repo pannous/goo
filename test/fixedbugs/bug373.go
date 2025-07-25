@@ -8,13 +8,13 @@
 
 package foo
 
-func f(x interface{}) {
-	switch t := x.(type) {  // ERROR "declared and not used"
+func f(x any) {
+	switch t := x.(type) { // ERROR "declared and not used"
 	case int:
 	}
 }
 
-func g(x interface{}) {
+func g(x any) {
 	switch t := x.(type) {
 	case int:
 	case float32:
@@ -22,7 +22,7 @@ func g(x interface{}) {
 	}
 }
 
-func h(x interface{}) {
+func h(x any) {
 	switch t := x.(type) {
 	case int:
 	case float32:

@@ -20,7 +20,7 @@ func (MyInt) m(*T1) {}
 
 func main() {
 	{
-		var i interface{} = new(T1)
+		var i any = new(T1)
 		_, ok1 := i.(*T1)
 		_, ok2 := i.(*T2)
 		_, ok3 := i.(*T3)
@@ -30,7 +30,7 @@ func main() {
 		}
 	}
 	{
-		var i interface{} = MyInt(0)
+		var i any = MyInt(0)
 		_, ok1 := i.(interface {
 			m(*T1)
 		})

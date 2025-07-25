@@ -108,7 +108,7 @@ func main() {
 	var f2 F2
 	f0 = f0
 	f0 = f1
-	f0 = func(x NewInt) int(f2) // ERROR "cannot|invalid"
+	f0 = (func(x NewInt) int)(f2) // ERROR "cannot|invalid"
 	f1 = f0
 	f1 = f1
 	f1 = F1(f2) // ERROR "cannot|invalid"
@@ -185,7 +185,7 @@ func main() {
 	c2 = c2
 
 	// internal compiler error (6g and gccgo)
-	type T interface{}
+	type T any
 	var _ T = 17 // assignment compatible
 	_ = T(17)    // internal compiler error even though assignment compatible
 }

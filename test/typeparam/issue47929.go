@@ -6,10 +6,10 @@
 
 package v4
 
-var sink interface{}
+var sink any
 
 //go:noinline
-func Do(result, body interface{}) {
+func Do(result, body any) {
 	sink = &result
 }
 
@@ -18,7 +18,7 @@ func DataAction(result DataActionResponse, body DataActionRequest) {
 }
 
 type DataActionRequest struct {
-	Action *interface{}
+	Action *any
 }
 
 type DataActionResponse struct {

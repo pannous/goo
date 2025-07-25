@@ -12,25 +12,25 @@
 package master
 
 type PriorityList struct {
-    elems []interface{}
+	elems []any
 }
 
 func (x *PriorityList) Len() int { return len(x.elems) }
 
-func (l *PriorityList) remove(i int) interface{} {
-    elem := l.elems[i]
-    l.elems = append(l.elems[:i], l.elems[i+1:]...)
-    return elem
+func (l *PriorityList) remove(i int) any {
+	elem := l.elems[i]
+	l.elems = append(l.elems[:i], l.elems[i+1:]...)
+	return elem
 }
 
-func (l *PriorityList) Next() interface{} {
-    return l.remove(l.Len() - 1)
+func (l *PriorityList) Next() any {
+	return l.remove(l.Len() - 1)
 }
 
 var l *PriorityList
 
 func Foo() {
-    // It would fail here if instrumented code (including inline-label) was copied.
-    for elem := l.Next(); elem != nil; elem = l.Next() {
-    }
+	// It would fail here if instrumented code (including inline-label) was copied.
+	for elem := l.Next(); elem != nil; elem = l.Next() {
+	}
 }

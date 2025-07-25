@@ -10,7 +10,7 @@ type TestSuite struct {
 	Tests []Test
 }
 type Test struct {
-	Want interface{}
+	Want any
 }
 type Int struct {
 	i int

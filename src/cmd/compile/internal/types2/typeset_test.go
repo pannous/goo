@@ -40,7 +40,7 @@ func TestTypeSetString(t *testing.T) {
 		"{m(); comparable; int|float32|string}": "{func (p.T).m(); int | float32 | string}",
 		"{m1(); int; m2(); comparable }":        "{func (p.T).m1(); func (p.T).m2(); int}",
 
-		"{E}; type E interface{}":           "𝓤",
+		"{E}; type E any":                   "𝓤",
 		"{E}; type E interface{int;string}": "∅",
 		"{E}; type E interface{comparable}": "{comparable}",
 	} {

@@ -8,7 +8,7 @@
 
 package escape
 
-var sink interface{}
+var sink any
 
 type M interface {
 	M()
@@ -215,7 +215,7 @@ type T2 struct {
 }
 
 func dotTypeEscape() *T2 { // #11931
-	var x interface{}
+	var x any
 	x = &T1{p: new(int)} // ERROR "new\(int\) escapes to heap" "&T1{...} does not escape"
 	return &T2{          // ERROR "&T2{...} escapes to heap"
 		T1: *(x.(*T1)),
@@ -228,8 +228,8 @@ func dotTypeEscape2() { // #13805, #15796
 		j := 0
 		var v int
 		var ok bool
-		var x interface{} = i // ERROR "0 does not escape"
-		var y interface{} = j // ERROR "0 does not escape"
+		var x any = i // ERROR "0 does not escape"
+		var y any = j // ERROR "0 does not escape"
 
 		*(&v) = x.(int)
 		*(&v), *(&ok) = y.(int)
@@ -238,8 +238,8 @@ func dotTypeEscape2() { // #13805, #15796
 		i := 0
 		j := 0
 		var ok bool
-		var x interface{} = i // ERROR "0 does not escape"
-		var y interface{} = j // ERROR "0 does not escape"
+		var x any = i // ERROR "0 does not escape"
+		var y any = j // ERROR "0 does not escape"
 
 		sink = x.(int)         // ERROR "x.\(int\) escapes to heap"
 		sink, *(&ok) = y.(int) // ERROR "autotmp_.* escapes to heap"
@@ -248,8 +248,8 @@ func dotTypeEscape2() { // #13805, #15796
 		i := 0 // ERROR "moved to heap: i"
 		j := 0 // ERROR "moved to heap: j"
 		var ok bool
-		var x interface{} = &i
-		var y interface{} = &j
+		var x any = &i
+		var y any = &j
 
 		sink = x.(*int)
 		sink, *(&ok) = y.(*int)

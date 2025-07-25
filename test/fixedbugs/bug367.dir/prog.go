@@ -16,7 +16,7 @@ type I interface {
 func main() {
 	var t T
 	p.F(t)
-	var x interface{} = t
+	var x any = t
 	_, ok := x.(I)
 	if ok {
 		panic("should not satisfy main.I")

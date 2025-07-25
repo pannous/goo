@@ -39,4 +39,4 @@ func identity(x uintptr) uintptr {
 	return x
 }
 
-var sink interface{}
+var sink any

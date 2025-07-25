@@ -31,14 +31,14 @@ func f1a(x *[]byte, y *[]byte) {
 	*x = z  // ERROR "write barrier"
 }
 
-func f2(x *interface{}, y interface{}) {
+func f2(x *any, y any) {
 	*x = y // no barrier (dead store)
 
 	z := y // no barrier
 	*x = z // ERROR "write barrier"
 }
 
-func f2a(x *interface{}, y *interface{}) {
+func f2a(x *any, y *any) {
 	*x = *y // no barrier (dead store)
 
 	z := y // no barrier
@@ -97,11 +97,11 @@ func f7(x, y *int) []*int {
 	return z[:i]
 }
 
-func f9(x *interface{}, v *byte) {
+func f9(x *any, v *byte) {
 	*x = v // ERROR "write barrier"
 }
 
-func f10(x *byte, f func(interface{})) {
+func f10(x *byte, f func(any)) {
 	f(x)
 }
 
@@ -145,7 +145,7 @@ func f16(x []T8, y T8) []T8 {
 	return append(x, y) // ERROR "write barrier"
 }
 
-func t1(i interface{}) **int {
+func t1(i any) **int {
 	// From issue 14306, make sure we have write barriers in a type switch
 	// where the assigned variable escapes.
 	switch x := i.(type) {
@@ -280,8 +280,8 @@ func f26(p *int) *T26 { // see issue 29573
 	}
 }
 
-func f27(p *int) []interface{} {
-	return []interface{}{
+func f27(p *int) []any {
+	return []any{
 		nil,         // no write barrier: zeroed memory, nil ptr
 		(*T26)(nil), // no write barrier: zeroed memory, type ptr & nil ptr
 		&g26,        // no write barrier: zeroed memory, type ptr & global ptr
@@ -292,8 +292,8 @@ func f27(p *int) []interface{} {
 
 var g28 [256]uint64
 
-func f28() []interface{} {
-	return []interface{}{
+func f28() []any {
+	return []any{
 		false,      // no write barrier
 		true,       // no write barrier
 		0,          // no write barrier

@@ -6,7 +6,7 @@
 
 package main
 
-func f[T any](i interface{}) {
+func f[T any](i any) {
 	switch i.(type) {
 	case T:
 		println("T")

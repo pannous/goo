@@ -13,7 +13,7 @@ import (
 
 func test1[T any](fn func(T) int, v T) int {
 	fn1 := func() int {
-		var i interface{} = v
+		var i any = v
 		val := fn(i.(T))
 		return val
 	}

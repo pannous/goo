@@ -9,7 +9,7 @@ package main
 import "reflect"
 
 type S[T any] struct {
-	a interface{}
+	a any
 }
 
 func (e S[T]) M() {

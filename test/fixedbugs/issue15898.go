@@ -6,7 +6,7 @@
 
 package p
 
-func f(e interface{}) {
+func f(e any) {
 	switch e.(type) {
 	case nil, nil: // ERROR "multiple nil cases in type switch|duplicate type in switch|duplicate case nil in type switch"
 	}

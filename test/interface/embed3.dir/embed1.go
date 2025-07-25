@@ -35,28 +35,28 @@ type X8 struct{ p.M2 }
 func (X8) foo(int) {}
 
 func main() {
-	var i1 interface{} = X1{}
+	var i1 any = X1{}
 	checks(func() { _ = i1.(p.I1) }, "interface conversion: main.X1 is not p.I1: missing method Foo")
 
-	var i2 interface{} = X2{}
+	var i2 any = X2{}
 	checks(func() { _ = i2.(p.I2) }, "interface conversion: main.X2 is not p.I2: missing method foo")
 
-	var i3 interface{} = X3{}
+	var i3 any = X3{}
 	checks(func() { _ = i3.(p.I2) }, "interface conversion: main.X3 is not p.I2: missing method foo")
 
-	var i4 interface{} = X4{}
+	var i4 any = X4{}
 	checks(func() { _ = i4.(p.I2) }, "interface conversion: main.X4 is not p.I2: missing method foo")
 
-	var i5 interface{} = X5{}
+	var i5 any = X5{}
 	checks(func() { _ = i5.(p.I2) }, "interface conversion: main.X5 is not p.I2: missing method foo")
 
-	var i6 interface{} = X6{}
+	var i6 any = X6{}
 	checks(func() { _ = i6.(p.I2) }, "")
 
-	var i7 interface{} = X7{}
+	var i7 any = X7{}
 	checks(func() { _ = i7.(p.I2) }, "")
 
-	var i8 interface{} = X8{}
+	var i8 any = X8{}
 	checks(func() { _ = i8.(p.I2) }, "")
 }
 

@@ -191,11 +191,11 @@ func TestTypesInfo(t *testing.T) {
 		typ  string // value type
 	}{
 		// single-valued expressions of untyped constants
-		{`package b0; var x interface{} = false`, `false`, `bool`},
-		{`package b1; var x interface{} = 0`, `0`, `int`},
-		{`package b2; var x interface{} = 0.`, `0.`, `float64`},
-		{`package b3; var x interface{} = 0i`, `0i`, `complex128`},
-		{`package b4; var x interface{} = "foo"`, `"foo"`, `string`},
+		{`package b0; var x any = false`, `false`, `bool`},
+		{`package b1; var x any = 0`, `0`, `int`},
+		{`package b2; var x any = 0.`, `0.`, `float64`},
+		{`package b3; var x any = 0i`, `0i`, `complex128`},
+		{`package b4; var x any = "foo"`, `"foo"`, `string`},
 
 		// uses of nil
 		{`package n0; var _ *int = nil`, `nil`, `*int`},
@@ -203,7 +203,7 @@ func TestTypesInfo(t *testing.T) {
 		{`package n2; var _ []byte = nil`, `nil`, `[]byte`},
 		{`package n3; var _ map[int]int = nil`, `nil`, `map[int]int`},
 		{`package n4; var _ chan int = nil`, `nil`, `chan int`},
-		{`package n5a; var _ interface{} = (*int)(nil)`, `nil`, `*int`},
+		{`package n5a; var _ any = (*int)(nil)`, `nil`, `*int`},
 		{`package n5b; var _ interface{m()} = nil`, `nil`, `interface{m()}`},
 		{`package n6; import "unsafe"; var _ unsafe.Pointer = nil`, `nil`, `unsafe.Pointer`},
 
@@ -212,7 +212,7 @@ func TestTypesInfo(t *testing.T) {
 		{`package n12; var (x []byte; _ = x == nil)`, `nil`, `[]byte`},
 		{`package n13; var (x map[int]int; _ = x == nil)`, `nil`, `map[int]int`},
 		{`package n14; var (x chan int; _ = x == nil)`, `nil`, `chan int`},
-		{`package n15a; var (x interface{}; _ = x == (*int)(nil))`, `nil`, `*int`},
+		{`package n15a; var (x any; _ = x == (*int)(nil))`, `nil`, `*int`},
 		{`package n15b; var (x interface{m()}; _ = x == nil)`, `nil`, `interface{m()}`},
 		{`package n15; import "unsafe"; var (x unsafe.Pointer; _ = x == nil)`, `nil`, `unsafe.Pointer`},
 
@@ -221,7 +221,7 @@ func TestTypesInfo(t *testing.T) {
 		{`package n22; var _ = ([]byte)(nil)`, `nil`, `[]byte`},
 		{`package n23; var _ = (map[int]int)(nil)`, `nil`, `map[int]int`},
 		{`package n24; var _ = (chan int)(nil)`, `nil`, `chan int`},
-		{`package n25a; var _ = (interface{})((*int)(nil))`, `nil`, `*int`},
+		{`package n25a; var _ = (any)((*int)(nil))`, `nil`, `*int`},
 		{`package n25b; var _ = (interface{m()})(nil)`, `nil`, `interface{m()}`},
 		{`package n26; import "unsafe"; var _ = unsafe.Pointer(nil)`, `nil`, `unsafe.Pointer`},
 
@@ -230,16 +230,16 @@ func TestTypesInfo(t *testing.T) {
 		{`package n32; func f([]byte) { f(nil) }`, `nil`, `[]byte`},
 		{`package n33; func f(map[int]int) { f(nil) }`, `nil`, `map[int]int`},
 		{`package n34; func f(chan int) { f(nil) }`, `nil`, `chan int`},
-		{`package n35a; func f(interface{}) { f((*int)(nil)) }`, `nil`, `*int`},
+		{`package n35a; func f(any) { f((*int)(nil)) }`, `nil`, `*int`},
 		{`package n35b; func f(interface{m()}) { f(nil) }`, `nil`, `interface{m()}`},
 		{`package n35; import "unsafe"; func f(unsafe.Pointer) { f(nil) }`, `nil`, `unsafe.Pointer`},
 
 		// comma-ok expressions
-		{`package p0; var x interface{}; var _, _ = x.(int)`,
+		{`package p0; var x any; var _, _ = x.(int)`,
 			`x.(int)`,
 			`(int, bool)`,
 		},
-		{`package p1; var x interface{}; func _() { _, _ = x.(int) }`,
+		{`package p1; var x any; func _() { _, _ = x.(int) }`,
 			`x.(int)`,
 			`(int, bool)`,
 		},
@@ -257,7 +257,7 @@ func TestTypesInfo(t *testing.T) {
 		},
 
 		// go.dev/issue/6796
-		{`package issue6796_a; var x interface{}; var _, _ = (x.(int))`,
+		{`package issue6796_a; var x any; var _, _ = (x.(int))`,
 			`x.(int)`,
 			`(int, bool)`,
 		},
@@ -283,11 +283,11 @@ func TestTypesInfo(t *testing.T) {
 			`m[0]`,
 			`(string, bool)`,
 		},
-		{`package issue7060_b; var ( m map[int]string; x, ok interface{} = m[0] )`,
+		{`package issue7060_b; var ( m map[int]string; x, ok any = m[0] )`,
 			`m[0]`,
 			`(string, bool)`,
 		},
-		{`package issue7060_c; func f(x interface{}, ok bool, m map[int]string) { x, ok = m[0] }`,
+		{`package issue7060_c; func f(x any, ok bool, m map[int]string) { x, ok = m[0] }`,
 			`m[0]`,
 			`(string, bool)`,
 		},
@@ -295,11 +295,11 @@ func TestTypesInfo(t *testing.T) {
 			`<-ch`,
 			`(string, bool)`,
 		},
-		{`package issue7060_e; var ( ch chan string; x, ok interface{} = <-ch )`,
+		{`package issue7060_e; var ( ch chan string; x, ok any = <-ch )`,
 			`<-ch`,
 			`(string, bool)`,
 		},
-		{`package issue7060_f; func f(x interface{}, ok bool, ch chan string) { x, ok = <-ch }`,
+		{`package issue7060_f; func f(x any, ok bool, ch chan string) { x, ok = <-ch }`,
 			`<-ch`,
 			`(string, bool)`,
 		},
@@ -330,8 +330,8 @@ func TestTypesInfo(t *testing.T) {
 		{brokenPkg + `x0; func _() { var x struct {f string}; x.f := 0 }`, `x.f`, `string`},
 		{brokenPkg + `x1; func _() { var z string; type x struct {f string}; y := &x{q: z}}`, `z`, `string`},
 		{brokenPkg + `x2; func _() { var a, b string; type x struct {f string}; z := &x{f: a, f: b,}}`, `b`, `string`},
-		{brokenPkg + `x3; var x = panic("");`, `panic`, `func(interface{})`},
-		{`package x4; func _() { panic("") }`, `panic`, `func(interface{})`},
+		{brokenPkg + `x3; var x = panic("");`, `panic`, `func(any)`},
+		{`package x4; func _() { panic("") }`, `panic`, `func(any)`},
 		{brokenPkg + `x5; func _() { var x map[string][...]int; x = map[string][...]int{"": {1,2,3}} }`, `x`, `map[string]invalid type`},
 
 		// parameterized functions
@@ -345,8 +345,8 @@ func TestTypesInfo(t *testing.T) {
 		// type parameters
 		{`package t0; type t[] int; var _ t`, `t`, `t0.t`}, // t[] is a syntax error that is ignored in this test in favor of t
 		{`package t1; type t[P any] int; var _ t[int]`, `t`, `t1.t[P any]`},
-		{`package t2; type t[P interface{}] int; var _ t[int]`, `t`, `t2.t[P interface{}]`},
-		{`package t3; type t[P, Q interface{}] int; var _ t[int, int]`, `t`, `t3.t[P, Q interface{}]`},
+		{`package t2; type t[P any] int; var _ t[int]`, `t`, `t2.t[P any]`},
+		{`package t3; type t[P, Q any] int; var _ t[int, int]`, `t`, `t3.t[P, Q any]`},
 		{brokenPkg + `t4; type t[P, Q interface{ m() }] int; var _ t[int, int]`, `t`, `broken_t4.t[P, Q interface{m()}]`},
 
 		// instantiated types must be sanitized
@@ -1036,10 +1036,10 @@ func TestImplicitsInfo(t *testing.T) {
 		{`package p0; import local "fmt"; var _ = local.Println`, ""}, // no Implicits entry
 		{`package p1; import "fmt"; var _ = fmt.Println`, "importSpec: package fmt"},
 
-		{`package p3; func f(x interface{}) { switch x.(type) { case int: } }`, ""}, // no Implicits entry
-		{`package p4; func f(x interface{}) { switch t := x.(type) { case int: _ = t } }`, "caseClause: var t int"},
-		{`package p5; func f(x interface{}) { switch t := x.(type) { case int, uint: _ = t } }`, "caseClause: var t interface{}"},
-		{`package p6; func f(x interface{}) { switch t := x.(type) { default: _ = t } }`, "caseClause: var t interface{}"},
+		{`package p3; func f(x any) { switch x.(type) { case int: } }`, ""}, // no Implicits entry
+		{`package p4; func f(x any) { switch t := x.(type) { case int: _ = t } }`, "caseClause: var t int"},
+		{`package p5; func f(x any) { switch t := x.(type) { case int, uint: _ = t } }`, "caseClause: var t any"},
+		{`package p6; func f(x any) { switch t := x.(type) { default: _ = t } }`, "caseClause: var t any"},
 
 		{`package p7; func f(x int) {}`, ""}, // no Implicits entry
 		{`package p8; func f(int) {}`, "field: var  int"},
@@ -1053,9 +1053,9 @@ func TestImplicitsInfo(t *testing.T) {
 		{`package f3; func f[T any]() (complex64) { return 0 }`, "field: var  complex64"},
 		{`package f4; func f[T any](t T) (T) { return t }`, "field: var  T"},
 		{`package t0; type T[A any] struct{}; func (*T[_]) f() {}`, "field: var  *t0.T[_]"},
-		{`package t1; type T[A any] struct{}; func _(x interface{}) { switch t := x.(type) { case T[int]: _ = t } }`, "caseClause: var t t1.T[int]"},
-		{`package t2; type T[A any] struct{}; func _[P any](x interface{}) { switch t := x.(type) { case T[P]: _ = t } }`, "caseClause: var t t2.T[P]"},
-		{`package t3; func _[P any](x interface{}) { switch t := x.(type) { case P: _ = t } }`, "caseClause: var t P"},
+		{`package t1; type T[A any] struct{}; func _(x any) { switch t := x.(type) { case T[int]: _ = t } }`, "caseClause: var t t1.T[int]"},
+		{`package t2; type T[A any] struct{}; func _[P any](x any) { switch t := x.(type) { case T[P]: _ = t } }`, "caseClause: var t t2.T[P]"},
+		{`package t3; func _[P any](x any) { switch t := x.(type) { case P: _ = t } }`, "caseClause: var t P"},
 	}
 
 	for _, test := range tests {
@@ -1322,13 +1322,13 @@ func TestScopesInfo(t *testing.T) {
 		{`package p10; func _() { switch x := 0; x { case 1: y := x; _ = y; default: }}`, []string{
 			"file:", "func:", "switch:x", "case:y", "case:",
 		}},
-		{`package p11; func _(t interface{}) { switch t.(type) {} }`, []string{
+		{`package p11; func _(t any) { switch t.(type) {} }`, []string{
 			"file:", "func:t", "switch:",
 		}},
-		{`package p12; func _(t interface{}) { switch t := t; t.(type) {} }`, []string{
+		{`package p12; func _(t any) { switch t := t; t.(type) {} }`, []string{
 			"file:", "func:t", "switch:t",
 		}},
-		{`package p13; func _(t interface{}) { switch x := t.(type) { case int: _ = x } }`, []string{
+		{`package p13; func _(t any) { switch x := t.(type) { case int: _ = x } }`, []string{
 			"file:", "func:t", "switch:", "case:x", // x implicitly declared
 		}},
 		{`package p14; func _() { select{} }`, []string{
@@ -2649,7 +2649,7 @@ func TestImplements(t *testing.T) {
 	const src = `
 package p
 
-type EmptyIface interface{}
+type EmptyIface any
 
 type I interface {
 	m()

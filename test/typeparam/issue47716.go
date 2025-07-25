@@ -53,8 +53,8 @@ func main() {
 		panic(fmt.Sprintf("got %d, want %d", got, want))
 	}
 
-	var v4 Tstruct[interface{}]
-	var v5 interface{}
+	var v4 Tstruct[any]
+	var v5 any
 	if got, want := unsafe.Offsetof(v4.f2), unsafe.Sizeof(v5); got != want {
 		panic(fmt.Sprintf("got %d, want %d", got, want))
 	}

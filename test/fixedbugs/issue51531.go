@@ -6,7 +6,7 @@
 
 package p
 
-type empty interface{}
+type empty any
 
 type Foo[T empty] int // ERROR "type parameter requires go1\.18 or later \(-lang was set to go1\.17; check go.mod\)"
 

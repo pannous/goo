@@ -4,12 +4,12 @@
 
 package a
 
-type T struct { x int }
+type T struct{ x int }
 
-func F() interface{} {
+func F() any {
 	return [2]T{}
 }
 
-func P() interface{} {
+func P() any {
 	return &[2]T{}
 }

@@ -13,7 +13,7 @@ import (
 	"reflect"
 )
 
-func verify(name string, result, expected interface{}) {
+func verify(name string, result, expected any) {
 	if !reflect.DeepEqual(result, expected) {
 		panic(name)
 	}
@@ -35,7 +35,7 @@ var (
 
 var tests = []struct {
 	name             string
-	result, expected interface{}
+	result, expected any
 }{
 	{"bool a", append([]bool{}), []bool{}},
 	{"bool b", append([]bool{}, true), []bool{true}},
@@ -194,7 +194,7 @@ func verifyStruct() {
 }
 
 func verifyInterface() {
-	type T interface{}
+	type T any
 	type S []T
 	e := make(S, 100)
 	for i := range e {

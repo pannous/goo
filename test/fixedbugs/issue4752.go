@@ -6,12 +6,12 @@
 
 package main
 
-func F(xi, yi interface{}) uint64 {
+func F(xi, yi any) uint64 {
 	x, y := xi.(uint64), yi.(uint64)
 	return x &^ y
 }
 
-func G(xi, yi interface{}) uint64 {
+func G(xi, yi any) uint64 {
 	return xi.(uint64) &^ yi.(uint64) // generates incorrect code
 }
 

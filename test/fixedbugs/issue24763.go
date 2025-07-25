@@ -8,12 +8,12 @@ package main
 
 func main() {
 	var s uint
-	var x = interface{}(1<<s + 1<<s) // compiler must not crash here
+	var x = any(1<<s + 1<<s) // compiler must not crash here
 	if x.(int) != 2 {
 		panic("x not int or not 2")
 	}
 
-	var y interface{}
+	var y any
 	y = 1<<s + 1 // compiler must not crash here
 	if y.(int) != 2 {
 		panic("y not int or not 2")

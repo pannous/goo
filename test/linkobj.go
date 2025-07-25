@@ -158,7 +158,7 @@ func cleanup() {
 	os.RemoveAll(tmpdir)
 }
 
-func fatalf(format string, args ...interface{}) {
+func fatalf(format string, args ...any) {
 	cleanup()
 	log.Fatalf(format, args...)
 }

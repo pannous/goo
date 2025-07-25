@@ -9,15 +9,15 @@ import (
 	"strings"
 )
 
-var G interface{}
+var G any
 
-func Unmarshal(data []byte, o interface{}) error {
+func Unmarshal(data []byte, o any) error {
 	G = o
-	v, ok := o.(*map[string]interface{})
+	v, ok := o.(*map[string]any)
 	if !ok {
 		return errors.New("eek")
 	}
-	vals := make(map[string]interface{})
+	vals := make(map[string]any)
 	s := string(data)
 	items := strings.Split(s, " ")
 	var err error

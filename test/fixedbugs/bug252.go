@@ -10,6 +10,6 @@ func f(args ...int) {
 	g(args)
 }
 
-func g(args ...interface{}) {
-	f(args)	// ERROR "cannot use|incompatible"
+func g(args ...any) {
+	f(args) // ERROR "cannot use|incompatible"
 }

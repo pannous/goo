@@ -10,13 +10,13 @@
 
 package main
 
-func recv(c chan interface{}) struct{} {
+func recv(c chan any) struct{} {
 	return (<-c).(struct{})
 }
 
-var m = make(map[interface{}]int)
+var m = make(map[any]int)
 
-func recv1(c chan interface{}) {
+func recv1(c chan any) {
 	defer rec()
 	m[(<-c).(struct{})] = 0
 }
@@ -26,7 +26,7 @@ func rec() {
 }
 
 func main() {
-	c := make(chan interface{})
+	c := make(chan any)
 	go recv(c)
 	c <- struct{}{}
 	go recv1(c)

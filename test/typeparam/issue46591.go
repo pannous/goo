@@ -8,7 +8,7 @@ package main
 
 type T[_ any] struct{}
 
-var m = map[interface{}]int{
+var m = map[any]int{
 	T[struct{ int }]{}: 0,
 	T[struct {
 		int "x"

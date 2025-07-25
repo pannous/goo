@@ -14,7 +14,7 @@ func f[T comparable](t, u T) bool {
 	return t == u
 }
 
-func g[T comparable](t T, i interface{}) bool {
+func g[T comparable](t T, i any) bool {
 	// Compare type parameter value to empty interface.
 	return t == i
 }
@@ -38,7 +38,7 @@ type myint int
 func (x myint) foo() {
 }
 
-func k[T comparable](t T, i interface{}) bool {
+func k[T comparable](t T, i any) bool {
 	// Compare derived type value to interface.
 	return struct{ a, b T }{t, t} == i
 }

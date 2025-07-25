@@ -423,7 +423,7 @@ func readpkglist(shlibpath string) (pkgs []*load.Package) {
 
 // cacheAction looks up {mode, p} in the cache and returns the resulting action.
 // If the cache has no such action, f() is recorded and returned.
-// TODO(rsc): Change the second key from *load.Package to interface{},
+// TODO(rsc): Change the second key from *load.Package to any,
 // to make the caching in linkShared less awkward?
 func (b *Builder) cacheAction(mode string, p *load.Package, f func() *Action) *Action {
 	a := b.actionCache[cacheKey{mode, p}]

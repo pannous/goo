@@ -46,11 +46,11 @@ func TestBar() I { return bar{1: 2} }
 
 type baz int
 
-func IsBaz(x interface{}) bool { _, ok := x.(baz); return ok }
+func IsBaz(x any) bool { _, ok := x.(baz); return ok }
 
 type baz2 int
 
-func IsBaz2(x interface{}) bool {
+func IsBaz2(x any) bool {
 	switch x.(type) {
 	case baz2:
 		return true

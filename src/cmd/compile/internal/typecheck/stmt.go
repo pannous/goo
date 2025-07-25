@@ -184,7 +184,7 @@ func tcCheckNil(n *ir.UnaryExpr) ir.Node {
 
 func tcCheck(n *ir.CheckStmt) ir.Node {
 	n.Cond = Expr(n.Cond)
-	// Ensure the condition has a type - convert to interface{} if needed
+	// Ensure the condition has a type - convert to any if needed
 	if n.Cond.Type() != nil && n.Cond.Type().IsUntyped() {
 		n.Cond = DefaultLit(n.Cond, nil)
 	}

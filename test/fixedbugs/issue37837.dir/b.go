@@ -16,12 +16,12 @@ func main() {
 
 	// Test that inlined type switches with short variable
 	// declarations work correctly.
-	_ = a.G(nil).(*interface{})                       // ERROR "inlining call to a.G"
-	_ = a.G(1).(*int)                                 // ERROR "inlining call to a.G" "does not escape"
-	_ = a.G(2.0).(*float64)                           // ERROR "inlining call to a.G" "does not escape"
-	_ = (*a.G("").(*interface{})).(string)            // ERROR "inlining call to a.G" "does not escape"
-	_ = (*a.G(([]byte)(nil)).(*interface{})).([]byte) // ERROR "inlining call to a.G" "does not escape"
-	_ = (*a.G(true).(*interface{})).(bool)            // ERROR "inlining call to a.G" "does not escape"
+	_ = a.G(nil).(*any)                       // ERROR "inlining call to a.G"
+	_ = a.G(1).(*int)                         // ERROR "inlining call to a.G" "does not escape"
+	_ = a.G(2.0).(*float64)                   // ERROR "inlining call to a.G" "does not escape"
+	_ = (*a.G("").(*any)).(string)            // ERROR "inlining call to a.G" "does not escape"
+	_ = (*a.G(([]byte)(nil)).(*any)).([]byte) // ERROR "inlining call to a.G" "does not escape"
+	_ = (*a.G(true).(*any)).(bool)            // ERROR "inlining call to a.G" "does not escape"
 }
 
 //go:noinline

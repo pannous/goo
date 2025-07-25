@@ -4,7 +4,7 @@
 
 package a
 
-type T interface{}
+type T any
 
 func f() T { return nil }
 

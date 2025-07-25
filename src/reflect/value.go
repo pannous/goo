@@ -1462,10 +1462,10 @@ func (v Value) CanInterface() bool {
 	return v.flag&flagRO == 0
 }
 
-// Interface returns v's current value as an interface{}.
+// Interface returns v's current value as an any.
 // It is equivalent to:
 //
-//	var i interface{} = (v's underlying value)
+//	var i any = (v's underlying value)
 //
 // It panics if the Value was obtained by accessing
 // unexported struct fields.

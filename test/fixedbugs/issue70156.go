@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	pi := new(interface{})
+	pi := new(any)
 	v := reflect.ValueOf(pi).Elem()
 	if v.Kind() != reflect.Interface {
 		panic(0)

@@ -54,7 +54,7 @@ func test3() {
 
 func test4() {
 	defer mustRecover("interface")
-	var x interface{} = 1
+	var x any = 1
 	println(x.(float32))
 }
 
@@ -66,15 +66,15 @@ type T struct {
 func test5() {
 	defer mustRecover("uncomparable")
 	var x T
-	var z interface{} = x
+	var z any = x
 	println(z != z)
 }
 
 func test6() {
 	defer mustRecover("unhashable type main.T")
 	var x T
-	var z interface{} = x
-	m := make(map[interface{}]int)
+	var z any = x
+	m := make(map[any]int)
 	m[z] = 1
 }
 

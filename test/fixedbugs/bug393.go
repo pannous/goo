@@ -9,7 +9,7 @@
 
 package bug393
 
-func f(x interface{}) int {
+func f(x any) int {
 	switch x {
 	case 1:
 		return 1

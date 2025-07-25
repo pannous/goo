@@ -541,7 +541,7 @@ func add(p unsafe.Pointer, x uintptr) unsafe.Pointer {
 	return unsafe.Pointer(uintptr(p) + x)
 }
 
-func funcPC(f interface{}) uintptr {
+func funcPC(f any) uintptr {
 	var a uintptr
 	return **(**uintptr)(add(unsafe.Pointer(&f), unsafe.Sizeof(a)))
 }

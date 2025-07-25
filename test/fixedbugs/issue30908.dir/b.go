@@ -15,21 +15,21 @@ var G int
 // An inlinable function. To trigger the bug in question this needs
 // to be inlined here within the package and also inlined into some
 // other package that imports it.
-func ReadValues(data []byte) (vals map[string]interface{}, err error) {
+func ReadValues(data []byte) (vals map[string]any, err error) {
 	err = a.Unmarshal(data, &vals)
 	if len(vals) == 0 {
-		vals = map[string]interface{}{}
+		vals = map[string]any{}
 	}
 	return
 }
 
 // A local call to the function above, which triggers the "move to heap"
 // of the output param.
-func CallReadValues(filename string) (map[string]interface{}, error) {
+func CallReadValues(filename string) (map[string]any, error) {
 	defer func() { G++ }()
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return map[string]interface{}{}, err
+		return map[string]any{}, err
 	}
 	return ReadValues(data)
 }

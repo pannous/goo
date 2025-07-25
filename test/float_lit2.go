@@ -41,8 +41,8 @@ const (
 
 var cvt = []struct {
 	bits   uint64 // keep us honest
-	exact  interface{}
-	approx interface{}
+	exact  any
+	approx any
 	text   string
 }{
 	// 0
@@ -143,7 +143,7 @@ func main() {
 	}
 }
 
-func bits(x interface{}) interface{} {
+func bits(x any) any {
 	switch x := x.(type) {
 	case float32:
 		return uint64(math.Float32bits(x))
@@ -153,7 +153,7 @@ func bits(x interface{}) interface{} {
 	return 0
 }
 
-func fromBits(b uint64, x interface{}) interface{} {
+func fromBits(b uint64, x any) any {
 	switch x.(type) {
 	case float32:
 		return math.Float32frombits(uint32(b))

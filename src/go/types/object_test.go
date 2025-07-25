@@ -106,7 +106,7 @@ var testObjects = []struct {
 	{"func f(int) string", "f", "func p.f(int) string", false},
 	{"func g[P any](x P){}", "g", "func p.g[P any](x P)", false},
 	{"func g[P interface{~int}](x P){}", "g.P", "type parameter P interface{~int}", false},
-	{"", "any", "type any = interface{}", false},
+	{"", "any", "type any = any", false},
 }
 
 func TestObjectString(t *testing.T) {

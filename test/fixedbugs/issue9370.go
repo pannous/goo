@@ -22,7 +22,7 @@ type G func()
 func (G) Method() {}
 
 var (
-	e interface{}
+	e any
 	i I
 	c C
 	n int

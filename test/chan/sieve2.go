@@ -63,12 +63,12 @@ func (h *PeekChHeap) Len() int {
 	return len(*h)
 }
 
-func (h *PeekChHeap) Pop() (v interface{}) {
+func (h *PeekChHeap) Pop() (v any) {
 	*h, v = (*h)[:h.Len()-1], (*h)[h.Len()-1]
 	return
 }
 
-func (h *PeekChHeap) Push(v interface{}) {
+func (h *PeekChHeap) Push(v any) {
 	*h = append(*h, v.(*PeekCh))
 }
 

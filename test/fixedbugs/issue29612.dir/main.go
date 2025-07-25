@@ -29,7 +29,7 @@ func main() {
 }
 
 //go:noinline
-func swt(i interface{}, want int) {
+func swt(i any, want int) {
 	var got int
 	switch i.(type) {
 	case *ssa1.T:

@@ -578,8 +578,8 @@ type astruct struct {
 }
 
 func main() {
-	var iface interface{} = map[string]astruct{}
-	var iface2 interface{} = []astruct{}
+	var iface any = map[string]astruct{}
+	var iface2 any = []astruct{}
 	println(iface, iface2)
 }
 `

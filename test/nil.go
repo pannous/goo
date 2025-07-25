@@ -17,7 +17,7 @@ type T struct {
 	i int
 }
 
-type IN interface{}
+type IN any
 
 func main() {
 	var i *int

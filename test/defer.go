@@ -29,7 +29,7 @@ func test1() {
 	}
 }
 
-func addDotDotDot(v ...interface{}) { result += fmt.Sprint(v...) }
+func addDotDotDot(v ...any) { result += fmt.Sprint(v...) }
 
 func test2helper() {
 	for i := 0; i < 10; i++ {

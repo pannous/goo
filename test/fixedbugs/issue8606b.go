@@ -54,7 +54,7 @@ func main() {
 	(*reflect.StringHeader)(unsafe.Pointer(&bad2)).Data = uintptr(unsafe.Pointer(&b[1]))
 
 	for _, test := range []struct {
-		a, b interface{}
+		a, b any
 	}{
 		{SI{s: bad1, i: 1}, SI{s: bad2, i: 2}},
 		{SS{s: bad1, t: "a"}, SS{s: bad2, t: "aa"}},

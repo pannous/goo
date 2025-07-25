@@ -16,10 +16,10 @@ import (
 
 func main() {
 	var (
-		x interface{}
+		x any
 		p *int
 		s []int
-		l *interface{}
+		l *any
 		r []*int
 	)
 	tests := []struct {

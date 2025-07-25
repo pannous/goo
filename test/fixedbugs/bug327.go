@@ -13,8 +13,8 @@
 package main
 
 type (
-	a interface{}
-	b interface{}
+	a any
+	b any
 )
 
 func main() {

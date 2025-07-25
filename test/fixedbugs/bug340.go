@@ -9,7 +9,7 @@
 package main
 
 func main() {
-	var x interface{}
+	var x any
 	switch t := x.(type) {
 	case 0:		// ERROR "type"
 		t.x = 1

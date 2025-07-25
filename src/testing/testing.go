@@ -287,7 +287,7 @@
 //
 //	func FuzzJSONMarshaling(f *testing.F) {
 //	    f.Fuzz(func(t *testing.T, b []byte) {
-//	        var v interface{}
+//	        var v any
 //	        if err := json.Unmarshal(b, &v); err != nil {
 //	            t.Skip()
 //	        }

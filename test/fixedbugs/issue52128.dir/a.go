@@ -4,7 +4,7 @@
 
 package a
 
-type I interface{}
+type I any
 
 type F func()
 

@@ -9,7 +9,7 @@ type Builder struct {
 }
 
 func (tb Builder) Build() (out struct {
-	x interface{}
+	x any
 	s string
 }) {
 	out.x = nil

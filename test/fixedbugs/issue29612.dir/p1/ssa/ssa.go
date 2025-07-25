@@ -12,7 +12,7 @@ type fooer interface {
 	foo()
 }
 
-func Unused(v interface{}) {
+func Unused(v any) {
 	v.(fooer).foo()
 	v.(interface{ foo() }).foo()
 }

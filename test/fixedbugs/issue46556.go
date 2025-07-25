@@ -6,8 +6,8 @@
 
 package p
 
-type A = interface{}
-type B interface{}
+type A = any
+type B any
 
 // Test that embedding both anonymous and defined types is supported.
 type C interface {

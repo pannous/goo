@@ -81,9 +81,9 @@ type MyStruct struct {
 
 func main() {
 	// Create a generic cache.
-	// All items are cached as interface{} so they need to be cast back to their
+	// All items are cached as any so they need to be cast back to their
 	// original type when retrieved.
-	// Failure in issue doesn't happen with 'any' replaced by 'interface{}'
+	// Failure in issue doesn't happen with 'any' replaced by 'any'
 	c := NewAnyCacher[any]()
 
 	myStruct := &MyStruct{"MySuperStruct"}

@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	e interface{}
+	e any
 	s = struct{ a *int }{}
 	b = e == s
 )
 
-func test(obj interface{}) {
+func test(obj any) {
 	if obj != struct{ a *string }{} {
 	}
 }
@@ -30,7 +30,7 @@ func f() [2]string {
 }
 
 func main() {
-	var e interface{} = [2]string{"abc", "def"}
+	var e any = [2]string{"abc", "def"}
 	_ = e == f()
 	if x != 1 {
 		fmt.Println("x=", x)

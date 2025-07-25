@@ -273,7 +273,7 @@ var copy_pt0b = pt0b
 var copy_pt1 = pt1
 var copy_pt1a = pt1a
 
-var _ interface{} = 1
+var _ any = 1
 
 type T1 int
 

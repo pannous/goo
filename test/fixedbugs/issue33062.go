@@ -21,9 +21,9 @@ type complexStruct struct {
 
 func main() {
 	x := complexStruct{1, simpleStruct{2, "xxx"}}
-	ix := interface{}(x)
+	ix := any(x)
 	y := complexStruct{1, simpleStruct{2, "yyy"}}
-	iy := interface{}(y)
+	iy := any(y)
 	if ix != ix {
 		panic("FAIL")
 	}

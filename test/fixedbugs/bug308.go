@@ -10,7 +10,7 @@ package main
 
 import "fmt"
 
-func log1(f string, argv ...interface{}) {
+func log1(f string, argv ...any) {
 	fmt.Printf("log: %s\n", fmt.Sprintf(f, argv...))
 }
 

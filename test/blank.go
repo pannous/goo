@@ -120,7 +120,7 @@ func main() {
 			panic("T{} != T{}")
 		}
 
-		var u1, u2 interface{}
+		var u1, u2 any
 		u1 = *(*U)(unsafe.Pointer(&T1{1, 2, 3}))
 		u2 = *(*U)(unsafe.Pointer(&T1{4, 5, 6}))
 		if u1 != u2 {

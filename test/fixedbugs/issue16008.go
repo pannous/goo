@@ -48,7 +48,7 @@ func (s *MemoryStore) Update(cb func(Tx) error) error {
 	return nil
 }
 
-var sink interface{}
+var sink any
 
 //go:noinline
 func UpdateNode(tx Tx, n *Node) error {

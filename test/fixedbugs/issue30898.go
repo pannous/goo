@@ -8,7 +8,7 @@
 
 package foo
 
-func debugf(format string, args ...interface{}) { // ERROR "can inline debugf" "format does not escape" "args does not escape"
+func debugf(format string, args ...any) { // ERROR "can inline debugf" "format does not escape" "args does not escape"
 	// Dummy implementation for non-debug build.
 	// A non-empty implementation would be enabled with a build tag.
 }

@@ -6,7 +6,6 @@ package errors
 
 import "strconv"
 
-
 type Code int
 
 // This file defines the error codes that can be produced during type-checking.
@@ -1055,7 +1054,7 @@ const (
 	// expression switch.
 	//
 	// Example:
-	//  func typename(i interface{}) string {
+	//  func typename(i any) string {
 	//  	switch i.(type) {
 	//  	case int64:
 	//  		fallthrough

@@ -18,7 +18,7 @@ func TypeString[T any]() string {
 }
 
 func Test[T, Bad, Good any]() {
-	switch interface{}(new(T)).(type) {
+	switch any(new(T)).(type) {
 	case Bad:
 		println("FAIL:", TypeString[T](), "matched", TypeString[Bad]())
 	case Good:

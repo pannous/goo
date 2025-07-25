@@ -37,8 +37,8 @@ var (
 	_ = uint16(16) << s
 	_ = uint32(32 << s)
 	_ = uint64(64 << s + s)
-	_ = (interface{})("foo")
-	_ = (interface{})(nil)
+	_ = (any)("foo")
+	_ = (any)(nil)
 )`
 	types := make(map[ast.Expr]TypeAndValue)
 	mustTypecheck(src, nil, &Info{Types: types})
@@ -276,7 +276,7 @@ func TestIssue22525(t *testing.T) {
 }
 
 func TestIssue25627(t *testing.T) {
-	const prefix = `package p; import "unsafe"; type P *struct{}; type I interface{}; type T `
+	const prefix = `package p; import "unsafe"; type P *struct{}; type I any; type T `
 	// The src strings (without prefix) are constructed such that the number of semicolons
 	// plus one corresponds to the number of fields expected in the respective struct.
 	for _, src := range []string{
@@ -908,10 +908,10 @@ func _Cgo_ptr(ptr unsafe.Pointer) unsafe.Pointer { return ptr }
 //go:linkname _Cgo_always_false runtime.cgoAlwaysFalse
 var _Cgo_always_false bool
 //go:linkname _Cgo_use runtime.cgoUse
-func _Cgo_use(interface{})
+func _Cgo_use(any)
 //go:linkname _Cgo_keepalive runtime.cgoKeepAlive
 //go:noescape
-func _Cgo_keepalive(interface{})
+func _Cgo_keepalive(any)
 //go:linkname _Cgo_no_callback runtime.cgoNoCallback
 func _Cgo_no_callback(bool)
 type _Ctype_struct_layout struct {
@@ -924,11 +924,11 @@ func _cgo_runtime_cgocall(unsafe.Pointer, uintptr) int32
 
 //go:linkname _cgoCheckPointer runtime.cgoCheckPointer
 //go:noescape
-func _cgoCheckPointer(interface{}, interface{})
+func _cgoCheckPointer(any, any)
 
 //go:linkname _cgoCheckResult runtime.cgoCheckResult
 //go:noescape
-func _cgoCheckResult(interface{})
+func _cgoCheckResult(any)
 `
 	testFiles(t, []string{"p.go", "_cgo_gotypes.go"}, [][]byte{[]byte(src), []byte(cgoTypes)}, false, func(cfg *Config) {
 		*boolFieldAddr(cfg, "go115UsesCgo") = true

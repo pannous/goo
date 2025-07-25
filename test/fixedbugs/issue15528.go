@@ -26,7 +26,7 @@ func makeStringer() fmt.Stringer  { return &RWS{} }
 
 // Test correct construction of static empty interface values
 var efaces = [...]struct {
-	x interface{}
+	x any
 	s string
 }{
 	{nil, "<nil> <nil>"},
@@ -43,7 +43,7 @@ var efaces = [...]struct {
 	{unsafe.Pointer(uintptr(0)), "unsafe.Pointer <nil>"},
 	{(*byte)(nil), "*uint8 <nil>"},
 	{io.Writer((*os.File)(nil)), "*os.File <nil>"},
-	{(interface{})(io.Writer((*os.File)(nil))), "*os.File <nil>"},
+	{(any)(io.Writer((*os.File)(nil))), "*os.File <nil>"},
 	{fmt.Stringer(Strunger(((*Int)(nil)))), "*main.Int <nil>"},
 }
 
@@ -73,12 +73,12 @@ var ifaces = [...]struct {
 
 // Test correct handling of direct interface values
 var (
-	one  int         = 1
-	iptr interface{} = &one
+	one  int = 1
+	iptr any = &one
 	clos int
-	f    interface{} = func() { clos++ }
-	deep interface{} = [1]struct{ a *[2]byte }{{a: &[2]byte{'z', 'w'}}}
-	ch   interface{} = make(chan bool, 1)
+	f    any = func() { clos++ }
+	deep any = [1]struct{ a *[2]byte }{{a: &[2]byte{'z', 'w'}}}
+	ch   any = make(chan bool, 1)
 )
 
 func main() {

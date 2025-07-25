@@ -243,7 +243,7 @@ var exprTests = [][2]string{
 	dup("x.(func(a, b, c int))"),
 	dup("x.(func(x ...T))"),
 
-	dup("x.(interface{})"),
+	dup("x.(any)"),
 	dup("x.(interface{m(); n(x int); E})"),
 	dup("x.(interface{m(); n(x int) T; E; F})"),
 

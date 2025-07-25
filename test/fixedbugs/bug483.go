@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	var x = [4]struct{ x, y interface{} }{
+	var x = [4]struct{ x, y any }{
 		{"a", "b"},
 		{"c", "d"},
 		{"e", "f"},

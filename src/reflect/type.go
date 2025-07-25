@@ -4,7 +4,7 @@
 
 // Package reflect implements run-time reflection, allowing a program to
 // manipulate objects with arbitrary types. The typical use is to take a value
-// with static type interface{} and extract its dynamic type information by
+// with static type any and extract its dynamic type information by
 // calling TypeOf, which returns a Type.
 //
 // A call to ValueOf returns a Value representing the run-time data.
@@ -2242,7 +2242,7 @@ func StructOf(fields []StructField) Type {
 		} else {
 			// Embedded field
 			if f.Typ.Kind() == abi.Pointer {
-				// Embedded ** and *interface{} are illegal
+				// Embedded ** and *any are illegal
 				elem := ft.Elem()
 				if k := elem.Kind(); k == abi.Pointer || k == abi.Interface {
 					panic("reflect.StructOf: illegal embedded field type " + stringFor(ft))

@@ -9,7 +9,7 @@
 
 package p
 
-func f(i interface{}) {
+func f(i any) {
 	if x, ok := i.(type); ok { // ERROR "assignment mismatch|outside type switch"
 		_ = x
 	}

@@ -22,6 +22,6 @@ const (
 )
 
 //go:noinline
-func W(a A, k, v interface{}) A {
+func W(a A, k, v any) A {
 	return A{3}
 }

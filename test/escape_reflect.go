@@ -13,7 +13,7 @@ import (
 	"unsafe"
 )
 
-var sink interface{}
+var sink any
 
 func typ(x int) any {
 	v := reflect.ValueOf(x) // ERROR "x does not escape"

@@ -22,11 +22,11 @@ func main() {
 	noCmp(f)
 }
 
-func cmp(x interface{}) bool {
+func cmp(x any) bool {
 	return x == x
 }
 
-func noCmp(x interface{}) {
+func noCmp(x any) {
 	shouldPanic(func() { cmp(x) })
 }
 

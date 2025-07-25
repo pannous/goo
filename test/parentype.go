@@ -8,12 +8,12 @@
 
 package main
 
-func f(interface{})
+func f(any)
 func g() {}
 func main() {
-	f(map[string]string{"a":"b","c":"d"})
-	f([...]int{1,2,3})
-	f(map[string]func(){"a":g,"c":g})
-	f(make(chan(<-chan int)))
-	f(make(chan<-(chan int)))
+	f(map[string]string{"a": "b", "c": "d"})
+	f([...]int{1, 2, 3})
+	f(map[string]func(){"a": g, "c": g})
+	f(make(chan (<-chan int)))
+	f(make(chan<- (chan int)))
 }

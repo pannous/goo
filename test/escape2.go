@@ -378,7 +378,7 @@ func float64ptrbitsptr(f *float64) *uint64 { // ERROR "leaking param: f to resul
 	return (*uint64)(unsafe.Pointer(f))
 }
 
-func typesw(i interface{}) *int { // ERROR "leaking param: i to result ~r0 level=0$"
+func typesw(i any) *int { // ERROR "leaking param: i to result ~r0 level=0$"
 	switch val := i.(type) {
 	case *int:
 		return val
@@ -610,11 +610,11 @@ func foo74c() {
 	}
 }
 
-func myprint(y *int, x ...interface{}) *int { // ERROR "leaking param: y to result ~r0 level=0$" "x does not escape$"
+func myprint(y *int, x ...any) *int { // ERROR "leaking param: y to result ~r0 level=0$" "x does not escape$"
 	return y
 }
 
-func myprint1(y *int, x ...interface{}) *interface{} { // ERROR "leaking param: x to result ~r0 level=0$" "y does not escape$"
+func myprint1(y *int, x ...any) *any { // ERROR "leaking param: x to result ~r0 level=0$" "y does not escape$"
 	return &x[0]
 }
 
@@ -631,7 +631,7 @@ func foo75esc(z *int) { // ERROR "leaking param: z$"
 }
 
 func foo75aesc(z *int) { // ERROR "z does not escape$"
-	var ppi **interface{}       // assignments to pointer dereferences lose track
+	var ppi **any               // assignments to pointer dereferences lose track
 	*ppi = myprint1(z, 1, 2, 3) // ERROR "... argument escapes to heap$" "1 escapes to heap$" "2 escapes to heap$" "3 escapes to heap$"
 }
 
@@ -676,20 +676,20 @@ func foo76g() {
 	}
 }
 
-func foo77(z []interface{}) { // ERROR "z does not escape$"
+func foo77(z []any) { // ERROR "z does not escape$"
 	myprint(nil, z...) // z does not escape
 }
 
-func foo77a(z []interface{}) { // ERROR "z does not escape$"
+func foo77a(z []any) { // ERROR "z does not escape$"
 	myprint1(nil, z...)
 }
 
-func foo77b(z []interface{}) { // ERROR "leaking param: z$"
-	var ppi **interface{}
+func foo77b(z []any) { // ERROR "leaking param: z$"
+	var ppi **any
 	*ppi = myprint1(nil, z...)
 }
 
-func foo77c(z []interface{}) { // ERROR "leaking param: z$"
+func foo77c(z []any) { // ERROR "leaking param: z$"
 	sink = myprint1(nil, z...)
 }
 
@@ -924,7 +924,7 @@ func foo116(b bool) *int {
 	return nil
 }
 
-func foo117(unknown func(interface{})) { // ERROR "unknown does not escape$"
+func foo117(unknown func(any)) { // ERROR "unknown does not escape$"
 	x := 1 // ERROR "moved to heap: x$"
 	unknown(&x)
 }
@@ -1334,7 +1334,7 @@ func foo139() *byte {
 }
 
 // issue 4751
-func foo140() interface{} {
+func foo140() any {
 	type T struct {
 		X string
 	}
@@ -1541,7 +1541,7 @@ func foo152() {
 
 // issue 8176 - &x in type switch body not marked as escaping
 
-func foo153(v interface{}) *int { // ERROR "v does not escape"
+func foo153(v any) *int { // ERROR "v does not escape"
 	switch x := v.(type) {
 	case int: // ERROR "moved to heap: x$"
 		return &x
@@ -1556,12 +1556,12 @@ func f() (x int, y *int) { // ERROR "moved to heap: x$"
 	return
 }
 
-func g() (x interface{}) { // ERROR "moved to heap: x$"
+func g() (x any) { // ERROR "moved to heap: x$"
 	x = &x
 	return
 }
 
-var sink interface{}
+var sink any
 
 type Lit struct {
 	p *int
@@ -1791,7 +1791,7 @@ func makemap2() {
 	sink = m
 }
 
-func nonescapingEface(m map[interface{}]bool) bool { // ERROR "m does not escape$"
+func nonescapingEface(m map[any]bool) bool { // ERROR "m does not escape$"
 	return m["foo"] // ERROR ".foo. does not escape$"
 }
 

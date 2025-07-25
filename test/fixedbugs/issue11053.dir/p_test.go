@@ -32,7 +32,7 @@ func (T) Add(out *P) {
 var PP P
 var out *P = &PP
 
-func F(s I) interface{} {
+func F(s I) any {
 	s.Add(out) // not inlined.
 	return out
 }

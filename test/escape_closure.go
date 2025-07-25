@@ -8,7 +8,7 @@
 
 package escape
 
-var sink interface{}
+var sink any
 
 func ClosureCallArgs0() {
 	x := 0

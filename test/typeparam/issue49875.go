@@ -6,7 +6,7 @@
 
 package p
 
-func f(args ...interface{}) {}
+func f(args ...any) {}
 
 func g() {
 	var args []any

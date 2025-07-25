@@ -7,7 +7,7 @@
 package main
 
 func main() {
-	var i interface{} = new(T)
+	var i any = new(T)
 	if _, ok := i.(interface{ Bad() }); ok {
 		panic("FAIL")
 	}

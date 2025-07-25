@@ -6,7 +6,7 @@
 
 package p
 
-type Symbol interface{}
+type Symbol any
 
 type Value interface {
 	String() string

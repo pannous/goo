@@ -7,7 +7,7 @@
 package main
 
 func main() {
-	m := map[interface{}]int{}
+	m := map[any]int{}
 	k := []int{}
 
 	mustPanic(func() {

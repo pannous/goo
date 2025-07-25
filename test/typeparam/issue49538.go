@@ -7,12 +7,12 @@
 package p
 
 type I interface {
-	M(interface{})
+	M(any)
 }
 
 type a[T any] struct{}
 
-func (a[T]) M(interface{}) {}
+func (a[T]) M(any) {}
 
 func f[T I](t *T) {
 	(*t).M(t)

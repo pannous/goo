@@ -144,7 +144,7 @@ func TestEvalPos(t *testing.T) {
 				/* c => , int */
 			}
 			_ = c
-			type FT /* FT => , p.FT */ interface{}
+			type FT /* FT => , p.FT */ any
 		}
 		`,
 		`

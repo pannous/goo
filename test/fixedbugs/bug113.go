@@ -6,7 +6,7 @@
 
 package main
 
-type I interface{}
+type I any
 
 func foo1(i int) int     { return i }
 func foo2(i int32) int32 { return i }
@@ -21,7 +21,7 @@ func main() {
 	if foo2(v2) != 1 {
 		panic(2)
 	}
-	
+
 	shouldPanic(p1)
 }
 

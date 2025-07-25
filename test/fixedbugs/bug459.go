@@ -14,7 +14,7 @@ var commandLine = NewFlagSet() // ERROR "initialization cycle|depends upon itsel
 type FlagSet struct {
 }
 
-func (f *FlagSet) failf(format string, a ...interface{}) {
+func (f *FlagSet) failf(format string, a ...any) {
 	f.usage()
 }
 

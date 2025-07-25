@@ -52,31 +52,31 @@ func main() {
 	mc[c] = 42
 	mc[make(C)] = 42
 
-	type I1 interface{}
+	type I1 any
 	type I2 interface {
 		f() int
 	}
-	var i0 interface{} = z
+	var i0 any = z
 	var i1 I1 = p
-	m0 := make(map[interface{}]int)
+	m0 := make(map[any]int)
 	m1 := make(map[I1]int)
 	m2 := make(map[I2]int)
 	m0[i0] = 42
 	m0[i1] = 42
-	m0[z] = 42 // this should work: z is assignment-compatible with interface{}
+	m0[z] = 42 // this should work: z is assignment-compatible with any
 	m0[new(struct {
 		x int
-	})] = 42       // this should work: *struct{x int} is assignment-compatible with interface{}
-	m0[p] = 42     // this should work: p is assignment-compatible with interface{}
-	m0[false] = 42 // this should work: false is assignment-compatible with interface{}
-	m0[17] = 42    // this should work: 17 is assignment-compatible with interface{}
-	m0["foo"] = 42 // this should work: "foo" is assignment-compatible with interface{}
+	})] = 42 // this should work: *struct{x int} is assignment-compatible with any
+	m0[p] = 42     // this should work: p is assignment-compatible with any
+	m0[false] = 42 // this should work: false is assignment-compatible with any
+	m0[17] = 42    // this should work: 17 is assignment-compatible with any
+	m0["foo"] = 42 // this should work: "foo" is assignment-compatible with any
 
 	m1[i0] = 42
 	m1[i1] = 42
 	m1[new(struct {
 		x int
-	})] = 42       // this should work: *struct{x int} is assignment-compatible with I1
+	})] = 42 // this should work: *struct{x int} is assignment-compatible with I1
 	m1[false] = 42 // this should work: false is assignment-compatible with I1
 	m1[17] = 42    // this should work: 17 is assignment-compatible with I1
 	m1["foo"] = 42 // this should work: "foo" is assignment-compatible with I1

@@ -13,7 +13,7 @@ import (
 
 type T struct{}
 
-func (*T) Foo(vals []interface{}) {
+func (*T) Foo(vals []any) {
 	switch v := vals[0].(type) {
 	case string:
 		_ = v
@@ -23,7 +23,7 @@ func (*T) Foo(vals []interface{}) {
 type R struct{ *T }
 
 type Q interface {
-	Foo([]interface{})
+	Foo([]any)
 }
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 	var q Q = &R{&T{}}
 	for i := 0; i < count; i++ {
 		go func() {
-			defer q.Foo([]interface{}{"meow"})
+			defer q.Foo([]any{"meow"})
 			time.Sleep(100 * time.Millisecond)
 		}()
 	}

@@ -18,8 +18,8 @@ type P1 *T
 func (p P) val() int   { return 1 } // ERROR "receiver.* pointer|invalid pointer or interface receiver|invalid receiver"
 func (p *P1) val() int { return 1 } // ERROR "receiver.* pointer|invalid pointer or interface receiver|invalid receiver"
 
-type I interface{}
-type I1 interface{}
+type I any
+type I1 any
 
 func (p I) val() int   { return 1 } // ERROR "receiver.*interface|invalid pointer or interface receiver"
 func (p *I1) val() int { return 1 } // ERROR "receiver.*interface|invalid pointer or interface receiver"

@@ -371,7 +371,7 @@ func (pkg *Package) oneLineNodeDepth(node ast.Node, depth int) string {
 
 	case *ast.InterfaceType:
 		if n.Methods == nil || len(n.Methods.List) == 0 {
-			return "interface{}"
+			return "any"
 		}
 		return "interface{ ... }"
 

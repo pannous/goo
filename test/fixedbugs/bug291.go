@@ -13,7 +13,7 @@ type T struct {
 }
 
 var t = &T{42}
-var i interface{} = t
+var i any = t
 var tt, ok = i.(*T)
 
 func main() {

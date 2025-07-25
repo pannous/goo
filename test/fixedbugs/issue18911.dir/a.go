@@ -4,4 +4,4 @@
 
 package a
 
-var X interface{} = struct{ x int }{}
+var X any = struct{ x int }{}

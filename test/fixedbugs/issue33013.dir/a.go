@@ -5,5 +5,5 @@
 package a
 
 type G interface {
-	UsesEmpty(p interface{}) int
+	UsesEmpty(p any) int
 }

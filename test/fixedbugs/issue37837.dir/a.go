@@ -4,7 +4,7 @@
 
 package a
 
-func F(i interface{}) int { // ERROR "can inline F" "i does not escape"
+func F(i any) int { // ERROR "can inline F" "i does not escape"
 	switch i.(type) {
 	case nil:
 		return 0
@@ -17,7 +17,7 @@ func F(i interface{}) int { // ERROR "can inline F" "i does not escape"
 	}
 }
 
-func G(i interface{}) interface{} { // ERROR "can inline G" "leaking param: i"
+func G(i any) any { // ERROR "can inline G" "leaking param: i"
 	switch i := i.(type) {
 	case nil: // ERROR "moved to heap: i"
 		return &i

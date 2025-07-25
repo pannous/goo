@@ -24,14 +24,14 @@ package main
 import "runtime"
 
 //go:noinline
-func f() interface{} {
+func f() any {
 	runtime.GC()
 	return nil
 }
 
 //go:noinline
 func g() {
-	var s interface{}
+	var s any
 	_ = func() {
 		s := f()
 		_ = s
@@ -42,7 +42,7 @@ func g() {
 }
 
 //go:noinline
-func useiface(x interface{}) {
+func useiface(x any) {
 }
 
 //go:noinline

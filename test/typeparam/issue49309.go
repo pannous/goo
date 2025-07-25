@@ -17,7 +17,7 @@ func myfunc(c string) {
 }
 
 //go:noinline
-func test2(a interface{}) {
+func test2(a any) {
 	_ = a.(string)
 }
 

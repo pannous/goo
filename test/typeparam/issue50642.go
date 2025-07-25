@@ -17,7 +17,7 @@ var ch any
 func (it Temp[T]) HasNext() bool {
 	var ok bool
 	temp1 = <-ch.(chan T)
-	// test conversion of T to interface{} during an OAS2RECV
+	// test conversion of T to any during an OAS2RECV
 	temp, ok = <-ch.(chan T)
 	return ok
 }

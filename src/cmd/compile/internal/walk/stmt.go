@@ -68,7 +68,7 @@ func walkStmt(n ir.Node) ir.Node {
 			n = ir.NewBlockStmt(n.Pos(), init)
 			init = nil
 		}
-		
+
 		if len(init) > 0 {
 			switch n.Op() {
 			case ir.OAS, ir.OAS2, ir.OBLOCK:
@@ -241,22 +241,22 @@ func walkCheck(n *ir.CheckStmt) ir.Node {
 	// Convert check condition to: if !runtime.truthy(condition) { panic("check failed") }
 	var init ir.Nodes
 	cond := walkExpr(n.Cond, &init)
-	
-	// Convert condition to interface{} for truthy call
+
+	// Convert condition to any for truthy call
 	condIface := typecheck.Conv(cond, types.Types[types.TINTER])
-	
+
 	// Create call to runtime.truthy
 	truthyCall := mkcall("truthy", types.Types[types.TBOOL], &init, condIface)
-	
+
 	// Create NOT expression: !runtime.truthy(condition)
 	notCond := ir.NewUnaryExpr(n.Pos(), ir.ONOT, truthyCall)
 	notCond.SetType(types.Types[types.TBOOL])
 	notCond.SetTypecheck(1)
-	
+
 	// Create panic call
 	condStr := ir.NewBasicLit(n.Pos(), types.Types[types.TSTRING], constant.MakeString("check failed"))
 	panicCall := mkcall("gopanic", nil, &init, condStr)
-	
+
 	// Create if statement: if !runtime.truthy(condition) { panic(...) }
 	ifStmt := ir.NewIfStmt(n.Pos(), notCond, []ir.Node{panicCall}, nil)
 	if len(init) > 0 {

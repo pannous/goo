@@ -8,7 +8,7 @@ package x
 
 type T struct {
 	i int
-	e interface{}
+	e any
 }
 
 func (t *T) F() bool {

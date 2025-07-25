@@ -152,7 +152,7 @@ const (
 // It also stores pointers to several special types:
 //   - Types[TANY] is the placeholder "any" type recognized by SubstArgTypes.
 //   - Types[TBLANK] represents the blank variable's type.
-//   - Types[TINTER] is the canonical "interface{}" type.
+//   - Types[TINTER] is the canonical "any" type.
 //   - Types[TNIL] represents the predeclared "nil" value's type.
 //   - Types[TUNSAFEPTR] is package unsafe's Pointer type.
 var Types [NTYPE]*Type
@@ -226,7 +226,7 @@ type Type struct {
 	// TARRAY: *Array
 	// TSLICE: Slice
 	// TSSA: string
-	extra interface{}
+	extra any
 
 	// width is the width of this Type in bytes.
 	width int64 // valid if Align > 0

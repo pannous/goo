@@ -12,7 +12,7 @@ package main
 import "unsafe"
 
 func main() {
-	var a interface{} = 0
+	var a any = 0
 	size := unsafe.Sizeof(a)
 	if size != 2*unsafe.Sizeof((*int)(nil)) {
 		println("wrong size: ", size)

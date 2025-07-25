@@ -150,7 +150,7 @@ func goFoo() {
 	}
 }
 
-func variadic(x ...interface{}) {}
+func variadic(x ...any) {}
 
 func testBlocking(t *testing.T) {
 	c := make(chan int)

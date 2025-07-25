@@ -9,11 +9,11 @@
 package p
 
 func main() {
-	m1 := map[interface{}]interface{}{
+	m1 := map[any]any{
 		nil:  0,
 		true: 1,
 	}
-	m2 := map[interface{}]interface{}{
+	m2 := map[any]any{
 		true: 1,
 		nil:  0,
 	}

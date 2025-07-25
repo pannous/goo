@@ -145,6 +145,6 @@ func (h Handle) Delete() {
 }
 
 var (
-	handles   = sync.Map{} // map[Handle]interface{}
+	handles   = sync.Map{} // map[Handle]any
 	handleIdx atomic.Uintptr
 )

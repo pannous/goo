@@ -30,7 +30,7 @@ func (s *SI) test(name string) (*int, error) {
 }
 
 //go:noinline
-func addUpdate(n *int, in interface{}, s ...string) error {
+func addUpdate(n *int, in any, s ...string) error {
 	if *n != 99 {
 		println("FAIL, *n should be 99, not", *n)
 	}
@@ -44,7 +44,7 @@ func main1() {
 }
 
 //go:noinline
-func g(b *byte, i interface{}) error {
+func g(b *byte, i any) error {
 	if *b != 17 {
 		println("FAIL, *b should be 17, not", *b)
 	}

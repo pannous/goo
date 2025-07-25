@@ -23,7 +23,7 @@ func F2() A {
 	return A{}
 }
 
-func Cmp(v interface{}) bool {
+func Cmp(v any) bool {
 	if F1() == v {
 		return true
 	}

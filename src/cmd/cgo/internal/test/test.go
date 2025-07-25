@@ -995,7 +995,7 @@ const greeting = "hello, world"
 
 type testPair struct {
 	Name      string
-	Got, Want interface{}
+	Got, Want any
 }
 
 var testPairs = []testPair{

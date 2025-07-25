@@ -57,7 +57,7 @@ func InitTypes(defTypeName func(sym *Sym, typ *Type) Object) {
 		SimType[et] = et
 	}
 
-	Types[TANY] = newType(TANY) // note: an old placeholder type, NOT the new builtin 'any' alias for interface{}
+	Types[TANY] = newType(TANY) // note: an old placeholder type, NOT the new builtin 'any' alias for any
 	Types[TINTER] = NewInterface(nil)
 	CheckSize(Types[TINTER])
 

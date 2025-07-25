@@ -78,7 +78,7 @@ func TestResolveIdents(t *testing.T) {
 		var i I
 		var _ = i.m
 		func _(s []int) { for i, x := range s { _, _ = i, x } }
-		func _(x interface{}) {
+		func _(x any) {
 			switch x := x.(type) {
 			case int:
 				_ = x

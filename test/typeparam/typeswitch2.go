@@ -8,7 +8,7 @@ package main
 
 import "fmt"
 
-func f[T any](i interface{}) {
+func f[T any](i any) {
 	switch x := i.(type) {
 	case T:
 		fmt.Println("T", x)

@@ -9,7 +9,7 @@
 
 package main
 
-type M interface{}
+type M any
 
 type A struct {
 	a string

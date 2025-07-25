@@ -6,6 +6,6 @@
 
 package p
 
-func f(i interface{}) {
+func f(i any) {
 	i, _ = i.(error)
 }

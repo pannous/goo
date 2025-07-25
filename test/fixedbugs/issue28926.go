@@ -11,7 +11,7 @@ type Stringer interface {
 }
 
 func main() {
-	var e interface{}
+	var e any
 	switch e := e.(type) {
 	case G: // ERROR "undefined: G|undefined type .*G"
 		e.M() // ok: this error should be ignored because the case failed its typecheck

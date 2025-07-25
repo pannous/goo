@@ -7,7 +7,7 @@
 package p
 
 func _() {
-	var x *interface{}
-	var y interface{}
+	var x *any
+	var y any
 	_ = x == y
 }

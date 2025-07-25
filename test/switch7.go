@@ -12,7 +12,7 @@ package main
 
 import "fmt"
 
-func f4(e interface{}) {
+func f4(e any) {
 	switch e.(type) {
 	case int:
 	case int: // ERROR "duplicate case int in type switch"
@@ -32,4 +32,3 @@ func f4(e interface{}) {
 	}:
 	}
 }
-

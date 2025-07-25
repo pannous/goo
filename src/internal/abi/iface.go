@@ -18,7 +18,7 @@ type ITab struct {
 	Fun   [1]uintptr // variable sized. fun[0]==0 means Type does not implement Inter.
 }
 
-// EmptyInterface describes the layout of a "interface{}" or a "any."
+// EmptyInterface describes the layout of a "any" or a "any."
 // These are represented differently than non-empty interface, as the first
 // word always points to an abi.Type.
 type EmptyInterface struct {

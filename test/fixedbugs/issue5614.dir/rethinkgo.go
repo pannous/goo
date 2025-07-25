@@ -5,10 +5,10 @@ type Session struct {
 
 func (s *Session) Run(query Exp) *int { return nil }
 
-type List []interface{}
+type List []any
 
 type Exp struct {
-	args []interface{}
+	args []any
 }
 
 func (e Exp) UseOutdated(useOutdated bool) Exp {

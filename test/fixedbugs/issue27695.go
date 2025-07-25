@@ -31,7 +31,7 @@ func main() {
 }
 
 type Stt struct {
-	Data interface{}
+	Data any
 }
 
 type My struct {
@@ -46,7 +46,7 @@ func (this *My) Run(rawData []byte) (Stt, error) {
 	return stt, nil
 }
 
-func _test() (interface{}, error) {
+func _test() (any, error) {
 	f := reflect.ValueOf(&My{}).MethodByName("Run")
 	if method, ok := f.Interface().(func([]byte) (Stt, error)); ok {
 		s, e := method(nil)
@@ -55,7 +55,7 @@ func _test() (interface{}, error) {
 		// when preparing to return). The result value that
 		// is assigned to s was not being scanned if GC happens
 		// to occur there.
-		i := interface{}(s)
+		i := any(s)
 		return i, e
 	}
 	return nil, nil

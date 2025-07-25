@@ -10,7 +10,7 @@ package main
 
 import "reflect"
 
-func typeof(x interface{}) string { return reflect.TypeOf(x).String() }
+func typeof(x any) string { return reflect.TypeOf(x).String() }
 
 func f() int { return 0 }
 

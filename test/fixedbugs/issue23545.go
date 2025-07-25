@@ -15,15 +15,15 @@ func main() {
 	}
 }
 
-func dummyID(x int) [Size]interface{} {
-	var out [Size]interface{}
+func dummyID(x int) [Size]any {
+	var out [Size]any
 	out[0] = x
 	return out
 }
 
 const Size = 32
 
-type OutputID [Size]interface{}
+type OutputID [Size]any
 
 //go:noinline
 func Get() OutputID {

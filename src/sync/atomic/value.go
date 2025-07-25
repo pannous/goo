@@ -17,7 +17,7 @@ type Value struct {
 	v any
 }
 
-// efaceWords is interface{} internal representation.
+// efaceWords is any internal representation.
 type efaceWords struct {
 	typ  unsafe.Pointer
 	data unsafe.Pointer

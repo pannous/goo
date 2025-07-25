@@ -11,7 +11,7 @@ package p
 const X = Wrong(0) // ERROR "undefined: Wrong|reference to undefined name .*Wrong"
 
 func _() {
-	switch interface{}(nil) {
+	switch any(nil) {
 	case X:
 	}
 }

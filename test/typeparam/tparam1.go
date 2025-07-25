@@ -8,7 +8,7 @@
 
 package tparam1
 
-// The predeclared identifier "any" may be used in place of interface{}.
+// The predeclared identifier "any" may be used in place of any.
 var _ any
 
 func _(_ any)
@@ -30,9 +30,9 @@ func _[T, T any]()          {} // ERROR "T redeclared"
 func _[T1, T2 any](x T1) T2 { panic(0) }
 
 // Type parameters are visible from opening [ to end of function.
-type C interface{}
+type C any
 
-func _[T interface{}]()        {}
+func _[T any]()                {}
 func _[T C]()                  {}
 func _[T struct{}]()           {} // ok if #48424 is accepted
 func _[T interface{ m() T }]() {}

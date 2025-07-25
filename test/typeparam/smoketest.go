@@ -9,9 +9,9 @@
 package smoketest
 
 // type parameters for functions
-func f1[P any]() {}
-func f2[P1, P2 any, P3 any]() {}
-func f3[P interface{}](x P, y T1[int]) {}
+func f1[P any]()               {}
+func f2[P1, P2 any, P3 any]()  {}
+func f3[P any](x P, y T1[int]) {}
 
 // function instantiations
 var _ = f1[int]
@@ -21,7 +21,7 @@ var _ = f3[bool]
 // type parameters for types
 type T1[P any] struct{}
 type T2[P1, P2 any, P3 any] struct{}
-type T3[P interface{}] interface{}
+type T3[P any] any
 
 // type instantiations
 type _ T1[int]

@@ -12,7 +12,7 @@ package main
 type Foo struct {
 	A int
 	B int
-	C interface{}
+	C any
 	Bar
 }
 

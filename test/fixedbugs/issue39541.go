@@ -17,7 +17,7 @@ func sub(args []reflect.Value) []reflect.Value {
 }
 
 func main() {
-	f := reflect.MakeFunc(reflect.TypeOf((func() interface{})(nil)), sub).Interface().(func() interface{})
+	f := reflect.MakeFunc(reflect.TypeOf((func() any)(nil)), sub).Interface().(func() any)
 	c := make(chan bool, 100)
 	for i := 0; i < 100; i++ {
 		go func() {

@@ -10,11 +10,11 @@
 package main
 
 type one struct {
-	i interface{}
+	i any
 }
 
 type two struct {
-	i interface{}
+	i any
 	s []string
 }
 

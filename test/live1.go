@@ -40,7 +40,6 @@ func f1(pkg, typ, meth string) {
 	panic("value method " + pkg + "." + typ + "." + meth + " called using nil *" + typ + " pointer")
 }
 
-func f2() interface{} {
+func f2() any {
 	return new(int)
 }
-

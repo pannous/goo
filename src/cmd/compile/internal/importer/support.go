@@ -19,7 +19,7 @@ func assert(p bool) {
 	base.Assert(p)
 }
 
-func errorf(format string, args ...interface{}) {
+func errorf(format string, args ...any) {
 	panic(fmt.Sprintf(format, args...))
 }
 

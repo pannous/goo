@@ -32,7 +32,7 @@ func doGet[T any](i getter[T]) T {
 }
 
 //go:noline
-func doGet2[T any](i interface{}) T {
+func doGet2[T any](i any) T {
 	i2 := i.(getter[T])
 	return i2.get()
 }

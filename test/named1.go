@@ -43,7 +43,7 @@ func main() {
 
 	_, b = m[2] // ok now
 
-	var inter interface{}
+	var inter any
 	_, b = inter.(Map) // ok now
 	_ = b
 

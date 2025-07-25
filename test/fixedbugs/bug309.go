@@ -8,7 +8,7 @@
 
 package bug309
 
-func foo(t interface{}, c chan int) {
+func foo(t any, c chan int) {
 	switch v := t.(type) {
 	case int:
 		select {

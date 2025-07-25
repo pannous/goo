@@ -6,7 +6,7 @@
 
 package codegen
 
-func efaceExtract(e interface{}) int {
+func efaceExtract(e any) int {
 	// This should be compiled with only
 	// a single conditional jump.
 	// amd64:-"JMP"

@@ -9,7 +9,7 @@
 package main
 
 func main() {
-	var x interface{} = "hello"
+	var x any = "hello"
 
 	switch x {
 	case "hello":

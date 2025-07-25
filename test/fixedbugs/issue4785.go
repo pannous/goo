@@ -8,7 +8,7 @@
 
 package main
 
-func t(x, y interface{}) interface{} {
+func t(x, y any) any {
 	return x.(float64) > y.(float64)
 }
 

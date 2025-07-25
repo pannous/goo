@@ -8,6 +8,6 @@ import "./p"
 
 type T struct{}
 
-func (T) M() interface{} {
+func (T) M() any {
 	return &p.T{}
 }

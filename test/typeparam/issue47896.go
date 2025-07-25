@@ -23,7 +23,7 @@ func (s *Slice[T]) Add(t *T) {
 }
 
 type Scanner interface {
-	Scan(...interface{}) error
+	Scan(...any) error
 }
 
 type Mapper[T any] func(s Scanner, t T) error

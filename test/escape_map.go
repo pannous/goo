@@ -8,7 +8,7 @@
 
 package escape
 
-var sink interface{}
+var sink any
 
 func map0() {
 	m := make(map[*int]*int) // ERROR "make\(map\[\*int\]\*int\) does not escape"

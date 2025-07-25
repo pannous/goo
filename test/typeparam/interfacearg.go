@@ -6,7 +6,7 @@
 
 package main
 
-type I interface{}
+type I any
 
 type _S[T any] struct {
 	x *T

@@ -213,7 +213,7 @@ type Addr struct {
 	//	for TYPE_FCONST, a float64
 	//	for TYPE_BRANCH, a *Prog (optional)
 	//	for TYPE_TEXTSIZE, an int32 (optional)
-	Val interface{}
+	Val any
 }
 
 type AddrName int8
@@ -492,7 +492,7 @@ type LSym struct {
 	P      []byte
 	R      []Reloc
 
-	Extra *interface{} // *FuncInfo, *VarInfo, *FileInfo, or *TypeInfo, if present
+	Extra *any // *FuncInfo, *VarInfo, *FileInfo, or *TypeInfo, if present
 
 	Pkg    string
 	PkgIdx int32
@@ -551,7 +551,7 @@ func (s *LSym) NewFuncInfo() *FuncInfo {
 		panic(fmt.Sprintf("invalid use of LSym - NewFuncInfo with Extra of type %T", *s.Extra))
 	}
 	f := new(FuncInfo)
-	s.Extra = new(interface{})
+	s.Extra = new(any)
 	*s.Extra = f
 	return f
 }
@@ -575,7 +575,7 @@ func (s *LSym) NewVarInfo() *VarInfo {
 		panic(fmt.Sprintf("invalid use of LSym - NewVarInfo with Extra of type %T", *s.Extra))
 	}
 	f := new(VarInfo)
-	s.Extra = new(interface{})
+	s.Extra = new(any)
 	*s.Extra = f
 	return f
 }
@@ -602,7 +602,7 @@ func (s *LSym) NewFileInfo() *FileInfo {
 		panic(fmt.Sprintf("invalid use of LSym - NewFileInfo with Extra of type %T", *s.Extra))
 	}
 	f := new(FileInfo)
-	s.Extra = new(interface{})
+	s.Extra = new(any)
 	*s.Extra = f
 	return f
 }
@@ -619,7 +619,7 @@ func (s *LSym) File() *FileInfo {
 // A TypeInfo contains information for a symbol
 // that contains a runtime._type.
 type TypeInfo struct {
-	Type interface{} // a *cmd/compile/internal/types.Type
+	Type any // a *cmd/compile/internal/types.Type
 }
 
 func (s *LSym) NewTypeInfo() *TypeInfo {
@@ -627,7 +627,7 @@ func (s *LSym) NewTypeInfo() *TypeInfo {
 		panic(fmt.Sprintf("invalid use of LSym - NewTypeInfo with Extra of type %T", *s.Extra))
 	}
 	t := new(TypeInfo)
-	s.Extra = new(interface{})
+	s.Extra = new(any)
 	*s.Extra = t
 	return t
 }
@@ -635,7 +635,7 @@ func (s *LSym) NewTypeInfo() *TypeInfo {
 // An ItabInfo contains information for a symbol
 // that contains a runtime.itab.
 type ItabInfo struct {
-	Type interface{} // a *cmd/compile/internal/types.Type
+	Type any // a *cmd/compile/internal/types.Type
 }
 
 func (s *LSym) NewItabInfo() *ItabInfo {
@@ -643,7 +643,7 @@ func (s *LSym) NewItabInfo() *ItabInfo {
 		panic(fmt.Sprintf("invalid use of LSym - NewItabInfo with Extra of type %T", *s.Extra))
 	}
 	t := new(ItabInfo)
-	s.Extra = new(interface{})
+	s.Extra = new(any)
 	*s.Extra = t
 	return t
 }
@@ -1202,7 +1202,7 @@ type Link struct {
 	DwFixups           *DwarfFixupTable
 	DwTextCount        int
 	Imports            []goobj.ImportedPkg
-	DiagFunc           func(string, ...interface{})
+	DiagFunc           func(string, ...any)
 	DiagFlush          func()
 	DebugInfo          func(ctxt *Link, fn *LSym, info *LSym, curfn Func) ([]dwarf.Scope, dwarf.InlCalls)
 	GenAbstractFunc    func(fn *LSym)
@@ -1240,12 +1240,12 @@ type Link struct {
 	Fingerprint goobj.FingerprintType // fingerprint of symbol indices, to catch index mismatch
 }
 
-func (ctxt *Link) Diag(format string, args ...interface{}) {
+func (ctxt *Link) Diag(format string, args ...any) {
 	ctxt.Errors++
 	ctxt.DiagFunc(format, args...)
 }
 
-func (ctxt *Link) Logf(format string, args ...interface{}) {
+func (ctxt *Link) Logf(format string, args ...any) {
 	fmt.Fprintf(ctxt.Bso, format, args...)
 	ctxt.Bso.Flush()
 }

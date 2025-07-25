@@ -6,7 +6,7 @@
 
 package p
 
-var sink interface{}
+var sink any
 
 func f1() {
 	var t T

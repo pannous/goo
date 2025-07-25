@@ -8,7 +8,7 @@ package main
 
 import "reflect"
 
-var tests = []interface{}{
+var tests = []any{
 	func(x int, s int) int {
 		return x << s
 	},

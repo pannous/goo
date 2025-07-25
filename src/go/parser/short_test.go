@@ -60,7 +60,7 @@ var valids = []string{
 	`package p; func (R) _()`,
 	`package p; type _ struct{ f [n]E }`,
 	`package p; type _ struct{ f [a+b+c+d]E }`,
-	`package p; type I1 interface{}; type I2 interface{ I1 }`,
+	`package p; type I1 any; type I2 interface{ I1 }`,
 
 	// generic code
 	`package p; type _ []T[int]`,
@@ -74,8 +74,8 @@ var valids = []string{
 	`package p; func _(x T[P1, P2, P3])`,
 	`package p; func _(x p.T[Q])`,
 	`package p; func _(p.T[Q])`,
-	`package p; type _[A interface{},] struct{}`,
-	`package p; type _[A interface{}] struct{}`,
+	`package p; type _[A any,] struct{}`,
+	`package p; type _[A any] struct{}`,
 	`package p; type _[A,  B any,] struct{}`,
 	`package p; type _[A, B any] struct{}`,
 	`package p; type _[A any,] struct{}`,
@@ -90,8 +90,8 @@ var valids = []string{
 
 	`package p; type _[A, B any] interface { _(a A) B }`,
 	`package p; type _[A, B C[A, B]] interface { _(a A) B }`,
-	`package p; func _[T1, T2 interface{}](x T1) T2`,
-	`package p; func _[T1 interface{ m() }, T2, T3 interface{}](x T1, y T3) T2`,
+	`package p; func _[T1, T2 any](x T1) T2`,
+	`package p; func _[T1 interface{ m() }, T2, T3 any](x T1, y T3) T2`,
 	`package p; var _ = []T[int]{}`,
 	`package p; var _ = [10]T[int]{}`,
 	`package p; var _ = func()T[int]{}`,
@@ -110,8 +110,8 @@ var valids = []string{
 	`package p; type _ struct{ T[P]}`,
 	`package p; type _ struct{ T[struct{a, b, c int}] }`,
 	`package p; type _ interface{int|float32; bool; m(); string;}`,
-	`package p; type I1[T any] interface{}; type I2 interface{ I1[int] }`,
-	`package p; type I1[T any] interface{}; type I2[T any] interface{ I1[T] }`,
+	`package p; type I1[T any] any; type I2 interface{ I1[int] }`,
+	`package p; type I1[T any] any; type I2[T any] interface{ I1[T] }`,
 	`package p; type _ interface { N[T] }`,
 	`package p; type T[P any] = T0`,
 }
@@ -205,7 +205,7 @@ var invalids = []string{
 
 	`package p; type _[A,] /* ERROR "missing type constraint" */ struct{ A }`,
 
-	`package p; func _[type /* ERROR "found 'type'" */ P, *Q interface{}]()`,
+	`package p; func _[type /* ERROR "found 'type'" */ P, *Q any]()`,
 
 	`package p; func (T) _[ /* ERROR "must have no type parameters" */ A, B any](a A) B`,
 	`package p; func (T) _[ /* ERROR "must have no type parameters" */ A, B C](a A) B`,

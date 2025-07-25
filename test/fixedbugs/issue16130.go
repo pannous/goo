@@ -34,7 +34,7 @@ func main() {
 			panic(fmt.Sprintf("got %q, expected interface conversion error", re.Error()))
 		}
 	}()
-	e := (interface{})(0)
+	e := (any)(0)
 	if _, ok := e.(I); ok {
 		panic("unexpected interface conversion success")
 	}

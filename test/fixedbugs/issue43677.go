@@ -15,4 +15,4 @@ var _ = [2]*int{nil, f()}
 
 var _ = struct{ x, y *int }{nil, f()}
 
-var _ interface{} = f()
+var _ any = f()

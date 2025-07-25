@@ -13,8 +13,8 @@ func main() {
 	use(f() == f())
 }
 
-func f() [2]interface{} {
-	var out [2]interface{}
+func f() [2]any {
+	var out [2]any
 	return out
 }
 

@@ -6,9 +6,9 @@
 
 package main
 
-func f[G any]() interface{} {
-	return func() interface{} {
-		return func() interface{} {
+func f[G any]() any {
+	return func() any {
+		return func() any {
 			var x G
 			return x
 		}()

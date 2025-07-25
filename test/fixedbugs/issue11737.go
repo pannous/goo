@@ -10,7 +10,7 @@ package p
 
 func f()
 
-func s(x interface{}) {
+func s(x any) {
 	switch x {
 	case f: // ERROR "invalid case f \(type func\(\)\) in switch \(incomparable type\)|can only be compared to nil"
 	}

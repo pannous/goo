@@ -19,7 +19,7 @@ type I interface {
 }
 
 var t T
-var e interface{} = &t
+var e any = &t
 var ok = false
 var ch = make(chan int)
 

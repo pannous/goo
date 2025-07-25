@@ -15,7 +15,7 @@ var (
 	tt = [...]T{t1, t2}
 )
 
-type I interface{}
+type I any
 
 type T struct {
 	F func() I

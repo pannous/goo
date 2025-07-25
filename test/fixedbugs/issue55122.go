@@ -29,7 +29,7 @@ func h(iter int) {
 }
 
 //go:noinline
-func g(x interface{}) {
+func g(x any) {
 	switch e := x.(type) {
 	case *[32]byte:
 		var c [32]byte

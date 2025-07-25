@@ -13,7 +13,7 @@ package escape
 
 func zero() int { return 0 }
 
-var sink interface{}
+var sink any
 
 // in -> out
 func param0(p *int) *int { // ERROR "leaking param: p to result ~r0"
@@ -82,7 +82,7 @@ type WrappedPair struct {
 	pair Pair
 }
 
-func leakParam(x interface{}) { // ERROR "leaking param: x"
+func leakParam(x any) { // ERROR "leaking param: x"
 	sink = x
 }
 
@@ -430,12 +430,12 @@ func h(x *Node) { // ERROR "leaking param: x"
 
 // Convert to a non-direct interface, require an allocation and
 // copy x to heap (not to result).
-func param14a(x [4]*int) interface{} { // ERROR "leaking param: x$"
+func param14a(x [4]*int) any { // ERROR "leaking param: x$"
 	return x // ERROR "x escapes to heap"
 }
 
 // Convert to a direct interface, does not need an allocation.
 // So x only leaks to result.
-func param14b(x *int) interface{} { // ERROR "leaking param: x to result ~r0 level=0"
+func param14b(x *int) any { // ERROR "leaking param: x to result ~r0 level=0"
 	return x
 }

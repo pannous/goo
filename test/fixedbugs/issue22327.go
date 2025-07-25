@@ -6,12 +6,12 @@
 
 // Using a multi-result function as an argument to
 // append should compile successfully. Previously there
-// was a missing *int -> interface{} conversion that caused
+// was a missing *int -> any conversion that caused
 // the compiler to ICE.
 
 package p
 
-func f() ([]interface{}, *int) {
+func f() ([]any, *int) {
 	return nil, nil
 }
 

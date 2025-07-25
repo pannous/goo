@@ -25,7 +25,7 @@ func usestack1(d int) byte {
 const n = 100000
 
 func main() {
-	c := make(chan interface{})
+	c := make(chan any)
 	done := make(chan bool)
 
 	for i := 0; i < 10; i++ {

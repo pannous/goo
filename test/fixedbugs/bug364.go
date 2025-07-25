@@ -10,11 +10,11 @@ import "fmt"
 
 var s string
 
-func accum(args ...interface{}) {
+func accum(args ...any) {
 	s += fmt.Sprintln(args...)
 }
 
-func f(){
+func f() {
 	v := 0.0
 	for i := 0; i < 3; i++ {
 		v += 0.1

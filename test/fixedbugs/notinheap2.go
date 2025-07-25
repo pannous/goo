@@ -36,7 +36,7 @@ var y3 *[1]nih
 var z []nih
 var w []nih
 var n int
-var sink interface{}
+var sink any
 
 type embed1 struct { // implicitly notinheap
 	x nih

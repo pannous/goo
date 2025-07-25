@@ -11,7 +11,7 @@ package main
 
 import "unsafe"
 
-type I interface{}
+type I any
 
 const (
 	// assume all types behave similarly to int8/uint8
@@ -87,8 +87,8 @@ func main() {
 	f(Bool)             // ERROR "convert|wrong type|cannot|incompatible"
 }
 
-const ptr = nil // ERROR "const.*nil|not constant"
-const _ = string([]byte(nil)) // ERROR "is not a? ?constant"
+const ptr = nil                                // ERROR "const.*nil|not constant"
+const _ = string([]byte(nil))                  // ERROR "is not a? ?constant"
 const _ = uintptr(unsafe.Pointer((*int)(nil))) // ERROR "is not a? ?constant"
-const _ = unsafe.Pointer((*int)(nil)) // ERROR "cannot be nil|invalid constant type|is not a constant|not constant"
-const _ = (*int)(nil) // ERROR "cannot be nil|invalid constant type|is not a constant|not constant"
+const _ = unsafe.Pointer((*int)(nil))          // ERROR "cannot be nil|invalid constant type|is not a constant|not constant"
+const _ = (*int)(nil)                          // ERROR "cannot be nil|invalid constant type|is not a constant|not constant"

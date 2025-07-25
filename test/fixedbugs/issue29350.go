@@ -6,4 +6,4 @@
 
 package p
 
-var X interface{} = 'x'
+var X any = 'x'

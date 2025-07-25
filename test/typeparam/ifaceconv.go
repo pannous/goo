@@ -12,16 +12,16 @@ package main
 
 import "fmt"
 
-type E interface{}
+type E any
 
-func f[T any](x T) interface{} {
-	var i interface{} = x
+func f[T any](x T) any {
+	var i any = x
 	return i
 }
 
-func fs[T any](x T) interface{} {
+func fs[T any](x T) any {
 	y := []T{x}
-	var i interface{} = y
+	var i any = y
 	return i
 }
 
@@ -53,9 +53,9 @@ func j[T C](t T) C {
 	return C(t) // explicit conversion
 }
 
-func js[T any](x T) interface{} {
+func js[T any](x T) any {
 	y := []T{x}
-	return interface{}(y)
+	return any(y)
 }
 
 func main() {

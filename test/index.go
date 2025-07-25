@@ -138,8 +138,8 @@ func contains(x, y string) bool {
 }
 
 
-var X interface{}
-func use(y interface{}) {
+var X any
+func use(y any) {
 	X = y
 }
 

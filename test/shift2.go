@@ -10,9 +10,9 @@
 
 package p
 
-func f(x int) int         { return 0 }
-func g(x interface{}) int { return 0 }
-func h(x float64) int     { return 0 }
+func f(x int) int     { return 0 }
+func g(x any) int     { return 0 }
+func h(x float64) int { return 0 }
 
 // from the spec
 var (

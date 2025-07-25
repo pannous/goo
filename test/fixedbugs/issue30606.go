@@ -10,7 +10,7 @@ import "reflect"
 
 func main() {}
 
-func typ(x interface{}) reflect.Type { return reflect.ValueOf(x).Type() }
+func typ(x any) reflect.Type { return reflect.ValueOf(x).Type() }
 
 var x = reflect.New(reflect.StructOf([]reflect.StructField{
 	{Name: "F5", Type: reflect.StructOf([]reflect.StructField{

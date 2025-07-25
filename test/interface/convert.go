@@ -15,7 +15,7 @@ type StringLengther interface {
 	String() string
 	Length() int
 }
-type Empty interface{}
+type Empty any
 
 type T string
 

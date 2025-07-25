@@ -32,7 +32,7 @@ type I2 interface {
 
 var i2 I2
 
-type E interface{}
+type E any
 
 var e E
 

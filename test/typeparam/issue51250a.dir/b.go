@@ -6,12 +6,12 @@ package b
 
 import "./a"
 
-type T struct { a int }
+type T struct{ a int }
 
-var I interface{} = a.G[T]{}
+var I any = a.G[T]{}
 
 //go:noinline
-func F(x interface{}) {
+func F(x any) {
 	switch x.(type) {
 	case a.G[T]:
 	case int:

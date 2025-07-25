@@ -674,7 +674,6 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 			checks.recordBuiltinType(call.Fun, makeSig(nil, &emptyInterface))
 		}
 
-
 	case _Print, _Println:
 		// print(x, y, ...)
 		// println(x, y, ...)
@@ -696,7 +695,7 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 		}
 
 	case _Recover:
-		// recover() interface{}
+		// recover() any
 		x.mode = value
 		x.typ = &emptyInterface
 		if checks.recordTypes() {

@@ -26,7 +26,7 @@ const (
 	max64 = two1024 - ulp64
 )
 
-var x = []interface{}{
+var x = []any{
 	float32(max32 + ulp32/2 - 1),             // ok
 	float32(max32 + ulp32/2 - two128/two256), // ok
 	float32(max32 + ulp32/2),                 // ERROR "constant 3\.40282e\+38 overflows float32|cannot convert.*to type float32"

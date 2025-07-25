@@ -8,7 +8,7 @@
 
 package escape
 
-var sink interface{}
+var sink any
 
 type ConstPtr struct {
 	p *int

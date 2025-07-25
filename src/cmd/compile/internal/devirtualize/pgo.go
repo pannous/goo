@@ -597,7 +597,7 @@ func rewriteFunctionCall(call *ir.CallExpr, curfn, callee *ir.Func) ir.Node {
 	argvars := append([]ir.Node(nil), args...)
 	call.Args = argvars
 
-	// FuncPCABIInternal takes an interface{}, emulate that. This is needed
+	// FuncPCABIInternal takes an any, emulate that. This is needed
 	// for to ensure we get the MAKEFACE we need for SSA.
 	fnIface := typecheck.Expr(ir.NewConvExpr(pos, ir.OCONV, types.Types[types.TINTER], fn))
 	calleeIface := typecheck.Expr(ir.NewConvExpr(pos, ir.OCONV, types.Types[types.TINTER], callee.Nname))

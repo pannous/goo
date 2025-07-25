@@ -12,11 +12,11 @@ package p
 func Two() (a, b int)
 
 // F used to compile.
-func F() (x interface{}, y int) {
+func F() (x any, y int) {
 	return Two(), 0 // ERROR "single-value context|2\-valued"
 }
 
 // Recursive used to trigger an internal compiler error.
-func Recursive() (x interface{}, y int) {
+func Recursive() (x any, y int) {
 	return Recursive(), 0 // ERROR "single-value context|2\-valued"
 }

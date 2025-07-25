@@ -17,7 +17,7 @@ const N = 2e6
 
 type Big = [N]int
 
-var sink interface{}
+var sink any
 
 func main() {
 	g(0, f(0))

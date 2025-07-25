@@ -7,14 +7,16 @@
 package main
 
 type myint int
-func (x myint) foo() int {return int(x)}
+
+func (x myint) foo() int { return int(x) }
 
 type myfloat float64
-func (x myfloat) foo() float64 {return float64(x) }
 
-func f[T any](i interface{}) {
+func (x myfloat) foo() float64 { return float64(x) }
+
+func f[T any](i any) {
 	switch x := i.(type) {
-	case interface { foo() T }:
+	case interface{ foo() T }:
 		println("fooer", x.foo())
 	default:
 		println("other")

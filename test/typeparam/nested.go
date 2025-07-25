@@ -56,7 +56,7 @@ type Int int
 type GlobalInt = Int // allow access to global Int, even when shadowed
 
 func F[A intish]() {
-	add := func(B, T interface{}) {
+	add := func(B, T any) {
 		tests = append(tests, test{
 			TArgs: [2]reflect.Type{
 				reflect.TypeOf(A(0)),
@@ -125,7 +125,7 @@ func main() {
 	}
 }
 
-func eq(a, b interface{}) string {
+func eq(a, b any) string {
 	op := "=="
 	if a != b {
 		op = "!="

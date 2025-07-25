@@ -886,7 +886,7 @@ func TestMapInterfaceKey(t *testing.T) {
 	}
 	m[GrabBag{i0: "foo"}] = true
 	if !m[GrabBag{i0: "foo"}] {
-		panic("interface{} not found")
+		panic("any not found")
 	}
 	m[GrabBag{i1: canString(5)}] = true
 	if !m[GrabBag{i1: canString(5)}] {

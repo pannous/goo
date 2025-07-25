@@ -58,20 +58,20 @@ var (
 )
 
 var (
-	iu16  interface{} = u16
-	iu32  interface{} = u32
-	iu64  interface{} = u64
-	iu128 interface{} = u128
-	if32  interface{} = f32
-	if64  interface{} = f64
-	ic128 interface{} = c128
-	is    interface{} = s
-	ib    interface{} = b
-	im    interface{} = m
-	ic    interface{} = c
-	iz    interface{} = z
-	ip    interface{} = p
-	ipp   interface{} = pp
+	iu16  any = u16
+	iu32  any = u32
+	iu64  any = u64
+	iu128 any = u128
+	if32  any = f32
+	if64  any = f64
+	ic128 any = c128
+	is    any = s
+	ib    any = b
+	im    any = m
+	ic    any = c
+	iz    any = z
+	ip    any = p
+	ipp   any = pp
 
 	ju16  J = u16
 	ju32  J = u32
@@ -84,12 +84,12 @@ var (
 	jb    J = b
 	jm    J = m
 	jc    J = c
-	jz J = z
-	jp J = p // The method set for *T contains the methods for T.
+	jz    J = z
+	jp    J = p // The method set for *T contains the methods for T.
 	// pp does not implement error.
 )
 
-func second(a ...interface{}) interface{} {
+func second(a ...any) any {
 	return a[1]
 }
 
@@ -167,15 +167,15 @@ func main() {
 	}
 	// pp does not implement J.
 
-	// Test that non-interface types can be used as ...interface{} arguments.
+	// Test that non-interface types can be used as ...any arguments.
 	if got := second(z, p, pp, u16, u32, u64, u128, f32, f64, c128, s, b, m, c); got != ip {
 		println("second: got", got, "want", ip)
 		panic("fail")
 	}
 
-	// Test that non-interface types can be sent on a chan interface{}.
+	// Test that non-interface types can be sent on a chan any.
 	const n = 100
-	uc := make(chan interface{})
+	uc := make(chan any)
 	go func() {
 		for i := 0; i < n; i++ {
 			select {

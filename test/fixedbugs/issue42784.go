@@ -4,7 +4,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Ensure that late expansion correctly set OpLoad argument type interface{}
+// Ensure that late expansion correctly set OpLoad argument type any
 
 package p
 
@@ -12,7 +12,7 @@ type iface interface {
 	m()
 }
 
-type it interface{}
+type it any
 
 type makeIface func() iface
 

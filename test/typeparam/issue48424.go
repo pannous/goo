@@ -50,5 +50,5 @@ func main() {
 type (
 	_[T struct{}]                     struct{}
 	_[M map[K]V, K comparable, V any] struct{}
-	_[_ interface{} | int]            struct{}
+	_[_ any | int]                    struct{}
 )

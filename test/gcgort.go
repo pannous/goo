@@ -190,7 +190,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(bool(false))
+			a := any(bool(false))
 			for i := 0; i < mods; i++ {
 				a = !a.(bool)
 				runtime.Gosched()
@@ -266,7 +266,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(uint8(0))
+			a := any(uint8(0))
 			for i := 0; i < mods; i++ {
 				a = a.(uint8) + 1
 				runtime.Gosched()
@@ -342,7 +342,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(uint16(0))
+			a := any(uint16(0))
 			for i := 0; i < mods; i++ {
 				a = a.(uint16) + 1
 				runtime.Gosched()
@@ -418,7 +418,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(uint32(0))
+			a := any(uint32(0))
 			for i := 0; i < mods; i++ {
 				a = a.(uint32) + 1
 				runtime.Gosched()
@@ -494,7 +494,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(uint64(0))
+			a := any(uint64(0))
 			for i := 0; i < mods; i++ {
 				a = a.(uint64) + 1
 				runtime.Gosched()
@@ -570,7 +570,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(int8(0))
+			a := any(int8(0))
 			for i := 0; i < mods; i++ {
 				a = a.(int8) + 1
 				runtime.Gosched()
@@ -646,7 +646,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(int16(0))
+			a := any(int16(0))
 			for i := 0; i < mods; i++ {
 				a = a.(int16) + 1
 				runtime.Gosched()
@@ -722,7 +722,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(int32(0))
+			a := any(int32(0))
 			for i := 0; i < mods; i++ {
 				a = a.(int32) + 1
 				runtime.Gosched()
@@ -798,7 +798,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(int64(0))
+			a := any(int64(0))
 			for i := 0; i < mods; i++ {
 				a = a.(int64) + 1
 				runtime.Gosched()
@@ -883,7 +883,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(float32(0))
+			a := any(float32(0))
 			for i := 0; i < mods; i++ {
 				a = a.(float32) * 1.01
 				runtime.Gosched()
@@ -968,7 +968,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(float64(0))
+			a := any(float64(0))
 			for i := 0; i < mods; i++ {
 				a = a.(float64) * 1.01
 				runtime.Gosched()
@@ -1053,7 +1053,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(complex64(complex(float32(1.01), float32(1.01))))
+			a := any(complex64(complex(float32(1.01), float32(1.01))))
 			for i := 0; i < mods; i++ {
 				a = a.(complex64) * complex(real(a.(complex64))*1.01, imag(a.(complex64))*1.01)
 				runtime.Gosched()
@@ -1138,7 +1138,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(complex128(complex(float64(1.01), float64(1.01))))
+			a := any(complex128(complex(float64(1.01), float64(1.01))))
 			for i := 0; i < mods; i++ {
 				a = a.(complex128) * complex(real(a.(complex128))*1.01, imag(a.(complex128))*1.01)
 				runtime.Gosched()
@@ -1214,7 +1214,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(byte(0))
+			a := any(byte(0))
 			for i := 0; i < mods; i++ {
 				a = a.(byte) + 1
 				runtime.Gosched()
@@ -1290,7 +1290,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(rune(0))
+			a := any(rune(0))
 			for i := 0; i < mods; i++ {
 				a = a.(rune) + 1
 				runtime.Gosched()
@@ -1366,7 +1366,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(uint(0))
+			a := any(uint(0))
 			for i := 0; i < mods; i++ {
 				a = a.(uint) + 1
 				runtime.Gosched()
@@ -1442,7 +1442,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(int(0))
+			a := any(int(0))
 			for i := 0; i < mods; i++ {
 				a = a.(int) + 1
 				runtime.Gosched()
@@ -1518,7 +1518,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(uintptr(0))
+			a := any(uintptr(0))
 			for i := 0; i < mods; i++ {
 				a = a.(uintptr) + 1
 				runtime.Gosched()
@@ -1595,7 +1595,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(str(0))
+			a := any(str(0))
 			f := func(a string) string { return a }
 			for i := 0; i < mods; i++ {
 				a = str(i)
@@ -1798,7 +1798,7 @@ var types = []modifier{
 			}
 		},
 		interfaceT: func() {
-			a := interface{}(newStructT())
+			a := any(newStructT())
 			for i := 0; i < mods; i++ {
 				a = a.(structT)
 				runtime.Gosched()

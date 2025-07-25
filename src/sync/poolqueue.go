@@ -33,7 +33,7 @@ type poolDequeue struct {
 	// harmless.
 	headTail atomic.Uint64
 
-	// vals is a ring buffer of interface{} values stored in this
+	// vals is a ring buffer of any values stored in this
 	// dequeue. The size of this must be a power of 2.
 	//
 	// vals[i].typ is nil if the slot is empty and non-nil
@@ -57,7 +57,7 @@ const dequeueBits = 32
 // the index. We divide by 4 so this fits in an int on 32-bit.
 const dequeueLimit = (1 << dequeueBits) / 4
 
-// dequeueNil is used in poolDequeue to represent interface{}(nil).
+// dequeueNil is used in poolDequeue to represent any(nil).
 // Since we use nil to represent empty slots, we need a sentinel value
 // to represent nil.
 type dequeueNil *struct{}

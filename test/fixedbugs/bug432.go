@@ -10,4 +10,4 @@ package p
 
 var v struct{ I }
 
-type I interface{}
+type I any

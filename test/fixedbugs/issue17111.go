@@ -12,5 +12,5 @@ var (
 	i int
 	x = I(i)
 
-	e interface{} = x
+	e any = x
 )

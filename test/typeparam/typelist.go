@@ -13,7 +13,7 @@ package p
 
 // Assignability of an unnamed pointer type to a type parameter that
 // has a matching underlying type.
-func _[T interface{}, PT interface{ ~*T }](x T) PT {
+func _[T any, PT interface{ ~*T }](x T) PT {
 	return &x
 }
 

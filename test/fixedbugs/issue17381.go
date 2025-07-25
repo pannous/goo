@@ -33,7 +33,7 @@ func main() {
 	f() // should panic
 }
 
-func funcPC(f interface{}) uintptr {
+func funcPC(f any) uintptr {
 	var ptr uintptr
 	return **(**uintptr)(unsafe.Pointer(uintptr(unsafe.Pointer(&f)) + unsafe.Sizeof(ptr)))
 }

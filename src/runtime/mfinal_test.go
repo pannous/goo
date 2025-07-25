@@ -13,7 +13,7 @@ import (
 )
 
 type Tintptr *int // assignable to *int
-type Tint int     // *Tint implements Tinter, interface{}
+type Tint int     // *Tint implements Tinter, any
 
 func (t *Tint) m() {}
 

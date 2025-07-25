@@ -18,7 +18,7 @@ func main() {
 }
 
 func test1() {
-	var all []interface{}
+	var all []any
 	for i := 0; i < 100; i++ {
 		p := new([]int)
 		*p = append(*p, 1, 2, 3, 4)

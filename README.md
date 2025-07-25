@@ -29,6 +29,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)
 ✅ enum Status { OK, BAD } with generated .String() method 
 
+☐ truthy unused?
 ☐ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)
 ☐ import "helper.go"

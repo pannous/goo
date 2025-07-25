@@ -23,7 +23,7 @@ func bad() {
 }
 
 func good() {
-	var i interface{}
+	var i any
 	var s string
 
 	switch i {

@@ -6,5 +6,5 @@
 
 package p
 
-// any is now permitted instead of interface{}
+// any is now permitted instead of any
 var x any

@@ -15,7 +15,6 @@ import (
 	"cmd/internal/src"
 )
 
-
 func AssignExpr(n ir.Node) ir.Node { return typecheck(n, ctxExpr|ctxAssign) }
 func Expr(n ir.Node) ir.Node       { return typecheck(n, ctxExpr) }
 func Stmt(n ir.Node) ir.Node       { return typecheck(n, ctxStmt) }
@@ -442,7 +441,6 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.CallExpr)
 		return tcPrint(n)
 
-
 	case ir.OPANIC:
 		n := n.(*ir.UnaryExpr)
 		return tcPanic(n)
@@ -722,7 +720,7 @@ func implicitstar(n ir.Node) ir.Node {
 	return Expr(star)
 }
 
-func needOneArg(n *ir.CallExpr, f string, args ...interface{}) (ir.Node, bool) {
+func needOneArg(n *ir.CallExpr, f string, args ...any) (ir.Node, bool) {
 	if len(n.Args) == 0 {
 		p := fmt.Sprintf(f, args...)
 		base.Errorf("missing argument to %s: %v", p, n)
@@ -946,7 +944,7 @@ func Lookdot(n *ir.SelectorExpr, t *types.Type, dostrcmp int) *types.Field {
 		if t.IsPtr() {
 			baseType = t.Elem()
 		}
-		
+
 		if baseType.Kind() == types.TINT && baseType.Sym() != nil {
 			// This looks like an enum type (named int type)
 			// Create a synthetic method call that returns the enum name
@@ -963,21 +961,21 @@ func createEnumNameField(n *ir.SelectorExpr, enumType *types.Type) *types.Field 
 	stringType := types.Types[types.TSTRING]
 	returnField := types.NewField(src.NoXPos, nil, stringType)
 	methodType := types.NewSignature(nil, nil, []*types.Field{returnField})
-	
+
 	// Create a synthetic method symbol
 	nameSym := &types.Sym{
 		Name: "name",
 		Pkg:  types.LocalPkg,
 	}
-	
+
 	// Create the method field
 	field := types.NewField(n.Pos(), nameSym, methodType)
-	
+
 	// Set up the selector expression as a method
 	n.Selection = field
 	n.SetType(methodType)
 	n.SetOp(ir.ODOTMETH) // Treat as a method
-	
+
 	return field
 }
 

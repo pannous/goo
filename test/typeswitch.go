@@ -42,7 +42,7 @@ func assert(b bool, s string) {
 	}
 }
 
-func f(i int) interface{} {
+func f(i int) any {
 	switch i {
 	case Bool:
 		return true
@@ -85,7 +85,7 @@ func main() {
 			assert(x[3] == 3 && i == Array, "array")
 		case map[string]int:
 			assert(x != nil && i == Map, "map")
-		case func(i int) interface{}:
+		case func(i int) any:
 			assert(x != nil && i == Func, "fun")
 		default:
 			assert(false, "unknown")

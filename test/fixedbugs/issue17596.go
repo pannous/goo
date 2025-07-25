@@ -12,7 +12,7 @@ type T interface {
 
 func f() (T, int)
 
-func g(v interface{}) (interface{}, int) {
+func g(v any) (any, int) {
 	var x int
 	v, x = f()
 	return v, x

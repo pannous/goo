@@ -12,7 +12,7 @@ package main
 
 import "errors"
 
-var sink interface{}
+var sink any
 
 //go:noinline
 func f(err *error) {
@@ -39,6 +39,7 @@ func A(n, m int64) (res int64, err error) {
 }
 
 // B does a little bit of recursion dribbling not-zero onto the stack.
+//
 //go:noinline
 func B(n int64) (res int64) {
 	if n <= 1 { // Prefer to leave a 1 on the stack.

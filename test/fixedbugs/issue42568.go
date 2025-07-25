@@ -4,7 +4,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Ensure that late expansion correctly handles an OpIData with type interface{}
+// Ensure that late expansion correctly handles an OpIData with type any
 
 package p
 
@@ -17,7 +17,7 @@ type I interface {
 }
 
 func f(i I) {
-	o := i.(interface{})
+	o := i.(any)
 	if _, ok := i.(*S); ok {
 		o = nil
 	}

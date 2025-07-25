@@ -12,7 +12,7 @@ func main() {
 		Count = 10
 	)
 	_ = int64(Delta * Count)
-	var i interface{} = Count
+	var i any = Count
 	j := i.(int)
 	if j != Count {
 		println("j=", j)

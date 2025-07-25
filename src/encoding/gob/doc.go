@@ -166,7 +166,7 @@ value, which has representation (00).
 
 Interface types are not checked for compatibility; all interface types are
 treated, for transmission, as members of a single "interface" type, analogous to
-int or []byte - in effect they're all treated as interface{}. Interface values
+int or []byte - in effect they're all treated as any. Interface values
 are transmitted as a string identifying the concrete type being sent (a name
 that must be pre-defined by calling [Register]), followed by a byte count of the
 length of the following data (so the value can be skipped if it cannot be

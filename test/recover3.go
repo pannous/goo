@@ -68,7 +68,7 @@ func main() {
 	checks("array-bounds", func() { println(p1[i]) }, "index out of range")
 	checks("slice-bounds", func() { println(sl[i]) }, "index out of range")
 
-	var inter interface{}
+	var inter any
 	inter = 1
 	checks("type-concrete", func() { println(inter.(string)) }, "int, not string")
 	checks("type-interface", func() { println(inter.(m)) }, "missing method m")

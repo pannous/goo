@@ -87,7 +87,7 @@ var x interface {
 	g1() int
 	g2() (int, int)
 } = s[int]{a: 7}
-var y interface{} = s[int]{a: 7}
+var y any = s[int]{a: 7}
 
 func interfaceMethods() {
 	x.g0()
