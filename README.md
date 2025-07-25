@@ -27,6 +27,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ map[active:true age:30 name:Alice]   
 ✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)
+☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`
+☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)
 ☐ import "helper.go"
 ☐ optional braces for function calls put 42 => put(42)   HARD?
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?
@@ -55,6 +57,8 @@ const (
 ☐ imported and not used only warning   
 ☐ cross off all done tasks from this list    
 ☐ any other pain points you and I might have     
+𐄂 AAA Game Engine Core? Never
+
   
 x := 1
 y := "test"

@@ -735,9 +735,45 @@ func walkDivMod(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 
 // walkDot walks an ODOT or ODOTPTR node.
 func walkDot(n *ir.SelectorExpr, init *ir.Nodes) ir.Node {
+	// Check for enum .name magic
+	if n.Sel.Name == "name" {
+		baseType := n.X.Type()
+		if baseType.IsPtr() {
+			baseType = baseType.Elem()
+		}
+		
+		if baseType.Kind() == types.TINT && baseType.Sym() != nil {
+			// This is an enum .name access - transform to runtime call
+			return walkEnumName(n, init)
+		}
+	}
+	
 	usefield(n)
 	n.X = walkExpr(n.X, init)
 	return n
+}
+
+// walkEnumName transforms enum.name access into map lookup: EnumName_names[value]
+func walkEnumName(n *ir.SelectorExpr, init *ir.Nodes) ir.Node {
+	enumType := n.X.Type()
+	if enumType.IsPtr() {
+		enumType = enumType.Elem()
+	}
+	
+	// Create map name: EnumName_names
+	typeName := enumType.Sym().Name
+	mapName := typeName + "_names"
+	
+	// Look up the map variable
+	mapSym := typecheck.Lookup(mapName)
+	mapVar := ir.NewNameAt(n.Pos(), mapSym, nil)
+	
+	// Create map access: EnumName_names[enumValue]
+	enumValue := walkExpr(n.X, init)
+	indexExpr := ir.NewIndexExpr(n.Pos(), mapVar, enumValue)
+	indexExpr.SetType(types.Types[types.TSTRING])
+	
+	return indexExpr
 }
 
 // walkDotType walks an ODOTTYPE or ODOTTYPE2 node.

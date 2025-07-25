@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+
 const debug = false
 const trace = false
 
@@ -764,6 +765,8 @@ func (p *parser) enumDecl() []Decl {
 	}
 	typeDecl.SetPos(pos)
 
+	// Note: EnumTypes registration happens later in typecheck phase
+
 	// Do iota counting ourselves! Generate: OK=0, ERROR=1, etc.
 	var constDecls []Decl
 	for i, enumValue := range enumValues {
@@ -776,8 +779,12 @@ func (p *parser) enumDecl() []Decl {
 		constDecls = append(constDecls, constDecl)
 	}
 
+	// Generate name map: var EnumName_names = map[EnumName]string{0:"OK", 1:"ERROR"}
+	nameMapDecl := p.createEnumNameMap(pos, enumName, enumValues)
+
 	result := []Decl{typeDecl}
 	result = append(result, constDecls...)
+	result = append(result, nameMapDecl)
 	return result
 }
 
@@ -813,6 +820,8 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 	typeDecl.SetPos(pos)
 	list = append(list, typeDecl)
 
+	// Note: EnumTypes registration happens later in typecheck phase
+
 	// Do iota counting ourselves! Generate: OK=0, ERROR=1, etc.
 	// This avoids the complexity of Go's const inheritance
 	for i, enumValue := range enumValues {
@@ -824,6 +833,10 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 		constDecl.SetPos(enumValue.Pos())
 		list = append(list, constDecl)
 	}
+
+	// Generate name map: var EnumName_names = map[EnumName]string{0:"OK", 1:"ERROR"}
+	nameMapDecl := p.createEnumNameMap(pos, enumName, enumValues)
+	list = append(list, nameMapDecl)
 	
 	return list
 }
@@ -841,6 +854,54 @@ func (p *parser) enumStmt() *DeclStmt {
 	s.DeclList = p.enumDeclGroup(nil)
 
 	return s
+}
+
+// createEnumNameMap creates var EnumName_names = map[EnumName]string{0:"OK", 1:"ERROR"}
+func (p *parser) createEnumNameMap(pos Pos, enumName *Name, enumValues []*Name) *VarDecl {
+	// Create map variable name: EnumName_names
+	mapVarName := &Name{Value: enumName.Value + "_names"}
+	mapVarName.SetPos(pos)
+
+	// Create map type: map[EnumName]string
+	mapType := &MapType{
+		Key:   enumName,                      // key type
+		Value: &Name{Value: "string"},       // value type
+	}
+	mapType.SetPos(pos)
+
+	// Create map literal elements: {0: "OK", 1: "ERROR"}
+	var elements []Expr
+	for i, enumValue := range enumValues {
+		keyLit := &BasicLit{Value: fmt.Sprintf("%d", i), Kind: IntLit}
+		keyLit.SetPos(enumValue.Pos())
+		
+		valueLit := &BasicLit{Value: fmt.Sprintf(`"%s"`, enumValue.Value), Kind: StringLit}
+		valueLit.SetPos(enumValue.Pos())
+
+		keyValue := &KeyValueExpr{
+			Key:   keyLit,
+			Value: valueLit,
+		}
+		keyValue.SetPos(enumValue.Pos())
+		elements = append(elements, keyValue)
+	}
+
+	// Create composite literal: map[EnumName]string{...}
+	mapLit := &CompositeLit{
+		Type: mapType,
+		ElemList: elements,
+	}
+	mapLit.SetPos(pos)
+
+	// Create var declaration
+	varDecl := &VarDecl{
+		NameList: []*Name{mapVarName},
+		Type:     mapType,
+		Values:   mapLit,
+	}
+	varDecl.SetPos(pos)
+
+	return varDecl
 }
 
 // extractName splits the expression x into (name, expr) if syntactically

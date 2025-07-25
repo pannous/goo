@@ -1,0 +1,5 @@
+enum Color { RED, GREEN, BLUE }
+
+myColor := BLUE
+printf("myColor = %v", myColor)
+printf("myColor.name = %v", myColor.name)
