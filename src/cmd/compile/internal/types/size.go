@@ -399,7 +399,7 @@ func CalcSize(t *Type) {
 		CheckSize(t.Elem())
 		t.align = uint8(PtrSize)
 		t.intRegs = 3
-		t.setAlg(ANOEQ)
+		t.setAlg(ASPECIAL) // Slices now use special equality comparison
 		if !t.Elem().NotInHeap() {
 			t.ptrBytes = int64(PtrSize)
 		}

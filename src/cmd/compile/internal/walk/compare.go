@@ -100,7 +100,7 @@ func walkCompare(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 		return finishCompare(n, expr, init)
 	}
 
-	// Must be comparison of array or struct.
+	// Must be comparison of array, struct, or slice.
 	// Otherwise back end handles it.
 	// While we're here, decide whether to
 	// inline or call an eq alg.
@@ -115,6 +115,15 @@ func walkCompare(n *ir.BinaryExpr, init *ir.Nodes) ir.Node {
 	}
 
 	switch t.Kind() {
+	case types.TSLICE:
+		// Only use special equality for slice-to-slice comparisons, not slice-to-nil
+		if !ir.IsNil(n.X) && !ir.IsNil(n.Y) {
+			// Slices use special equality function, never inline
+			inline = false
+		} else {
+			// slice-to-nil comparison, let backend handle it
+			return n
+		}
 	default:
 		if base.Debug.Libfuzzer != 0 && t.IsInteger() && (n.X.Name() == nil || !n.X.Name().Libfuzzer8BitCounter()) {
 			n.X = cheapExpr(n.X, init)

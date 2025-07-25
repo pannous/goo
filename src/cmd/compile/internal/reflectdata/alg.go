@@ -397,6 +397,10 @@ func eqFunc(t *types.Type) *ir.Func {
 	default:
 		base.Fatalf("geneq %v", t)
 
+	case types.TSLICE:
+		// Simple test: always return true to see if this function is even called
+		fn.Body.Append(ir.NewAssignStmt(base.Pos, nr, ir.NewBool(base.Pos, true)))
+
 	case types.TARRAY:
 		nelem := t.NumElem()
 

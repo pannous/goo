@@ -617,7 +617,7 @@ Error:
 // If there is no more specific cause, the result is "".
 func (checks *Checker) incomparableCause(typ Type) string {
 	switch under(typ).(type) {
-	case *Slice, *Signature, *Map:
+	case *Signature, *Map:
 		return compositeKind(typ) + " can only be compared to nil"
 	}
 	// see if we can extract a more specific error
