@@ -24,8 +24,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ allow unused imports: as warning!  
 ✅ z := map{"a": 1, "b": 2}  => map[any]any{…}  
 ✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}  
-☐ map[active:true age:30 name:Alice]   
-☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}  
+✅ map[active:true age:30 name:Alice]   
+☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1} HARD  
 test_list_comparison.goo [1,2]==[1,2]  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
 ☐   
@@ -44,6 +44,12 @@ test_list_comparison.goo [1,2]==[1,2]
 ☐ cross off all done tasks from this list    
 ☐ any other pain points you and I might have     
   
+x := 1
+y := "test"
+myString := fmt.Sprint("The value of x is ", x, " and the value of y is ", y)
+myAutoConcat := "The value of x is " x " and the value of y is " y
+myTemplate := `The value of x is ${x} and the value of y is ${y}!`
+
   
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)  
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attribution license][cc4-by].*  

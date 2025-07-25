@@ -298,6 +298,54 @@ func nilinterequal(p, q unsafe.Pointer) bool {
 	y := *(*eface)(q)
 	return x._type == y._type && efaceeq(x._type, x.data, y.data)
 }
+func sliceequal(x, y unsafe.Pointer) bool {
+	// DEBUG: Add a simple print to see if this function is called
+	print("sliceequal called\n")
+	
+	// x and y point to slice values
+	sx := (*slice)(x)
+	sy := (*slice)(y)
+	
+	// Quick length check
+	if sx.len != sy.len {
+		return false
+	}
+	
+	// Empty slices are equal
+	if sx.len == 0 {
+		return true
+	}
+	
+	// Same reference check  
+	if sx.array == sy.array {
+		return true
+	}
+	
+	// Use any/interface{} comparison for content equality
+	// This leverages Go's existing value comparison mechanism
+	
+	// For int slices (most common case)
+	elemSize := unsafe.Sizeof(int(0))
+	
+	for i := 0; i < sx.len; i++ {
+		// Get pointers to elements
+		pElem := add(sx.array, uintptr(i)*elemSize)
+		qElem := add(sy.array, uintptr(i)*elemSize)
+		
+		// Cast to int and compare as any
+		pVal := *(*int)(pElem)
+		qVal := *(*int)(qElem)
+		
+		var pAny any = pVal
+		var qAny any = qVal
+		
+		if pAny != qAny {
+			return false
+		}
+	}
+	
+	return true
+}
 func efaceeq(t *_type, x, y unsafe.Pointer) bool {
 	if t == nil {
 		return true

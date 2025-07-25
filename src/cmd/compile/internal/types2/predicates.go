@@ -197,6 +197,13 @@ func comparableType(T Type, dynamic bool, seen map[Type]bool) *typeError {
 		}
 		return typeErrorf(cause)
 
+	case *Slice:
+		// Slices are now comparable if element type is comparable
+		if comparableType(t.elem, dynamic, seen) != nil {
+			return typeErrorf("slice with non-comparable element type %s", t.elem)
+		}
+		return nil
+
 	default:
 		return typeErrorf("")
 	}

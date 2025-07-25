@@ -1,5 +1,15 @@
-check [1,2] == [1,2]
+var x any = 42
+var y any = 41 + 1
+check x == y
+if [1,2] == [1,2] {
+		printf("Test passed: lists are equal")
+} else {
+		printf("Test failed: lists are not equal")
+}
 a := [1, 2, 3]
 b := [1, 2, 3]
 check a == b
+
+check [1,2] == [1,2]
+
 printf("Test passed: a and b are equal")
