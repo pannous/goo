@@ -1,6 +1,6 @@
 name := "Go"
-version := 1.25.5
-printf("Welcome to %s version %.2f!\n", name, version)
+version := 1.255
+printf("Welcome to %s version %.3f!\n", name, version)
 
 // This should also work because fmt was auto-imported
 fmt.Println("fmt.Println also works now!")

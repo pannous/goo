@@ -237,8 +237,10 @@ func (checks *Checker) collectObjects() {
 		// we get "." as the directory which is what we would want.
 		fileDir := dir(file.PkgName.Pos().RelFilename()) // TODO(gri) should this be filename?
 
-		// TODO: Auto-inject import "fmt" if file uses printf but doesn't import fmt
-		// injectFmtImportIfNeeded(file, fileDir, checks, fileScope)
+		// Auto-inject import "fmt" for .goo files if file uses printf but doesn't import fmt
+		if strings.HasSuffix(file.PkgName.Pos().RelFilename(), ".goo") {
+			injectFmtImportIfNeeded(file, fileDir, checks, fileScope)
+		}
 
 
 		first := -1                // index of first ConstDecl in the current group, or -1

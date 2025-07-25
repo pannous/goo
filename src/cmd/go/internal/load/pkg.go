@@ -1933,6 +1933,11 @@ func (p *Package) load(ctx context.Context, opts PackageOpts, path string, stk *
 			// %go_import directives to import other packages.
 		}
 
+		// Auto-inject fmt import for .goo files that use printf but don't import fmt
+		if needsFmtImport(p) {
+			addImport("fmt", true)
+		}
+
 		// The linker loads implicit dependencies.
 		if p.Name == "main" && !p.Internal.ForceLibrary {
 			ldDeps, err := LinkerDeps(p)
@@ -3614,4 +3619,47 @@ func SelectCoverPackages(roots []*Package, match []func(*Package) bool, op strin
 	}
 
 	return covered
+}
+
+// needsFmtImport checks if any .goo files in the package use printf but don't import fmt
+func needsFmtImport(p *Package) bool {
+	// Only check .goo files
+	for _, file := range p.GoFiles {
+		if !strings.HasSuffix(file, ".goo") {
+			continue
+		}
+		
+		// Check if fmt is already imported
+		hasFmt := false
+		for _, imp := range p.Imports {
+			if imp == "fmt" {
+				hasFmt = true
+				break
+			}
+		}
+		if hasFmt {
+			return false
+		}
+		
+		// Check if file uses printf
+		fullPath := filepath.Join(p.Dir, file)
+		content, err := os.ReadFile(fullPath)
+		if err != nil {
+			continue
+		}
+		
+		lines := strings.Split(string(content), "\n")
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			// Skip comment lines starting with #
+			if strings.HasPrefix(trimmed, "#") {
+				continue
+			}
+			// Look for printf function calls
+			if strings.Contains(line, "printf(") {
+				return true
+			}
+		}
+	}
+	return false
 }
