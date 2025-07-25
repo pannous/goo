@@ -1,0 +1,17 @@
+enum Color { RED, GREEN, BLUE, YELLOW, PURPLE }
+
+printf("Color enum values:")
+printf("RED = %v", RED)
+printf("GREEN = %v", GREEN) 
+printf("BLUE = %v", BLUE)
+printf("YELLOW = %v", YELLOW)
+printf("PURPLE = %v", PURPLE)
+
+// Test type usage
+var myColor Color = BLUE
+printf("myColor = %v", myColor)
+
+// Test in expressions
+if myColor == BLUE {
+    printf("Color is blue!")
+}
