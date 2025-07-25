@@ -1837,7 +1837,7 @@ func BuildInstallFunc(b *Builder, ctx context.Context, a *Action) (err error) {
 	}
 
 	if !a.buggyInstall {
-		defer b.cleanup(a1)
+		// defer b.cleanup(a1)  // Goo 2025-07-25 : keep tmp for debugging
 	}
 
 	return sh.moveOrCopyFile(a.Target, a1.built, perm, false)

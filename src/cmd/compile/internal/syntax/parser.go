@@ -425,21 +425,6 @@ func (p *parser) fileOrNil() *File {
 	// Accept import declarations anywhere for error tolerance, but complain.
 	// { ( ImportDecl | TopLevelDecl ) ";" }
 
-	// Auto-inject fmt import for .goo files that use printf but don't import fmt
-	if strings.HasSuffix(p.file.filename, ".goo") && p.needsFmtImport(f) {
-		fmtLit := &BasicLit{
-			Value: `"fmt"`,
-			Kind:  StringLit,
-		}
-		fmtLit.pos = p.pos()
-
-		fmtImport := &ImportDecl{
-			Path: fmtLit,
-		}
-		fmtImport.pos = p.pos()
-		f.DeclList = append(f.DeclList, fmtImport)
-	}
-
 	prev := _Import
 	for p.tok != _EOF {
 		if p.tok == _Import && prev != _Import {
@@ -2808,12 +2793,23 @@ func (p *parser) needsFmtImport(f *File) bool {
 		}
 	}
 
-	// Check if printf is used by scanning the source text directly
-	// This avoids the AST inspection that includes commented code
-	// Todo why avoid AST inspection? Too late?
 	text := string(p.scanner.source.buf)
-	// Look for printf calls that are not commented out
 	lines := strings.Split(text, "\n")
+	
+	// Check if fmt is already imported in the source text
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		// Skip comment lines starting with #
+		if strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		// Look for fmt import statements
+		if strings.Contains(line, `import "fmt"`) || strings.Contains(line, `import("fmt")`) {
+			return false
+		}
+	}
+
+	// Check if printf is used by scanning the source text directly
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		// Skip comment lines starting with #

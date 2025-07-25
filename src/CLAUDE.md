@@ -1,6 +1,13 @@
 # Claude Memory File
 
+before we do anything:
+```
+cd /opt/other/go/src
+export GOROOT=/opt/other/go
+```
 ## Working Guidelines
+
+
 never unstage or undo my changes (unless explicitly asked), understand and incorporate them!
 
 This project contains the source code for the go language and it's compiler and its toolchains.
@@ -22,8 +29,19 @@ Always replace interface{} with any
 # Compile
 To compile go, use the following command:
 
+```
 cd /opt/other/go/src
-./make.bash 2>&1 | tail -10
+export GOROOT_FINAL=/opt/other/go 
+./make.bash 2>&1 | head -10
+```
+
+<!-- remove GOROOT_FINAL for release! -->
+
+# Debugging
+
+../bin/go build -work
+retains logs in 
+WORK=/tmp/go-debug/…
 
 # Go Compiler Lexer/Scanner Summary
 
