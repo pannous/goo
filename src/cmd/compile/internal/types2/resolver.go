@@ -242,7 +242,6 @@ func (checks *Checker) collectObjects() {
 			injectFmtImportIfNeeded(file, fileDir, checks, fileScope)
 		}
 
-
 		first := -1                // index of first ConstDecl in the current group, or -1
 		var last *syntax.ConstDecl // last ConstDecl with init expressions, or nil
 		for index, decl := range file.DeclList {
@@ -756,12 +755,12 @@ func dir(path string) string {
 	return "."
 }
 
-// injectFmtImportIfNeeded scans the file for printf usage and automatically
-// injects import "fmt" if printf is used but fmt is not already imported.
+// injectFmtImportIfNeeded scans the file for put or printf usage and automatically
+// injects import "fmt" if put or printf is used but fmt is not already imported.
 func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker, fileScope *Scope) {
 	needsFmtImport := false
 	hasFmtImport := false
-	
+
 	// First check if fmt is already imported
 	for _, decl := range file.DeclList {
 		if imp, ok := decl.(*syntax.ImportDecl); ok && imp.Path != nil {
@@ -771,20 +770,20 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 			}
 		}
 	}
-	
+
 	// If fmt not imported, scan for printf usage
 	if !hasFmtImport {
 		syntax.Inspect(file, func(n syntax.Node) bool {
 			if call, ok := n.(*syntax.CallExpr); ok {
-				if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "printf" {
+				if name, ok := call.Fun.(*syntax.Name); ok && (name.Value == "printf" || name.Value == "put") {
 					needsFmtImport = true
-					return false // found printf, stop searching
+					return false // found put or printf, stop searching
 				}
 			}
 			return true
 		})
 	}
-	
+
 	// Inject import "fmt" by processing it exactly like a regular import
 	if needsFmtImport {
 		// Create synthetic import declaration
@@ -793,12 +792,12 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 			Kind:  syntax.StringLit,
 		}
 		importPath.SetPos(file.PkgName.Pos())
-		
+
 		fmtImport := &syntax.ImportDecl{
 			Path: importPath,
 		}
 		fmtImport.SetPos(importPath.Pos())
-		
+
 		// Process this import using the exact same logic as regular imports
 		path, err := validatedImportPath(importPath.Value)
 		if err != nil {
@@ -832,7 +831,7 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 
 		// Add to checks.imports for consistency
 		checks.imports = append(checks.imports, pkgName)
-		
+
 		// NOTE: Don't add to file.DeclList - just handle the import programmatically
 		// The AST transformation in call.go will handle the printf -> fmt.Printf conversion
 	}
