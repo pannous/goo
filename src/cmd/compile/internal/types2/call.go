@@ -171,9 +171,8 @@ func (checks *Checker) instantiateSignature(pos syntax.Pos, expr syntax.Expr, ty
 func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 	// Transform printf calls to fmt.Printf calls
 	if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "printf" {
-		// Check if this is the builtin printf (not a user-defined function)
-		_, obj := checks.lookupScope("printf")
-		if obj != nil && obj.Parent() == Universe {
+		// Check if this is not a user-defined function (no local definition found)
+		if checks.lookup("printf") == nil {
 			// For now, require manual fmt import until auto-import is working
 			if checks.lookup("fmt") != nil {
 				// Transform printf(...) to fmt.Printf(...) by modifying call in place
@@ -197,9 +196,8 @@ func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 
 	// Transform put calls to fmt.Printf calls with %v\n format
 	if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "put" {
-		// Check if this is the builtin put (not a user-defined function)
-		_, obj := checks.lookupScope("put")
-		if obj != nil && obj.Parent() == Universe {
+		// Check if this is not a user-defined function (no local definition found)
+		if checks.lookup("put") == nil {
 			// For now, require manual fmt import until auto-import is working
 			if checks.lookup("fmt") != nil {
 				// Transform put(arg) to fmt.Printf("%v\n", arg) by modifying call in place
