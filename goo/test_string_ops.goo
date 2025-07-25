@@ -1,0 +1,15 @@
+check "a"+"1" == "a1"
+check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)
+check "hi".reverse() == "ih"
+check "hi".first() == "h"
+check "hi".last() == "i"
+check "hi".size() == 2
+check "hi".length() == 2
+check "hi".contains("h") == true
+check "hi".contains("x") == false
+check "hi".indexOf("h") == 0
+check "hi".indexOf("x") == -1
+check "hi".indexOf("i") == 1
+check "hi".from(1) == "i"
+check "hi".to(1) == "h"
+check "hello".sub(1,3) == "el" // sub(start, end) is inclusive of start and exclusive of end

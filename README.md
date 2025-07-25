@@ -29,13 +29,12 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)
 ✅ enum Status { OK, BAD } with generated .String() method 
 
+☐ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)
+check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)
 ☐ import "helper.go"
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`
-☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)
-☐ optional braces for function calls put 42 => put(42)   HARD?
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println   
-☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1} HARD  
 ☐ for loops  :    
 ☐ for keyword := keywords  => for _, keyword := range keywords { __
 ☐ String methods "abc".contains("a")  1. real 2. by compiler 
@@ -45,7 +44,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
-☐ a is Type for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }
+☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }
 ☐ func test() int { 42 } => func test() int { return 42 }  auto return 
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
 ☐ class via struct (!)    
@@ -55,11 +54,17 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ any other pain points you and I might have     
 𐄂 AAA Game Engine Core? Never
 
+
+HARD
+☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}   
+☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters) 
+☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)
+
   
 x := 1
 y := "test"
-myString := fmt.Sprint("The value of x is ", x, " and the value of y is ", y)
 myAutoConcat := "The value of x is " x " and the value of y is " y
+myString := fmt.Sprint("The value of x is ", x, " and the value of y is ", y)
 myTemplate := `The value of x is ${x} and the value of y is ${y}!`
 
   
