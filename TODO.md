@@ -1,3 +1,7 @@
+put(1,2,3)
+printf(1,2,3)
+printf("%v %v %v", 1,2,3)
+
   - assert(condition) panics at runtime if condition is false
   - For compile-time boolean constants, checking occurs at compile time
   - Generates if !condition { panic("assertion failed") } in the backend
