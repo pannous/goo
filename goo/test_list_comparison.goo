@@ -1,10 +1,13 @@
+import "fmt"
+import "reflect"
+
 var x any = 42
 var y any = 41 + 1
 check x == y
 if [1,2] == [1,2] {
-		printf("Test passed: lists are equal")
+	printf("Test passed: lists are equal")
 } else {
-		printf("Test failed: lists are not equal")
+	printf("Test failed: lists are not equal")
 }
 a := [1, 2, 3]
 b := [1, 2, 3]
@@ -13,3 +16,106 @@ check a == b
 check [1,2] == [1,2]
 
 printf("Test passed: a and b are equal")
+
+
+
+// Test what algorithm different types use
+// We can infer this from what comparisons work
+
+// Basic types that should be comparable
+fmt.Println("Testing basic comparisons:")
+fmt.Printf("int: %d == %d: %v\n", 1, 1, 1 == 1)
+fmt.Printf("string: %s == %s: %v\n", "a", "a", "a" == "a")
+fmt.Printf("bool: %v == %v: %v\n", true, true, true == true)
+
+// Function types (should not be comparable except to nil)
+# var f1 func()
+# var f2 func()
+# fmt.Printf("nil func == nil func: %v\n", f1 == f2)
+
+// What about slices of functions?
+fmt.Println("Testing slice element types:")
+
+// Try to compare int slices (this might tell us if they're going through runtime)
+a1 := []int{1}  // no new variables on left side of :=
+b1 := []int{1}
+fmt.Printf("[]int{1} == []int{1}: %v\n", a1 == b1)
+
+// Test what happens with int comparison
+# a := 1 cannot use 1 (untyped int constant) as []any value in assignment
+
+// Test arrays for comparison
+arr1 := [2]int{1, 2}
+arr2 := [2]int{1, 2}
+arr3 := [2]int{3, 4}
+
+fmt.Printf("Array comparison: %v == %v: %v\n", arr1, arr2, arr1 == arr2)
+fmt.Printf("Array comparison: %v == %v: %v\n", arr1, arr3, arr1 == arr3)
+
+// Check types
+fmt.Printf("Type of int: %v\n", reflect.TypeOf(a))
+fmt.Printf("Type of []int: %v\n", reflect.TypeOf([]int{1, 2}))
+
+// Test empty slice lengths
+empty1 := []int{}
+empty2 := []int{}
+
+fmt.Printf("len(empty1): %d\n", len(empty1))
+fmt.Printf("len(empty2): %d\n", len(empty2))
+fmt.Printf("len(empty1) == len(empty2): %v\n", len(empty1) == len(empty2))
+fmt.Printf("empty1 == empty2: %v\n", empty1 == empty2)
+
+// Test nil slices
+var nil1 []int
+var nil2 []int
+fmt.Printf("nil1 == nil2: %v\n", nil1 == nil2)
+fmt.Printf("len(nil1): %d, len(nil2): %d\n", len(nil1), len(nil2))
+
+// Test mixed nil and empty
+fmt.Printf("nil1 == empty1: %v\n", nil1 == empty1)
+
+a := []int{1, 2}
+b := []int{1, 2}
+
+// This should trigger the generation of slice equality function
+result := a == b
+fmt.Printf("Result: %v\n", result)
+
+// Test very simple case
+a := []int{1}
+b := []int{1}
+
+fmt.Printf("Single element: %v == %v: %v\n", a, b, a == b)
+
+// Test two elements  
+c := []int{1, 2}
+d := []int{1, 2}
+
+fmt.Printf("Two elements: %v == %v: %v\n", c, d, c == d)
+
+s1 := []int{1, 2}
+s2 := []int{1, 2}
+fmt.Println("s1 == s2:", s1 == s2)
+
+// Test simple cases to debug
+fmt.Println("Testing slice comparisons:")
+
+// Test same slice reference
+a := []int{1, 2}
+b := a
+fmt.Printf("Same reference: %v\n", a == b)
+
+// Test different slices with same content
+c := []int{1, 2} 
+d := []int{1, 2}
+fmt.Printf("Different slices, same content: %v\n", c == d)
+
+// Test empty slices
+e := []int{}
+f := []int{}
+fmt.Printf("Empty slices: %v\n", e == f)
+
+// Test nil slices
+var g []int
+var h []int
+fmt.Printf("Nil slices: %v\n", g == h)
