@@ -195,6 +195,45 @@ func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 		}
 	}
 
+	// Transform put calls to fmt.Printf calls with %v\n format
+	if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "put" {
+		// Check if this is the builtin put (not a user-defined function)
+		_, obj := checks.lookupScope("put")
+		if obj != nil && obj.Parent() == Universe {
+			// For now, require manual fmt import until auto-import is working
+			if checks.lookup("fmt") != nil {
+				// Transform put(arg) to fmt.Printf("%v\n", arg) by modifying call in place
+				fmtName := syntax.NewName(name.Pos(), "fmt")
+				printfName := syntax.NewName(name.Pos(), "Printf")
+				selector := &syntax.SelectorExpr{
+					X:   fmtName,
+					Sel: printfName,
+				}
+				selector.SetPos(name.Pos())
+
+				// Create format string "%v\n"
+				formatStr := &syntax.BasicLit{
+					Kind:  syntax.StringLit,
+					Value: "\"%v\\n\"",
+				}
+				formatStr.SetPos(name.Pos())
+
+				// Insert format string as first argument
+				newArgs := make([]syntax.Expr, len(call.ArgList)+1)
+				newArgs[0] = formatStr
+				copy(newArgs[1:], call.ArgList)
+				call.ArgList = newArgs
+
+				// Replace the function in the original call
+				call.Fun = selector
+			} else {
+				// Provide helpful error message
+				checks.errorf(name, UndeclaredName, "put requires 'import \"fmt\"' - automatic import only for .goo files")
+				return expression
+			}
+		}
+	}
+
 	var inst *syntax.IndexExpr // function instantiation, if any
 	if iexpr, _ := call.Fun.(*syntax.IndexExpr); iexpr != nil {
 		if checks.indexExpr(x, iexpr) {

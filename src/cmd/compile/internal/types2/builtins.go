@@ -679,6 +679,11 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 		// This case should never be reached due to early transformation
 		checks.errorf(call, InvalidSyntaxTree, "printf should have been transformed to fmt.Printf")
 
+	case _Put:
+		// put is handled by AST transformation in callExpr, not as a builtin
+		// This case should never be reached due to early transformation
+		checks.errorf(call, InvalidSyntaxTree, "put should have been transformed to fmt.Printf")
+
 	case _Print, _Println:
 		// print(x, y, ...)
 		// println(x, y, ...)

@@ -188,6 +188,7 @@ const (
 	_Print
 	_Println
 	_Printf
+	_Put
 	_Real
 	_Recover
 	_Typeof
@@ -231,6 +232,7 @@ var predeclaredFuncs = [...]struct {
 	_Print:   {"print", 0, true, statement},
 	_Println: {"println", 0, true, statement},
 	_Printf:  {"printf", 1, true, statement},
+	_Put:     {"put", 1, false, statement},
 	_Real:    {"real", 1, false, expression},
 	_Recover: {"recover", 0, false, statement},
 	_Typeof:  {"typeof", 1, false, expression},
