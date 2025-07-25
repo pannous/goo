@@ -782,9 +782,13 @@ func (p *parser) enumDecl() []Decl {
 	// Generate name map: var EnumName_names = map[EnumName]string{0:"OK", 1:"ERROR"}
 	nameMapDecl := p.createEnumNameMap(pos, enumName, enumValues)
 
+	// Generate String() method: func (e EnumName) String() string { return EnumName_names[e] }
+	stringMethodDecl := p.createEnumStringMethod(pos, enumName)
+
 	result := []Decl{typeDecl}
 	result = append(result, constDecls...)
 	result = append(result, nameMapDecl)
+	result = append(result, stringMethodDecl)
 	return result
 }
 
@@ -837,6 +841,10 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 	// Generate name map: var EnumName_names = map[EnumName]string{0:"OK", 1:"ERROR"}
 	nameMapDecl := p.createEnumNameMap(pos, enumName, enumValues)
 	list = append(list, nameMapDecl)
+
+	// Generate String() method: func (e EnumName) String() string { return EnumName_names[e] }
+	stringMethodDecl := p.createEnumStringMethod(pos, enumName)
+	list = append(list, stringMethodDecl)
 	
 	return list
 }
@@ -902,6 +910,56 @@ func (p *parser) createEnumNameMap(pos Pos, enumName *Name, enumValues []*Name) 
 	varDecl.SetPos(pos)
 
 	return varDecl
+}
+
+// createEnumStringMethod creates func (e EnumName) String() string { return EnumName_names[e] }
+func (p *parser) createEnumStringMethod(pos Pos, enumName *Name) *FuncDecl {
+	// Create receiver parameter: (e EnumName)
+	receiverName := &Name{Value: "e"}
+	receiverField := &Field{
+		Name: receiverName,
+		Type: enumName,
+	}
+
+	// Create String method name
+	stringMethodName := &Name{Value: "String"}
+
+	// Create return type: string
+	returnType := &Name{Value: "string"}
+
+	// Create function signature
+	funcType := &FuncType{
+		ResultList: []*Field{{Type: returnType}},
+	}
+
+	// Create map access: EnumName_names[e]
+	mapName := &Name{Value: enumName.Value + "_names"}
+	receiverRef := &Name{Value: "e"}
+
+	mapAccess := &IndexExpr{
+		X:     mapName,
+		Index: receiverRef,
+	}
+
+	// Create return statement
+	returnStmt := &ReturnStmt{
+		Results: mapAccess,
+	}
+
+	// Create function body
+	body := &BlockStmt{
+		List: []Stmt{returnStmt},
+	}
+
+	// Create function declaration
+	funcDecl := &FuncDecl{
+		Recv: receiverField,
+		Name: stringMethodName,
+		Type: funcType,
+		Body: body,
+	}
+
+	return funcDecl
 }
 
 // extractName splits the expression x into (name, expr) if syntactically
