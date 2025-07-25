@@ -27,9 +27,11 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ map[active:true age:30 name:Alice]   
 ✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)
+✅ enum Status { OK, BAD } with generated .String() method 
+
+☐ import "helper.go"
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`
 ☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)
-☐ import "helper.go"
 ☐ optional braces for function calls put 42 => put(42)   HARD?
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println   
@@ -46,8 +48,6 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ☐ a is Type for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }
 ☐ func test() int { 42 } => func test() int { return 42 }  auto return 
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
-☐ Avoid struct-based enums unless modeling algebraic data types manually (e.g., tagged unions)
-☐ enum Status { OK, BAD } with generated .String() method 
 ☐ class via struct (!)    
 ☐ plugin.Open() is for loading .so files at runtime
 ☐ imported and not used only warning   
