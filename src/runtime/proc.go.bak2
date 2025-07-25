@@ -3808,7 +3808,7 @@ func stealWork(now int64) (gp *g, inheritTime bool, rnow, pollUntil int64, newWo
 	for i := 0; i < stealTries; i++ {
 		stealTimersOrRunNextG := i == stealTries-1
 
-		for enumVar := stealOrder.start(cheaprand()); !enumVar.done(); enumVar.next() {
+		for enum := stealOrder.start(cheaprand()); !enumVar.done(); enumVar.next() {
 			if sched.gcwaiting.Load() {
 				// GC work may be available.
 				return nil, false, now, pollUntil, true
@@ -7579,16 +7579,16 @@ func (ord *randomOrder) start(i uint32) randomEnum {
 	}
 }
 
-func (enumVar *randomEnum) done() bool {
+func (enum *randomEnum) done() bool {
 	return enumVar.i == enumVar.count
 }
 
-func (enumVar *randomEnum) next() {
+func (enum *randomEnum) next() {
 	enumVar.i++
 	enumVar.pos = (enumVar.pos + enumVar.inc) % enumVar.count
 }
 
-func (enumVar *randomEnum) position() uint32 {
+func (enum *randomEnum) position() uint32 {
 	return enumVar.pos
 }
 

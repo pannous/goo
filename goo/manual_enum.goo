@@ -1,0 +1,9 @@
+type Status int
+const (
+	OK Status = iota
+	ERROR
+)
+
+printf("Status values:")
+printf("OK = %v", OK)
+printf("ERROR = %v", ERROR)

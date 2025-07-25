@@ -446,6 +446,10 @@ func (p *parser) fileOrNil() *File {
 			p.next()
 			f.DeclList = p.appendGroup(f.DeclList, p.typeDecl)
 
+		case _Enum:
+			p.next()
+			f.DeclList = append(f.DeclList, p.enumDecl()...)
+
 		case _Var:
 			p.next()
 			f.DeclList = p.appendGroup(f.DeclList, p.varDecl)
@@ -723,6 +727,87 @@ func (p *parser) typeDecl(group *Group) Decl {
 	}
 
 	return d
+}
+
+// enumDecl parses "enum Name { NameList }" and returns equivalent type and const declarations.
+// enum Token { ILLEGAL EOF IDENT NUMBER } becomes:
+// type Token int
+// const ( ILLEGAL Token = iota; EOF; IDENT; NUMBER )
+func (p *parser) enumDecl() []Decl {
+	if trace {
+		defer p.trace("enumDecl")()
+	}
+
+	pos := p.pos()
+	enumName := p.name()
+
+	p.want(_Lbrace)
+
+	if p.tok != _Name {
+		p.syntaxError("expected enum value name")
+		return nil
+	}
+
+	enumValues := p.nameList(p.name())
+
+	p.want(_Rbrace)
+
+	if len(enumValues) == 0 {
+		p.syntaxErrorAt(pos, "enum must have at least one value")
+		return nil
+	}
+
+	// Create type declaration: type EnumName int
+	typeDecl := &TypeDecl{
+		Name: enumName,
+		Type: &Name{Value: "int"},
+	}
+	typeDecl.SetPos(pos)
+
+	// Create const declarations with shared group for const block behavior
+	group := &Group{}
+	var constDecls []Decl
+
+	// First constant gets "= iota"
+	firstConst := &ConstDecl{
+		Group:    group,
+		NameList: []*Name{enumValues[0]},
+		Type:     enumName,
+		Values:   &Name{Value: "iota"},
+	}
+	firstConst.SetPos(enumValues[0].Pos())
+	constDecls = append(constDecls, firstConst)
+
+	// Remaining constants inherit iota (no explicit value, same group)
+	for i := 1; i < len(enumValues); i++ {
+		constDecl := &ConstDecl{
+			Group:    group,
+			NameList: []*Name{enumValues[i]},
+			Type:     enumName,
+			// No Values means it inherits from previous constant in same group
+		}
+		constDecl.SetPos(enumValues[i].Pos())
+		constDecls = append(constDecls, constDecl)
+	}
+
+	result := []Decl{typeDecl}
+	result = append(result, constDecls...)
+	return result
+}
+
+// enumStmt handles enum declarations in statement context
+func (p *parser) enumStmt() *DeclStmt {
+	if trace {
+		defer p.trace("enumStmt")()
+	}
+
+	s := new(DeclStmt)
+	s.pos = p.pos()
+
+	p.next() // consume _Enum
+	s.DeclList = p.enumDecl()
+
+	return s
 }
 
 // extractName splits the expression x into (name, expr) if syntactically
@@ -2994,6 +3079,9 @@ func (p *parser) stmtOrNil() Stmt {
 
 	case _Type:
 		return p.declStmt(p.typeDecl)
+
+	case _Enum:
+		return p.enumStmt()
 	}
 
 	p.clearPragma()

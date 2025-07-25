@@ -7579,16 +7579,16 @@ func (ord *randomOrder) start(i uint32) randomEnum {
 	}
 }
 
-func (enumVar *randomEnum) done() bool {
+func (enum *randomEnum) done() bool {
 	return enumVar.i == enumVar.count
 }
 
-func (enumVar *randomEnum) next() {
+func (enum *randomEnum) next() {
 	enumVar.i++
 	enumVar.pos = (enumVar.pos + enumVar.inc) % enumVar.count
 }
 
-func (enumVar *randomEnum) position() uint32 {
+func (enum *randomEnum) position() uint32 {
 	return enumVar.pos
 }
 

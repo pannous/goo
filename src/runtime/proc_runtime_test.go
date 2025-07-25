@@ -14,18 +14,18 @@ func RunStealOrderTest() {
 			panic("too few coprimes")
 		}
 		for co := 0; co < len(ord.coprimes); co++ {
-			enum := ord.start(uint32(co))
+			enums := ord.start(uint32(co))
 			checked := make([]bool, procs)
 			for p := 0; p < procs; p++ {
-				x := enum.position()
+				x := enums.position()
 				if checked[x] {
-					println("procs:", procs, "inc:", enum.inc)
+					println("procs:", procs, "inc:", enums.inc)
 					panic("duplicate during enumeration")
 				}
 				checked[x] = true
-				enum.next()
+				enums.next()
 			}
-			if !enum.done() {
+			if !enums.done() {
 				panic("not done")
 			}
 		}
