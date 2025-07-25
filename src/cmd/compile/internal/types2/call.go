@@ -184,17 +184,17 @@ func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 					Sel: printfName,
 				}
 				selector.SetPos(name.Pos())
-				
+
 				// Replace the function in the original call
 				call.Fun = selector
 			} else {
 				// Provide helpful error message
-				checks.errorf(name, UndeclaredName, "printf requires 'import \"fmt\"' - automatic import not yet supported")
+				checks.errorf(name, UndeclaredName, "printf requires 'import \"fmt\"' - automatic import only for .goo files")
 				return expression
 			}
 		}
 	}
-	
+
 	var inst *syntax.IndexExpr // function instantiation, if any
 	if iexpr, _ := call.Fun.(*syntax.IndexExpr); iexpr != nil {
 		if checks.indexExpr(x, iexpr) {

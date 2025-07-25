@@ -25,11 +25,13 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ z := map{"a": 1, "b": 2}  => map[any]any{…}  
 ✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}  
 ✅ map[active:true age:30 name:Alice]   
+✅ test_list_comparison.goo [1,2]==[1,2]  
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1} HARD  
-test_list_comparison.goo [1,2]==[1,2]  
-☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
-☐   
-☐ for keyword := keywords  => for _, keyword := range keywords { __  
+☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println   
+☐ for loops  :    
+☐ for keyword := keywords  => for _, keyword := range keywords { __
+☐ printf(i)	=> printf("%v", i) for non-string types i
+
 ☐ String methods "abc".contains("a")  
 ☐ return void, e.g. return print("ok") HARD    
 ☐ void(!) as synonym for func, e.g. void main(){} BAD  
@@ -37,7 +39,6 @@ test_list_comparison.goo [1,2]==[1,2]
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
-☐ for loops      
 ☐ enums via struct or const ( ILLEGAL Token = iota  
 ☐ class via struct    
 ☐ imported and not used only warning   
