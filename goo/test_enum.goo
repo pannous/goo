@@ -1,26 +1,10 @@
-import "fmt"
-
 enum Status { OK, BAD }
-
-printf("Status values:")
-printf("OK = %v", OK)
-printf("BAD = %v", BAD)
+printf("OK = %v\n", OK)
+printf("OK = %d\n", OK)
+printf("OK = %s\n", OK) // strict needs String() method
+printf("BAD = %v\n", BAD) // if String() method, else int
 
 status := OK
-printf("Variable status = %v", status)
-
-func (s Status) String() string { return "TEST" }
-
-# func (s Status) String() string {
-#     switch s {
-#     case OK:
-#         return "OK"
-#     case BAD:
-#         return "BAD"
-#     default:
-#         return "UNKNOWN"
-#     }
-# }
-printf(status.String())
-# check status.String() == "OK"
-check status.String() == "TEST"
+printf("Variable status = %v\n", status)
+check status == 0
+check status == OK

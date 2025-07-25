@@ -300,6 +300,7 @@ func tokstring(tok token) string {
 		return "comma"
 	case _Semi:
 		return "semicolon or newline"
+	default:
 	}
 	s := tok.String()
 	if _Break <= tok && tok <= _Var {
@@ -730,9 +731,11 @@ func (p *parser) typeDecl(group *Group) Decl {
 }
 
 // enumDecl parses "enum Name { NameList }" and returns equivalent type and const declarations.
-// enum Token { ILLEGAL EOF IDENT NUMBER } becomes:
-// type Token int
-// const ( ILLEGAL Token = iota; EOF; IDENT; NUMBER )
+// enum Status { OK, BAD }
+// as example becomes emitted as AST Nodes:
+// type Status int
+// const ( OK Status = 0; BAD Status = 1 )
+// func (s Status) String() string { return [...]string{"OK", "BAD"}[s] }
 func (p *parser) enumDecl() []Decl {
 	if trace {
 		defer p.trace("enumDecl")()
@@ -764,7 +767,9 @@ func (p *parser) enumDecl() []Decl {
 	}
 	typeDecl.SetPos(pos)
 
-	// Do iota counting ourselves! Generate: OK=0, ERROR=1, etc.
+	// Note: EnumTypes registration happens later in typecheck phase
+
+	// Do iota counting ourselves! Generate: OK=0, BAD=1, etc.
 	var constDecls []Decl
 	for i, enumValue := range enumValues {
 		constDecl := &ConstDecl{
@@ -776,8 +781,16 @@ func (p *parser) enumDecl() []Decl {
 		constDecls = append(constDecls, constDecl)
 	}
 
+	// Generate name map: var EnumName_names = map[EnumName]string{0:"OK", 1:"BAD"}
+	// nameMapDecl := p.createEnumNameMap(pos, enumName, enumValues)
+
+	// Generate String() method: func (s EnumName) String() string { return [...]string{"OK", "BAD"}[s] }
+	stringMethodDecl := p.createEnumStringMethod(pos, enumName, enumValues)
+
 	result := []Decl{typeDecl}
 	result = append(result, constDecls...)
+	// result = append(result, nameMapDecl)
+	result = append(result, stringMethodDecl)
 	return result
 }
 
@@ -789,17 +802,17 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 
 	pos := p.pos()
 	enumName := p.name()
-	
+
 	p.want(_Lbrace)
-	
+
 	if p.tok != _Name {
 		p.syntaxError("expected enum value name")
 		return list
 	}
-	
+
 	enumValues := p.nameList(p.name())
 	p.want(_Rbrace)
-	
+
 	if len(enumValues) == 0 {
 		p.syntaxErrorAt(pos, "enum must have at least one value")
 		return list
@@ -813,7 +826,9 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 	typeDecl.SetPos(pos)
 	list = append(list, typeDecl)
 
-	// Do iota counting ourselves! Generate: OK=0, ERROR=1, etc.
+	// Note: EnumTypes registration happens later in typecheck phase
+
+	// Do iota counting ourselves! Generate: OK=0, BAD=1, etc.
 	// This avoids the complexity of Go's const inheritance
 	for i, enumValue := range enumValues {
 		constDecl := &ConstDecl{
@@ -824,7 +839,15 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 		constDecl.SetPos(enumValue.Pos())
 		list = append(list, constDecl)
 	}
-	
+
+	// Generate name map: var EnumName_names = map[EnumName]string{0:"OK", 1:"BAD"}
+	// nameMapDecl := p.createEnumNameMap(pos, enumName, enumValues)
+	// list = append(list, nameMapDecl)
+
+	// Generate String() method: func (s EnumName) String() string { return [...]string{"OK", "BAD"}[s] }
+	stringMethodDecl := p.createEnumStringMethod(pos, enumName, enumValues)
+	list = append(list, stringMethodDecl)
+
 	return list
 }
 
@@ -841,6 +864,117 @@ func (p *parser) enumStmt() *DeclStmt {
 	s.DeclList = p.enumDeclGroup(nil)
 
 	return s
+}
+
+// createEnumNameMap creates var EnumName_names = map[EnumName]string{0:"OK", 1:"BAD"}
+func (p *parser) createEnumNameMap(pos Pos, enumName *Name, enumValues []*Name) *VarDecl {
+	// Create map variable name: EnumName_names
+	mapVarName := &Name{Value: enumName.Value + "_names"}
+	mapVarName.SetPos(pos)
+
+	// Create map type: map[EnumName]string
+	mapType := &MapType{
+		Key:   enumName,               // key type
+		Value: &Name{Value: "string"}, // value type
+	}
+	mapType.SetPos(pos)
+
+	// Create map literal elements: {0: "OK", 1: "BAD"}
+	var elements []Expr
+	for i, enumValue := range enumValues {
+		keyLit := &BasicLit{Value: fmt.Sprintf("%d", i), Kind: IntLit}
+		keyLit.SetPos(enumValue.Pos())
+
+		valueLit := &BasicLit{Value: fmt.Sprintf(`"%s"`, enumValue.Value), Kind: StringLit}
+		valueLit.SetPos(enumValue.Pos())
+
+		keyValue := &KeyValueExpr{
+			Key:   keyLit,
+			Value: valueLit,
+		}
+		keyValue.SetPos(enumValue.Pos())
+		elements = append(elements, keyValue)
+	}
+
+	// Create composite literal: map[EnumName]string{...}
+	mapLit := &CompositeLit{
+		Type:     mapType,
+		ElemList: elements,
+	}
+	mapLit.SetPos(pos)
+
+	// Create var declaration
+	varDecl := &VarDecl{
+		NameList: []*Name{mapVarName},
+		Type:     mapType,
+		Values:   mapLit,
+	}
+	varDecl.SetPos(pos)
+
+	return varDecl
+}
+
+// createEnumStringMethod creates func (s EnumName) String() string { return [...]string{"OK", "BAD"}[s] }
+func (p *parser) createEnumStringMethod(pos Pos, enumName *Name, enumValues []*Name) *FuncDecl {
+	receiverName := &Name{Value: "s"}
+	receiverName.SetPos(pos)
+	receiverField := &Field{Name: receiverName, Type: enumName}
+	receiverField.SetPos(pos)
+
+	methodName := &Name{Value: "String"}
+	methodName.SetPos(pos)
+
+	returnField := &Field{Type: &Name{Value: "string"}}
+	returnField.Type.SetPos(pos)
+	returnField.SetPos(pos)
+
+	funcType := &FuncType{ResultList: []*Field{returnField}}
+	funcType.SetPos(pos)
+
+	var arrayElements []Expr
+	for _, enumValue := range enumValues {
+		stringLit := &BasicLit{
+			Value: fmt.Sprintf(`"%s"`, enumValue.Value),
+			Kind:  StringLit,
+		}
+		stringLit.SetPos(enumValue.Pos())
+		arrayElements = append(arrayElements, stringLit)
+	}
+
+	arrayType := &ArrayType{
+		Len:  nil, // nil means [...] in Go syntax
+		Elem: &Name{Value: "string"},
+	}
+	arrayType.Elem.SetPos(pos)
+	arrayType.SetPos(pos)
+
+	arrayLit := &CompositeLit{
+		Type:     arrayType,
+		ElemList: arrayElements,
+	}
+	arrayLit.SetPos(pos)
+
+	indexExpr := &IndexExpr{
+		X:     arrayLit,
+		Index: &Name{Value: "s"},
+	}
+	indexExpr.Index.SetPos(pos)
+	indexExpr.SetPos(pos)
+
+	returnStmt := &ReturnStmt{Results: indexExpr}
+	returnStmt.SetPos(pos)
+
+	body := &BlockStmt{List: []Stmt{returnStmt}}
+	body.SetPos(pos)
+
+	funcDecl := &FuncDecl{
+		Recv: receiverField,
+		Name: methodName,
+		Type: funcType,
+		Body: body,
+	}
+	funcDecl.SetPos(pos)
+	return funcDecl
 }
 
 // extractName splits the expression x into (name, expr) if syntactically

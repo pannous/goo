@@ -15,6 +15,7 @@ import (
 	"cmd/internal/src"
 )
 
+
 func AssignExpr(n ir.Node) ir.Node { return typecheck(n, ctxExpr|ctxAssign) }
 func Expr(n ir.Node) ir.Node       { return typecheck(n, ctxExpr) }
 func Stmt(n ir.Node) ir.Node       { return typecheck(n, ctxStmt) }
@@ -938,7 +939,46 @@ func Lookdot(n *ir.SelectorExpr, t *types.Type, dostrcmp int) *types.Field {
 		return f2
 	}
 
+	// Check for enum .name magic
+	if n.Sel.Name == "name" {
+		// For now, handle any named integer type as potential enum
+		baseType := t
+		if t.IsPtr() {
+			baseType = t.Elem()
+		}
+		
+		if baseType.Kind() == types.TINT && baseType.Sym() != nil {
+			// This looks like an enum type (named int type)
+			// Create a synthetic method call that returns the enum name
+			return createEnumNameField(n, baseType)
+		}
+	}
+
 	return nil
+}
+
+// createEnumNameField creates a synthetic .name method for enum types
+func createEnumNameField(n *ir.SelectorExpr, enumType *types.Type) *types.Field {
+	// Create a method type: func() string
+	stringType := types.Types[types.TSTRING]
+	returnField := types.NewField(src.NoXPos, nil, stringType)
+	methodType := types.NewSignature(nil, nil, []*types.Field{returnField})
+	
+	// Create a synthetic method symbol
+	nameSym := &types.Sym{
+		Name: "name",
+		Pkg:  types.LocalPkg,
+	}
+	
+	// Create the method field
+	field := types.NewField(n.Pos(), nameSym, methodType)
+	
+	// Set up the selector expression as a method
+	n.Selection = field
+	n.SetType(methodType)
+	n.SetOp(ir.ODOTMETH) // Treat as a method
+	
+	return field
 }
 
 func nokeys(l ir.Nodes) bool {
