@@ -1,0 +1,8 @@
+package main
+
+import "fmt"
+
+func main() {
+	printf("Hello from printf!\n")
+	fmt.Println("Hello from fmt.Println!")
+}
