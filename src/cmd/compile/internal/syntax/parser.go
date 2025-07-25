@@ -764,29 +764,15 @@ func (p *parser) enumDecl() []Decl {
 	}
 	typeDecl.SetPos(pos)
 
-	// Simulate what appendGroup does for const ( OK Status = iota; ERROR; ... )
-	group := &Group{}
+	// Do iota counting ourselves! Generate: OK=0, ERROR=1, etc.
 	var constDecls []Decl
-
-	// First const declaration: OK Status = iota
-	firstConst := &ConstDecl{
-		Group:    group,
-		NameList: []*Name{enumValues[0]},
-		Type:     enumName,
-		Values:   &Name{Value: "iota"},
-	}
-	firstConst.SetPos(enumValues[0].Pos())
-	constDecls = append(constDecls, firstConst)
-
-	// Remaining const declarations inherit iota value
-	for i := 1; i < len(enumValues); i++ {
+	for i, enumValue := range enumValues {
 		constDecl := &ConstDecl{
-			Group:    group, // Same group for inheritance
-			NameList: []*Name{enumValues[i]},
+			NameList: []*Name{enumValue},
 			Type:     enumName,
-			// No Values - inherits from previous const in same group
+			Values:   &BasicLit{Value: fmt.Sprintf("%d", i), Kind: IntLit},
 		}
-		constDecl.SetPos(enumValues[i].Pos())
+		constDecl.SetPos(enumValue.Pos())
 		constDecls = append(constDecls, constDecl)
 	}
 
@@ -827,23 +813,13 @@ func (p *parser) enumDeclGroup(list []Decl) []Decl {
 	typeDecl.SetPos(pos)
 	list = append(list, typeDecl)
 
-	// Create a single const declaration with all names like: const ( OK, ERROR Status = iota )
-	// But this doesn't work correctly for iota, so create separate ones with shared group
-	group := &Group{}
-	
-	// Create individual const declarations for each enum value with same group
+	// Do iota counting ourselves! Generate: OK=0, ERROR=1, etc.
+	// This avoids the complexity of Go's const inheritance
 	for i, enumValue := range enumValues {
 		constDecl := &ConstDecl{
-			Group:    group,
 			NameList: []*Name{enumValue},
 			Type:     enumName,
-		}
-		if i == 0 {
-			// Only first constant gets explicit iota value
-			constDecl.Values = &Name{Value: "iota"}
-		} else {
-			// Others inherit (nil Values)
-			constDecl.Values = nil
+			Values:   &BasicLit{Value: fmt.Sprintf("%d", i), Kind: IntLit},
 		}
 		constDecl.SetPos(enumValue.Pos())
 		list = append(list, constDecl)
