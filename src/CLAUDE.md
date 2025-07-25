@@ -104,8 +104,18 @@ src/cmd/compile/internal/ir/op_string.go
 Rule: If you see DO NOT EDIT in the header, never modify it directly. Find the source file/generator that creates it and modify that instead. And generate via ./make.bash
 
 # Testing Guidelines
-recompile bin/go before testing!
-Always create exactly one new go file <git_root>/goo/test_{feature}.go to test the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
+ALWAYS RUN tests before doing any changes!
+To check the current status and that everthing is (should be) OK.
+
+NEVER modify existing tests!!
+If you need a different test create one in the folder ./probes/ 
+but consolidate all newly created tests later.
+
+after performing changes recompile bin/go before testing!
+
+# Consolidation
+If all newly created tests in ./probes/ succed:
+Create exactly one new file <git_root>/goo/test_{feature}.goo to test cases for the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
 Only create ONE new test per feature and reuse existing tests for very similar features.
 Before committing quickly run these new tests with the freshly built ../bin/go 
 After committing, run the following command in src/ to test the compatibility with the whole system:
