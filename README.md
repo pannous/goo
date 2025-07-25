@@ -27,6 +27,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ map[active:true age:30 name:Alice]   
 ✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)
+☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`
+☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)
 ☐ import "helper.go"
 ☐ optional braces for function calls put 42 => put(42)   HARD?
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?
@@ -41,20 +43,42 @@ so does adding a little o to Go[o] make everything a little more beautiful
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
-☐ enums via const ( ILLEGAL Token = iota
+☐ a is Type => a.(Type) for type assertion, e.g. if a is int => if _, ok := a.(int); ok { ... }
+☐ func test() int { 42 } => func test() int { return 42 }  auto return 
+☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
 ☐ Avoid struct-based enums unless modeling algebraic data types manually (e.g., tagged unions)
-enum Token{ ILLEGAL EOF IDENT NUMBER } =>
-type Token int
+enum Status { OK, BAD }
+is transformed by compiler to =>
+type Status int
 const (
-	ILLEGAL Token = iota
-	EOF
-	IDENT
-	NUMBER
+	OK Status = 0
+    BAD Status = 1
 )
+func (s Status) String() string { return "TEST" }
+func (s Status) String() string { return [...]string{"OK", "BAD"}[s] }
+func (s Status) String() string {
+    switch s {
+    case OK:
+        return "OK"
+    case ERROR:
+        return "ERROR"
+    default: // can it ever be reached?
+        return "UNKNOWN"
+    }
+}
+
+if s, ok := value.(fmt.Stringer); ok {
+    // call s.String()
+} else {
+    // default formatting
+}
+☐ 
 ☐ class via struct (!)    
 ☐ imported and not used only warning   
 ☐ cross off all done tasks from this list    
 ☐ any other pain points you and I might have     
+𐄂 AAA Game Engine Core? Never
+
   
 x := 1
 y := "test"

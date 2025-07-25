@@ -1,10 +1,26 @@
 import "fmt"
 
-enum Status { OK, ERROR }
+enum Status { OK, BAD }
 
 printf("Status values:")
 printf("OK = %v", OK)
-printf("ERROR = %v", ERROR)
+printf("BAD = %v", BAD)
 
 status := OK
 printf("Variable status = %v", status)
+
+func (s Status) String() string { return "TEST" }
+
+# func (s Status) String() string {
+#     switch s {
+#     case OK:
+#         return "OK"
+#     case BAD:
+#         return "BAD"
+#     default:
+#         return "UNKNOWN"
+#     }
+# }
+printf(status.String())
+# check status.String() == "OK"
+check status.String() == "TEST"
