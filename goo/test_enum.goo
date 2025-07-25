@@ -1,0 +1,8 @@
+enum Status { OK, ERROR }
+
+printf("Status values:")
+printf("OK = %v", OK)
+printf("ERROR = %v", ERROR)
+
+status := OK
+printf("Variable status = %v", status)

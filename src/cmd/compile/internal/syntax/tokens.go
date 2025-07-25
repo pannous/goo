@@ -49,6 +49,7 @@ const (
 	_Chan        // chan
 	_Check       // check
 	_Const       // const
+	_Enum        // enum
 	_Continue    // continue
 	_Default     // default
 	_Defer       // defer
@@ -126,6 +127,7 @@ var TokenNames = [...]string{
 	_Chan:        "chan",
 	_Check:       "check",
 	_Const:       "const",
+	_Enum:        "enum",
 	_Continue:    "continue",
 	_Default:     "default",
 	_Defer:       "defer",
