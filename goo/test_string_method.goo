@@ -1,5 +1,0 @@
-enum Status { OK, ERROR }
-
-myStatus := ERROR
-printf("Status with %%v: %v", myStatus)
-printf("Status with %%s: %s", myStatus.String())

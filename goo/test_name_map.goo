@@ -1,4 +1,0 @@
-enum Status { OK, ERROR }
-
-printf("Generated name map:")
-printf("Status_names = %v", Status_names)
