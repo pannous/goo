@@ -1,0 +1,2 @@
+put("OK")
+check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)

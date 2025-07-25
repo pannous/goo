@@ -1,6 +1,5 @@
-# GoLang "No GOROOT" … just rebuild:
+# If GoLang.app says "No GOROOT" … just rebuild:
 # cd /opt/other/go/src; GOROOT_FINAL=/opt/other/go ./make.bash
-#import "fmt" just disable for now!
-#import "os" // OK without this line!
-
 printf("OK")
+
+#check [1]+[1] == [1,1]
