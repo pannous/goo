@@ -1,0 +1,8 @@
+import "os" // could not import fmt (open : no such file or directory) !? mess!
+
+files, _ := os.ReadDir(".")
+
+for _, file := range files {
+#	fmt.Println(file.Name())
+	printf(file.Name())
+}
