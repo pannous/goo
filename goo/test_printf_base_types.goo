@@ -1,6 +1,0 @@
-printf("Hello")
-printf(true)
-printf(42)
-printf(3.14)
-printf([1,2,3])
-printf({a:1, b:2})

@@ -52,3 +52,11 @@ Should we completely remove the old buildin mechanism for printf,put or would th
        684 +      // This case should never be reached due to early transformation
        685 +      checks.errorf(call, InvalidSyntaxTree, "put should have been transformed to fmt.Printf")
        686 +  
+
+parser.go
+sep == SPACE? OK
+// list = [ f { sep f } [sep] ] close .
+func (p *parser) list(context string, sep, close token, f func() bool) Pos {
+	if debug && (sep != _Comma && sep != _Semi || close != _Rparen && close != _Rbrace && close != _Rbrack) {
+		panic("invalid sep or close argument for list")
+	}

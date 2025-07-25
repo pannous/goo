@@ -1,0 +1,38 @@
+#!/usr/bin/env goo
+
+import "fmt"
+import "os"
+	path := "."
+	
+	// Test that both imports work together
+	files, err := os.ReadDir(path)
+	if err { 
+		panic("Error reading directory ${path}") 
+	}
+	
+	// Test auto-import with printf
+	printf("Directory listing:\n")
+	
+	// Test explicit fmt usage
+	fmt.Println("Using fmt.Println:")
+	
+	for _, file := range files {
+		// Test that printf works with existing fmt import
+		printf("File: %s\n", file.Name())
+		fmt.Printf("fmt: %s\n", file.Name())
+		
+		// Just show first few files for testing
+		if file.Name() == "test_import.goo" {
+			break
+		}
+	}
+	
+	// Test import conflict resolution
+	// Both printf and fmt.Printf should work
+	printf("printf works with fmt imported\n")
+	fmt.Printf("fmt.Printf also works\n")
+	
+	// Test with array indexing and imports
+	if len(files) > 0 {
+		printf("First file: %v\n", files#1.Name())
+	}

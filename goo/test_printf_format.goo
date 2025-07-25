@@ -1,8 +1,0 @@
-package main
-import "fmt"
-
-func main() {
-	result := 3 + 4
-	printf("3 + 4 = %d\n", result)
-	fmt.Printf("3 + 4 = %d\n", result) // Compare with direct fmt.Printf
-}

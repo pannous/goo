@@ -775,7 +775,8 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 	if !hasFmtImport {
 		syntax.Inspect(file, func(n syntax.Node) bool {
 			if call, ok := n.(*syntax.CallExpr); ok {
-				if name, ok := call.Fun.(*syntax.Name); ok && (name.Value == "printf" || name.Value == "put") {
+				if name, ok := call.Fun.(*syntax.Name); ok &&
+					(name.Value == "printf" || name.Value == "put" || name.Value == "prints") {
 					needsFmtImport = true
 					return false // found put or printf, stop searching
 				}
