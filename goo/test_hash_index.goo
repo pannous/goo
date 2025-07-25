@@ -1,5 +1,10 @@
 #!/usr/bin/env goo
 
+# TODO hash vs comment FAILS:
+#put("OK") # syntax error: unexpected name is after top level declaration
+#put("OK")  #  multiple-value fmt.Printf("%v\n", "OK") (value of type (n int, err error)) in single-value context  valid
+put("OK") // ok
+
 // Test arrays and slices with 1-indexed access
 z := []rune{'a', 'b', 'c'}
 nums := []int{10, 20, 30, 40}
@@ -64,3 +69,5 @@ check z#2 ==
 
 check
 z#2 == 'b'
+
+put("All checks passed!")
