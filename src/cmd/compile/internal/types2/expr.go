@@ -817,7 +817,7 @@ func (checks *Checker) binary(x *operand, e syntax.Expr, lhs, rhs syntax.Expr, o
 		return
 	}
 
-	// Special handling for string + number concatenation
+	// Special handling for string + number/boolean concatenation
 	if op == syntax.Add && !Identical(x.typ, y.typ) {
 		if allString(x.typ) && allNumeric(y.typ) {
 			// String + Number: "text" + 123 -> "text123"
@@ -835,6 +835,30 @@ func (checks *Checker) binary(x *operand, e syntax.Expr, lhs, rhs syntax.Expr, o
 				// Convert numeric constant to string representation
 				numStr := x.val.String()
 				x.val = constant.MakeString(numStr)
+				x.typ = y.typ // Use the same string type as right operand
+			} else {
+				checks.convertUntyped(x, Typ[String])
+			}
+		} else if allString(x.typ) && allBoolean(y.typ) {
+			// String + Boolean: "prefix" + true -> "prefix✔️"
+			if x.mode == constant_ && y.mode == constant_ {
+				boolStr := "✖️" // false
+				if constant.BoolVal(y.val) {
+					boolStr = "✔️" // true
+				}
+				y.val = constant.MakeString(boolStr)
+				y.typ = x.typ // Use the same string type as left operand
+			} else {
+				checks.convertUntyped(&y, Typ[String])
+			}
+		} else if allBoolean(x.typ) && allString(y.typ) {
+			// Boolean + String: true + "suffix" -> "✔️suffix"
+			if x.mode == constant_ && y.mode == constant_ {
+				boolStr := "✖️" // false
+				if constant.BoolVal(x.val) {
+					boolStr = "✔️" // true
+				}
+				x.val = constant.MakeString(boolStr)
 				x.typ = y.typ // Use the same string type as right operand
 			} else {
 				checks.convertUntyped(x, Typ[String])
