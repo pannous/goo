@@ -1,0 +1,40 @@
+#!/usr/bin/env goo
+
+// Test string + number concatenation feature
+
+// Basic string + integer
+result1 := "a" + 1
+put("Test 1: " + result1)
+check result1 == "a1"
+
+// String + larger integer
+result2 := "value: " + 42
+put("Test 2: " + result2)
+check result2 == "value: 42"
+
+// Integer + string  
+result3 := 1 + "b"
+put("Test 3: " + result3)
+check result3 == "1b"
+
+// String + negative integer
+result4 := "count: " + (-5)
+put("Test 4: " + result4)
+check result4 == "count: -5"
+
+// Integer + string with spaces
+result5 := 123 + " items"
+put("Test 5: " + result5)
+check result5 == "123 items"
+
+// String + float (should work with numeric types)
+result6 := "pi is " + 3.14159
+put("Test 6: " + result6)
+check result6 == "pi is 3.14159"
+
+// Chained concatenation
+result7 := "prefix" + 1 + 2 + "suffix"
+put("Test 7: " + result7)
+check result7 == "prefix12suffix"
+
+put("All string concatenation tests passed!")
