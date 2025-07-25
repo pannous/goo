@@ -37,4 +37,13 @@ result7 := "prefix" + 1 + 2 + "suffix"
 put("Test 7: " + result7)
 check result7 == "prefix12suffix"
 
+result8 := "a" + true
+put("Test 8: " + result8)
+check result8 == "a✔️"
+
+result9 := "a" + false
+put("Test 9: " + result9)
+check result9 == "a✖️"
+
+
 put("All string concatenation tests passed!")
