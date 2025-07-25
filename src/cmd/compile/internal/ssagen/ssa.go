@@ -7023,7 +7023,7 @@ func genssa(f *ssa.Func, pp *objw.Progs) {
 		for p := s.pp.Text; p != nil; p = p.Link {
 			if p.Pos.IsKnown() && p.InnermostFilename() != filename {
 				filename = p.InnermostFilename()
-				f.Logf("# %s\n", filename)
+				//f.Logf("# %s\n", filename)  Goo 2025-07-25 https://chatgpt.com/share/6883e753-8a04-8005-a530-0bcfa658db46
 			}
 
 			var s string
