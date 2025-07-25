@@ -1,0 +1,20 @@
+
+// needs main()
+type Tee struct {
+	x, y int
+}
+
+func (t Tee) sum() int       { return t.x + t.y }
+func (t Tee) display()       { println("x:", t.x, "y:", t.y) }
+
+func tee(x, y int) Tee    { return Tee{x, y} }
+
+func test_struct() {
+	t := tee(3, 4)
+	t.display()
+	println("Sum:", t.sum())
+}
+
+func main() {
+	test_struct()
+}

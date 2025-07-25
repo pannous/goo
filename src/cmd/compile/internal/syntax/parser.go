@@ -215,8 +215,9 @@ func (p *parser) gotAssign() bool {
 	case _Assign:
 		p.next()
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 // ----------------------------------------------------------------------------

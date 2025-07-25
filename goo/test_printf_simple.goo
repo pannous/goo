@@ -1,1 +1,0 @@
-package main; func main() { printf("Hello", 42, true) }

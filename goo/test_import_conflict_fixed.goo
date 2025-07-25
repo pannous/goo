@@ -1,8 +1,0 @@
-import "fmt"
-import "os"
-
-files, _ := os.ReadDir(".")
-
-for _, file := range files {
-	printf(file.Name())
-}

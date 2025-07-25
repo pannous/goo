@@ -1,4 +1,0 @@
-import "fmt"
-
-printf("This should work without import conflicts")
-fmt.Println("And this should also work")

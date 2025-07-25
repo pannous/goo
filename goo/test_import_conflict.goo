@@ -1,5 +1,0 @@
-import "os" // could not import fmt (open : no such file or directory) !? mess!
-
-files, _ := os.ReadDir(".")
-
-printf("%v",files#3)

@@ -1,6 +1,0 @@
-package main
-
-func main() {
-	printf("Hello, world!\n")
-	printf("This is a test: %d\n", 42)
-}
