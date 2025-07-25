@@ -44,3 +44,11 @@ errors.UnusedImport
 
   The solution is to modify the types2 system to not set checks.firstErr for soft errors like unused imports. Let
    me check where firstErr is set:
+
+
+Should we completely remove the old buildin mechanism for printf,put or would that make it fail?
+       682 +    case _Put:
+       683 +      // put is handled by AST transformation in callExpr, not as a builtin
+       684 +      // This case should never be reached due to early transformation
+       685 +      checks.errorf(call, InvalidSyntaxTree, "put should have been transformed to fmt.Printf")
+       686 +  

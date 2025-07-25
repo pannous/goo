@@ -169,8 +169,8 @@ func (checks *Checker) instantiateSignature(pos syntax.Pos, expr syntax.Expr, ty
 }
 
 func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
-	// Transform printf calls to fmt.Printf calls
-	if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "printf" {
+	// Transform printf calls to fmt.Printf calls TODO: put into a separate function
+	if name, ok := call.Fun.(*syntax.Name); ok && (name.Value == "printf") {
 		// Check if this is not a user-defined function (no local definition found)
 		if checks.lookup("printf") == nil {
 			// For now, require manual fmt import until auto-import is working
@@ -194,7 +194,7 @@ func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 		}
 	}
 
-	// Transform put calls to fmt.Printf calls with %v\n format
+	// Transform put calls to fmt.Printf calls with %v\n format TODO: put into a separate function
 	if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "put" {
 		// Check if this is not a user-defined function (no local definition found)
 		if checks.lookup("put") == nil {

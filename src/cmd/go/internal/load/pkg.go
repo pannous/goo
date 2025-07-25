@@ -1933,7 +1933,7 @@ func (p *Package) load(ctx context.Context, opts PackageOpts, path string, stk *
 			// %go_import directives to import other packages.
 		}
 
-		// Auto-inject fmt import for .goo files that use printf but don't import fmt
+		// Auto-inject fmt import for .goo files that use printf() or put() but don't import fmt
 		if needsFmtImport(p) {
 			addImport("fmt", true)
 		}
@@ -3628,7 +3628,7 @@ func needsFmtImport(p *Package) bool {
 		if !strings.HasSuffix(file, ".goo") {
 			continue
 		}
-		
+
 		// Check if fmt is already imported
 		hasFmt := false
 		for _, imp := range p.Imports {
@@ -3640,14 +3640,14 @@ func needsFmtImport(p *Package) bool {
 		if hasFmt {
 			return false
 		}
-		
+
 		// Check if file uses printf
 		fullPath := filepath.Join(p.Dir, file)
 		content, err := os.ReadFile(fullPath)
 		if err != nil {
 			continue
 		}
-		
+
 		lines := strings.Split(string(content), "\n")
 		for _, line := range lines {
 			trimmed := strings.TrimSpace(line)

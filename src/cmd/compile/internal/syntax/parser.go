@@ -2795,7 +2795,7 @@ func (p *parser) needsFmtImport(f *File) bool {
 
 	text := string(p.scanner.source.buf)
 	lines := strings.Split(text, "\n")
-	
+
 	// Check if fmt is already imported in the source text
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -2817,7 +2817,7 @@ func (p *parser) needsFmtImport(f *File) bool {
 			continue
 		}
 		// Look for printf function calls
-		if strings.Contains(line, "printf(") {
+		if strings.Contains(line, "printf(") || strings.Contains(line, "put(") {
 			return true
 		}
 	}
