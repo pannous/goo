@@ -1,0 +1,6 @@
+printf("%v","Hello")
+printf("%v",true)
+printf("%v",42)
+printf("%v",3.14)
+printf("%v",[1,2,3])
+printf("%v",{a:1, b:2})
