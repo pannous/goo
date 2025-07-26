@@ -256,11 +256,15 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 
 		for i := range lhsElems {
 			lhs, ok1 := lhsElems[i].(*syntax.Name)
-			rhsLit, ok2 := rhsElems[i].(*syntax.BasicLit)
-			if ok1 && ok2 {
+			if !ok1 {
+				continue
+			}
+			
+			// Handle literal assignments
+			if rhsLit, ok2 := rhsElems[i].(*syntax.BasicLit); ok2 {
 				switch rhsLit.Kind {
 				case syntax.IntLit:
-					ctx.Types[lhs.Value] = "int" // todo reuse existing types / enums!
+					ctx.Types[lhs.Value] = "int"
 				case syntax.StringLit:
 					ctx.Types[lhs.Value] = "string"
 				case syntax.FloatLit:
@@ -269,9 +273,15 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 					ctx.Types[lhs.Value] = "rune"
 				case syntax.ImagLit:
 					ctx.Types[lhs.Value] = "complex128"
-				//case syntax.BoolLit:
 				default:
-					ctx.Types[lhs.Value] = "unknown" // Fallback for unsupported types
+					ctx.Types[lhs.Value] = "unknown"
+				}
+			}
+			
+			// Handle boolean names (true/false)
+			if rhsName, ok2 := rhsElems[i].(*syntax.Name); ok2 {
+				if rhsName.Value == "true" || rhsName.Value == "false" {
+					ctx.Types[lhs.Value] = "bool"
 				}
 			}
 		}
