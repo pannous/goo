@@ -26,6 +26,7 @@ type Transformer interface {
 }
 
 // ApplyTransformations runs all registered transformers on the syntax tree.
+// called bycmd/compile/internal/noder/unified.go
 func ApplyTransformations(files []*syntax.File) {
 	for _, file := range files {
 		var userTransformers = os.Getenv("GOO_USE_TRANSFORMERS") == "1"
@@ -234,14 +235,28 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 			collectFromStmt(sub, ctx)
 		}
 	case *syntax.AssignStmt:
-		lhsList, ok1 := s.Lhs.(*syntax.ListExpr)
-		rhsList, ok2 := s.Rhs.(*syntax.ListExpr)
-		if !ok1 || !ok2 || len(lhsList.ElemList) != len(rhsList.ElemList) {
+		var lhsElems []syntax.Expr
+		var rhsElems []syntax.Expr
+
+		if lhsList, ok := s.Lhs.(*syntax.ListExpr); ok {
+			lhsElems = lhsList.ElemList
+		} else {
+			lhsElems = []syntax.Expr{s.Lhs}
+		}
+
+		if rhsList, ok := s.Rhs.(*syntax.ListExpr); ok {
+			rhsElems = rhsList.ElemList
+		} else {
+			rhsElems = []syntax.Expr{s.Rhs}
+		}
+
+		if len(lhsElems) != len(rhsElems) {
 			return
 		}
-		for i := range lhsList.ElemList {
-			lhs, ok1 := lhsList.ElemList[i].(*syntax.Name)
-			rhsLit, ok2 := rhsList.ElemList[i].(*syntax.BasicLit)
+
+		for i := range lhsElems {
+			lhs, ok1 := lhsElems[i].(*syntax.Name)
+			rhsLit, ok2 := rhsElems[i].(*syntax.BasicLit)
 			if ok1 && ok2 {
 				switch rhsLit.Kind {
 				case syntax.IntLit:

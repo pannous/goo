@@ -17,6 +17,10 @@ Stick to one suggested approach first, NO "Actually, let me take a different app
 If one approach fails, note it in ./probes/TRIED.md and try another approach.
 After one feature is done you can delete this file.
 
+• Quick compiler rebuild:
+/opt/other/go/src/build-compiler.sh !!
+
+• Full rebuild (when is this needed??)
 GOROOT=/opt/other/go ./make.bash 2>&1 | head -10
 
 !! Important! Never do destructive commands like remove, rm, git clean, etc even in YOLO mode: get explicit user confirmation !!
@@ -50,7 +54,7 @@ go/types/universe.go
 cmd/compile/internal/syntax/tokens.go
 cmd/compile/internal/noder folder with important files: types.go irgen.go noder.go 
 
-If you’re extending Go itself:
+If you're extending Go itself:
 •	cmd/compile/internal/syntax/parser.go AST construction!
 •	make things pass in types2 but  
 •	implement the actual (desugaring) AST transformation in the noder !
@@ -131,3 +135,6 @@ NEVER manually touch generated files like op_string.go  token_string.go
 To avoid code duplication do a quick git history search (grep?) to see if there have been related changes
 
 Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
+
+## Build Optimization Memories
+• no need to ./make.bash twice with no changes
