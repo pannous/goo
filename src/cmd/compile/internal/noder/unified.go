@@ -18,6 +18,7 @@ import (
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/inline"
 	"cmd/compile/internal/ir"
+	"cmd/compile/internal/noder/transforms"
 	"cmd/compile/internal/pgoir"
 	"cmd/compile/internal/syntax"
 	"cmd/compile/internal/typecheck"
@@ -200,7 +201,7 @@ func unified(m posMap, noders []*noder) {
 			files = append(files, noder.file)
 		}
 	}
-	ApplyTransformations(files)
+	transforms.ApplyTransformations(files)
 
 	data := writePkgStub(m, noders)
 
