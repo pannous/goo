@@ -9,24 +9,19 @@ import (
 	"fmt"
 )
 
-// StringConcatTransformer handles automatic string conversion in concatenation.
+// StringConcatTransform handles automatic string conversion in concatenation.
 // It transforms expressions like
 // "result:" + z --> "result:" + strconv.Itoa(z)  // deprecated vs:
 // "result:" + z --> "result:" + fmt.Sprintf("%v", z) // works!
 // "result:" + z --> "result:" + z.String()  // NOT for int!
-type StringConcatTransformer struct{}
+type StringConcatTransform struct{}
 
-func (t *StringConcatTransformer) Name() string {
+func (t *StringConcatTransform) Name() string {
 	return "string_concat"
 }
 
-func (t *StringConcatTransformer) Transform(file *syntax.File, ctx *TransformContext) bool {
+func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	//return false // no Transform today:)
-	// First, check if we need to add strconv import
-	//needsStrconv := t.hasStringConcat(file)
-	//if needsStrconv {
-	//	t.addStrconvImport(file)
-	//}
 	needsFmtImport := !t.hasImport(file, "fmt") && t.hasStringConcat(file)
 	if needsFmtImport {
 		t.addFmtImport(file)
@@ -44,12 +39,12 @@ func (t *StringConcatTransformer) Transform(file *syntax.File, ctx *TransformCon
 	return changed
 }
 
-func (t *StringConcatTransformer) transformFuncBody(stmt syntax.Stmt, ctx *TransformContext) bool {
+func (t *StringConcatTransform) transformFuncBody(stmt syntax.Stmt, ctx *TransformContext) bool {
 	if stmt == nil {
 		return false
 	}
 
-	// Only process if it's a BlockStmt (function body)
+	// Only process if it's a BlockStmt (function body) WHY?
 	if _, ok := stmt.(*syntax.BlockStmt); !ok {
 		return false
 	}
@@ -58,7 +53,7 @@ func (t *StringConcatTransformer) transformFuncBody(stmt syntax.Stmt, ctx *Trans
 }
 
 // walkStmt walks a statement and transforms any string concatenations
-func (t *StringConcatTransformer) walkStmt(stmt syntax.Stmt, ctx *TransformContext) bool {
+func (t *StringConcatTransform) walkStmt(stmt syntax.Stmt, ctx *TransformContext) bool {
 	if stmt == nil {
 		return false
 	}
@@ -123,7 +118,7 @@ func (t *StringConcatTransformer) walkStmt(stmt syntax.Stmt, ctx *TransformConte
 }
 
 // walkExpr walks an expression and transforms any string concatenations
-func (t *StringConcatTransformer) walkExpr(expr syntax.Expr, ctx *TransformContext) bool {
+func (t *StringConcatTransform) walkExpr(expr syntax.Expr, ctx *TransformContext) bool {
 	if expr == nil {
 		return false
 	}
@@ -185,7 +180,7 @@ func (t *StringConcatTransformer) walkExpr(expr syntax.Expr, ctx *TransformConte
 
 // transformConcatOperation checks if this is a string concatenation with a non-string operand
 // and wraps the non-string operand with fmt.Sprintf if it's an integer.
-func (t *StringConcatTransformer) transformConcatOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
+func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	//println("Attempting transformConcatOperation on:", syntax.String(op))
 	if op.Op != syntax.Add {
 		//println("No transformation applied for operation:", syntax.String(op))
@@ -221,7 +216,7 @@ func (t *StringConcatTransformer) transformConcatOperation(op *syntax.Operation,
 }
 
 // isStringLiteral returns true if the expression is a string literal.
-func (t *StringConcatTransformer) isStringLiteral(expr syntax.Expr) bool {
+func (t *StringConcatTransform) isStringLiteral(expr syntax.Expr) bool {
 	if basic, ok := expr.(*syntax.BasicLit); ok {
 		return basic.Kind == syntax.StringLit
 	}
@@ -230,7 +225,7 @@ func (t *StringConcatTransformer) isStringLiteral(expr syntax.Expr) bool {
 
 // mightBeIntegerVariable returns true if the expression could be an integer variable.
 // For now, we'll be conservative and only handle simple identifiers.
-func (t *StringConcatTransformer) mightBeIntegerVariable(expr syntax.Expr, ctx *TransformContext) bool {
+func (t *StringConcatTransform) mightBeIntegerVariable(expr syntax.Expr, ctx *TransformContext) bool {
 	if name, ok := expr.(*syntax.Name); ok {
 		return ctx.Types[name.Value] == "int"
 	}
@@ -238,7 +233,7 @@ func (t *StringConcatTransformer) mightBeIntegerVariable(expr syntax.Expr, ctx *
 }
 
 // createItoacCall creates a syntax tree for strconv.Itoa(expr).
-//func (t *StringConcatTransformer) createItoacCall(expr syntax.Expr) syntax.Expr {
+//func (t *StringConcatTransform) createItoacCall(expr syntax.Expr) syntax.Expr {
 //	// Create strconv.Itoa(expr)
 //	return &syntax.CallExpr{
 //		Fun: &syntax.SelectorExpr{
@@ -253,7 +248,7 @@ func (t *StringConcatTransformer) mightBeIntegerVariable(expr syntax.Expr, ctx *
 //	}
 //}
 
-func (t *StringConcatTransformer) createSprintfCall(expr syntax.Expr) syntax.Expr {
+func (t *StringConcatTransform) createSprintfCall(expr syntax.Expr) syntax.Expr {
 	return &syntax.CallExpr{
 		Fun: &syntax.SelectorExpr{
 			X: &syntax.Name{
@@ -274,7 +269,7 @@ func (t *StringConcatTransformer) createSprintfCall(expr syntax.Expr) syntax.Exp
 }
 
 // hasStringConcat checks if the file contains string + int concatenations
-func (t *StringConcatTransformer) hasStringConcat(file *syntax.File) bool {
+func (t *StringConcatTransform) hasStringConcat(file *syntax.File) bool {
 	// todo: instead of parsing the whole file we can mark it in parser.go
 	for _, decl := range file.DeclList {
 		if funcDecl, ok := decl.(*syntax.FuncDecl); ok {
@@ -287,7 +282,7 @@ func (t *StringConcatTransformer) hasStringConcat(file *syntax.File) bool {
 }
 
 // bodyHasStringConcat checks if the function body contains string + int concatenations
-func (t *StringConcatTransformer) bodyHasStringConcat(stmt syntax.Stmt) bool {
+func (t *StringConcatTransform) bodyHasStringConcat(stmt syntax.Stmt) bool {
 	if stmt == nil {
 		return false
 	}
@@ -301,7 +296,7 @@ func (t *StringConcatTransformer) bodyHasStringConcat(stmt syntax.Stmt) bool {
 }
 
 // checkForStringConcat recursively checks statements for string + int concatenations
-func (t *StringConcatTransformer) checkForStringConcat(stmt syntax.Stmt) bool {
+func (t *StringConcatTransform) checkForStringConcat(stmt syntax.Stmt) bool {
 	if stmt == nil {
 		return false
 	}
@@ -336,7 +331,7 @@ func (t *StringConcatTransformer) checkForStringConcat(stmt syntax.Stmt) bool {
 }
 
 // checkExprForStringConcat recursively checks expressions for string + int concatenations
-func (t *StringConcatTransformer) checkExprForStringConcat(expr syntax.Expr) bool {
+func (t *StringConcatTransform) checkExprForStringConcat(expr syntax.Expr) bool {
 	if expr == nil {
 		return false
 	}
@@ -367,7 +362,7 @@ func (t *StringConcatTransformer) checkExprForStringConcat(expr syntax.Expr) boo
 	return false
 }
 
-func (t *StringConcatTransformer) addFmtImport(file *syntax.File) {
+func (t *StringConcatTransform) addFmtImport(file *syntax.File) {
 	// Check if fmt is already imported
 	if t.hasImport(file, "fmt") {
 		return
@@ -400,7 +395,7 @@ func (t *StringConcatTransformer) addFmtImport(file *syntax.File) {
 }
 
 // addStrconvImport adds the strconv import to the file
-//func (t *StringConcatTransformer) addStrconvImport(file *syntax.File) {
+//func (t *StringConcatTransform) addStrconvImport(file *syntax.File) {
 //	// Check if strconv is already imported
 //	if t.hasImport(file, "strconv") {
 //		return
@@ -432,7 +427,7 @@ func (t *StringConcatTransformer) addFmtImport(file *syntax.File) {
 //	file.DeclList = newDeclList
 //}
 
-func (t *StringConcatTransformer) hasImport(file *syntax.File, name string) bool {
+func (t *StringConcatTransform) hasImport(file *syntax.File, name string) bool {
 	if name[0] != '"' { // Ensure the import name is quoted
 		name = "\"" + name + "\""
 	}
@@ -455,7 +450,7 @@ func init() {
 	//do_register := !msg_shown // Only register if not already shown
 	if do_register {
 		//println("Registering string concat transformer!")
-		RegisterTransformer(&StringConcatTransformer{}) // per context?
+		RegisterTransformer(&StringConcatTransform{}) // per context?
 	} else {
 		//println("NOT Registering string concat transformer")
 	}
