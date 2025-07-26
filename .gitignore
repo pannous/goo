@@ -63,3 +63,4 @@ main.wasm
 probes
 
 src/probes
+/src/cmd/compile/compile

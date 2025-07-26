@@ -12,7 +12,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ goo file extension    
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`    
 ✅ and or operators for && ||  
-✅ no Main needed ☐  implicit package main    
+✅ no Main needed   ☐  implicit package main    
 ✅ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)  
 ✅ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?  
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }  
@@ -26,39 +26,40 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}  
 ✅ map[active:true age:30 name:Alice]   
 ✅ test_list_comparison.goo [1,2]==[1,2]  
-✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)
-✅ enum Status { OK, BAD } with generated .String() method 
-✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)
-check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)
-check not x == false =>   falsey(x)
-
-☐ import "helper.go"
-☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`
-☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?
-☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println   
-☐ for loops  :    
-☐ for keyword := keywords  => for _, keyword := range keywords { __
-☐ String methods "abc".contains("a")  1. real 2. by compiler 
-☐ return void, e.g. return print("ok") HARD    
-☐ void(!) as synonym for func, e.g. void main(){} BAD  
-☐ public() -> Public() calls OK // as compiler plugin?  
+✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
+✅ enum Status { OK, BAD } with generated .String() method  
+✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)    
+check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
+check not x == false =>   falsey(x)  
+  
+declared and not used  make this a warning only (with flag to reenable error)
+☐ import "helper.go"    
+☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`    
+☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?    
+☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println       
+☐ for loops  :      
+☐ for keyword := keywords  => for _, keyword := range keywords { __    
+☐ String methods "abc".contains("a")  1. real 2. by compiler    
+☐ return void, e.g. return print("ok") HARD       
+☐ void(!) as synonym for func, e.g. void main(){} BAD      
+☐ public() -> Public() calls OK // as compiler plugin?    
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
-    Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
-☐ silent/implicit error propagation  
-☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }
-☐ func test() int { 42 } => func test() int { return 42 }  auto return 
-☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
-☐ class via struct (!)    
-☐ plugin.Open() is for loading .so files at runtime
-☐ imported and not used only warning   
-☐ cross off all done tasks from this list    
+    Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.    
+☐ silent/implicit error propagation    
+☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  
+☐ func test() int { 42 } => func test() int { return 42 }  auto return   
+☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
+☐ class via struct (!)      
+☐ plugin.Open() is for loading .so files at runtime  
+☐ imported and not used only warning     
+☐ cross off all done tasks from this list      
 ☐ any other pain points you and I might have     
 𐄂 AAA Game Engine Core? Never
 
 
-HARD
-☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}   
-☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters) 
+HARD  
+☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}     
+☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)   
 ☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)
 
   
@@ -114,3 +115,7 @@ https://go.dev/doc/install/source for more source installation instructions.
 All new features tested in goo [folder](https://github.com/pannous/goo/tree/master/goo)
 
 Todo: Web Demo  
+
+<!--
+You can modify CLAUDE.md while the agent is working, it will pick up the changes!! "I see from the updated CLAUDE.md that…"
+-->

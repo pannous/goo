@@ -1,0 +1,37 @@
+#!/usr/bin/env goo
+
+// Test string interpolation feature: "a" x "b" => "a" + x + "b"
+
+// Basic string interpolation with variable
+x := "middle"
+result1 := "left" x "right"
+put("Test 1: " + result1)
+check result1 == "left middle right"
+
+// String interpolation with integer
+result2 := "value:" 42 "units"
+put("Test 2: " + result2) 
+check result2 == "value: 42 units"
+
+// String interpolation with expression
+result3 := "result:" (2 + 3) "total"
+put("Test 3: " + result3)
+check result3 == "result: 5 total"
+
+// String interpolation with identifier
+name := "world"
+result4 := "hello" name "!"
+put("Test 4: " + result4)
+check result4 == "hello world !"
+
+// String interpolation with float literal
+result5 := "pi" 3.14159 "approximately"
+put("Test 5: " + result5)
+check result5 == "pi 3.14159 approximately"
+
+// String interpolation with negative number
+result6 := "temp:" (-5) "degrees"
+put("Test 6: " + result6)
+check result6 == "temp: -5 degrees"
+
+put("All string interpolation tests passed!")
