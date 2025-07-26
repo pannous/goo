@@ -1,0 +1,10 @@
+Building Go cmd/dist using /opt/homebrew/Cellar/go/1.24.5/libexec. (go1.24.5 darwin/arm64)
+Building Go toolchain1 using /opt/homebrew/Cellar/go/1.24.5/libexec.
+Building Go bootstrap cmd/go (go_bootstrap) using Go toolchain1.
+Building Go toolchain2 using go_bootstrap and Go toolchain1.
+Building Go toolchain3 using go_bootstrap and Go toolchain2.
+Building packages and commands for darwin/arm64.
+---
+Installed Go for darwin/arm64 in /opt/other/go
+Installed commands in /opt/other/go/bin
+*** You need to add /opt/other/go/bin to your PATH.
