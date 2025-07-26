@@ -1,6 +1,8 @@
-// Copyright 2025 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// Copyright 2025 The Goo Authors. All rights reserved.
+
+//go:build transforms
+
+// only include in cmd/go build with transforms enabled!
 
 package transforms
 
@@ -21,9 +23,11 @@ func (t *StringConcatTransform) Name() string {
 }
 
 func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	println("StringConcatTransform.Transform called")
 	//return false // no Transform today:)
 	needsFmtImport := !t.hasImport(file, "fmt") && t.hasStringConcat(file)
 	if needsFmtImport {
+		println("Adding fmt import")
 		t.addFmtImport(file)
 	}
 
@@ -107,15 +111,29 @@ func (t *StringConcatTransform) walkStmt(stmt syntax.Stmt, ctx *TransformContext
 		if s.Results != nil && t.walkExpr(s.Results, ctx) {
 			changed = true
 		}
+	// Add more cases for other statement types as needed
+	case *syntax.CheckStmt:
+		changed = t.walkExpr(s.Cond, ctx)
+	//case *syntax.DeclStmt:
 	default:
 		changed = false
-		//fmt.Printf("Unhandled stmt node type: %T\n", s)
+		fmt.Printf("Unhandled stmt node type: %T\n", s)
 	}
 	if changed {
-		fmt.Printf("Transformed statement: %s\n", syntax.String(stmt))
+		//fmt.Printf("Transformed statement: %s\n", syntax.String(stmt))
+	} else {
+		//print("UN Transformed statement: \n")
 	}
 	return changed
 }
+
+//func (p *printer) stmt(n syntax.Stmt) {
+//    switch n := n.(type) {
+//    case *syntax.CheckStmt:
+//        p.print("check ")
+//        p.expr(n.X)
+//    }
+//}
 
 // walkExpr walks an expression and transforms any string concatenations
 func (t *StringConcatTransform) walkExpr(expr syntax.Expr, ctx *TransformContext) bool {
@@ -163,14 +181,18 @@ func (t *StringConcatTransform) walkExpr(expr syntax.Expr, ctx *TransformContext
 		if t.walkExpr(e.Index, ctx) {
 			changed = true
 		}
+	case *syntax.Name:
+		changed = false
+	case *syntax.BasicLit:
+		changed = e.Kind != syntax.StringLit
 	case *syntax.ListExpr:
 		for _, elem := range e.ElemList {
 			if t.walkExpr(elem, ctx) {
 				changed = true
 			}
 		}
-		//default:
-		//	fmt.Printf("Unhandled expr node type: %T\n", e)
+	default:
+		fmt.Printf("Unhandled expr node type: %T\n", e)
 	}
 	if changed {
 		fmt.Printf("Transformed expression: %s\n", syntax.String(expr))
@@ -181,35 +203,29 @@ func (t *StringConcatTransform) walkExpr(expr syntax.Expr, ctx *TransformContext
 // transformConcatOperation checks if this is a string concatenation with a non-string operand
 // and wraps the non-string operand with fmt.Sprintf if it's an integer.
 func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
-	//println("Attempting transformConcatOperation on:", syntax.String(op))
 	if op.Op != syntax.Add {
-		//println("No transformation applied for operation:", syntax.String(op))
 		return nil
 	}
 
-	leftIsString := t.isStringLiteral(op.X)
-	rightIsString := t.isStringLiteral(op.Y)
+	leftIsString := t.isStringExpression(op.X, ctx)
+	rightIsString := t.isStringExpression(op.Y, ctx)
 
 	if leftIsString && !rightIsString {
-		if t.mightBeIntegerVariable(op.Y, ctx) {
-			println("Transforming: string + int (right)")
+		if t.mightBeNumericVariable(op.Y, ctx) {
 			return &syntax.Operation{
 				Op: op.Op,
 				X:  op.X,
 				Y:  t.createSprintfCall(op.Y),
 			}
 		}
-		//} else if rightIsString && !leftIsString {
-		//	if t.mightBeIntegerVariable(op.X) {
-		//		println("Transforming: int + string (left)")
-		//		return &syntax.Operation{
-		//			Op: op.Op,
-		//			X:  t.createSprintfCall(op.X),
-		//			Y:  op.Y,
-		//		}
-		//	}
-		//}
-
+	} else if rightIsString && !leftIsString {
+		if t.mightBeNumericVariable(op.X, ctx) {
+			return &syntax.Operation{
+				Op: op.Op,
+				X:  t.createSprintfCall(op.X),
+				Y:  op.Y,
+			}
+		}
 	}
 
 	return nil
@@ -223,12 +239,104 @@ func (t *StringConcatTransform) isStringLiteral(expr syntax.Expr) bool {
 	return false
 }
 
-// mightBeIntegerVariable returns true if the expression could be an integer variable.
-// For now, we'll be conservative and only handle simple identifiers.
-func (t *StringConcatTransform) mightBeIntegerVariable(expr syntax.Expr, ctx *TransformContext) bool {
-	if name, ok := expr.(*syntax.Name); ok {
-		return ctx.Types[name.Value] == "int"
+// isStringExpression returns true if the expression could be a string (literal or variable)
+func (t *StringConcatTransform) isStringExpression(expr syntax.Expr, ctx *TransformContext) bool {
+	// Check if it's a string literal
+	if t.isStringLiteral(expr) {
+		return true
 	}
+
+	// Check if it's a string variable (based on context)
+	if name, ok := expr.(*syntax.Name); ok {
+		if ctx != nil && ctx.Types != nil {
+			varType := ctx.Types[name.Value]
+			return varType == "string"
+		}
+		println("UNKNOWN variable type for", name.Value)
+		// Conservative: assume variables might be strings
+		return true
+	}
+
+	// String expressions like function calls returning strings, etc.
+	if _, ok := expr.(*syntax.CallExpr); ok {
+		return true // Function might return string
+	}
+
+	if _, ok := expr.(*syntax.SelectorExpr); ok {
+		return true // Field might be string
+	}
+
+	return false
+}
+
+// mightBeNumericVariable returns true if the expression could be a numeric variable.
+// Enhanced to handle complex expressions including operations, array access, struct fields, etc.
+func (t *StringConcatTransform) mightBeNumericVariable(expr syntax.Expr, ctx *TransformContext) bool {
+	// Handle literal numbers and booleans
+	if basic, ok := expr.(*syntax.BasicLit); ok {
+		return basic.Kind == syntax.IntLit || basic.Kind == syntax.FloatLit || basic.Kind == syntax.ImagLit
+	}
+
+	// Handle boolean literals (true/false are represented as Names)
+	if name, ok := expr.(*syntax.Name); ok {
+		if name.Value == "true" || name.Value == "false" {
+			return true
+		}
+	}
+
+	// Handle variables with known types
+	if name, ok := expr.(*syntax.Name); ok {
+		if ctx != nil && ctx.Types != nil {
+			varType := ctx.Types[name.Value]
+			return varType == "int" || varType == "float64" || varType == "float32" ||
+				varType == "int32" || varType == "int64" || varType == "int8" || varType == "int16" ||
+				varType == "uint" || varType == "uint8" || varType == "uint16" || varType == "uint32" || varType == "uint64" ||
+				varType == "bool" || varType == "complex64" || varType == "complex128" || varType == "byte" || varType == "rune"
+		}
+		// Conservative fallback - assume common variable names might be numeric
+		return true
+	}
+
+	// Handle parenthesized expressions
+	if paren, ok := expr.(*syntax.ParenExpr); ok {
+		return t.mightBeNumericVariable(paren.X, ctx)
+	}
+
+	// Handle arithmetic operations (likely to be numeric)
+	if op, ok := expr.(*syntax.Operation); ok {
+		switch op.Op {
+		case syntax.Add, syntax.Sub, syntax.Mul, syntax.Div, syntax.Rem:
+			return true // Arithmetic operations are numeric
+		case syntax.And, syntax.Or, syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq:
+			return true // Boolean operations
+		}
+	}
+
+	// Handle array/slice indexing
+	if _, ok := expr.(*syntax.IndexExpr); ok {
+		return true // Assume array elements might be numeric
+	}
+
+	// Handle struct field access
+	if _, ok := expr.(*syntax.SelectorExpr); ok {
+		return true // Assume struct fields might be numeric
+	}
+
+	// Handle function calls
+	if _, ok := expr.(*syntax.CallExpr); ok {
+		return true // Assume function results might be numeric
+	}
+
+	// Handle unary operations
+	if unary, ok := expr.(*syntax.Operation); ok && unary.Y == nil {
+		switch unary.Op {
+		case syntax.Add, syntax.Sub, syntax.Not:
+			return true // +x, -x, !x
+		case syntax.Mul: // *ptr (pointer dereference)
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -339,10 +447,10 @@ func (t *StringConcatTransform) checkExprForStringConcat(expr syntax.Expr) bool 
 	switch e := expr.(type) {
 	case *syntax.Operation:
 		if e.Op == syntax.Add {
-			leftIsString := t.isStringLiteral(e.X)
-			rightIsString := t.isStringLiteral(e.Y)
-			if (leftIsString && t.mightBeIntegerVariable(e.Y, nil)) ||
-				(rightIsString && t.mightBeIntegerVariable(e.X, nil)) {
+			leftIsString := t.isStringExpression(e.X, nil)
+			rightIsString := t.isStringExpression(e.Y, nil)
+			if (leftIsString && t.mightBeNumericVariable(e.Y, nil)) ||
+				(rightIsString && t.mightBeNumericVariable(e.X, nil)) {
 				return true
 			}
 		}
@@ -449,7 +557,7 @@ func init() {
 	do_register := true
 	//do_register := !msg_shown // Only register if not already shown
 	if do_register {
-		//println("Registering string concat transformer!")
+		println("Registering string concat transformer!")
 		RegisterTransformer(&StringConcatTransform{}) // per context?
 	} else {
 		//println("NOT Registering string concat transformer")

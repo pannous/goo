@@ -54,6 +54,15 @@ func String(n Node) string {
 	return buf.String()
 }
 
+//func (p *printer) stmt(n Stmt) {
+//	switch n := n.(type) {
+//	case CheckStmt: //  'CheckStmt' does not implement 'Stmt' :(
+//		p.print("check ")
+//	default:
+//		panic(fmt.Sprintf("unexpected statement %T", n))
+//	}
+//}
+
 type ctrlSymbol int
 
 const (

@@ -436,28 +436,28 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		var check bool
+		var checks bool
 		switch mask & 0xf {
 		case 2:
 			op = "CMPBGT"
-			check = true
+			checks = true
 		case 4:
 			op = "CMPBLT"
-			check = true
+			checks = true
 		case 6:
 			op = "CMPBNE"
-			check = true
+			checks = true
 		case 8:
 			op = "CMPBEQ"
-			check = true
+			checks = true
 		case 10:
 			op = "CMPBGE"
-			check = true
+			checks = true
 		case 12:
 			op = "CMPBLE"
-			check = true
+			checks = true
 		}
-		if check {
+		if checks {
 			args[2] = args[3]
 			args = args[:3]
 		}
@@ -466,28 +466,28 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		var check bool
+		var checks bool
 		switch mask & 0xf {
 		case 2:
 			op = "CMPUBGT"
-			check = true
+			checks = true
 		case 4:
 			op = "CMPUBLT"
-			check = true
+			checks = true
 		case 7:
 			op = "CMPUBNE"
-			check = true
+			checks = true
 		case 8:
 			op = "CMPUBEQ"
-			check = true
+			checks = true
 		case 10:
 			op = "CMPUBGE"
-			check = true
+			checks = true
 		case 12:
 			op = "CMPUBLE"
-			check = true
+			checks = true
 		}
-		if check {
+		if checks {
 			args[2] = args[3]
 			args = args[:3]
 		}
@@ -498,11 +498,11 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		opStr, check := branch_relative_op(mask, inst.Op)
+		opStr, checks := branch_relative_op(mask, inst.Op)
 		if opStr != "" {
 			op = opStr
 		}
-		if check {
+		if checks {
 			args[0] = args[1]
 			args = args[:1]
 		}
@@ -527,28 +527,28 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 		if err != nil {
 			return fmt.Sprintf("GoSyntax: error in converting Atoi:%s", err)
 		}
-		var check bool
+		var checks bool
 		switch mask & 0xf {
 		case 2: //Greaterthan (M=2)
 			op = "MOVDGT"
-			check = true
+			checks = true
 		case 4: //Lessthan (M=4)
 			op = "MOVDLT"
-			check = true
+			checks = true
 		case 7: // Not Equal (M=7)
 			op = "MOVDNE"
-			check = true
+			checks = true
 		case 8: // Equal (M=8)
 			op = "MOVDEQ"
-			check = true
+			checks = true
 		case 10: // Greaterthan or Equal (M=10)
 			op = "MOVDGE"
-			check = true
+			checks = true
 		case 12: // Lessthan or Equal (M=12)
 			op = "MOVDLE"
-			check = true
+			checks = true
 		}
-		if check {
+		if checks {
 			args[0], args[1] = args[1], args[0]
 			args = args[:2]
 		} else {
@@ -1045,40 +1045,40 @@ func GoSyntax(inst Inst, pc uint64, symname func(uint64) (string, uint64)) strin
 
 // This function returns corresponding extended mnemonic for the given
 // branch on relative mnemonic.
-func branch_relative_op(mask int, opconst Op) (op string, check bool) {
+func branch_relative_op(mask int, opconst Op) (op string, checks bool) {
 	switch mask & 0xf {
 	case 1:
 		op = "BVS"
-		check = true
+		checks = true
 	case 2:
 		op = "BGT"
-		check = true
+		checks = true
 	case 4:
 		op = "BLT"
-		check = true
+		checks = true
 	case 5:
 		op = "BLTU"
-		check = true
+		checks = true
 	case 7:
 		op = "BNE"
-		check = true
+		checks = true
 	case 8:
 		op = "BEQ"
-		check = true
+		checks = true
 	case 10:
 		op = "BGE"
-		check = true
+		checks = true
 	case 12:
 		op = "BLE"
-		check = true
+		checks = true
 	case 13:
 		op = "BLEU"
-		check = true
+		checks = true
 	case 15:
 		op = "BR"
-		check = true
+		checks = true
 	}
-	return op, check
+	return op, checks
 }
 
 // This function returns corresponding extended mnemonic for the given

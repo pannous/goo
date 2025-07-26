@@ -49,6 +49,7 @@ import (
 )
 
 func init() {
+	os.Setenv("GOO_USE_TRANSFORMERS", "1") // Enable transformers by default for .goo files
 	base.Go.Commands = []*base.Command{
 		bug.CmdBug,
 		work.CmdBuild,
@@ -292,7 +293,7 @@ func lookupCmd(args []string) (cmd *base.Command, used int) {
 		// len(c.Commands) == 0 && !c.Runnable() => help text; stop at "help"
 		break
 	}
-	
+
 	// If no command was found and the first argument ends with .go or .goo, default to run
 	if used == 0 && len(args) > 0 {
 		if strings.HasSuffix(args[0], ".go") || strings.HasSuffix(args[0], ".goo") {
@@ -300,7 +301,7 @@ func lookupCmd(args []string) (cmd *base.Command, used int) {
 			used = 0 // Keep used as 0 so we pass all args to run
 		}
 	}
-	
+
 	return cmd, used
 }
 
