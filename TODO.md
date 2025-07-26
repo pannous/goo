@@ -1,3 +1,8 @@
+<!-- remove GOROOT_FINAL for release! -->
+ remove from .bashpaths : 
+export GOROOT_FINAL=/opt/other/go 
+
+
 put(1,2,3)
 printf(1,2,3)
 printf("%v %v %v", 1,2,3)
@@ -64,3 +69,31 @@ func (p *parser) list(context string, sep, close token, f func() bool) Pos {
 	if debug && (sep != _Comma && sep != _Semi || close != _Rparen && close != _Rbrace && close != _Rbrack) {
 		panic("invalid sep or close argument for list")
 	}
+
+
+<--
+Currently ignore the system test because it fails unrelated to our changes:
+After committing, run the following command in src/ to test the compatibility with the whole system:
+```bash
+GOROOT=/opt/other/go ./run.bash --no-rebuild 2>&1 | grep -Ev '^\?|^ok ' | grep -m1 FAIL && exit 1
+```
+This command runs the tests, filters out the output to show only failures, and exits with an error code if any tests fail.
+if we encounter a FAIL, ponder whether our changes might be related to it and if so try once to fix it or tell me to look at it.
+-->
+
+
+
+tools requires Go 1.25.5, but system go is 1.24.5 => 
+ignore the go.mod by GOTOOLCHAIN=local  
+or use GOROOT=/opt/other/go /opt/other/go/bin/go instead of global go!
+
+
+ Write(test_runtime.go)
+  ⎿  Wrote 11 lines to test_runtime.go                
+     package main
+     import "runtime"
+     //go:linkname stringfromint runtime.stringfromint
+     func stringfromint(x int64) string
+     func main() {
+         result := stringfromint(42)
+         println("stringfromint(42):", result)
