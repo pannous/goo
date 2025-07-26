@@ -2,13 +2,12 @@
 
 //go:build transforms
 
-// only include in cmd/go build with transforms enabled!
+// only include in cmd/compile build with transforms enabled!
 
 package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 )
 
 // StringConcatTransform handles automatic string conversion in concatenation.
@@ -16,7 +15,16 @@ import (
 // "result:" + z --> "result:" + strconv.Itoa(z)  // deprecated vs:
 // "result:" + z --> "result:" + fmt.Sprintf("%v", z) // works!
 // "result:" + z --> "result:" + z.String()  // NOT for int!
+
 type StringConcatTransform struct{}
+
+// concatVisitor implements syntax.Visitor to transform string concatenations
+type concatVisitor struct {
+	transform      *StringConcatTransform
+	ctx            *TransformContext //ctx.Types[name.Value] // e.g., "int", "string" guessed in transform.go
+	changed        bool
+	needsFmtImport bool
+}
 
 func (t *StringConcatTransform) Name() string {
 	return "string_concat"
@@ -24,180 +32,43 @@ func (t *StringConcatTransform) Name() string {
 
 func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	println("StringConcatTransform.Transform called")
-	//return false // no Transform today:)
-	needsFmtImport := !t.hasImport(file, "fmt") && t.hasStringConcat(file)
-	if needsFmtImport {
+
+	// Single pass: walk the entire AST once using syntax.Walk
+	visitor := &concatVisitor{transform: t, ctx: ctx}
+	syntax.Walk(file, visitor)
+
+	// Add fmt import if needed and transformations were made
+	if visitor.needsFmtImport && !t.hasImport(file, "fmt") {
 		println("Adding fmt import")
 		t.addFmtImport(file)
 	}
 
-	// Transform expressions
-	changed := false
-	for _, decl := range file.DeclList {
-		if funcDecl, ok := decl.(*syntax.FuncDecl); ok {
-			if t.transformFuncBody(funcDecl.Body, ctx) {
-				changed = true
-			}
-		}
-	}
-	return changed
+	return visitor.changed
 }
 
-func (t *StringConcatTransform) transformFuncBody(stmt syntax.Stmt, ctx *TransformContext) bool {
-	if stmt == nil {
-		return false
+// Visit implements syntax.Visitor interface
+func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
+		return nil
 	}
 
-	// Only process if it's a BlockStmt (function body) WHY?
-	if _, ok := stmt.(*syntax.BlockStmt); !ok {
-		return false
-	}
-
-	return t.walkStmt(stmt, ctx)
-}
-
-// walkStmt walks a statement and transforms any string concatenations
-func (t *StringConcatTransform) walkStmt(stmt syntax.Stmt, ctx *TransformContext) bool {
-	if stmt == nil {
-		return false
-	}
-
-	changed := false
-	switch s := stmt.(type) {
-	case *syntax.BlockStmt:
-		for _, stmt := range s.List {
-			if t.walkStmt(stmt, ctx) {
-				changed = true
-			}
-		}
-	case *syntax.ExprStmt:
-		if t.walkExpr(s.X, ctx) {
-			changed = true
-		}
-	case *syntax.AssignStmt:
-		if s.Lhs != nil && t.walkExpr(s.Lhs, ctx) {
-			changed = true
-		}
-		if s.Rhs != nil && t.walkExpr(s.Rhs, ctx) {
-			changed = true
-		}
-	case *syntax.IfStmt:
-		if s.Init != nil && t.walkStmt(s.Init, ctx) {
-			changed = true
-		}
-		if t.walkExpr(s.Cond, ctx) {
-			changed = true
-		}
-		if t.walkStmt(s.Then, ctx) {
-			changed = true
-		}
-		if s.Else != nil && t.walkStmt(s.Else, ctx) {
-			changed = true
-		}
-	case *syntax.ForStmt:
-		if s.Init != nil && t.walkStmt(s.Init, ctx) {
-			changed = true
-		}
-		if s.Cond != nil && t.walkExpr(s.Cond, ctx) {
-			changed = true
-		}
-		if s.Post != nil && t.walkStmt(s.Post, ctx) {
-			changed = true
-		}
-		if t.walkStmt(s.Body, ctx) {
-			changed = true
-		}
-	case *syntax.ReturnStmt:
-		if s.Results != nil && t.walkExpr(s.Results, ctx) {
-			changed = true
-		}
-	// Add more cases for other statement types as needed
-	case *syntax.CheckStmt:
-		changed = t.walkExpr(s.Cond, ctx)
-	//case *syntax.DeclStmt:
-	default:
-		changed = false
-		fmt.Printf("Unhandled stmt node type: %T\n", s)
-	}
-	if changed {
-		//fmt.Printf("Transformed statement: %s\n", syntax.String(stmt))
-	} else {
-		//print("UN Transformed statement: \n")
-	}
-	return changed
-}
-
-//func (p *printer) stmt(n syntax.Stmt) {
-//    switch n := n.(type) {
-//    case *syntax.CheckStmt:
-//        p.print("check ")
-//        p.expr(n.X)
-//    }
-//}
-
-// walkExpr walks an expression and transforms any string concatenations
-func (t *StringConcatTransform) walkExpr(expr syntax.Expr, ctx *TransformContext) bool {
-	if expr == nil {
-		return false
-	}
-
-	changed := false
-	switch e := expr.(type) {
-	case *syntax.Operation:
-		if t.walkExpr(e.X, ctx) {
-			changed = true
-		}
-		if e.Y != nil && t.walkExpr(e.Y, ctx) {
-			changed = true
-		}
-		// Check if this operation needs transformation
-		if transformed := t.transformConcatOperation(e, ctx); transformed != nil {
-			// Copy the transformed expression back
+	// Check for string concatenation operations
+	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Add {
+		println("Found ADD operation:", syntax.String(op))
+		if transformed := v.transform.transformConcatOperation(op, v.ctx); transformed != nil {
+			println("TRANSFORMING:", syntax.String(op), "->", syntax.String(transformed))
 			if newOp, ok := transformed.(*syntax.Operation); ok {
-				e.X = newOp.X
-				e.Y = newOp.Y
-				changed = true
+				op.X = newOp.X
+				op.Y = newOp.Y
+				v.changed = true
+				v.needsFmtImport = true
 			}
+		} else {
+			println("NOT transforming:", syntax.String(op))
 		}
-	case *syntax.CallExpr:
-		if t.walkExpr(e.Fun, ctx) {
-			changed = true
-		}
-		if e.ArgList != nil {
-			for _, arg := range e.ArgList {
-				if t.walkExpr(arg, ctx) {
-					changed = true
-				}
-			}
-		}
-	case *syntax.SelectorExpr:
-		if t.walkExpr(e.X, ctx) {
-			changed = true
-		}
-	case *syntax.IndexExpr:
-		if t.walkExpr(e.X, ctx) {
-			changed = true
-		}
-		if t.walkExpr(e.Index, ctx) {
-			changed = true
-		}
-	case *syntax.Name:
-		changed = false
-	case *syntax.BasicLit:
-		changed = e.Kind != syntax.StringLit
-	case *syntax.ListExpr:
-		for _, elem := range e.ElemList {
-			if t.walkExpr(elem, ctx) {
-				changed = true
-			}
-		}
-	default:
-		fmt.Printf("Unhandled expr node type: %T\n", e)
 	}
-	if changed {
-		fmt.Printf("Transformed expression: %s\n", syntax.String(expr))
-	}
-	return changed
+
+	return v // Continue walking
 }
 
 // transformConcatOperation checks if this is a string concatenation with a non-string operand
@@ -209,6 +80,7 @@ func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, c
 
 	leftIsString := t.isStringExpression(op.X, ctx)
 	rightIsString := t.isStringExpression(op.Y, ctx)
+	println("  leftIsString:", leftIsString, "rightIsString:", rightIsString)
 
 	if leftIsString && !rightIsString {
 		if t.mightBeNumericVariable(op.Y, ctx) {
@@ -239,33 +111,25 @@ func (t *StringConcatTransform) isStringLiteral(expr syntax.Expr) bool {
 	return false
 }
 
-// isStringExpression returns true if the expression could be a string (literal or variable)
+// isStringExpression returns true if the expression is definitely a string
 func (t *StringConcatTransform) isStringExpression(expr syntax.Expr, ctx *TransformContext) bool {
-	// Check if it's a string literal
+	// Check if it's a string literal - this is definitive
 	if t.isStringLiteral(expr) {
 		return true
 	}
 
-	// Check if it's a string variable (based on context)
+	// Check if it's a string variable with known type
 	if name, ok := expr.(*syntax.Name); ok {
 		if ctx != nil && ctx.Types != nil {
 			varType := ctx.Types[name.Value]
 			return varType == "string"
 		}
-		println("UNKNOWN variable type for", name.Value)
-		// Conservative: assume variables might be strings
-		return true
+		// Without type context, be conservative and assume NOT string
+		return false
 	}
 
-	// String expressions like function calls returning strings, etc.
-	if _, ok := expr.(*syntax.CallExpr); ok {
-		return true // Function might return string
-	}
-
-	if _, ok := expr.(*syntax.SelectorExpr); ok {
-		return true // Field might be string
-	}
-
+	// For all other cases (function calls, selectors, etc.), be conservative
+	// and assume NOT string unless we have definitive proof
 	return false
 }
 
@@ -280,6 +144,7 @@ func (t *StringConcatTransform) mightBeNumericVariable(expr syntax.Expr, ctx *Tr
 	// Handle boolean literals (true/false are represented as Names)
 	if name, ok := expr.(*syntax.Name); ok {
 		if name.Value == "true" || name.Value == "false" {
+			println("mightBeNumeric fallback for", name.Value)
 			return true
 		}
 	}
@@ -294,6 +159,7 @@ func (t *StringConcatTransform) mightBeNumericVariable(expr syntax.Expr, ctx *Tr
 				varType == "bool" || varType == "complex64" || varType == "complex128" || varType == "byte" || varType == "rune"
 		}
 		// Conservative fallback - assume common variable names might be numeric
+		println("mightBeNumeric fallback for", name.Value)
 		return true
 	}
 
@@ -374,100 +240,6 @@ func (t *StringConcatTransform) createSprintfCall(expr syntax.Expr) syntax.Expr 
 			expr,
 		},
 	}
-}
-
-// hasStringConcat checks if the file contains string + int concatenations
-func (t *StringConcatTransform) hasStringConcat(file *syntax.File) bool {
-	// todo: instead of parsing the whole file we can mark it in parser.go
-	for _, decl := range file.DeclList {
-		if funcDecl, ok := decl.(*syntax.FuncDecl); ok {
-			if t.bodyHasStringConcat(funcDecl.Body) {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// bodyHasStringConcat checks if the function body contains string + int concatenations
-func (t *StringConcatTransform) bodyHasStringConcat(stmt syntax.Stmt) bool {
-	if stmt == nil {
-		return false
-	}
-
-	// Handle the case where stmt is not a BlockStmt
-	if blockStmt, ok := stmt.(*syntax.BlockStmt); ok {
-		return t.checkForStringConcat(blockStmt)
-	}
-
-	return t.checkForStringConcat(stmt)
-}
-
-// checkForStringConcat recursively checks statements for string + int concatenations
-func (t *StringConcatTransform) checkForStringConcat(stmt syntax.Stmt) bool {
-	if stmt == nil {
-		return false
-	}
-
-	switch s := stmt.(type) {
-	case *syntax.BlockStmt:
-		for _, stmt := range s.List {
-			if t.checkForStringConcat(stmt) {
-				return true
-			}
-		}
-	case *syntax.ExprStmt:
-		return t.checkExprForStringConcat(s.X)
-	case *syntax.AssignStmt:
-		return (s.Lhs != nil && t.checkExprForStringConcat(s.Lhs)) ||
-			(s.Rhs != nil && t.checkExprForStringConcat(s.Rhs))
-	case *syntax.IfStmt:
-		if s.Init != nil && t.checkForStringConcat(s.Init) {
-			return true
-		}
-		if t.checkExprForStringConcat(s.Cond) {
-			return true
-		}
-		if t.checkForStringConcat(s.Then) {
-			return true
-		}
-		if s.Else != nil && t.checkForStringConcat(s.Else) {
-			return true
-		}
-	}
-	return false
-}
-
-// checkExprForStringConcat recursively checks expressions for string + int concatenations
-func (t *StringConcatTransform) checkExprForStringConcat(expr syntax.Expr) bool {
-	if expr == nil {
-		return false
-	}
-
-	switch e := expr.(type) {
-	case *syntax.Operation:
-		if e.Op == syntax.Add {
-			leftIsString := t.isStringExpression(e.X, nil)
-			rightIsString := t.isStringExpression(e.Y, nil)
-			if (leftIsString && t.mightBeNumericVariable(e.Y, nil)) ||
-				(rightIsString && t.mightBeNumericVariable(e.X, nil)) {
-				return true
-			}
-		}
-		return t.checkExprForStringConcat(e.X) || (e.Y != nil && t.checkExprForStringConcat(e.Y))
-	case *syntax.CallExpr:
-		if t.checkExprForStringConcat(e.Fun) {
-			return true
-		}
-		if e.ArgList != nil {
-			for _, arg := range e.ArgList {
-				if t.checkExprForStringConcat(arg) {
-					return true
-				}
-			}
-		}
-	}
-	return false
 }
 
 func (t *StringConcatTransform) addFmtImport(file *syntax.File) {
@@ -557,8 +329,8 @@ func init() {
 	do_register := true
 	//do_register := !msg_shown // Only register if not already shown
 	if do_register {
-		println("Registering string concat transformer!")
-		RegisterTransformer(&StringConcatTransform{}) // per context?
+		println("Registering string concat transformer!") // reactivate this when //go:build transforms is there
+		RegisterTransformer(&StringConcatTransform{})     // per context?
 	} else {
 		//println("NOT Registering string concat transformer")
 	}

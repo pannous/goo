@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(GOROOT=/opt/other/go ./make.bash)",
+      "Bash(/opt/other/go/bin/go build probes/test_concat_simple.goo)",
+      "Bash(ls:*)",
+      "Bash(GOO_USE_TRANSFORMERS=1 /opt/other/go/bin/go build probes/test_concat_simple.goo)",
+      "Bash(./bin/go build:*)",
+      "Bash(sed:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }
