@@ -117,7 +117,8 @@ func htmlGen(w io.Writer, src []byte, boundaries []cover.Boundary) error {
 			if b.Start {
 				n := 0
 				if b.Count > 0 {
-					n = int(math.Floor(b.Norm*9)) + 1
+					b0 := int(math.Floor(b.Norm * 9))
+					n = b0 + 1
 				}
 				fmt.Fprintf(dst, `<span class="cov%v" title="%v">`, n, b.Count)
 			} else {

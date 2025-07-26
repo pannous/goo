@@ -36,13 +36,14 @@ func (*node) aNode()           {}
 
 // package PkgName; DeclList[0], DeclList[1], ...
 type File struct {
-	Pragma       Pragma
-	PkgName      *Name
-	DeclList     []Decl
+	Pragma        Pragma
+	PkgName       *Name
+	DeclList      []Decl
 	TopLevelStmts []Stmt // top-level statements for implicit main
-	EOF          Pos
-	GoVersion    string
+	EOF           Pos
+	GoVersion     string
 	node
+	Path *PosBase
 }
 
 // ----------------------------------------------------------------------------
@@ -60,7 +61,7 @@ type (
 		Group        *Group // nil means not part of a group
 		Pragma       Pragma
 		LocalPkgName *Name     // including "."; nil means no rename present
-		Path         *BasicLit // Path.Bad || Path.Kind == StringLit; nil means no path
+		Path         *BasicLit // Path.Bad || Path.Kind == StringLit; nil means no Path
 		decl
 	}
 

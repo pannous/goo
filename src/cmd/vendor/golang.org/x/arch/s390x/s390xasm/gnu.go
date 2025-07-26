@@ -699,18 +699,18 @@ func HandleExtndMnemonic(inst *Inst) string {
 			}
 		}
 	case "vfee", "vfene":
-		var check bool
+		var checks bool
 		for i := 0; i < len(vec21InstrExtndMnics); i++ {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2].(Mask)) == vec21InstrExtndMnics[i].Value2 {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1))
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2-1))
-				check = true
+				checks = true
 				break
 			}
 		}
-		if !check {
+		if !checks {
 			if uint8(inst.Args[3].(Mask)) == 0 && (uint8(inst.Args[4].(Mask)) != uint8(0)) {
 				newOpStr = opString + vec21InstrExtndMnics[0].ExtnOpStr
 				removeArg(inst, int8(vec21InstrExtndMnics[0].Offset1))
@@ -727,7 +727,7 @@ func HandleExtndMnemonic(inst *Inst) string {
 
 	case "vfae", "vstrc":
 		off := uint8(0)
-		var check bool
+		var checks bool
 		if opString == "vstrc" {
 			off = uint8(1)
 		}
@@ -737,23 +737,23 @@ func HandleExtndMnemonic(inst *Inst) string {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2+off-1))
-				check = true
+				checks = true
 				break
 			}
 		}
 
-		for i := 0; !(check) && (i < len(vec21InstrExtndMnics)-9); i++ {
+		for i := 0; !(checks) && (i < len(vec21InstrExtndMnics)-9); i++ {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+off].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask)) == vec21InstrExtndMnics[i].Value2 {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2+off-1))
-				check = true
+				checks = true
 				break
 			}
 		}
-		//for i := 3; !(check) && (i < len(vec21InstrExtndMnics)); i++ {
-		for i := len(vec21InstrExtndMnics) - 1; !(check) && (i > 2); i-- {
+		//for i := 3; !(checks) && (i < len(vec21InstrExtndMnics)); i++ {
+		for i := len(vec21InstrExtndMnics) - 1; !(checks) && (i > 2); i-- {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+off].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask))&(vec21InstrExtndMnics[i].Value2) == vec21InstrExtndMnics[i].Value2 {
 				x := uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+off].(Mask)) ^ (vec21InstrExtndMnics[i].Value2)
@@ -761,30 +761,30 @@ func HandleExtndMnemonic(inst *Inst) string {
 				if x != 0 {
 					inst.Args[vec21InstrExtndMnics[i].Offset2+off] = Mask(x)
 					removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
-					check = true
+					checks = true
 					break
 				} else {
 					removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+off))
 					removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2+off-1))
-					check = true
+					checks = true
 					break
 				}
 			}
 		}
-		if !check && inst.Args[4+off].(Mask) == Mask(0) {
+		if !checks && inst.Args[4+off].(Mask) == Mask(0) {
 			removeArg(inst, int8(4+off))
 			break
 		}
 
 	case "vstrs":
-		var check bool
+		var checks bool
 		for i := 0; i < len(vec21InstrExtndMnics)-3; i++ {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+1].(Mask)) == vec21InstrExtndMnics[i].Value2 {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1+1))
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2))
-				check = true
+				checks = true
 				break
 			}
 			if i == 2 {
@@ -792,7 +792,7 @@ func HandleExtndMnemonic(inst *Inst) string {
 			}
 		}
 
-		for i := 0; !(check) && (i < len(vec21InstrExtndMnics)-9); i++ {
+		for i := 0; !(checks) && (i < len(vec21InstrExtndMnics)-9); i++ {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1+1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2+1].(Mask)) != 0 {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
@@ -802,19 +802,19 @@ func HandleExtndMnemonic(inst *Inst) string {
 		}
 
 	case "vistr":
-		var check bool
+		var checks bool
 		for i := 0; i < len(vec21InstrExtndMnics)-6; i++ {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1-1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2-1].(Mask)) == vec21InstrExtndMnics[i].Value2 {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset1-1))
 				removeArg(inst, int8(vec21InstrExtndMnics[i].Offset2-2))
-				check = true
+				checks = true
 				break
 			}
 		}
 
-		for i := 0; !(check) && (i < len(vec21InstrExtndMnics)-9); i++ {
+		for i := 0; !(checks) && (i < len(vec21InstrExtndMnics)-9); i++ {
 			if uint8(inst.Args[vec21InstrExtndMnics[i].Offset1-1].(Mask)) == vec21InstrExtndMnics[i].Value1 &&
 				uint8(inst.Args[vec21InstrExtndMnics[i].Offset2-1].(Mask)) != 0 {
 				newOpStr = opString + vec21InstrExtndMnics[i].ExtnOpStr

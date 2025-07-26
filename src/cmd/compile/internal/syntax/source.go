@@ -137,7 +137,7 @@ redo:
 	// EOF
 	if s.r == s.e {
 		if s.ioerr != io.EOF {
-			// ensure we never start with a '/' (e.g., rooted path) in the error message
+			// ensure we never start with a '/' (e.g., rooted Path) in the error message
 			s.error("I/O error: " + s.ioerr.Error())
 			s.ioerr = nil
 		}

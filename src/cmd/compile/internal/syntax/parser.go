@@ -404,6 +404,7 @@ func (p *parser) fileOrNil() *File {
 
 	f := new(File)
 	f.pos = p.pos()
+	f.Path = p.file
 
 	// PackageClause
 	f.GoVersion = p.goVersion
@@ -611,12 +612,12 @@ func (p *parser) importDecl(group *Group) Decl {
 	}
 	d.Path = p.oliteral()
 	if d.Path == nil {
-		p.syntaxError("missing import path")
+		p.syntaxError("missing import Path")
 		p.advance(_Semi, _Rparen)
 		return d
 	}
 	if !d.Path.Bad && d.Path.Kind != StringLit {
-		p.syntaxErrorAt(d.Path.Pos(), "import path must be a string")
+		p.syntaxErrorAt(d.Path.Pos(), "import Path must be a string")
 		d.Path.Bad = true
 	}
 	// d.Path.Bad || d.Path.Kind == StringLit

@@ -435,21 +435,21 @@ func (st *state) encoding(params bool, local forLocalNameType) AST {
 	mwq, _ := a.(*MethodWithQualifiers)
 
 	var findTemplate func(AST) *Template
-	findTemplate = func(check AST) *Template {
-		switch check := check.(type) {
+	findTemplate = func(checks AST) *Template {
+		switch checks := checks.(type) {
 		case *Template:
-			return check
+			return checks
 		case *Qualified:
-			if check.LocalName {
-				return findTemplate(check.Name)
-			} else if _, ok := check.Name.(*Constructor); ok {
-				return findTemplate(check.Name)
+			if checks.LocalName {
+				return findTemplate(checks.Name)
+			} else if _, ok := checks.Name.(*Constructor); ok {
+				return findTemplate(checks.Name)
 			}
 		case *MethodWithQualifiers:
-			return findTemplate(check.Method)
+			return findTemplate(checks.Method)
 		case *Constructor:
-			if check.Base != nil {
-				return findTemplate(check.Base)
+			if checks.Base != nil {
+				return findTemplate(checks.Base)
 			}
 		}
 		return nil

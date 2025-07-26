@@ -1,19 +1,3 @@
-
-
-#put("OK")
-#put("result:" (2+3) "total")
-import "fmt"
-fmt.Println("OK")
-#printf("OK")
+check "a"+1 == "a1"
 z := 42
-
-s := fmt.Sprintf("%d", z)
-println(s)
-put("result:" + z)
-#put("result:" z) // declared and not used: z
-#y := ""
-# check y == false
-# check not y
-# check not x == false
-
-# invalid operation: operator ! not defined on "OK" (untyped string constant)
+check "a"+z == "a42"

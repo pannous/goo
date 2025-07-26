@@ -1,12 +1,13 @@
 // Copyright 2025 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-
 package transforms
 
 import (
 	"cmd/compile/internal/syntax"
 	"fmt"
+	"os"
+	"strings"
 )
 
 // Transformer represents a syntax tree transformation stage.
@@ -27,21 +28,41 @@ type Transformer interface {
 // ApplyTransformations runs all registered transformers on the syntax tree.
 func ApplyTransformations(files []*syntax.File) {
 	for _, file := range files {
+		var userTransformers = os.Getenv("GOO_USE_TRANSFORMERS") == "1"
+		if strings.Contains(file.Path.Filename(), ".goo") {
+			userTransformers = true // Force transformers for .goo files
+		}
+		if !userTransformers {
+			continue
+		}
 		if file.PkgName.Value != "main" {
 			continue /* Skip non-main packages */
+		}
+		if isToolchainPath(file) {
+			continue /* Skip toolchain packages */
 		}
 
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
-
 		for _, transformer := range TransformRegistry {
-			fmt.Printf("Checking transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			transformer.Transform(file, ctx)
 			{
-				fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+				fmt.Printf("!!Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			}
 		}
 	}
+}
+
+func isToolchainPath(file *syntax.File) bool {
+	toolchainPaths := []string{
+		"bufio", "bytes", "cmp", "command-line-arguments", "context", "crypto", "embed", "encoding", "errors", "expvar", "flag", "fmt", "hash", "html", "image", "io", "iter", "log", "maps", "math", "mime", "net", "os", "path", "plugin", "reflect", "regexp", "runtime", "slices", "sort", "strconv", "strings", "structs", "sync", "syscall", "testing", "time", "unicode", "unique", "weak",
+	}
+	for _, path := range toolchainPaths {
+		if strings.HasPrefix(file.PkgName.Value, path) {
+			return true // This is a toolchain package, skip it
+		}
+	}
+	return false
 }
 
 // SyntaxWalker provides a framework for walking and transforming syntax trees.
@@ -224,9 +245,18 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 			if ok1 && ok2 {
 				switch rhsLit.Kind {
 				case syntax.IntLit:
-					ctx.Types[lhs.Value] = "int"
+					ctx.Types[lhs.Value] = "int" // todo reuse existing types / enums!
 				case syntax.StringLit:
 					ctx.Types[lhs.Value] = "string"
+				case syntax.FloatLit:
+					ctx.Types[lhs.Value] = "float64"
+				case syntax.RuneLit:
+					ctx.Types[lhs.Value] = "rune"
+				case syntax.ImagLit:
+					ctx.Types[lhs.Value] = "complex128"
+				//case syntax.BoolLit:
+				default:
+					ctx.Types[lhs.Value] = "unknown" // Fallback for unsupported types
 				}
 			}
 		}
