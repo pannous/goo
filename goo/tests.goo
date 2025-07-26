@@ -1,3 +1,5 @@
+
+
 #put("OK")
 #put("result:" (2+3) "total")
 import "fmt"
@@ -7,7 +9,7 @@ z := 42
 
 s := fmt.Sprintf("%d", z)
 println(s)
-#put("result:" + z)
+put("result:" + z)
 #put("result:" z) // declared and not used: z
 #y := ""
 # check y == false

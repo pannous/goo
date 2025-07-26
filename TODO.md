@@ -1,3 +1,7 @@
+if newExpr := w.VisitExpr(expr); newExpr != nil {
+if newExpr := w.VisitExpr(expr) { OK??
+
+
 <!-- remove GOROOT_FINAL for release! -->
  remove from .bashpaths : 
 export GOROOT_FINAL=/opt/other/go 
