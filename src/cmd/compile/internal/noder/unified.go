@@ -19,6 +19,7 @@ import (
 	"cmd/compile/internal/inline"
 	"cmd/compile/internal/ir"
 	"cmd/compile/internal/pgoir"
+	"cmd/compile/internal/syntax"
 	"cmd/compile/internal/typecheck"
 	"cmd/compile/internal/types"
 	"cmd/compile/internal/types2"
@@ -191,6 +192,15 @@ func unified(m posMap, noders []*noder) {
 	typecheck.HaveInlineBody = unifiedHaveInlineBody
 	pgoir.LookupFunc = LookupFunc
 	pgoir.PostLookupCleanup = PostLookupCleanup
+
+	// Apply syntax transformations before processing
+	var files []*syntax.File
+	for _, noder := range noders {
+		if noder.file != nil {
+			files = append(files, noder.file)
+		}
+	}
+	ApplyTransformations(files)
 
 	data := writePkgStub(m, noders)
 
