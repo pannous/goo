@@ -5,6 +5,7 @@
 package noder
 
 import (
+	"cmd/compile/internal/transforms"
 	"cmp"
 	"fmt"
 	"internal/buildcfg"
@@ -18,7 +19,6 @@ import (
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/inline"
 	"cmd/compile/internal/ir"
-	"cmd/compile/internal/noder/transforms"
 	"cmd/compile/internal/pgoir"
 	"cmd/compile/internal/syntax"
 	"cmd/compile/internal/typecheck"
