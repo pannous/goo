@@ -18,6 +18,7 @@ type methodVisitor struct {
 	changed             bool
 	needsStringsImport  bool
 	needsStrconvImport  bool
+	needsUnicodeImport  bool
 }
 
 func (t *StringMethodsTransform) Name() string {
@@ -27,22 +28,38 @@ func (t *StringMethodsTransform) Name() string {
 // transformStringMethod transforms string method calls to standard library calls
 func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, methodName string, args []syntax.Expr) syntax.Expr {
 	switch methodName {
+	// Basic string info
 	case "reverse":
 		return t.createReverseCall(receiver)
 	case "first":
 		return t.createFirstCall(receiver)
 	case "last":
 		return t.createLastCall(receiver)
-	case "size", "length", "count": // todo byte vs rune
+	case "size", "length", "len": 
 		return t.createLenCall(receiver)
-	case "contains":
+	case "count":
+		if len(args) == 1 {
+			return t.createCountCall(receiver, args[0])
+		}
+		return t.createLenCall(receiver) // count() with no args = length
+	case "isEmpty":
+		return t.createIsEmptyCall(receiver)
+		
+	// Search methods
+	case "contains", "includes":
 		if len(args) == 1 {
 			return t.createContainsCall(receiver, args[0])
 		}
-	case "indexOf":
+	case "indexOf", "find":
 		if len(args) == 1 {
 			return t.createIndexCall(receiver, args[0])
 		}
+	case "lastIndexOf", "rfind":
+		if len(args) == 1 {
+			return t.createLastIndexCall(receiver, args[0])
+		}
+		
+	// Substring methods
 	case "from":
 		if len(args) == 1 {
 			return t.createFromCall(receiver, args[0])
@@ -51,35 +68,59 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createToCall(receiver, args[0])
 		}
-	case "sub", "substring":
+	case "sub", "substring", "slice":
 		if len(args) == 2 {
 			return t.createSubCall(receiver, args[0], args[1])
 		}
-	case "replace":
+		
+	// Replace methods
+	case "replace", "replaceAll":
 		if len(args) == 2 {
 			return t.createReplaceCall(receiver, args[0], args[1])
 		}
-	case "toUpper", "upper", "upperCase":
+	case "replaceFirst":
+		if len(args) == 2 {
+			return t.createReplaceFirstCall(receiver, args[0], args[1])
+		}
+		
+	// Case conversion
+	case "toUpper", "upper", "upperCase", "toUpperCase":
 		return t.createToUpperCall(receiver)
-	case "toLower", "lower", "lowerCase":
+	case "toLower", "lower", "lowerCase", "toLowerCase":
 		return t.createToLowerCall(receiver)
-	case "capitalize", "title":
+	case "capitalize", "title", "toTitle":
 		return t.createCapitalizeCall(receiver)
-	case "trim":
+	case "swapCase":
+		return t.createSwapCaseCall(receiver)
+		
+	// Trim methods
+	case "trim", "strip":
 		return t.createTrimCall(receiver)
+	case "trimLeft", "lstrip", "trimStart":
+		return t.createTrimLeftCall(receiver)
+	case "trimRight", "rstrip", "trimEnd":
+		return t.createTrimRightCall(receiver)
+		
+	// Split/Join methods
 	case "split":
 		if len(args) == 1 {
 			return t.createSplitCall(receiver, args[0])
 		}
-	case "splits":
+	case "splits", "chars":
 		return t.createSplitsCall(receiver)
+	case "lines":
+		return t.createLinesCall(receiver)
+	case "words":
+		return t.createWordsCall(receiver)
 	case "runes":
 		return t.createRunesCall(receiver)
 	case "join":
 		if len(args) == 1 {
 			return t.createJoinCall(receiver, args[0])
 		}
-	case "startsWith":
+		
+	// Prefix/Suffix methods
+	case "startsWith", "beginsWith":
 		if len(args) == 1 {
 			return t.createStartsWithCall(receiver, args[0])
 		}
@@ -87,16 +128,98 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createEndsWithCall(receiver, args[0])
 		}
-	case "toInt":
+	case "removePrefix":
+		if len(args) == 1 {
+			return t.createRemovePrefixCall(receiver, args[0])
+		}
+	case "removeSuffix":
+		if len(args) == 1 {
+			return t.createRemoveSuffixCall(receiver, args[0])
+		}
+		
+	// Padding methods
+	case "center":
+		if len(args) >= 1 {
+			var fillChar syntax.Expr = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			if len(args) == 2 {
+				fillChar = args[1]
+			}
+			return t.createCenterCall(receiver, args[0], fillChar)
+		}
+	case "ljust", "padLeft":
+		if len(args) >= 1 {
+			var fillChar syntax.Expr = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			if len(args) == 2 {
+				fillChar = args[1]
+			}
+			return t.createPadLeftCall(receiver, args[0], fillChar)
+		}
+	case "rjust", "padRight":
+		if len(args) >= 1 {
+			var fillChar syntax.Expr = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			if len(args) == 2 {
+				fillChar = args[1]
+			}
+			return t.createPadRightCall(receiver, args[0], fillChar)
+		}
+	case "zfill":
+		if len(args) == 1 {
+			return t.createZfillCall(receiver, args[0])
+		}
+		
+	// Character type checking
+	case "isAlpha":
+		return t.createIsAlphaCall(receiver)
+	case "isDigit", "isNumeric":
+		return t.createIsDigitCall(receiver)
+	case "isAlphaNumeric", "isAlnum":
+		return t.createIsAlnumCall(receiver)
+	case "isLower":
+		return t.createIsLowerCall(receiver)
+	case "isUpper":
+		return t.createIsUpperCall(receiver)
+	case "isSpace":
+		return t.createIsSpaceCall(receiver)
+	case "isPrintable":
+		return t.createIsPrintableCall(receiver)
+		
+	// Type conversion
+	case "toInt", "parseInt":
 		if len(args) == 0 {
 			return t.createToIntCall(receiver, nil)
 		} else if len(args) == 1 {
 			return t.createToIntCall(receiver, args[0])
 		}
-	case "toFloat":
+	case "toFloat", "parseFloat":
 		return t.createToFloatCall(receiver)
+	case "toBool", "parseBool":
+		return t.createToBoolCall(receiver)
+		
+	// Repetition
+	case "repeat", "times":
+		if len(args) == 1 {
+			return t.createRepeatCall(receiver, args[0])
+		}
+		
+	// Format methods (these need runtime implementation)
+	case "format":
+		return t.createCompilerError(receiver, "format", "string formatting with placeholders")
+	case "expandTabs":
+		return t.createCompilerError(receiver, "expandTabs", "tab expansion")
+	case "encode":
+		return t.createCompilerError(receiver, "encode", "string encoding")
+	case "decode":
+		return t.createCompilerError(receiver, "decode", "string decoding")
+	case "casefold":
+		return t.createCompilerError(receiver, "casefold", "aggressive case folding")
+	case "partition":
+		return t.createCompilerError(receiver, "partition", "string partitioning")
+	case "rpartition":
+		return t.createCompilerError(receiver, "rpartition", "reverse string partitioning")
 	}
-	return nil
+	
+	// If we reach here, method is not recognized at all
+	return t.createCompilerError(receiver, methodName, "unknown string method")
 }
 
 func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
@@ -113,6 +236,10 @@ func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformCont
 	if visitor.needsStrconvImport && !t.hasImport(file, "strconv") {
 		println("Adding strconv import")
 		t.addStrconvImport(file)
+	}
+	if visitor.needsUnicodeImport && !t.hasImport(file, "unicode") {
+		println("Adding unicode import")
+		t.addUnicodeImport(file)
 	}
 
 	return visitor.changed
@@ -141,14 +268,44 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 						v.transform.handleSliceTransformation(call, expr)
 					}
 					v.changed = true
-					// Track required imports
-					switch methodName {
-					case "contains", "indexOf", "replace", "toUpper", "toLower", "upper", "lower", 
-						 "upperCase", "lowerCase", "capitalize", "title", "trim", "split", "splits",
-						 "join", "startsWith", "endsWith":
-						v.needsStringsImport = true
-					case "toInt", "toFloat":
-						v.needsStrconvImport = true
+					// Track required imports based on method name
+					stringsMethods := []string{
+						"contains", "includes", "indexOf", "find", "lastIndexOf", "rfind",
+						"replace", "replaceAll", "replaceFirst", 
+						"toUpper", "upper", "upperCase", "toUpperCase",
+						"toLower", "lower", "lowerCase", "toLowerCase",
+						"capitalize", "title", "toTitle",
+						"trim", "strip", "trimLeft", "lstrip", "trimStart",
+						"trimRight", "rstrip", "trimEnd",
+						"split", "splits", "chars", "lines", "words", "join",
+						"startsWith", "beginsWith", "endsWith",
+						"removePrefix", "removeSuffix", "repeat", "times",
+					}
+					unicodeMethods := []string{
+						"isAlpha", "isDigit", "isNumeric", "isAlphaNumeric", "isAlnum",
+						"isLower", "isUpper", "isSpace", "isPrintable",
+					}
+					strconvMethods := []string{
+						"toInt", "parseInt", "toFloat", "parseFloat", "toBool", "parseBool",
+					}
+					
+					for _, method := range stringsMethods {
+						if method == methodName {
+							v.needsStringsImport = true
+							break
+						}
+					}
+					for _, method := range unicodeMethods {
+						if method == methodName {
+							v.needsUnicodeImport = true
+							break
+						}
+					}
+					for _, method := range strconvMethods {
+						if method == methodName {
+							v.needsStrconvImport = true
+							break
+						}
 					}
 				}
 			}
@@ -532,6 +689,231 @@ func (t *StringMethodsTransform) addStrconvImport(file *syntax.File) {
 	newDeclList = append(newDeclList, strconvImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
+}
+
+func (t *StringMethodsTransform) addUnicodeImport(file *syntax.File) {
+	if t.hasImport(file, "unicode") {
+		return
+	}
+
+	unicodeImport := &syntax.ImportDecl{
+		Path: &syntax.BasicLit{
+			Value: "\"unicode\"",
+			Kind:  syntax.StringLit,
+		},
+	}
+
+	var insertPos int
+	for i, decl := range file.DeclList {
+		if _, ok := decl.(*syntax.ImportDecl); ok {
+			insertPos = i + 1
+		} else {
+			break
+		}
+	}
+
+	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
+	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
+	newDeclList = append(newDeclList, unicodeImport)
+	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
+	file.DeclList = newDeclList
+}
+
+// NEW METHOD IMPLEMENTATIONS
+
+// createCompilerError creates a compiler error for unimplemented methods
+func (t *StringMethodsTransform) createCompilerError(receiver syntax.Expr, methodName, description string) syntax.Expr {
+	// Instead of creating a syntax error, we'll create a call to a non-existent function
+	// that will produce a clear error message
+	errorFuncName := "TODO_implement_runtime_function_for_" + methodName + "_" + description
+	return &syntax.CallExpr{
+		Fun:     &syntax.Name{Value: errorFuncName},
+		ArgList: []syntax.Expr{receiver},
+	}
+}
+
+// createCountCall creates strings.Count(receiver, substr)
+func (t *StringMethodsTransform) createCountCall(receiver, substr syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Count"},
+		},
+		ArgList: []syntax.Expr{receiver, substr},
+	}
+}
+
+// createIsEmptyCall creates len(receiver) == 0
+func (t *StringMethodsTransform) createIsEmptyCall(receiver syntax.Expr) syntax.Expr {
+	return &syntax.Operation{
+		Op: syntax.Eql,
+		X: &syntax.CallExpr{
+			Fun:     &syntax.Name{Value: "len"},
+			ArgList: []syntax.Expr{receiver},
+		},
+		Y: &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
+	}
+}
+
+// createLastIndexCall creates strings.LastIndex(receiver, substr)
+func (t *StringMethodsTransform) createLastIndexCall(receiver, substr syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "LastIndex"},
+		},
+		ArgList: []syntax.Expr{receiver, substr},
+	}
+}
+
+// createReplaceFirstCall creates strings.Replace(receiver, old, new, 1)
+func (t *StringMethodsTransform) createReplaceFirstCall(receiver, old, new syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Replace"},
+		},
+		ArgList: []syntax.Expr{receiver, old, new, &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}},
+	}
+}
+
+// createSwapCaseCall creates TODO error (needs runtime implementation)
+func (t *StringMethodsTransform) createSwapCaseCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "swapCase", "case_swapping")
+}
+
+// createTrimLeftCall creates strings.TrimLeft(receiver, " ")
+func (t *StringMethodsTransform) createTrimLeftCall(receiver syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "TrimLeft"},
+		},
+		ArgList: []syntax.Expr{receiver, &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}},
+	}
+}
+
+// createTrimRightCall creates strings.TrimRight(receiver, " ")
+func (t *StringMethodsTransform) createTrimRightCall(receiver syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "TrimRight"},
+		},
+		ArgList: []syntax.Expr{receiver, &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}},
+	}
+}
+
+// createLinesCall creates strings.Split(receiver, "\n")
+func (t *StringMethodsTransform) createLinesCall(receiver syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Split"},
+		},
+		ArgList: []syntax.Expr{receiver, &syntax.BasicLit{Kind: syntax.StringLit, Value: `"\n"`}},
+	}
+}
+
+// createWordsCall creates strings.Fields(receiver)
+func (t *StringMethodsTransform) createWordsCall(receiver syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Fields"},
+		},
+		ArgList: []syntax.Expr{receiver},
+	}
+}
+
+// createRemovePrefixCall creates strings.TrimPrefix(receiver, prefix)
+func (t *StringMethodsTransform) createRemovePrefixCall(receiver, prefix syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "TrimPrefix"},
+		},
+		ArgList: []syntax.Expr{receiver, prefix},
+	}
+}
+
+// createRemoveSuffixCall creates strings.TrimSuffix(receiver, suffix)
+func (t *StringMethodsTransform) createRemoveSuffixCall(receiver, suffix syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "TrimSuffix"},
+		},
+		ArgList: []syntax.Expr{receiver, suffix},
+	}
+}
+
+// createRepeatCall creates strings.Repeat(receiver, count)
+func (t *StringMethodsTransform) createRepeatCall(receiver, count syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Repeat"},
+		},
+		ArgList: []syntax.Expr{receiver, count},
+	}
+}
+
+// Padding methods (need runtime implementation)
+func (t *StringMethodsTransform) createCenterCall(receiver, width, fillChar syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "center", "string_centering")
+}
+
+func (t *StringMethodsTransform) createPadLeftCall(receiver, width, fillChar syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "padLeft", "left_padding")
+}
+
+func (t *StringMethodsTransform) createPadRightCall(receiver, width, fillChar syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "padRight", "right_padding")
+}
+
+func (t *StringMethodsTransform) createZfillCall(receiver, width syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "zfill", "zero_padding")
+}
+
+// Unicode character checking methods
+func (t *StringMethodsTransform) createIsAlphaCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isAlpha", "unicode_alpha_check")
+}
+
+func (t *StringMethodsTransform) createIsDigitCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isDigit", "unicode_digit_check")
+}
+
+func (t *StringMethodsTransform) createIsAlnumCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isAlnum", "unicode_alphanumeric_check")
+}
+
+func (t *StringMethodsTransform) createIsLowerCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isLower", "unicode_lowercase_check")
+}
+
+func (t *StringMethodsTransform) createIsUpperCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isUpper", "unicode_uppercase_check")
+}
+
+func (t *StringMethodsTransform) createIsSpaceCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isSpace", "unicode_whitespace_check")
+}
+
+func (t *StringMethodsTransform) createIsPrintableCall(receiver syntax.Expr) syntax.Expr {
+	return t.createCompilerError(receiver, "isPrintable", "unicode_printable_check")
+}
+
+// createToBoolCall creates strconv.ParseBool(receiver)
+func (t *StringMethodsTransform) createToBoolCall(receiver syntax.Expr) syntax.Expr {
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strconv"},
+			Sel: &syntax.Name{Value: "ParseBool"},
+		},
+		ArgList: []syntax.Expr{receiver},
+	}
 }
 
 func init() {
