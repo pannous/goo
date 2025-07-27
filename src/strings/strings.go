@@ -1321,8 +1321,8 @@ func Substring(s string, start, end int) string {
 	return ""
 }
 
-// ReverseString returns a string with its Unicode runes in reverse order.
-func ReverseString(s string) string {
+// Reverse returns a string with its Unicode runes in reverse order.
+func Reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
