@@ -1,0 +1,10 @@
+class tee{
+		int x;
+		int y;
+		tee(int x, int y) {
+				this.x = x;
+				this.y = y;
+		}
+		int sum() { return x + y; }
+		void display() { print("x: " + x + ", y: " + y); }
+}

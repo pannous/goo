@@ -48,6 +48,7 @@ const (
 	_Case        // case
 	_Chan        // chan
 	_Check       // check
+	_Class       // class
 	_Const       // const
 	_Enum        // enum
 	_Continue    // continue
@@ -126,6 +127,7 @@ var TokenNames = [...]string{
 	_Case:        "case",
 	_Chan:        "chan",
 	_Check:       "check",
+	_Class:       "class",
 	_Const:       "const",
 	_Enum:        "enum",
 	_Continue:    "continue",
