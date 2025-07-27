@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 )
 
 // StringMethodsTransform handles automatic transformation of string method calls
@@ -27,6 +28,7 @@ func (t *StringMethodsTransform) Name() string {
 
 // transformStringMethod transforms string method calls to standard library calls
 func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, methodName string, args []syntax.Expr) syntax.Expr {
+	fmt.Printf("transformStringMethod: %s\n", methodName)
 	switch methodName {
 	// Basic string info
 	case "reverse":
@@ -224,6 +226,8 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 
 func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	println("StringMethodsTransform.Transform called")
+	// Temporarily disabled - just return false without doing any transformation
+	return false
 
 	visitor := &methodVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
@@ -317,13 +321,31 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 // createReverseCall creates strings.ReverseString(receiver)
 func (t *StringMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "ReverseString"},
-		},
+	pos := receiver.Pos()
+
+	// Create the strings identifier
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	// Create the ReverseString identifier
+	funcName := &syntax.Name{Value: "Reverse"}
+	funcName.SetPos(pos)
+
+	// Create the selector expression
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	// Create the call expression
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createFirstCall creates receiver[0:1] for first character
@@ -370,13 +392,27 @@ func (t *StringMethodsTransform) createLenCall(receiver syntax.Expr) syntax.Expr
 
 // createContainsCall creates strings.Contains(receiver, arg)
 func (t *StringMethodsTransform) createContainsCall(receiver, arg syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Contains"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Contains"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, arg},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createIndexCall creates strings.Index(receiver, arg)
@@ -408,13 +444,27 @@ func (t *StringMethodsTransform) createToCall(receiver, arg syntax.Expr) syntax.
 
 // createSubCall creates strings.Substring(receiver, start, end)
 func (t *StringMethodsTransform) createSubCall(receiver, start, end syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Substring"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Substring"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, start, end},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // isStringExpression returns true if the expression is definitely a string
@@ -515,13 +565,27 @@ func (t *StringMethodsTransform) createReplaceCall(receiver, old, new syntax.Exp
 
 // createToUpperCall creates strings.ToUpper(receiver)
 func (t *StringMethodsTransform) createToUpperCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "ToUpper"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "ToUpper"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createToLowerCall creates strings.ToLower(receiver)

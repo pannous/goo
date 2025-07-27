@@ -235,6 +235,11 @@ func (checks *Checker) softErrorf(at poser, code Code, format string, args ...an
 	err.report()
 }
 
+func (checks *Checker) warningf(at poser, code Code, format string, args ...any) {
+	fmt.Printf(format, args...)
+	// todo register warning
+}
+
 func (checks *Checker) versionErrorf(at poser, v goVersion, format string, args ...any) {
 	msg := checks.sprintf(format, args...)
 	err := checks.newError(UnsupportedFeature)

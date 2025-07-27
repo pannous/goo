@@ -250,6 +250,11 @@ func (checks *Checker) softErrorf(at positioner, code Code, format string, args 
 	err.report()
 }
 
+func (checks *Checker) warningf(at positioner, code Code, format string, args ...any) {
+	fmt.Printf("warning: %s: %s\n", checks.fset.Position(at.Pos()), checks.sprintf(format, args...))
+	// todo register warning
+}
+
 func (checks *Checker) versionErrorf(at positioner, v goVersion, format string, args ...any) {
 	msg := checks.sprintf(format, args...)
 	err := checks.newError(UnsupportedFeature)
