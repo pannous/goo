@@ -22,7 +22,7 @@ type methodVisitor struct {
 }
 
 func (t *StringMethodsTransform) Name() string {
-	return "string_methods"
+	return "string_methods_transform"
 }
 
 // transformStringMethod transforms string method calls to standard library calls
@@ -266,7 +266,7 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 					case *syntax.SliceExpr:
 						// For slice expressions, we just need to update the call directly
 						*call = *(&syntax.CallExpr{
-							Fun: &syntax.Name{Value: "string"},
+							Fun:     &syntax.Name{Value: "string"},
 							ArgList: []syntax.Expr{expr},
 						})
 					}
@@ -529,7 +529,6 @@ func (t *StringMethodsTransform) hasImport(file *syntax.File, name string) bool 
 	}
 	return false
 }
-
 
 // createReplaceCall creates strings.ReplaceAll(receiver, old, new)
 func (t *StringMethodsTransform) createReplaceCall(receiver, old, new syntax.Expr) syntax.Expr {

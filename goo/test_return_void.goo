@@ -1,6 +1,8 @@
-#def meaning() int {return 42}
-def meaning() int {42} // ^^ easy
-#def meaning(){return 42} // harder but doable? OR BUG?
-#def meaning(){42} // harder but doable? OR UNINTENDED?
+def ignore() {
+	if 1 {
+		return println("OK")  //  (no value) used as value
+	}
+	println("NO")
+}
 
-printf("Meaning of life is %d\n", meaning())
+ignore()

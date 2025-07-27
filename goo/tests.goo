@@ -4,3 +4,4 @@ check "hi".first() == "h"
 check "hi".last() == "i"
 check "hi".size() == 2
 check "hi".length() == 2
+print("All basic string operations passed!")
