@@ -14,21 +14,20 @@ import (
 // class methods and constructors are also transformed appropriately.
 type ClassTransform struct{}
 
-
 func (t *ClassTransform) Name() string {
-	return "class"
+	return "class_transform"
 }
 
 func (t *ClassTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	changed := false
-	
+
 	// Walk through all declarations in the file
 	for i, decl := range file.DeclList {
 		if typeDecl, ok := decl.(*syntax.TypeDecl); ok {
 			if t.isClassDeclaration(typeDecl) {
 				if transformed := t.transformClassDeclaration(typeDecl, ctx); transformed != nil {
 					file.DeclList[i] = transformed
-					
+
 					// Add class methods to the file
 					methods := syntax.GetClassMethods(typeDecl.Name.Value)
 					if len(methods) > 0 {
@@ -37,7 +36,7 @@ func (t *ClassTransform) Transform(file *syntax.File, ctx *TransformContext) boo
 							file.DeclList = append(file.DeclList, method)
 						}
 					}
-					
+
 					changed = true
 				}
 			}
@@ -46,7 +45,6 @@ func (t *ClassTransform) Transform(file *syntax.File, ctx *TransformContext) boo
 
 	return changed
 }
-
 
 // isClassDeclaration checks if this is a class declaration
 func (t *ClassTransform) isClassDeclaration(decl *syntax.TypeDecl) bool {
@@ -78,8 +76,6 @@ func (t *ClassTransform) transformMethodBody(method *syntax.FuncDecl, className 
 	// no AST transformation is needed - the user provides the correct syntax
 	// The method body already uses self.x, self.y etc.
 }
-
-
 
 // transformClassMethod transforms class methods to regular methods
 func (t *ClassTransform) transformClassMethod(method *syntax.FuncDecl, className string, ctx *TransformContext) *syntax.FuncDecl {

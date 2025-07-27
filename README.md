@@ -31,27 +31,29 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)    
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
 check not x == false =>   falsey(x)  
-  
 ✅ declared and not used  make this a warning only (with flag to reenable error)
-✅ String methods "abc".contains("a")      
+✅ String methods "abc".contains("a")
+✅ class via type struct
+✅ imported and not used only warning
+✅ return void, e.g. return print("ok") HARD
+✅ func test() int { 42 } => func test() int { return 42 }  auto return   
+☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)
+☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
+
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println       
 ☐ import "helper.go"    
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`    
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?    
 ☐ for loops  :      
-☐ for keyword := keywords  => for _, keyword := range keywords { __    
-☐ return void, e.g. return print("ok") HARD       
+☐  for keyword := keywords  => for _, keyword := range keywords { __    
 ☐ void(!) as synonym for func, e.g. void main(){} BAD      
 ☐ public() -> Public() calls OK // as compiler plugin?    
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.    
 ☐ silent/implicit error propagation    
 ☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  
-☐ func test() int { 42 } => func test() int { return 42 }  auto return   
-☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
-☐ class via struct (!)      
+  
 ☐ plugin.Open() is for loading .so files at runtime  
-☐ imported and not used only warning     
 ☐ cross off all done tasks from this list      
 ☐ any other pain points you and I might have     
 𐄂 AAA Game Engine Core? Never

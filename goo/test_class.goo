@@ -4,6 +4,6 @@ class Person {
 }
 
 untyped := {name: "Alice", age: 30}
-
-p := Person{name: "Alice", age: 30}
-printf("Name: %s, Age: %d\n", p.name, p.age)
+person := Person{name: "Alice", age: 30}
+printf("Name: %s, Age: %d\n", person.name, person.age)
+printf("Name: %s, Age: %d\n", untyped.name, untyped.age)

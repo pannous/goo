@@ -5,6 +5,7 @@ class Point{
 		display() { print("x: " + self.x + ", y: " + self.y) }
 }
 t := Point{x: 3, y: 4}
+#t := Point(3, 4) // Alternative constructor syntax
 t.display()
 print("Sum: " + t.sum())
 

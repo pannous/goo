@@ -27,7 +27,7 @@ type concatVisitor struct {
 }
 
 func (t *StringConcatTransform) Name() string {
-	return "string_concat"
+	return "string_concat_transform"
 }
 
 func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
@@ -139,9 +139,9 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 	for i := 0; i < len(parts)-1; i++ {
 		leftIsString := t.isStringExpression(parts[i], ctx) || t.containsString(parts[i], ctx)
 		rightIsString := t.isStringExpression(parts[i+1], ctx)
-		
+
 		if (leftIsString && !rightIsString && t.mightBeNumericVariable(parts[i+1], ctx)) ||
-		   (!leftIsString && rightIsString && t.mightBeNumericVariable(parts[i], ctx)) {
+			(!leftIsString && rightIsString && t.mightBeNumericVariable(parts[i], ctx)) {
 			hasStringConcatWithNonString = true
 			break
 		}
@@ -153,18 +153,18 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 
 	// Transform the chain: wrap non-string operands when they're being concatenated with strings
 	var result syntax.Expr = parts[0]
-	
+
 	for i := 1; i < len(parts); i++ {
 		leftIsStringish := t.isStringExpression(result, ctx) || t.containsString(result, ctx)
 		rightIsString := t.isStringExpression(parts[i], ctx)
-		
+
 		var rightSide syntax.Expr = parts[i]
-		
+
 		// If left side is string-ish and right side is not string but could be numeric, wrap it
 		if leftIsStringish && !rightIsString && t.mightBeNumericVariable(parts[i], ctx) {
 			rightSide = t.createSprintfCall(parts[i])
 		}
-		
+
 		result = &syntax.Operation{
 			Op: syntax.Add,
 			X:  result,
@@ -179,7 +179,7 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 // extractConcatenationParts extracts all parts from a left-associative concatenation chain
 func (t *StringConcatTransform) extractConcatenationParts(expr syntax.Expr) []syntax.Expr {
 	var parts []syntax.Expr
-	
+
 	// Handle left-associative chaining: ((a + b) + c) + d
 	var collect func(syntax.Expr)
 	collect = func(e syntax.Expr) {
@@ -193,7 +193,7 @@ func (t *StringConcatTransform) extractConcatenationParts(expr syntax.Expr) []sy
 			parts = append(parts, e)
 		}
 	}
-	
+
 	collect(expr)
 	return parts
 }
@@ -204,12 +204,12 @@ func (t *StringConcatTransform) containsString(expr syntax.Expr, ctx *TransformC
 	if t.isStringExpression(expr, ctx) {
 		return true
 	}
-	
+
 	// For operations, check if any operand is a string
 	if op, ok := expr.(*syntax.Operation); ok && op.Op == syntax.Add {
 		return t.containsString(op.X, ctx) || t.containsString(op.Y, ctx)
 	}
-	
+
 	return false
 }
 

@@ -1,5 +1,3 @@
-#import "strings"
-#check "hello".reverse() == "olleh"
-check "hello".toUpper() == "HELLO"
-
+import "strings"
+check "hello".reverse() == "olleh"
 printf("All checks passed!\n")
