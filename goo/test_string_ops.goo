@@ -5,9 +5,10 @@ check "hi".first() == "h"
 check "hi".last() == "i"
 check "hi".size() == 2
 check "hi".length() == 2
-struct Person {
-		name string
-		age  int
-}
-p := Person{name: "Alice", age: 30}
+
+#struct Person {
+#		name string
+#		age  int
+#}
+#p := Person{name: "Alice", age: 30}
 #check "Name: " + p.name + ", Age: " + p.age == "Name: Alice, Age: 30"

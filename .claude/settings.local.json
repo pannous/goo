@@ -14,7 +14,11 @@
       "Bash(./bin/go run:*)",
       "Bash(git add:*)",
       "Bash(GOO_USE_TRANSFORMERS=1 ../bin/go build probes/test_chained_concat.goo)",
-      "Bash(GOO_USE_TRANSFORMERS=1 ./bin/go build probes/test_chained_concat.goo)"
+      "Bash(GOO_USE_TRANSFORMERS=1 ./bin/go build probes/test_chained_concat.goo)",
+      "Bash(GOROOT=/opt/other/go go build -x runtime)",
+      "Bash(GOO_USE_TRANSFORMERS=1 ../bin/go run test_isa_syntax.goo)",
+      "Bash(GOO_USE_TRANSFORMERS=1 ../bin/go run test_simple_isa.goo)",
+      "Bash(GOO_USE_TRANSFORMERS=1 ../bin/go run test_minimal_isa.goo)"
     ],
     "deny": []
   }

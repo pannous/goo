@@ -234,6 +234,13 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 		for _, sub := range s.List {
 			collectFromStmt(sub, ctx)
 		}
+	case *syntax.DeclStmt:
+		for _, decl := range s.DeclList {
+			if _, ok := decl.(*syntax.VarDecl); ok {
+				// Handle variable declarations with initialization
+				// This could be extended to handle more complex declarations
+			}
+		}
 	case *syntax.AssignStmt:
 		var lhsElems []syntax.Expr
 		var rhsElems []syntax.Expr
@@ -282,6 +289,34 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 			if rhsName, ok2 := rhsElems[i].(*syntax.Name); ok2 {
 				if rhsName.Value == "true" || rhsName.Value == "false" {
 					ctx.Types[lhs.Value] = "bool"
+				}
+			}
+
+			// Handle composite literals (slices, arrays, maps)
+			if rhsComp, ok2 := rhsElems[i].(*syntax.CompositeLit); ok2 {
+				if sliceType, ok3 := rhsComp.Type.(*syntax.SliceType); ok3 {
+					// This is a slice type like []int
+					if elemType, ok4 := sliceType.Elem.(*syntax.Name); ok4 {
+						ctx.Types[lhs.Value] = "[]" + elemType.Value
+					} else {
+						ctx.Types[lhs.Value] = "slice"
+					}
+				} else if arrayType, ok3 := rhsComp.Type.(*syntax.ArrayType); ok3 {
+					if arrayType.Len == nil {
+						// This is a slice type like []int
+						if elemType, ok4 := arrayType.Elem.(*syntax.Name); ok4 {
+							ctx.Types[lhs.Value] = "[]" + elemType.Value
+						} else {
+							ctx.Types[lhs.Value] = "slice"
+						}
+					} else {
+						// This is an array type like [3]int
+						if elemType, ok4 := arrayType.Elem.(*syntax.Name); ok4 {
+							ctx.Types[lhs.Value] = "[]" + elemType.Value // treat as slice for method purposes
+						} else {
+							ctx.Types[lhs.Value] = "array"
+						}
+					}
 				}
 			}
 		}

@@ -1,0 +1,41 @@
+// dangerous cast x as T panics if x is not T
+// safe cast x as? T returns nil if x is not T
+
+x any := 3
+any_list := [1, "two", 3.0, true, nil]
+int_list := [1, 2, 3]
+// Test as casts in Goo
+// DON'T REMOVE TESTS even if they fail
+check x as int == 3  // neccessary?
+check any_list[0] as int == 1 // neccessary?
+check any_list[1] as string == "two" // neccessary?
+check any_list[2] as float == 3.0 // neccessary?
+check any_list[3] as bool == true // neccessary?
+check any_list[4] as nil == nil // neccessary?
+
+check int_list as []int == [1, 2, 3] // neccessary!
+check int_list as int[] == [1, 2, 3] // neccessary
+
+struct S {
+		a int
+		b string
+}
+s := S{a: 1, b: "test"}
+#if s as? string {
+if s is? string {
+	check "s is NOT a string" == "true" // ;)
+} else {
+	check "s is NOT a string" // ok truty
+}
+
+# HARD casts ok or only soft casts?
+check 1 as string == "1"
+check "1" as int == 1
+
+check 3.1 as int == 3
+
+string_list := any_list as string[]
+string_list, ok := any_list as string[]
+string_list, ok := any_list as? string[]
+#!/usr/bin/env goo
+

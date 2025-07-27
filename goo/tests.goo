@@ -1,4 +1,5 @@
 // Test only basic methods that work
+check "a" isa string
 check "a"+"1" == "a1"
 check "hi".first() == "h"
 check "hi".last() == "i"

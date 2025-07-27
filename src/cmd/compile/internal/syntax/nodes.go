@@ -217,6 +217,8 @@ type (
 	}
 
 	// X.(Type)
+	// Used for direct type assertion
+	// val, ok := x.(T)
 	AssertExpr struct {
 		X    Expr
 		Type Expr
@@ -225,6 +227,8 @@ type (
 
 	// X.(type)
 	// Lhs := X.(type)
+	// Used in type switches, e.g.:
+	// switch v := x.(type) { case T: ... }
 	TypeSwitchGuard struct {
 		Lhs *Name // nil means no Lhs :=
 		X   Expr  // X.(type)

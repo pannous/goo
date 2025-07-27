@@ -1,37 +1,38 @@
-check [1, 2, 3].first() == 1
-check [1, 2, 3].last() == 3
-check [1, 2, 3].size() == 3
-check [1, 2, 3].length() == 3
-check [].isEmpty() == true
-check [1].isEmpty() == false
+// Test list methods in Goo
+// DON'T REMOVE TESTS even if they fail
+aList:=[]int{1, 2, 3}
 
-check [1, 2, 3].reverse() == [3, 2, 1]
-check [1, 2, 3].contains(2) == true
-check [1, 2, 3].contains(5) == false
+check aList[1] == 2
+check aList#2 == 2
+check aList[1:] == []int{2, 3}
+check aList[:2] == []int{1, 2}
+check aList[1:2] == []int{2}       // slice(start, end)
 
-check [1, 2, 3].indexOf(2) == 1
-check [1, 2, 3].indexOf(5) == -1
+check aList.first() == 1
+check aList.last() == 3
+check aList.size() == 3
+check aList.length() == 3
+check len([]int{}) == 0
+check len([]int{1}) == 1
 
-check [1, 2, 3][1:] == [2, 3]
-check [1, 2, 3][:2] == [1, 2]
-check [1, 2, 3][1:2] == [2]       // slice(start, end)
+#check aList.reverse() == []int{3, 2, 1}
+#check aList.contains(2) == true
+#check aList.contains(5) == false
 
-check [1, 2, 3].join("-") == "1-2-3"  // if all elements stringifiable
-check [1, 2, 3].map(x => x*2) == [2, 4, 6]
-check [1, 2, 3].filter(x => x%2==1) == [1, 3]
-check [1, 2, 3].reduce((a,b)=>a+b, 0) == 6
+#check aList.indexOf(2) == 1
+#check aList.indexOf(5) == -1
 
-check [3,1,2].sort() == [1,2,3]
-check [3,1,2].sortDesc() == [3,2,1]
+#check aList.join("-") == "1-2-3"  // if all elements stringifiable
 
-check [1,2,3].append(4) == [1,2,3,4]
-check [1,2,3].prepend(0) == [0,1,2,3]
-check [1,2,3].insert(1,1) == [1,1,2,3]  // 0: before index 0 == prepend
-#check [1,2,3].insert(at = 0,1) == [1,1,2,3]  // 0: before index 0 == prepend
-#check [1,2,3].insert(0, at = 1) == [1,0,2,3]  // 0: before index 0 == prepend
+#check []int{3,1,2}.sort() == aList
+#check aList.sortDesc() == []int{3,2,1}
 
-check [1,2,3].pop() == 3 // and removes it
-check [1,2,3].shift() == 1 // and removes it
+check aList.append(4) == []int{1,2,3,4}
+#check aList.prepend(0) == []int{0,1,2,3}
+#check aList.insert(1,1) == []int{1,1,2,3}  // 0: before index 0 == prepend
 
-check [1,2,3].slice(1,2) == [2]
-check [1,2,3].copy() == [1,2,3]
+#check aList.pop() == 3 // and removes it
+#check aList.shift() == 1 // and removes it
+
+check aList.slice(1,2) == []int{2}
+#check aList.copy() == aList

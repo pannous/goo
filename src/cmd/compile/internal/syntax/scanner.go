@@ -15,6 +15,7 @@ package syntax
 import (
 	"fmt"
 	"io"
+	"os"
 	"unicode"
 	"unicode/utf8"
 )
@@ -395,6 +396,13 @@ func (s *scanner) ident() {
 	lit := s.segment()
 	if len(lit) >= 2 {
 		if tok := keywordMap[hash(lit)]; tok != 0 && tokStrFast(tok) == string(lit) {
+			// Check if this is a transform-only token
+			if (tok == _Class || tok == _Check) && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
+				// Treat as regular identifier when transforms disabled
+				s.tok = _Name
+				s.lit = string(lit)
+				return
+			}
 			s.nlsemi = contains(1<<_Break|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
 			s.tok = tok
 			return
@@ -440,6 +448,14 @@ func (s *scanner) ident() {
 	// special case for 'or' as ||
 	if string(lit) == "or" {
 		s.op, s.prec = OrOr, precOrOr
+		s.tok = _Operator
+		return
+	}
+
+	// special case for 'isa' as type assertion operator
+	if string(lit) == "isa" && os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
+		fmt.Printf("DEBUG: Scanner recognized 'isa' as IS operator\n")
+		s.op, s.prec = IS, precCmp
 		s.tok = _Operator
 		return
 	}

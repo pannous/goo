@@ -1,0 +1,8 @@
+#!/usr/bin/env goo
+func double(x int) int {
+    return x * 2
+}
+
+xs := []int{1, 2, 3}
+ys := xs.map(double) // should return []int{2, 4, 6}
+
