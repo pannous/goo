@@ -1,10 +1,10 @@
-class tee{
-		int x;
-		int y;
-		tee(int x, int y) {
-				this.x = x;
-				this.y = y;
-		}
-		int sum() { return x + y; }
-		void display() { print("x: " + x + ", y: " + y); }
+class Point{
+		x int
+		y int
+		sum() int { return self.x + self.y }
+		display() { print("x: " + self.x + ", y: " + self.y) }
 }
+t := Point{x: 3, y: 4}
+t.display()
+print("Sum: " + t.sum())
+
