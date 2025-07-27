@@ -4,84 +4,84 @@ Goo is an open source programming language that makes it easy to build simple, r
   
 Goo is an up-to-date fork of Go with the following modifications:  
 <!--  
-just like most ugliness in the world appears when you add a five to json(5)   
+just like most ugliness in the world appears when you add a five to json(5)  
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
-✅ truthy/falsey if    
-✅ # comment and shebang support    
-✅ goo file extension    
-✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`    
+✅ truthy/falsey if  
+✅ # comment and shebang support  
+✅ goo file extension  
+✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
-✅ no Main needed   ☐  implicit package main    
+✅ no Main needed   ☐  implicit package main  
 ✅ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)  
 ✅ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?  
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }  
 ✅ z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
 ✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator  
 ✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
-✅ go command default to run => `go test.go` OK
+✅ go command default to run => `go test.go` OK  
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
 ✅ z := map{"a": 1, "b": 2}  => map[any]any{…}  
 ✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}  
-✅ map[active:true age:30 name:Alice]   
+✅ map[active:true age:30 name:Alice]  
 ✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
 ✅ enum Status { OK, BAD } with generated .String() method  
-✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)    
+✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)  
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
 check not x == false =>   falsey(x)  
-✅ declared and not used  make this a warning only (with flag to reenable error)
-✅ String methods "abc".contains("a")
-✅ class via type struct
-✅ imported and not used only warning
-✅ return void, e.g. return print("ok") HARD
-✅ func test() int { 42 } => func test() int { return 42 }  auto return   
-☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)
-☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)
-☐ [1, 2, 3] is []any
-☐ [1, 2, 3] is []int
-☐ if x is int { ... }  => if _, ok := x.(int); ok { }
-☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println       
-☐ import "helper.go"    
-☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`    
-☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?    
-☐ for loops  :      
-☐  for keyword := keywords  => for _, keyword := range keywords { __    
-☐ void(!) as synonym for func, e.g. void main(){} BAD      
-☐ public() -> Public() calls OK // as compiler plugin?    
+✅ declared and not used  make this a warning only (with flag to reenable error)  
+✅ String methods "abc".contains("a")  
+✅ class via type struct  
+✅ imported and not used only warning  
+✅ return void, e.g. return print("ok") HARD  
+✅ func test() int { 42 } => func test() int { return 42 }  auto return  
+☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
+☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
+☐ [1, 2, 3] is []any  
+☐ [1, 2, 3] is []int  
+☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
+☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
+☐ import "helper.go"  
+☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`  
+☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?  
+☐ for loops  :  
+☐  for keyword := keywords  => for _, keyword := range keywords { __  
+☐ void(!) as synonym for func, e.g. void main(){} BAD  
+☐ public() -> Public() calls OK // as compiler plugin?  
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
-    Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.    
-☐ silent/implicit error propagation    
+    Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
+☐ silent/implicit error propagation  
 ☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  
   
 ☐ plugin.Open() is for loading .so files at runtime  
-☐ cross off all done tasks from this list      
-☐ any other pain points you and I might have     
-𐄂 AAA Game Engine Core? Never
-
-
-HARD  
-
-map(x => x * 2)
-filter(x => x % 2 == 1)
-reduce((a, b) => a + b, 0)
-Desugared form (your compiler should expand this):
-map(func(x any) any { return x * 2 })
-If types are known ([]int, etc.), generate func(int) int instead of func(any) any.
-
-
-☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}     
-☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)   
-☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)
-
+☐ cross off all done tasks from this list  
+☐ any other pain points you and I might have  
+𐄂 AAA Game Engine Core? Never  
   
-x := 1
-y := "test"
-myAutoConcat := "The value of x is " x " and the value of y is " y
-myString := fmt.Sprint("The value of x is ", x, " and the value of y is ", y)
-myTemplate := `The value of x is ${x} and the value of y is ${y}!`
-
+  
+HARD  
+  
+map(x => x * 2)  
+filter(x => x % 2 == 1)  
+reduce((a, b) => a + b, 0)  
+Desugared form (your compiler should expand this):  
+map(func(x any) any { return x * 2 })  
+If types are known ([]int, etc.), generate func(int) int instead of func(any) any.  
+  
+  
+☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}  
+☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)  
+☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)  
+  
+  
+x := 1  
+y := "test"  
+myAutoConcat := "The value of x is " x " and the value of y is " y  
+myString := fmt.Sprint("The value of x is ", x, " and the value of y is ", y)  
+myTemplate := `The value of x is ${x} and the value of y is ${y}!`  
+  
   
 ![Gopher image](https://golang.org/doc/gopher/fiveyears.jpg)  
 *Gopher image by Renee French, licensed under Creative Commons 4.0 Attribution license  
@@ -117,18 +117,18 @@ export GOROOT=/usr/local/goo/
 git clone --recursive https://github.com/pannous/goo  
 cd goo/src  
 ./make.bash  
-```
-
+```  
+  
 https://go.dev/doc/install/source for more source installation instructions.  
-
+  
 ### Test new features  
 ```  
-./bin/go run goo/test.goo
-```
-All new features tested in goo [folder](https://github.com/pannous/goo/tree/master/goo)
-
+./bin/go run goo/test.goo  
+```  
+All new features tested in goo [folder](https://github.com/pannous/goo/tree/master/goo)  
+  
 Todo: Web Demo  
-
-<!--
-You can modify CLAUDE.md while the agent is working, it will pick up the changes!! "I see from the updated CLAUDE.md that…"
--->
+  
+<!--  
+You can modify CLAUDE.md while the agent is working, it will pick up the changes!! "I see from the updated CLAUDE.md that…"  
+-->  
