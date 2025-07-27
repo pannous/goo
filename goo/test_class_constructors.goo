@@ -1,0 +1,16 @@
+class Point{
+		x int
+		y int
+		// very nice auto constructor already works! now special constructor methods:
+#		todo other syntax names : new, create, init(x int, y int) ? ALL! ;)
+		// constructor
+		Point(x int) {
+				this.x = x
+				this.y = x
+		}
+		sum() int { return x + y }
+		display() { print("x: " + x + ", y: " + y) }
+}
+t := Point(3, 4)
+t.display()
+print("Sum: " + t.sum())

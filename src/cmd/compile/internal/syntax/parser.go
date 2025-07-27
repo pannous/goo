@@ -12,6 +12,21 @@ import (
 	"strings"
 )
 
+// Global storage for class methods (temporary solution)
+var globalClassMethods = make(map[string][]*FuncDecl)
+
+// storeClassMethods stores methods for a class
+func storeClassMethods(className string, methods []*FuncDecl) {
+	globalClassMethods[className] = methods
+}
+
+// getClassMethods retrieves and clears methods for a class
+func GetClassMethods(className string) []*FuncDecl {
+	methods := globalClassMethods[className]
+	delete(globalClassMethods, className)
+	return methods
+}
+
 const debug = false
 const trace = false
 
@@ -318,6 +333,7 @@ func (p *parser) syntaxError(msg string) { p.syntaxErrorAt(p.pos(), msg) }
 // They are good synchronization points in case of syntax
 // errors and (usually) shouldn't be skipped over.
 const stopset uint64 = 1<<_Break |
+	1<<_Class |
 	1<<_Const |
 	1<<_Continue |
 	1<<_Defer |
@@ -448,6 +464,10 @@ func (p *parser) fileOrNil() *File {
 			p.next()
 			f.DeclList = p.appendGroup(f.DeclList, p.typeDecl)
 
+		case _Class:
+			p.next()
+			f.DeclList = p.appendGroup(f.DeclList, p.classTypeDecl)
+
 		case _Enum:
 			p.next()
 			f.DeclList = p.enumDeclGroup(f.DeclList)
@@ -476,7 +496,7 @@ func (p *parser) fileOrNil() *File {
 			if p.tok == _Lbrace && len(f.DeclList) > 0 && isEmptyFuncDecl(f.DeclList[len(f.DeclList)-1]) {
 				// opening { of function declaration on next line
 				p.syntaxError("unexpected semicolon or newline before {")
-				p.advance(_Import, _Const, _Type, _Var, _Func)
+				p.advance(_Import, _Const, _Class, _Type, _Var, _Func)
 				continue
 			} else {
 				// Parse as a top-level statement for implicit main
@@ -492,7 +512,7 @@ func (p *parser) fileOrNil() *File {
 
 		if p.tok != _EOF && !p.got(_Semi) {
 			p.syntaxError("after top level declaration")
-			p.advance(_Import, _Const, _Type, _Var, _Func)
+			p.advance(_Import, _Const, _Class, _Type, _Var, _Func)
 		}
 	}
 	// p.tok == _EOF
@@ -866,6 +886,110 @@ func (p *parser) enumStmt() *DeclStmt {
 
 	return s
 }
+
+func (p *parser) classTypeDecl(group *Group) Decl {
+	if trace {
+		defer p.trace("classTypeDecl")()
+	}
+
+	pos := p.pos()
+	// Don't consume _Class here - it's already consumed by declStmt
+	className := p.name()
+	
+
+	// Create struct type using existing parser logic
+	structType := new(StructType)
+	structType.pos = pos
+
+	p.want(_Lbrace)
+	
+	var classMethods []*FuncDecl
+	
+	p.list("class body", _Semi, _Rbrace, func() bool {
+		if p.tok == _Name {
+			// Save the name for potential method parsing
+			name := p.lit
+			pos := p.pos()
+			p.next() // consume name
+			
+			if p.tok == _Lparen {
+				// This is a method: name(...) returnType { body }
+				
+				// Parse the method without using classMethodDecl initially
+				// Parse function type (we're already at the '(')
+				_, funcType := p.funcType("class method")
+				
+				// Parse method body
+				body := p.blockStmt("function body")
+				
+				// Create receiver for the method  
+				receiverName := &Name{Value: "self"}
+				receiverName.SetPos(pos)
+				
+				receiver := &Field{
+					Name: receiverName,
+					Type: className,
+				}
+				receiver.SetPos(pos)
+				
+				// Create method name
+				methodName := &Name{Value: name}
+				methodName.SetPos(pos)
+				
+				// Create method declaration
+				method := &FuncDecl{
+					Recv: receiver,
+					Name: methodName,
+					Type: funcType,
+					Body: body,
+				}
+				method.SetPos(pos)
+				
+				classMethods = append(classMethods, method)
+			} else {
+				// This is a field: name type
+				
+				// We already consumed the name, now parse the type
+				fieldType := p.type_()
+				
+				// Create field
+				field := &Field{
+					Name: &Name{Value: name},
+					Type: fieldType,
+				}
+				field.SetPos(pos)
+				field.Name.SetPos(pos)
+				
+				structType.FieldList = append(structType.FieldList, field)
+			}
+		} else {
+			// Other cases (embedded types, etc.)
+			p.fieldDecl(structType)
+		}
+		return false
+	})
+
+	// Create type declaration: type ClassName struct { ... }
+	typeDecl := &TypeDecl{
+		Name: className,
+		Type: structType,
+		Group: group,
+	}
+	typeDecl.SetPos(pos)
+	
+	// Mark this as a class-generated type for the transform to detect
+	typeDecl.Alias = true // Repurpose this field as a class marker
+	
+	// Store class methods for the transform to add to the file
+	if len(classMethods) > 0 {
+		// Store the methods in a way the transform can access them
+		// We'll use a global variable for now (not ideal but works)
+		storeClassMethods(className.Value, classMethods)
+	}
+	
+	return typeDecl
+}
+
 
 // createEnumNameMap creates var EnumName_names = map[EnumName]string{0:"OK", 1:"BAD"}
 func (p *parser) createEnumNameMap(pos Pos, enumName *Name, enumValues []*Name) *VarDecl {
@@ -3247,6 +3371,9 @@ func (p *parser) stmtOrNil() Stmt {
 
 	case _Type:
 		return p.declStmt(p.typeDecl)
+
+	case _Class:
+		return p.declStmt(p.classTypeDecl)
 
 	case _Enum:
 		return p.enumStmt()

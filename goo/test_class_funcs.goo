@@ -1,0 +1,20 @@
+package main
+
+class Point {
+    x int
+    y int
+}
+
+func (p Point) sum() int {
+    return p.x + p.y
+}
+
+func (p Point) display() {
+    printf("x: %d, y: %d\n", p.x, p.y)
+}
+
+func main() {
+    t := Point{x: 3, y: 4}
+    t.display()
+    printf("Sum: %d\n", t.sum())
+}
