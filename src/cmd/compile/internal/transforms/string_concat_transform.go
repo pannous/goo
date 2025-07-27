@@ -321,18 +321,6 @@ func (t *StringConcatTransform) hasImport(file *syntax.File, name string) bool {
 	return false
 }
 
-// Register the transformer during package initialization
-var msg_shown = false
-
 func init() {
-	//do_register := false
-	do_register := true
-	//do_register := !msg_shown // Only register if not already shown
-	if do_register {
-		println("Registering string concat transformer!") // reactivate this when //go:build transforms is there
-		RegisterTransformer(&StringConcatTransform{})     // per context?
-	} else {
-		//println("NOT Registering string concat transformer")
-	}
-	msg_shown = true
+	RegisterTransformer(&StringConcatTransform{}) // per context?
 }

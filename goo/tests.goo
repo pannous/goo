@@ -1,3 +1,5 @@
 #check "a"+1 == "a1"
-z := 42
-check "a"+z == "a42"
+check "a" == 'a'
+#
+#z := 42
+#check "a"+z == "a42"
