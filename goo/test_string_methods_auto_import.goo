@@ -1,0 +1,66 @@
+import "strings" // todo auto on demand
+import "fmt" // todo auto on demand
+#import "unicode" // todo auto on demand
+#import "strconv" // for string conversion
+#import "string_tools" // for string manipulation utilities  'cannot find package' <WHICH?>c TODO
+
+
+
+check "a"+"1" == "a1"
+check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)
+#check "hi".reverse() == "ih"
+check "hi".first() == "h"
+check "hi".last() == "i"
+check "hi".size() == 2
+check "hi".length() == 2
+#check "hello".isEmpty() == false  use falsy
+
+#check "hi".contains("h") == true
+#check "hi".contains("x") == false
+#check "hi".indexOf("h") == 0
+#check "hi".indexOf("x") == -1
+#check "hi".indexOf("i") == 1
+check "hi"[1:] == "i" // index -1 (constant of type int) must not be negative
+#check "hi".from(1) == "i"
+#check "hi".to(1) == "h"
+#check "hello".sub(1,3) == "el" // sub(start, end) is inclusive of start and exclusive of end
+#check "hello".replace("l", "x") == "hexxo"
+#check "hello".reverse() == "olleh"
+check "hello".toUpper() == "HELLO"
+check "hello".toLower() == "hello"
+check "hello".upper() == "HELLO" // toUpper is an alias for upper, show 💡
+check "hello".lower() == "hello"
+check "hello".upperCase() == "HELLO"
+check "hello".lowerCase() == "hello"
+check "hello".capitalize() == "Hello"
+check "hello".title() == "Hello"
+check "hello".trim() == "hello"
+check " hello ".trim() == "hello"
+check " hello ".trim() == "hello"
+
+#check "hellø".runes() == ['h', 'e', 'l', 'l', 'ø'] // invalid use of [...] array (outside a composite literal)
+#check "hello".join("-") == "h-e-l-l-o"
+#check "hello".join("") == "hello"
+#check "hello".startsWith("he") == true
+#check "hello".startsWith("lo") == false
+#check "hello".endsWith("lo") == true
+#check "hello".endsWith("he") == false
+#print("hello".split(""))
+#check "hello".split("l") == ["he", "", "o"]
+#check "hello".split("l") == ["he", "", "o"]
+#check "hello".split("") == ["h", "e", "l", "l", "o"]
+#check "hello".splits() == ["h", "e", "l", "l", "o"]
+#return
+#exit(0) // todo: remove this, just for testing
+// todo:
+#check "42".toInt() == 42
+#check "42".toInt(10) == 42
+#check "42".toInt(16) == 66 // 42 in hex is
+#check "42".toInt(2) == 0 // 42 in binary is 101010, which is not a valid binary number
+#check "101010".toInt(2) == 42 // 101010 in binary is 42
+#check "42".toFloat() == 42.0
+#check "42.5".toFloat() == 42.5
+#check "a" == 'a'
+
+
+printf("All checks passed!\n")
