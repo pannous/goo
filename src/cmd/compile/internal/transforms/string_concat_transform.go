@@ -31,7 +31,7 @@ func (t *StringConcatTransform) Name() string {
 }
 
 func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	println("StringConcatTransform.Transform called")
+	println("*** CUSTOM_COMPILER_BUILD_VERIFICATION_2025_07_27 ***")
 
 	// Single pass: walk the entire AST once using syntax.Walk
 	visitor := &concatVisitor{transform: t, ctx: ctx}
@@ -50,6 +50,26 @@ func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformConte
 func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if node == nil {
 		return nil
+	}
+
+	// Check for string interpolation patterns in expressions
+	if expr, ok := node.(*syntax.ExprStmt); ok {
+		if transformed := v.transform.transformStringInterpolation(expr.X, v.ctx); transformed != nil {
+			println("TRANSFORMING INTERPOLATION:", syntax.String(expr.X), "->", syntax.String(transformed))
+			expr.X = transformed
+			v.changed = true
+			v.needsFmtImport = true
+		}
+	}
+
+	// Check for string interpolation in assignments
+	if assign, ok := node.(*syntax.AssignStmt); ok && assign.Rhs != nil {
+		if transformed := v.transform.transformStringInterpolation(assign.Rhs, v.ctx); transformed != nil {
+			println("TRANSFORMING ASSIGNMENT INTERPOLATION:", syntax.String(assign.Rhs), "->", syntax.String(transformed))
+			assign.Rhs = transformed
+			v.changed = true
+			v.needsFmtImport = true
+		}
 	}
 
 	// Check for string concatenation operations
@@ -101,6 +121,96 @@ func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, c
 	}
 
 	return nil
+}
+
+// transformStringInterpolation handles string interpolation patterns like "str" value "str"
+// and transforms them to "str" + fmt.Sprintf("%v", value) + "str"
+func (t *StringConcatTransform) transformStringInterpolation(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
+	// Look for operations that could be string interpolation
+	if op, ok := expr.(*syntax.Operation); ok {
+		// Check if this looks like string interpolation (consecutive operations)
+		parts := t.extractInterpolationParts(op)
+		if len(parts) >= 3 && t.isStringInterpolationPattern(parts, ctx) {
+			println("Found string interpolation pattern with", len(parts), "parts")
+			return t.buildInterpolationChain(parts, ctx)
+		}
+	}
+	return nil
+}
+
+// extractInterpolationParts extracts all consecutive parts from nested operations
+func (t *StringConcatTransform) extractInterpolationParts(expr syntax.Expr) []syntax.Expr {
+	var parts []syntax.Expr
+	
+	// Handle nested operations by flattening them
+	var flatten func(syntax.Expr)
+	flatten = func(e syntax.Expr) {
+		if op, ok := e.(*syntax.Operation); ok && op.Op == syntax.Add {
+			// For operations, process left and right recursively
+			flatten(op.X)
+			flatten(op.Y)
+		} else {
+			// For non-operations, add as a part
+			parts = append(parts, e)
+		}
+	}
+	
+	flatten(expr)
+	return parts
+}
+
+// isStringInterpolationPattern checks if the parts form a valid string interpolation pattern
+func (t *StringConcatTransform) isStringInterpolationPattern(parts []syntax.Expr, ctx *TransformContext) bool {
+	if len(parts) < 3 {
+		return false
+	}
+	
+	// Check if pattern alternates: string, non-string, string, ...
+	// or starts with string: string, non-string, string
+	for i, part := range parts {
+		isString := t.isStringExpression(part, ctx)
+		if i%2 == 0 {
+			// Even positions should be strings (0, 2, 4, ...)
+			if !isString {
+				return false
+			}
+		} else {
+			// Odd positions should be non-strings (1, 3, 5, ...)
+			if isString {
+				return false
+			}
+		}
+	}
+	
+	return true
+}
+
+// buildInterpolationChain builds a chain of + operations with fmt.Sprintf calls
+func (t *StringConcatTransform) buildInterpolationChain(parts []syntax.Expr, ctx *TransformContext) syntax.Expr {
+	if len(parts) == 0 {
+		return nil
+	}
+	
+	var result syntax.Expr = parts[0]
+	
+	for i := 1; i < len(parts); i++ {
+		var rightSide syntax.Expr
+		
+		// If this is a non-string part, wrap it with fmt.Sprintf
+		if !t.isStringExpression(parts[i], ctx) {
+			rightSide = t.createSprintfCall(parts[i])
+		} else {
+			rightSide = parts[i]
+		}
+		
+		result = &syntax.Operation{
+			Op: syntax.Add,
+			X:  result,
+			Y:  rightSide,
+		}
+	}
+	
+	return result
 }
 
 // isStringLiteral returns true if the expression is a string literal.
@@ -324,3 +434,4 @@ func (t *StringConcatTransform) hasImport(file *syntax.File, name string) bool {
 func init() {
 	RegisterTransformer(&StringConcatTransform{}) // per context?
 }
+// Test comment Sun Jul 27 11:43:35 CEST 2025

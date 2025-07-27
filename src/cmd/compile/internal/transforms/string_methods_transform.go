@@ -226,8 +226,6 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 
 func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	println("StringMethodsTransform.Transform called")
-	// Temporarily disabled - just return false without doing any transformation
-	return false
 
 	visitor := &methodVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
