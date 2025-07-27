@@ -5,5 +5,6 @@ GODEBUG=keepwork=1
 GOCACHE=/tmp/go-cache
 GOOS=darwin
 GOARCH=arm64
+cd /opt/other/go/src/
 go build -tags=transforms -o ../bin/compile ./cmd/compile
 cp ../bin/compile ../pkg/tool/darwin_arm64/compile
