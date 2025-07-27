@@ -1301,3 +1301,31 @@ func CutPrefix(s, prefix string) (after string, found bool) {
 func CutSuffix(s, suffix string) (before string, found bool) {
 	return stringslite.CutSuffix(s, suffix)
 }
+
+// Substring returns a substring of s from start (inclusive) to end (exclusive).
+// It properly handles Unicode runes, not just bytes.
+func Substring(s string, start, end int) string {
+	i, j := 0, 0
+	for idx := range s {
+		if i == start {
+			j = idx
+		}
+		if i == end {
+			return s[j:idx]
+		}
+		i++
+	}
+	if i == end {
+		return s[j:]
+	}
+	return ""
+}
+
+// ReverseString returns a string with its Unicode runes in reverse order.
+func ReverseString(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+}

@@ -48,7 +48,7 @@ func ApplyTransformations(files []*syntax.File) {
 		for _, transformer := range TransformRegistry {
 			transformer.Transform(file, ctx)
 			{
-				fmt.Printf("!!Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+				fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			}
 		}
 	}
@@ -259,7 +259,7 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 			if !ok1 {
 				continue
 			}
-			
+
 			// Handle literal assignments
 			if rhsLit, ok2 := rhsElems[i].(*syntax.BasicLit); ok2 {
 				switch rhsLit.Kind {
@@ -277,7 +277,7 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 					ctx.Types[lhs.Value] = "unknown"
 				}
 			}
-			
+
 			// Handle boolean names (true/false)
 			if rhsName, ok2 := rhsElems[i].(*syntax.Name); ok2 {
 				if rhsName.Value == "true" || rhsName.Value == "false" {

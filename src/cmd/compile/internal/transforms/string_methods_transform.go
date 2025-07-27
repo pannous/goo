@@ -13,12 +13,12 @@ import (
 type StringMethodsTransform struct{}
 
 type methodVisitor struct {
-	transform           *StringMethodsTransform
-	ctx                 *TransformContext
-	changed             bool
-	needsStringsImport  bool
-	needsStrconvImport  bool
-	needsUnicodeImport  bool
+	transform          *StringMethodsTransform
+	ctx                *TransformContext
+	changed            bool
+	needsStringsImport bool
+	needsStrconvImport bool
+	needsUnicodeImport bool
 }
 
 func (t *StringMethodsTransform) Name() string {
@@ -35,7 +35,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createFirstCall(receiver)
 	case "last":
 		return t.createLastCall(receiver)
-	case "size", "length", "len": 
+	case "size", "length", "len":
 		return t.createLenCall(receiver)
 	case "count":
 		if len(args) == 1 {
@@ -44,7 +44,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createLenCall(receiver) // count() with no args = length
 	case "isEmpty":
 		return t.createIsEmptyCall(receiver)
-		
+
 	// Search methods
 	case "contains", "includes":
 		if len(args) == 1 {
@@ -58,7 +58,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createLastIndexCall(receiver, args[0])
 		}
-		
+
 	// Substring methods
 	case "from":
 		if len(args) == 1 {
@@ -72,7 +72,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 2 {
 			return t.createSubCall(receiver, args[0], args[1])
 		}
-		
+
 	// Replace methods
 	case "replace", "replaceAll":
 		if len(args) == 2 {
@@ -82,7 +82,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 2 {
 			return t.createReplaceFirstCall(receiver, args[0], args[1])
 		}
-		
+
 	// Case conversion
 	case "toUpper", "upper", "upperCase", "toUpperCase":
 		return t.createToUpperCall(receiver)
@@ -92,7 +92,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createCapitalizeCall(receiver)
 	case "swapCase":
 		return t.createSwapCaseCall(receiver)
-		
+
 	// Trim methods
 	case "trim", "strip":
 		return t.createTrimCall(receiver)
@@ -100,7 +100,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createTrimLeftCall(receiver)
 	case "trimRight", "rstrip", "trimEnd":
 		return t.createTrimRightCall(receiver)
-		
+
 	// Split/Join methods
 	case "split":
 		if len(args) == 1 {
@@ -118,7 +118,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createJoinCall(receiver, args[0])
 		}
-		
+
 	// Prefix/Suffix methods
 	case "startsWith", "beginsWith":
 		if len(args) == 1 {
@@ -136,7 +136,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createRemoveSuffixCall(receiver, args[0])
 		}
-		
+
 	// Padding methods
 	case "center":
 		if len(args) >= 1 {
@@ -166,7 +166,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createZfillCall(receiver, args[0])
 		}
-		
+
 	// Character type checking
 	case "isAlpha":
 		return t.createIsAlphaCall(receiver)
@@ -182,7 +182,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createIsSpaceCall(receiver)
 	case "isPrintable":
 		return t.createIsPrintableCall(receiver)
-		
+
 	// Type conversion
 	case "toInt", "parseInt":
 		if len(args) == 0 {
@@ -194,13 +194,13 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createToFloatCall(receiver)
 	case "toBool", "parseBool":
 		return t.createToBoolCall(receiver)
-		
+
 	// Repetition
 	case "repeat", "times":
 		if len(args) == 1 {
 			return t.createRepeatCall(receiver, args[0])
 		}
-		
+
 	// Format methods (these need runtime implementation)
 	case "format":
 		return t.createCompilerError(receiver, "format", "string formatting with placeholders")
@@ -217,7 +217,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 	case "rpartition":
 		return t.createCompilerError(receiver, "rpartition", "reverse string partitioning")
 	}
-	
+
 	// If we reach here, method is not recognized at all
 	return t.createCompilerError(receiver, methodName, "unknown string method")
 }
@@ -271,7 +271,7 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 					// Track required imports based on method name
 					stringsMethods := []string{
 						"contains", "includes", "indexOf", "find", "lastIndexOf", "rfind",
-						"replace", "replaceAll", "replaceFirst", 
+						"replace", "replaceAll", "replaceFirst",
 						"toUpper", "upper", "upperCase", "toUpperCase",
 						"toLower", "lower", "lowerCase", "toLowerCase",
 						"capitalize", "title", "toTitle",
@@ -280,6 +280,7 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 						"split", "splits", "chars", "lines", "words", "join",
 						"startsWith", "beginsWith", "endsWith",
 						"removePrefix", "removeSuffix", "repeat", "times",
+						"reverse", "sub", "substring", "slice",
 					}
 					unicodeMethods := []string{
 						"isAlpha", "isDigit", "isNumeric", "isAlphaNumeric", "isAlnum",
@@ -288,7 +289,7 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 					strconvMethods := []string{
 						"toInt", "parseInt", "toFloat", "parseFloat", "toBool", "parseBool",
 					}
-					
+
 					for _, method := range stringsMethods {
 						if method == methodName {
 							v.needsStringsImport = true
@@ -314,12 +315,13 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// createReverseCall creates a function to reverse a string
+// createReverseCall creates strings.ReverseString(receiver)
 func (t *StringMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Expr {
-	// For now, create a simple inline reverse using range and string concatenation
-	// This would need a proper reverse function in practice
 	return &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "reverseString"},
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "ReverseString"},
+		},
 		ArgList: []syntax.Expr{receiver},
 	}
 }
@@ -404,11 +406,14 @@ func (t *StringMethodsTransform) createToCall(receiver, arg syntax.Expr) syntax.
 	}
 }
 
-// createSubCall creates receiver[start:end] for substring with start and end
+// createSubCall creates strings.Substring(receiver, start, end)
 func (t *StringMethodsTransform) createSubCall(receiver, start, end syntax.Expr) syntax.Expr {
-	return &syntax.SliceExpr{
-		X:     receiver,
-		Index: [3]syntax.Expr{start, end, nil},
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Substring"},
+		},
+		ArgList: []syntax.Expr{receiver, start, end},
 	}
 }
 
@@ -476,6 +481,7 @@ func (t *StringMethodsTransform) hasImport(file *syntax.File, name string) bool 
 
 // handleSliceTransformation converts a SliceExpr back to a CallExpr for the visitor pattern
 func (t *StringMethodsTransform) handleSliceTransformation(call *syntax.CallExpr, slice *syntax.SliceExpr) {
+	println("JUST USE INDEX for substring operations \"hello\"[1:3] -> \"hello\".substring(1, 3)")
 	// Convert slice operations to function calls that can work within the visitor pattern
 	// This is a workaround since we can't easily replace nodes in the visitor
 
@@ -483,12 +489,12 @@ func (t *StringMethodsTransform) handleSliceTransformation(call *syntax.CallExpr
 	// In a real implementation, you'd want to add these helpers to a runtime package
 	if slice.Index[0] != nil && slice.Index[1] == nil {
 		// from(string, index)
-		call.Fun = &syntax.Name{Value: "substringFrom"}
-		call.ArgList = []syntax.Expr{slice.X, slice.Index[0]}
+		call.Fun = &syntax.Name{Value: "substring"}
+		call.ArgList = []syntax.Expr{slice.X, slice.Index[0], &syntax.BasicLit{Kind: syntax.IntLit, Value: "-1"}}
 	} else if slice.Index[0] == nil && slice.Index[1] != nil {
 		// to(string, index)
-		call.Fun = &syntax.Name{Value: "substringTo"}
-		call.ArgList = []syntax.Expr{slice.X, slice.Index[1]}
+		call.Fun = &syntax.Name{Value: "substring"}
+		call.ArgList = []syntax.Expr{slice.X, &syntax.BasicLit{Kind: syntax.IntLit, Value: "-1"}, slice.Index[1]}
 	} else if slice.Index[0] != nil && slice.Index[1] != nil {
 		// sub(string, start, end)
 		call.Fun = &syntax.Name{Value: "substring"}
@@ -622,7 +628,7 @@ func (t *StringMethodsTransform) createEndsWithCall(receiver, suffix syntax.Expr
 	}
 }
 
-// createToIntCall creates helper function call for string to int conversion  
+// createToIntCall creates helper function call for string to int conversion
 func (t *StringMethodsTransform) createToIntCall(receiver syntax.Expr, base syntax.Expr) syntax.Expr {
 	if base == nil {
 		// Call runtime helper: stringToInt(receiver)
@@ -892,7 +898,7 @@ func (t *StringMethodsTransform) createIsPrintableCall(receiver syntax.Expr) syn
 
 // createToBoolCall creates helper function call for string to bool conversion
 func (t *StringMethodsTransform) createToBoolCall(receiver syntax.Expr) syntax.Expr {
-	// Call runtime helper: stringToBool(receiver)  
+	// Call runtime helper: stringToBool(receiver)
 	return &syntax.CallExpr{
 		Fun:     &syntax.Name{Value: "stringToBool"},
 		ArgList: []syntax.Expr{receiver},
