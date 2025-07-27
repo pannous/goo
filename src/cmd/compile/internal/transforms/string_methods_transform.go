@@ -622,44 +622,29 @@ func (t *StringMethodsTransform) createEndsWithCall(receiver, suffix syntax.Expr
 	}
 }
 
-// createToIntCall creates strconv.Atoi(receiver) or strconv.ParseInt(receiver, base, 64)
+// createToIntCall creates helper function call for string to int conversion  
 func (t *StringMethodsTransform) createToIntCall(receiver syntax.Expr, base syntax.Expr) syntax.Expr {
 	if base == nil {
-		// Default base 10
+		// Call runtime helper: stringToInt(receiver)
 		return &syntax.CallExpr{
-			Fun: &syntax.SelectorExpr{
-				X:   &syntax.Name{Value: "strconv"},
-				Sel: &syntax.Name{Value: "Atoi"},
-			},
+			Fun:     &syntax.Name{Value: "stringToInt"},
 			ArgList: []syntax.Expr{receiver},
 		}
 	} else {
-		// With custom base
+		// Call runtime helper: stringToIntBase(receiver, base)
 		return &syntax.CallExpr{
-			Fun: &syntax.SelectorExpr{
-				X:   &syntax.Name{Value: "strconv"},
-				Sel: &syntax.Name{Value: "ParseInt"},
-			},
-			ArgList: []syntax.Expr{
-				receiver,
-				base,
-				&syntax.BasicLit{Kind: syntax.IntLit, Value: "64"},
-			},
+			Fun:     &syntax.Name{Value: "stringToIntBase"},
+			ArgList: []syntax.Expr{receiver, base},
 		}
 	}
 }
 
-// createToFloatCall creates strconv.ParseFloat(receiver, 64)
+// createToFloatCall creates helper function call for string to float conversion
 func (t *StringMethodsTransform) createToFloatCall(receiver syntax.Expr) syntax.Expr {
+	// Call runtime helper: stringToFloat(receiver)
 	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strconv"},
-			Sel: &syntax.Name{Value: "ParseFloat"},
-		},
-		ArgList: []syntax.Expr{
-			receiver,
-			&syntax.BasicLit{Kind: syntax.IntLit, Value: "64"},
-		},
+		Fun:     &syntax.Name{Value: "stringToFloat"},
+		ArgList: []syntax.Expr{receiver},
 	}
 }
 
@@ -905,13 +890,11 @@ func (t *StringMethodsTransform) createIsPrintableCall(receiver syntax.Expr) syn
 	return t.createCompilerError(receiver, "isPrintable", "unicode_printable_check")
 }
 
-// createToBoolCall creates strconv.ParseBool(receiver)
+// createToBoolCall creates helper function call for string to bool conversion
 func (t *StringMethodsTransform) createToBoolCall(receiver syntax.Expr) syntax.Expr {
+	// Call runtime helper: stringToBool(receiver)  
 	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strconv"},
-			Sel: &syntax.Name{Value: "ParseBool"},
-		},
+		Fun:     &syntax.Name{Value: "stringToBool"},
 		ArgList: []syntax.Expr{receiver},
 	}
 }
