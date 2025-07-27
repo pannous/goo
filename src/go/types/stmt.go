@@ -780,7 +780,7 @@ func (checks *Checker) stmt(ctxt stmtContext, s ast.Stmt) {
 				checks.usedVars[v] = true // avoid usage error when checking entire function
 			}
 			if !used {
-				checks.softErrorf(lhs, UnusedVar, "%s declared and not used", lhs.Name)
+				checks.warningf(lhs, UnusedVar, "%s declared and not used", lhs.Name)
 			}
 		}
 

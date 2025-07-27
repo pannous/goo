@@ -149,11 +149,11 @@ func ResNclose(state *ResState) {
 //go:cgo_import_dynamic libresolv_res_9_nsearch res_9_nsearch "/usr/lib/libresolv.9.dylib"
 func libresolv_res_9_nsearch_trampoline()
 
-func ResNsearch(state *ResState, dname *byte, class, typ int, ans *byte, anslen int) (int, error) {
+func ResNsearch(state *ResState, dname *byte, classe, typ int, ans *byte, anslen int) (int, error) {
 	r1, _, errno := syscall_syscall6(abi.FuncPCABI0(libresolv_res_9_nsearch_trampoline),
 		uintptr(unsafe.Pointer(state)),
 		uintptr(unsafe.Pointer(dname)),
-		uintptr(class),
+		uintptr(classe),
 		uintptr(typ),
 		uintptr(unsafe.Pointer(ans)),
 		uintptr(anslen))

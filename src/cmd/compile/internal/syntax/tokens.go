@@ -10,7 +10,6 @@ type Token uint
 
 type token = Token
 
-
 const (
 	_    token = iota
 	_EOF       // EOF
@@ -48,7 +47,6 @@ const (
 	_Case        // case
 	_Chan        // chan
 	_Check       // check
-	_Class       // class
 	_Const       // const
 	_Enum        // enum
 	_Continue    // continue
@@ -72,6 +70,7 @@ const (
 	_Switch      // switch
 	_Type        // type
 	_Var         // var
+	_Class       // class
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -103,17 +102,17 @@ func contains(tokset uint64, tok token) bool {
 var TokenNames = [...]string{
 	0:            "", // unused (token 0)
 	_EOF:         "EOF",
-	_Name:        "name", 
+	_Name:        "name",
 	_Literal:     "literal",
 	_Operator:    "op",
 	_AssignOp:    "op=",
-	_IncOp:       "opop", 
+	_IncOp:       "opop",
 	_Assign:      "=",
 	_Define:      ":=",
 	_Arrow:       "<-",
 	_Star:        "*",
 	_Lparen:      "(",
-	_Lbrack:      "[", 
+	_Lbrack:      "[",
 	_Lbrace:      "{",
 	_Rparen:      ")",
 	_Rbrack:      "]",
@@ -127,7 +126,6 @@ var TokenNames = [...]string{
 	_Case:        "case",
 	_Chan:        "chan",
 	_Check:       "check",
-	_Class:       "class",
 	_Const:       "const",
 	_Enum:        "enum",
 	_Continue:    "continue",
@@ -151,6 +149,7 @@ var TokenNames = [...]string{
 	_Switch:      "switch",
 	_Type:        "type",
 	_Var:         "var",
+	_Class:       "class",
 }
 
 // String returns the string representation of the token.
@@ -207,6 +206,7 @@ const (
 	AndNot // &^
 	Shl    // <<
 	Shr    // >>
+	IS     // isa
 )
 
 // OperatorNames provides string representations for Operator constants, replacing stringer-generated operator_string.go
@@ -235,6 +235,7 @@ var OperatorNames = [...]string{
 	AndNot: "&^",
 	Shl:    "<<",
 	Shr:    ">>",
+	IS:     "isa",
 }
 
 // String returns the string representation of the Operator.

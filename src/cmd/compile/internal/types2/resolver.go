@@ -737,9 +737,9 @@ func (checks *Checker) errorUnusedPkg(obj *PkgName) {
 		elem = elem[i+1:]
 	}
 	if obj.name == "" || obj.name == "." || obj.name == elem {
-		checks.softErrorf(obj, UnusedImport, "%q imported and not used", path)
+		checks.warningf(obj, UnusedImport, "%q imported and not used", path)
 	} else {
-		checks.softErrorf(obj, UnusedImport, "%q imported as %s and not used", path, obj.name)
+		checks.warningf(obj, UnusedImport, "%q imported as %s and not used", path, obj.name)
 	}
 }
 

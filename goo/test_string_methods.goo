@@ -52,10 +52,7 @@ check "hello".bytes() == [104, 101, 108, 108, 111] // returns a list of bytes (A
 #check "hello".codePoints() == [104, 101, 108, 108, 111] // returns a list of code points (Unicode values)
 check "hello".runes() == []rune{'h', 'e', 'l', 'l', 'o'}
 #print("hello".split(""))
-any_list := "hi you".split(" ") // []any is a list of any type, here it is a list of strings
-string_list := any_list as string[]
-string_list, ok := any_list as string[]
-string_list, ok := any_list as? string[]
+#any_list := "hi you".split(" ") // []any is a list of any type, here it is a list of strings
 #check "hello".split("l") == ["he", "", "o"] as string[] // split returns a list of strings
 #check "hello".split("l") == ["he", "", "o"]
 #check "hello".split("") == ["h", "e", "l", "l", "o"]

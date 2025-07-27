@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"go/build/constraint"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -130,6 +131,17 @@ func (p *parser) clearPragma() {
 		p.pragh(p.pos(), p.scanner.blank, "", p.pragma)
 		p.pragma = nil
 	}
+}
+
+// transformsEnabled checks if transforms should be enabled for this file
+func (p *parser) transformsEnabled() bool {
+	// Check environment variable
+	if os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
+		return true
+	}
+	// Check file extension (might be lost due to -trimpath)
+	filename := p.file.Filename()
+	return strings.HasSuffix(filename, ".goo")
 }
 
 // updateBase sets the current position base to a new line base at pos.
@@ -895,47 +907,46 @@ func (p *parser) classTypeDecl(group *Group) Decl {
 	pos := p.pos()
 	// Don't consume _Class here - it's already consumed by declStmt
 	className := p.name()
-	
 
 	// Create struct type using existing parser logic
 	structType := new(StructType)
 	structType.pos = pos
 
 	p.want(_Lbrace)
-	
+
 	var classMethods []*FuncDecl
-	
+
 	p.list("class body", _Semi, _Rbrace, func() bool {
 		if p.tok == _Name {
 			// Save the name for potential method parsing
 			name := p.lit
 			pos := p.pos()
 			p.next() // consume name
-			
+
 			if p.tok == _Lparen {
 				// This is a method: name(...) returnType { body }
-				
+
 				// Parse the method without using classMethodDecl initially
 				// Parse function type (we're already at the '(')
 				_, funcType := p.funcType("class method")
-				
+
 				// Parse method body
 				body := p.blockStmt("function body")
-				
-				// Create receiver for the method  
+
+				// Create receiver for the method
 				receiverName := &Name{Value: "self"}
 				receiverName.SetPos(pos)
-				
+
 				receiver := &Field{
 					Name: receiverName,
 					Type: className,
 				}
 				receiver.SetPos(pos)
-				
+
 				// Create method name
 				methodName := &Name{Value: name}
 				methodName.SetPos(pos)
-				
+
 				// Create method declaration
 				method := &FuncDecl{
 					Recv: receiver,
@@ -944,14 +955,14 @@ func (p *parser) classTypeDecl(group *Group) Decl {
 					Body: body,
 				}
 				method.SetPos(pos)
-				
+
 				classMethods = append(classMethods, method)
 			} else {
 				// This is a field: name type
-				
+
 				// We already consumed the name, now parse the type
 				fieldType := p.type_()
-				
+
 				// Create field
 				field := &Field{
 					Name: &Name{Value: name},
@@ -959,7 +970,7 @@ func (p *parser) classTypeDecl(group *Group) Decl {
 				}
 				field.SetPos(pos)
 				field.Name.SetPos(pos)
-				
+
 				structType.FieldList = append(structType.FieldList, field)
 			}
 		} else {
@@ -971,25 +982,24 @@ func (p *parser) classTypeDecl(group *Group) Decl {
 
 	// Create type declaration: type ClassName struct { ... }
 	typeDecl := &TypeDecl{
-		Name: className,
-		Type: structType,
+		Name:  className,
+		Type:  structType,
 		Group: group,
 	}
 	typeDecl.SetPos(pos)
-	
+
 	// Mark this as a class-generated type for the transform to detect
 	typeDecl.Alias = true // Repurpose this field as a class marker
-	
+
 	// Store class methods for the transform to add to the file
 	if len(classMethods) > 0 {
 		// Store the methods in a way the transform can access them
 		// We'll use a global variable for now (not ideal but works)
 		storeClassMethods(className.Value, classMethods)
 	}
-	
+
 	return typeDecl
 }
-
 
 // createEnumNameMap creates var EnumName_names = map[EnumName]string{0:"OK", 1:"BAD"}
 func (p *parser) createEnumNameMap(pos Pos, enumName *Name, enumValues []*Name) *VarDecl {
@@ -1297,7 +1307,17 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 		tprec := p.prec
 		p.next()
 		t.X = x
-		t.Y = p.binaryExpr(nil, tprec)
+		
+		// Special handling for 'isa' operator - right side should be a type
+		if p.transformsEnabled() && t.Op == IS {
+			// Debug output
+			if debug {
+				fmt.Printf("DEBUG: Parsing isa operator with type on right side\n")
+			}
+			t.Y = p.type_()
+		} else {
+			t.Y = p.binaryExpr(nil, tprec)
+		}
 		x = t
 	}
 	return x
@@ -1589,7 +1609,7 @@ loop:
 
 			case _Lparen:
 				p.next()
-				if p.got(_Type) {
+				if p.got(_Type) { // pexpr '.' (Type)  e.g.  x.(int)
 					t := new(TypeSwitchGuard)
 					// t.Lhs is filled in by parser.simpleStmt
 					t.pos = pos

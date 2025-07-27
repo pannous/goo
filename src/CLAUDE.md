@@ -100,9 +100,10 @@ For some reason modification in typecheck.go are mostly problematic so try other
 ALWAYS RUN tests before doing any changes!
 To check the current status and that everthing is (should be) OK.
 
-NEVER modify existing tests!!
-If you need a different test create one in the folder ./probes/ 
-but consolidate all newly created tests later.
+NEVER modify existing tests!
+INSTEAD of touching tests in goo, create new tests in the probes folder
+Do not remove tests that are not passing instead leave them there for later fixing.
+
 
 Do not re-create tests for what is already working, if this is already tested elsewhere.
 

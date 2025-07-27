@@ -844,7 +844,8 @@ func (checks *Checker) typeSwitchStmt(inner stmtContext, s *syntax.SwitchStmt, g
 			checks.usedVars[v] = true // avoid usage error when checking entire function
 		}
 		if !used {
-			checks.softErrorf(lhs, UnusedVar, "%s declared and not used", lhs.Value)
+			//checks.softErrorf(lhs, UnusedVar, "%s declared and not used", lhs.Value)
+			checks.warningf(lhs, UnusedVar, "%s declared and not used", lhs.Value)
 		}
 	}
 }
