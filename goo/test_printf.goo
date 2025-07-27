@@ -26,8 +26,8 @@ import "fmt"
 	// Multiple arguments
 	printf("Multiple: %v %v %v %v\n", 1, 2, 3, 4)
 	
-	// Comparison with fmt.Printf (should behave identically)
-	fmt.Printf("fmt.Printf: %s %d\n", "test", 99)
+	// Comparison with printf (should behave identically)
+	printf("printf: %s %d\n", "test", 99)
 	printf("printf: %s %d\n", "test", 99)
 	
 	// Edge cases

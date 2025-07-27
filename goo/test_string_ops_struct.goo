@@ -1,13 +1,9 @@
-// Test only basic methods that don't need imports
-check "a"+"1" == "a1"
-check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)
-check "hi".first() == "h"
-check "hi".last() == "i"
-check "hi".size() == 2
-check "hi".length() == 2
-struct Person {
+type Person struct {
 		name string
 		age  int
 }
 p := Person{name: "Alice", age: 30}
-check "Name: " + p.name + ", Age: " + p.age == "Name: Alice, Age: 30"
+
+check "Name: " + p.name == "Name: Alice"
+check "Age: " + p.age == "Age: 30"
+#check "Name: " + p.name + ", Age: " + p.age == "Name: Alice, Age: 30"

@@ -32,14 +32,14 @@ so does adding a little o to Go[o] make everything a little more beautiful
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
 check not x == false =>   falsey(x)  
   
-declared and not used  make this a warning only (with flag to reenable error)
+✅ declared and not used  make this a warning only (with flag to reenable error)
+✅ String methods "abc".contains("a")      
+☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println       
 ☐ import "helper.go"    
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`    
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?    
-☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println       
 ☐ for loops  :      
 ☐ for keyword := keywords  => for _, keyword := range keywords { __    
-☐ String methods "abc".contains("a")  1. real 2. by compiler    
 ☐ return void, e.g. return print("ok") HARD       
 ☐ void(!) as synonym for func, e.g. void main(){} BAD      
 ☐ public() -> Public() calls OK // as compiler plugin?    

@@ -23,7 +23,7 @@ printf("After modification: %v\n", z1)
 printf("Access z1[a]: %v\n", z1["a"])
 
 // Test map comparison  
-z5 := {a: 1, b: 2}
+#z5 := {a: 1, b: 2}
 # printf("z2 == z5: %v\n", z2 == z5) // map can only be compared to nil HARD!
 
 // Test typeof
@@ -31,8 +31,8 @@ printf("typeof(z1): %v\n", typeof(z1))
 printf("typeof(z2): %v\n", typeof(z2))
 printf("typeof(z3): %v\n", typeof(z3))
 
-// Test with fmt.Printf for comparison
-fmt.Printf("fmt.Printf z1: %v\n", z1)
+// Test with printf for comparison
+printf("printf z1: %v\n", z1)
 
 // Test empty maps
 empty1 := map{}
@@ -46,3 +46,4 @@ printf("empty {}: %v\n", empty2)
 # 	settings: {theme: "dark", lang: "en"}
 # }
 # printf("nested: %v\n", nested)
+printf("All tests completed successfully.\n")
