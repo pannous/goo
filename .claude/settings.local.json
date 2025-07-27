@@ -9,7 +9,12 @@
       "Bash(GOO_USE_TRANSFORMERS=1 /opt/other/go/bin/go build probes/test_concat_simple.goo)",
       "Bash(./bin/go build:*)",
       "Bash(sed:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(./build-compiler.sh:*)",
+      "Bash(./bin/go run:*)",
+      "Bash(git add:*)",
+      "Bash(GOO_USE_TRANSFORMERS=1 ../bin/go build probes/test_chained_concat.goo)",
+      "Bash(GOO_USE_TRANSFORMERS=1 ./bin/go build probes/test_chained_concat.goo)"
     ],
     "deny": []
   }

@@ -6,7 +6,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 )
 
 // StringMethodsTransform handles automatic transformation of string method calls
@@ -28,7 +27,7 @@ func (t *StringMethodsTransform) Name() string {
 
 // transformStringMethod transforms string method calls to standard library calls
 func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, methodName string, args []syntax.Expr) syntax.Expr {
-	fmt.Printf("transformStringMethod: %s\n", methodName)
+	println("transformStringMethod:", methodName)
 	switch methodName {
 	// Basic string info
 	case "reverse":
@@ -265,13 +264,16 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 					case *syntax.CallExpr:
 						*call = *expr
 					case *syntax.SliceExpr:
-						// We need to replace the parent node, but in the visitor pattern
-						// we can't easily do this. For now, let's convert slices to function calls
-						v.transform.handleSliceTransformation(call, expr)
+						// For slice expressions, we just need to update the call directly
+						*call = *(&syntax.CallExpr{
+							Fun: &syntax.Name{Value: "string"},
+							ArgList: []syntax.Expr{expr},
+						})
 					}
 					v.changed = true
 					// Track required imports based on method name
 					stringsMethods := []string{
+						"reverse",
 						"contains", "includes", "indexOf", "find", "lastIndexOf", "rfind",
 						"replace", "replaceAll", "replaceFirst",
 						"toUpper", "upper", "upperCase", "toUpperCase",
@@ -282,7 +284,6 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 						"split", "splits", "chars", "lines", "words", "join",
 						"startsWith", "beginsWith", "endsWith",
 						"removePrefix", "removeSuffix", "repeat", "times",
-						"reverse", "sub", "substring", "slice",
 					}
 					unicodeMethods := []string{
 						"isAlpha", "isDigit", "isNumeric", "isAlphaNumeric", "isAlnum",
@@ -317,33 +318,15 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// createReverseCall creates strings.ReverseString(receiver)
+// createReverseCall creates strings.Reverse(receiver)
 func (t *StringMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Expr {
-	pos := receiver.Pos()
-
-	// Create the strings identifier
-	stringsName := &syntax.Name{Value: "strings"}
-	stringsName.SetPos(pos)
-
-	// Create the ReverseString identifier
-	funcName := &syntax.Name{Value: "Reverse"}
-	funcName.SetPos(pos)
-
-	// Create the selector expression
-	selector := &syntax.SelectorExpr{
-		X:   stringsName,
-		Sel: funcName,
-	}
-	selector.SetPos(pos)
-
-	// Create the call expression
-	call := &syntax.CallExpr{
-		Fun:     selector,
+	return &syntax.CallExpr{
+		Fun: &syntax.SelectorExpr{
+			X:   &syntax.Name{Value: "strings"},
+			Sel: &syntax.Name{Value: "Reverse"},
+		},
 		ArgList: []syntax.Expr{receiver},
 	}
-	call.SetPos(pos)
-
-	return call
 }
 
 // createFirstCall creates receiver[0:1] for first character
@@ -382,10 +365,18 @@ func (t *StringMethodsTransform) createLastCall(receiver syntax.Expr) syntax.Exp
 
 // createLenCall creates len(receiver)
 func (t *StringMethodsTransform) createLenCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "len"},
+	pos := receiver.Pos()
+
+	lenName := &syntax.Name{Value: "len"}
+	lenName.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     lenName,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createContainsCall creates strings.Contains(receiver, arg)
@@ -415,39 +406,12 @@ func (t *StringMethodsTransform) createContainsCall(receiver, arg syntax.Expr) s
 
 // createIndexCall creates strings.Index(receiver, arg)
 func (t *StringMethodsTransform) createIndexCall(receiver, arg syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Index"},
-		},
-		ArgList: []syntax.Expr{receiver, arg},
-	}
-}
-
-// createFromCall creates receiver[arg:] for substring from index
-func (t *StringMethodsTransform) createFromCall(receiver, arg syntax.Expr) syntax.Expr {
-	return &syntax.SliceExpr{
-		X:     receiver,
-		Index: [3]syntax.Expr{arg, nil, nil},
-	}
-}
-
-// createToCall creates receiver[:arg] for substring to index
-func (t *StringMethodsTransform) createToCall(receiver, arg syntax.Expr) syntax.Expr {
-	return &syntax.SliceExpr{
-		X:     receiver,
-		Index: [3]syntax.Expr{nil, arg, nil},
-	}
-}
-
-// createSubCall creates strings.Substring(receiver, start, end)
-func (t *StringMethodsTransform) createSubCall(receiver, start, end syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
 
-	funcName := &syntax.Name{Value: "Substring"}
+	funcName := &syntax.Name{Value: "Index"}
 	funcName.SetPos(pos)
 
 	selector := &syntax.SelectorExpr{
@@ -458,11 +422,50 @@ func (t *StringMethodsTransform) createSubCall(receiver, start, end syntax.Expr)
 
 	call := &syntax.CallExpr{
 		Fun:     selector,
-		ArgList: []syntax.Expr{receiver, start, end},
+		ArgList: []syntax.Expr{receiver, arg},
 	}
 	call.SetPos(pos)
 
 	return call
+}
+
+// createFromCall creates receiver[arg:] for substring from index
+func (t *StringMethodsTransform) createFromCall(receiver, arg syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
+	slice := &syntax.SliceExpr{
+		X:     receiver,
+		Index: [3]syntax.Expr{arg, nil, nil},
+	}
+	slice.SetPos(pos)
+
+	return slice
+}
+
+// createToCall creates receiver[:arg] for substring to index
+func (t *StringMethodsTransform) createToCall(receiver, arg syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
+	slice := &syntax.SliceExpr{
+		X:     receiver,
+		Index: [3]syntax.Expr{nil, arg, nil},
+	}
+	slice.SetPos(pos)
+
+	return slice
+}
+
+// createSubCall creates receiver[start:end] for substring operation
+func (t *StringMethodsTransform) createSubCall(receiver, start, end syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
+	slice := &syntax.SliceExpr{
+		X:     receiver,
+		Index: [3]syntax.Expr{start, end, nil},
+	}
+	slice.SetPos(pos)
+
+	return slice
 }
 
 // isStringExpression returns true if the expression is definitely a string
@@ -527,28 +530,6 @@ func (t *StringMethodsTransform) hasImport(file *syntax.File, name string) bool 
 	return false
 }
 
-// handleSliceTransformation converts a SliceExpr back to a CallExpr for the visitor pattern
-func (t *StringMethodsTransform) handleSliceTransformation(call *syntax.CallExpr, slice *syntax.SliceExpr) {
-	println("JUST USE INDEX for substring operations \"hello\"[1:3] -> \"hello\".substring(1, 3)")
-	// Convert slice operations to function calls that can work within the visitor pattern
-	// This is a workaround since we can't easily replace nodes in the visitor
-
-	// For now, we'll modify the call to use a helper function
-	// In a real implementation, you'd want to add these helpers to a runtime package
-	if slice.Index[0] != nil && slice.Index[1] == nil {
-		// from(string, index)
-		call.Fun = &syntax.Name{Value: "substring"}
-		call.ArgList = []syntax.Expr{slice.X, slice.Index[0], &syntax.BasicLit{Kind: syntax.IntLit, Value: "-1"}}
-	} else if slice.Index[0] == nil && slice.Index[1] != nil {
-		// to(string, index)
-		call.Fun = &syntax.Name{Value: "substring"}
-		call.ArgList = []syntax.Expr{slice.X, &syntax.BasicLit{Kind: syntax.IntLit, Value: "-1"}, slice.Index[1]}
-	} else if slice.Index[0] != nil && slice.Index[1] != nil {
-		// sub(string, start, end)
-		call.Fun = &syntax.Name{Value: "substring"}
-		call.ArgList = []syntax.Expr{slice.X, slice.Index[0], slice.Index[1]}
-	}
-}
 
 // createReplaceCall creates strings.ReplaceAll(receiver, old, new)
 func (t *StringMethodsTransform) createReplaceCall(receiver, old, new syntax.Expr) syntax.Expr {

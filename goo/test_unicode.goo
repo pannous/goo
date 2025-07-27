@@ -19,10 +19,10 @@ func αβγ() int {
 
 func main() {
     fmt.Println("Testing Unicode identifiers:")
-    fmt.Printf("δ = %d\n", δ)
-    fmt.Printf("变量 = %s\n", 变量)
-    fmt.Printf("переменная = %s\n", переменная)
-    fmt.Printf("π = %f\n", π)
-    fmt.Printf("函数() = %s\n", 函数())
-    fmt.Printf("αβγ() = %d\n", αβγ())
+    printf("δ = %d\n", δ)
+    printf("变量 = %s\n", 变量)
+    printf("переменная = %s\n", переменная)
+    printf("π = %f\n", π)
+    printf("函数() = %s\n", 函数())
+    printf("αβγ() = %d\n", αβγ())
 }

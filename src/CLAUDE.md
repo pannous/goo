@@ -108,6 +108,8 @@ Do not re-create tests for what is already working, if this is already tested el
 
 after performing changes recompile bin/go before testing!
 
+• Never modify my tests in goo. Only add one new test after I've approved the fully functional major feature otherwise leave your tests in probes
+
 # Consolidation
 When failing to make progress don't celebrate (prior progress), 
 Do NOT repeat What Works well from previous progress,
@@ -118,7 +120,7 @@ Create exactly one new file <git_root>/goo/test_{feature}.goo to test cases for 
 Only create ONE new test per feature and reuse existing tests for very similar features.
 Before committing quickly run these new tests with the freshly built ../bin/go 
 
-# Test Writing Memories
+# Test Writing
 Usually when you create one test there's no more need to modify it unless you really missed something
 USE existing tests instead of writing new ones
 ## Editing Guidelines
@@ -136,5 +138,18 @@ To avoid code duplication do a quick git history search (grep?) to see if there 
 
 Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 
-## Build Optimization Memories
+## Build Optimization
 • no need to ./make.bash twice with no changes
+
+## Transformers
+• Add Position information SetPos(pos) In Transformers
+• Never modify tests in the goo folder only in probes.
+
+## System Health
+• do ./run_all_tests.sh before and after work to see if the general system is ok
+
+## Code File Guidelines
+• omit package main and func main in .goo files
+
+## Debugging
+• don't Temporarily disable To test functionality that worked before instead push forward to resolve the issue

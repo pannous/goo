@@ -11,7 +11,7 @@ func main() {
 		if i == 1 {
 			continue
 		}
-		fmt.Printf("i = %d\n", i)
+		printf("i = %d\n", i)
 	}
 	
 	fmt.Println("Success!")

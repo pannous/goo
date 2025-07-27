@@ -1,10 +1,7 @@
-class tee{
-		int x;
-		int y;
-		tee(int x, int y) {
-				this.x = x;
-				this.y = y;
-		}
-		int sum() { return x + y; }
-		void display() { print("x: " + x + ", y: " + y); }
+class Person {
+	name string
+	age  int
 }
+
+p := Person{name: "Alice", age: 30}
+printf("Name: %s, Age: %d\n", p.name, p.age)

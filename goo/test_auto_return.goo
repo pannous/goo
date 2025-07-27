@@ -1,11 +1,5 @@
-def meaning() int {return 42}
-#def meaning() int {42}
-#def meaning(){return 42}
-def hello() {
-	printf("Hello from def")
-}
+#def meaning() int {return 42}
+def meaning() int {42} // ^^ easy
+#def meaning(){return 42} // harder but doable?
 
-def main(){
-	hello()
-	printf("Meaning of life is %d\n", meaning())
-}
+printf("Meaning of life is %d\n", meaning())

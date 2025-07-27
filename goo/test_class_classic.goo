@@ -1,8 +1,7 @@
 class tee{
-#		int x
-#		int y
-		x int
-		y int
+// same as test_class_methods.goo but with flipped order of types (x int) => (int x)
+		int x
+		int y
 		tee(int x, int y) {
 				this.x = x
 				this.y = y

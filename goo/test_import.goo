@@ -16,7 +16,7 @@ fmt.Println("Using fmt.Println:")
 for _, file := range files {
 	// Test that printf works with existing fmt import
 	printf("File: %s\n", file.Name())
-	fmt.Printf("fmt: %s\n", file.Name())
+	printf("fmt: %s\n", file.Name())
 	
 	// Just show first few files for testing
 	if file.Name() == "test_import.goo" {
@@ -25,9 +25,9 @@ for _, file := range files {
 }
 
 // Test import conflict resolution
-// Both printf and fmt.Printf should work
+// Both printf and printf should work
 printf("printf works with fmt imported\n")
-fmt.Printf("fmt.Printf also works\n")
+printf("printf also works\n")
 
 // Test with array indexing and imports
 if len(files) > 0 {
