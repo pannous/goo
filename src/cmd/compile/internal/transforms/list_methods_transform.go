@@ -313,6 +313,12 @@ func (t *ListMethodsTransform) transformExpr(expr syntax.Expr, ctx *TransformCon
 			newParen.X = newX
 			return &newParen
 		}
+	case *syntax.LambdaExpr:
+		if newBody := t.transformExpr(e.Body, ctx); newBody != e.Body {
+			newLambda := *e
+			newLambda.Body = newBody
+			return &newLambda
+		}
 	}
 	return expr
 }

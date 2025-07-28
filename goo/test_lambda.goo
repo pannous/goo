@@ -27,10 +27,22 @@ func testLambdaWithComplexExpression() {
     println("Complex lambda test passed")
 }
 
+#apply := (f, x) => f(x)
+func apply[T any, R any](f func(T) R, x T) R {
+	return f(x)
+}
+def testLambdaArg() {
+		square := x => x * x
+		check apply(square, 4) == 16 // 4*4 = 16
+		check apply(x => x + 1, 5) == 6 // 5+1 = 6
+		println("Lambda argument test passed")
+}
+
 func main() {
     testBasicLambda()
     testLambdaInVariableAssignment()
     testMultipleLambdas()
     testLambdaWithComplexExpression()
+    testLambdaArg()
     println("All lambda tests passed!")
 }

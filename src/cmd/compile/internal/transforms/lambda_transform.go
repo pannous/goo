@@ -111,6 +111,12 @@ func (t *LambdaTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 				return &newStmt
 			}
 		}
+	case *syntax.CheckStmt:
+		if newCond := t.transformExpr(s.Cond); newCond != s.Cond {
+			newStmt := *s
+			newStmt.Cond = newCond
+			return &newStmt
+		}
 	}
 	return stmt
 }
