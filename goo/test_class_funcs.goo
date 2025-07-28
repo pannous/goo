@@ -1,5 +1,3 @@
-package main
-
 class Point {
     x int
     y int

@@ -1290,7 +1290,56 @@ func (p *parser) expr() Expr {
 		defer p.trace("expr")()
 	}
 
-	return p.binaryExpr(nil, 0)
+	return p.lambdaExpr()
+}
+
+// lambdaExpr parses lambda expressions or falls back to binary expressions
+func (p *parser) lambdaExpr() Expr {
+	x := p.binaryExpr(nil, 0)
+	
+	// Check for lambda expression: x => body
+	if p.tok == _Lambda {
+		return p.parseLambda(x)
+	}
+	
+	return x
+}
+
+// parseLambda parses a lambda expression given the left-hand side
+func (p *parser) parseLambda(lhs Expr) Expr {
+	pos := p.pos()
+	p.next() // consume '=>'
+	
+	lambda := new(LambdaExpr)
+	lambda.pos = pos
+	
+	// Convert lhs to parameter list
+	switch x := lhs.(type) {
+	case *Name:
+		// Single parameter: x => body
+		field := new(Field)
+		field.pos = x.pos
+		field.Name = x
+		// For lambda parameters, we'll use 'int' as the default type for now
+		// TODO: Implement proper type inference
+		intType := new(Name)
+		intType.pos = x.pos
+		intType.Value = "int"
+		field.Type = intType
+		lambda.ParamList = []*Field{field}
+	case *ParenExpr:
+		// Handle (x, y) => body - TODO: implement this
+		p.syntaxError("parenthesized lambda parameters not yet supported")
+		return lambda
+	default:
+		p.syntaxErrorAt(lhs.Pos(), "invalid lambda parameter")
+		return lambda
+	}
+	
+	// Parse body expression
+	lambda.Body = p.binaryExpr(nil, 0)
+	
+	return lambda
 }
 
 // Expression = UnaryExpr | Expression binary_op Expression .

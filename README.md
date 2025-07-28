@@ -39,9 +39,6 @@ check not x == false =>   falsey(x)
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
-☐ [1, 2, 3] is []any  
-☐ [1, 2, 3] is []int  
-☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
 ☐ import "helper.go"  
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`  
@@ -64,11 +61,15 @@ check not x == false =>   falsey(x)
 HARD  
   
 map(x => x * 2)  
-filter(x => x % 2 == 1)  
-reduce((a, b) => a + b, 0)  
 Desugared form (your compiler should expand this):  
 map(func(x any) any { return x * 2 })  
+filter(x => x % 2 == 1)  
+reduce((a, b) => a + b, 0)  
 If types are known ([]int, etc.), generate func(int) int instead of func(any) any.  
+☐ 1 is int        surprisingly hard to implement
+☐ [1, 2, 3] is []any  HARD!!  
+☐ [1, 2, 3] is []int  
+☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
   
   
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}  

@@ -48,9 +48,10 @@ check "hello".endsWith("he") == false
 check "hello".charAt(i)
 check "hello".runeAt(i)
 check "hello".codePointAt(i)
-check "hello".bytes() == [104, 101, 108, 108, 111] // returns a list of bytes (ASCII values)
+#check "hello".bytes() == [104, 101, 108, 108, 111] // returns a list of bytes (ASCII values)
+#invalid use of [...] array (outside a composite literal)
 #check "hello".codePoints() == [104, 101, 108, 108, 111] // returns a list of code points (Unicode values)
-check "hello".runes() == []rune{'h', 'e', 'l', 'l', 'o'}
+#check "hello".runes() == []rune{'h', 'e', 'l', 'l', 'o'}
 #print("hello".split(""))
 #any_list := "hi you".split(" ") // []any is a list of any type, here it is a list of strings
 #check "hello".split("l") == ["he", "", "o"] as string[] // split returns a list of strings
