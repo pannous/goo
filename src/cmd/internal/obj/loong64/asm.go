@@ -33,7 +33,7 @@ const (
 )
 
 type Optab struct {
-	as    obj.As
+	ass   obj.As
 	from1 uint8
 	reg   uint8
 	from3 uint8
@@ -485,8 +485,8 @@ var atomicInst = map[obj.As]uint32{
 	AAMMINDBVU: 0x070E3 << 15, // ammin_db.du
 }
 
-func IsAtomicInst(as obj.As) bool {
-	_, ok := atomicInst[as]
+func IsAtomicInst(ass obj.As) bool {
+	_, ok := atomicInst[ass]
 
 	return ok
 }
@@ -1266,8 +1266,8 @@ func cmp(a int, b int) bool {
 }
 
 func ocmp(p1, p2 Optab) int {
-	if p1.as != p2.as {
-		return int(p1.as) - int(p2.as)
+	if p1.ass != p2.ass {
+		return int(p1.ass) - int(p2.ass)
 	}
 	if p1.from1 != p2.from1 {
 		return int(p1.from1) - int(p2.from1)
@@ -1308,14 +1308,14 @@ func buildop(ctxt *obj.Link) {
 			}
 		}
 	}
-	for n = 0; optab[n].as != obj.AXXX; n++ {
+	for n = 0; optab[n].ass != obj.AXXX; n++ {
 	}
 	slices.SortFunc(optab[:n], ocmp)
 	for i := 0; i < n; i++ {
-		r := optab[i].as
+		r := optab[i].ass
 		r0 := r & obj.AMask
 		start := i
-		for optab[i].as == r {
+		for optab[i].ass == r {
 			i++
 		}
 		oprange[r0] = optab[start:i]
@@ -2048,8 +2048,8 @@ func (c *ctxt0) asmout(p *obj.Prog, o *Optab, out []uint32) {
 		if p.To.Target() != nil {
 			v = int32(p.To.Target().Pc-p.Pc) >> 2
 		}
-		as, rd, rj, width := p.As, p.Reg, p.From.Reg, 16
-		switch as {
+		ass, rd, rj, width := p.As, p.Reg, p.From.Reg, 16
+		switch ass {
 		case ABGTZ, ABLEZ:
 			rd, rj = rj, rd
 		case ABFPT, ABFPF:
@@ -2063,7 +2063,7 @@ func (c *ctxt0) asmout(p *obj.Prog, o *Optab, out []uint32) {
 			if rd == 0 || rd == REGZERO || rj == REGZERO {
 				// BEQZ/BNEZ can be encoded with 21-bit offsets.
 				width = 21
-				as = -as
+				ass = -ass
 				if rj == 0 || rj == REGZERO {
 					rj = rd
 				}
@@ -2074,12 +2074,12 @@ func (c *ctxt0) asmout(p *obj.Prog, o *Optab, out []uint32) {
 			if (v<<11)>>11 != v {
 				c.ctxt.Diag("21 bit-width, short branch too far\n%v", p)
 			}
-			o1 = OP_16IR_5I(c.opirr(as), uint32(v), uint32(rj))
+			o1 = OP_16IR_5I(c.opirr(ass), uint32(v), uint32(rj))
 		case 16:
 			if (v<<16)>>16 != v {
 				c.ctxt.Diag("16 bit-width, short branch too far\n%v", p)
 			}
-			o1 = OP_16IRR(c.opirr(as), uint32(v), uint32(rj), uint32(rd))
+			o1 = OP_16IRR(c.opirr(ass), uint32(v), uint32(rj), uint32(rd))
 		default:
 			c.ctxt.Diag("unexpected branch encoding\n%v", p)
 		}

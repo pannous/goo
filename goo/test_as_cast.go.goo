@@ -1,5 +1,6 @@
 // dangerous cast x as T panics if x is not T
 // safe cast x as? T returns nil if x is not T
+// x as T   =>  x.(T) // panics if x is not T
 
 x any := 3
 any_list := [1, "two", 3.0, true, nil]

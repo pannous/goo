@@ -119,8 +119,8 @@ func walkConvInterface(n *ir.ConvExpr, init *ir.Nodes) ir.Node {
 	rhs.SetTypecheck(1)
 
 	res := typecheck.TempAt(base.Pos, ir.CurFunc, toType)
-	as := ir.NewAssignListStmt(base.Pos, ir.OAS2DOTTYPE, []ir.Node{res, ir.BlankNode}, []ir.Node{rhs})
-	init.Append(as)
+	ass := ir.NewAssignListStmt(base.Pos, ir.OAS2DOTTYPE, []ir.Node{res, ir.BlankNode}, []ir.Node{rhs})
+	init.Append(ass)
 	return res
 }
 
@@ -315,8 +315,8 @@ func walkStringToBytes(n *ir.ConvExpr, init *ir.Nodes) ir.Node {
 		if len(sc) > 0 {
 			sptr := ir.NewUnaryExpr(base.Pos, ir.OSPTR, s)
 			sptr.SetBounded(true)
-			as := ir.NewAssignStmt(base.Pos, ir.NewStarExpr(base.Pos, p), ir.NewStarExpr(base.Pos, typecheck.ConvNop(sptr, t.PtrTo())))
-			appendWalkStmt(init, as)
+			ass := ir.NewAssignStmt(base.Pos, ir.NewStarExpr(base.Pos, p), ir.NewStarExpr(base.Pos, typecheck.ConvNop(sptr, t.PtrTo())))
+			appendWalkStmt(init, ass)
 		}
 
 		// Slice the [n]byte to a []byte.

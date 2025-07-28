@@ -16,7 +16,7 @@ import (
 type parseAddrsTest struct {
 	attrs uint
 	b     []byte
-	as    []Addr
+	ass   []Addr
 }
 
 var parseAddrsLittleEndianTests = []parseAddrsTest{
@@ -88,14 +88,14 @@ func TestParseAddrs(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		as, err := parseAddrs(tt.attrs, tt.b)
+		ass, err := parseAddrs(tt.attrs, tt.b)
 		if err != nil {
 			t.Error(i, err)
 			continue
 		}
-		as = as[:8] // the list varies between operating systems
-		if !reflect.DeepEqual(as, tt.as) {
-			t.Errorf("#%d: got %+v; want %+v", i, as, tt.as)
+		ass = ass[:8] // the list varies between operating systems
+		if !reflect.DeepEqual(ass, tt.ass) {
+			t.Errorf("#%d: got %+v; want %+v", i, ass, tt.ass)
 			continue
 		}
 	}

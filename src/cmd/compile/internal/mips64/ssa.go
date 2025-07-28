@@ -96,11 +96,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if x == y {
 			return
 		}
-		as := mips.AMOVV
+		ass := mips.AMOVV
 		if isFPreg(x) && isFPreg(y) {
-			as = mips.AMOVD
+			ass = mips.AMOVD
 		}
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = x
 		p.To.Type = obj.TYPE_REG
@@ -514,42 +514,42 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		p.To.Sym = ssagen.BoundsCheckFunc[v.AuxInt]
 		s.UseArgs(16) // space used in callee args area by assembly stubs
 	case ssa.OpMIPS64LoweredAtomicLoad8, ssa.OpMIPS64LoweredAtomicLoad32, ssa.OpMIPS64LoweredAtomicLoad64:
-		as := mips.AMOVV
+		ass := mips.AMOVV
 		switch v.Op {
 		case ssa.OpMIPS64LoweredAtomicLoad8:
-			as = mips.AMOVB
+			ass = mips.AMOVB
 		case ssa.OpMIPS64LoweredAtomicLoad32:
-			as = mips.AMOVW
+			ass = mips.AMOVW
 		}
 		s.Prog(mips.ASYNC)
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_MEM
 		p.From.Reg = v.Args[0].Reg()
 		p.To.Type = obj.TYPE_REG
 		p.To.Reg = v.Reg0()
 		s.Prog(mips.ASYNC)
 	case ssa.OpMIPS64LoweredAtomicStore8, ssa.OpMIPS64LoweredAtomicStore32, ssa.OpMIPS64LoweredAtomicStore64:
-		as := mips.AMOVV
+		ass := mips.AMOVV
 		switch v.Op {
 		case ssa.OpMIPS64LoweredAtomicStore8:
-			as = mips.AMOVB
+			ass = mips.AMOVB
 		case ssa.OpMIPS64LoweredAtomicStore32:
-			as = mips.AMOVW
+			ass = mips.AMOVW
 		}
 		s.Prog(mips.ASYNC)
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = v.Args[1].Reg()
 		p.To.Type = obj.TYPE_MEM
 		p.To.Reg = v.Args[0].Reg()
 		s.Prog(mips.ASYNC)
 	case ssa.OpMIPS64LoweredAtomicStorezero32, ssa.OpMIPS64LoweredAtomicStorezero64:
-		as := mips.AMOVV
+		ass := mips.AMOVV
 		if v.Op == ssa.OpMIPS64LoweredAtomicStorezero32 {
-			as = mips.AMOVW
+			ass = mips.AMOVW
 		}
 		s.Prog(mips.ASYNC)
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = mips.REGZERO
 		p.To.Type = obj.TYPE_MEM

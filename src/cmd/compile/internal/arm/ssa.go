@@ -96,8 +96,8 @@ func makeshift(v *ssa.Value, reg int16, typ int64, s int64) shift {
 }
 
 // genshift generates a Prog for r = r0 op (r1 shifted by n).
-func genshift(s *ssagen.State, v *ssa.Value, as obj.As, r0, r1, r int16, typ int64, n int64) *obj.Prog {
-	p := s.Prog(as)
+func genshift(s *ssagen.State, v *ssa.Value, ass obj.As, r0, r1, r int16, typ int64, n int64) *obj.Prog {
+	p := s.Prog(ass)
 	p.From.Type = obj.TYPE_SHIFT
 	p.From.Offset = int64(makeshift(v, r1, typ, n))
 	p.Reg = r0
@@ -114,8 +114,8 @@ func makeregshift(r1 int16, typ int64, r2 int16) shift {
 }
 
 // genregshift generates a Prog for r = r0 op (r1 shifted by r2).
-func genregshift(s *ssagen.State, as obj.As, r0, r1, r2, r int16, typ int64) *obj.Prog {
-	p := s.Prog(as)
+func genregshift(s *ssagen.State, ass obj.As, r0, r1, r2, r int16, typ int64) *obj.Prog {
+	p := s.Prog(ass)
 	p.From.Type = obj.TYPE_SHIFT
 	p.From.Offset = int64(makeregshift(r1, typ, r2))
 	p.Reg = r0
@@ -159,18 +159,18 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if x == y {
 			return
 		}
-		as := arm.AMOVW
+		ass := arm.AMOVW
 		if v.Type.IsFloat() {
 			switch v.Type.Size() {
 			case 4:
-				as = arm.AMOVF
+				ass = arm.AMOVF
 			case 8:
-				as = arm.AMOVD
+				ass = arm.AMOVD
 			default:
 				panic("bad float size")
 			}
 		}
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = x
 		p.To.Type = obj.TYPE_REG

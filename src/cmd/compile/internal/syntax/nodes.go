@@ -232,6 +232,14 @@ type (
 		expr
 	}
 
+	// X as Type
+	// Used for cast expression: x as T -> x.(T)
+	AsCastExpr struct {
+		X    Expr
+		Type Expr
+		expr
+	}
+
 	// X.(type)
 	// Lhs := X.(type)
 	// Used in type switches, e.g.:

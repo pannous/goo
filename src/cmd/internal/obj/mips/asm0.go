@@ -61,7 +61,7 @@ const (
 )
 
 type Optab struct {
-	as     obj.As
+	ass    obj.As
 	a1     uint8
 	a2     uint8
 	a3     uint8
@@ -876,8 +876,8 @@ func cmp(a int, b int) bool {
 }
 
 func ocmp(p1, p2 Optab) int {
-	if p1.as != p2.as {
-		return int(p1.as) - int(p2.as)
+	if p1.ass != p2.ass {
+		return int(p1.ass) - int(p2.ass)
 	}
 	if p1.a1 != p2.a1 {
 		return int(p1.a1) - int(p2.a1)
@@ -912,14 +912,14 @@ func buildop(ctxt *obj.Link) {
 			}
 		}
 	}
-	for n = 0; optab[n].as != obj.AXXX; n++ {
+	for n = 0; optab[n].ass != obj.AXXX; n++ {
 	}
 	slices.SortFunc(optab[:n], ocmp)
 	for i := 0; i < n; i++ {
-		r := optab[i].as
+		r := optab[i].ass
 		r0 := r & obj.AMask
 		start := i
-		for optab[i].as == r {
+		for optab[i].ass == r {
 			i++
 		}
 		oprange[r0] = optab[start:i]

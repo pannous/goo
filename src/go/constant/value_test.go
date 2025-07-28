@@ -454,9 +454,9 @@ func val(lit string) Value {
 		return MakeBool(false)
 	}
 
-	if as, bs, ok := strings.Cut(lit, "/"); ok {
+	if ass, bs, ok := strings.Cut(lit, "/"); ok {
 		// assume fraction
-		a := MakeFromLiteral(as, token.INT, 0)
+		a := MakeFromLiteral(ass, token.INT, 0)
 		b := MakeFromLiteral(bs, token.INT, 0)
 		return BinaryOp(a, token.QUO, b)
 	}

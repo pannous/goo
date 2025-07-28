@@ -20,7 +20,7 @@ func il(s string) string {
 
 func f() {
 	var s string
-	var as []string
-	switch false && (s+"a"+as[0]+il(s)+as[0]+s == "") {
+	var ass []string
+	switch false && (s+"a"+ass[0]+il(s)+ass[0]+s == "") {
 	}
 }

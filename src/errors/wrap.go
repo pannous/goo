@@ -110,10 +110,10 @@ func As(err error, target any) bool {
 	if targetType.Kind() != reflectlite.Interface && !targetType.Implements(errorType) {
 		panic("errors: *target must be interface or implement error")
 	}
-	return as(err, target, val, targetType)
+	return ass(err, target, val, targetType)
 }
 
-func as(err error, target any, targetVal reflectlite.Value, targetType reflectlite.Type) bool {
+func ass(err error, target any, targetVal reflectlite.Value, targetType reflectlite.Type) bool {
 	for {
 		if reflectlite.TypeOf(err).AssignableTo(targetType) {
 			targetVal.Elem().Set(reflectlite.ValueOf(err))
@@ -133,7 +133,7 @@ func as(err error, target any, targetVal reflectlite.Value, targetType reflectli
 				if err == nil {
 					continue
 				}
-				if as(err, target, targetVal, targetType) {
+				if ass(err, target, targetVal, targetType) {
 					return true
 				}
 			}

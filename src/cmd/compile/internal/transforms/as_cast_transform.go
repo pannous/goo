@@ -4,26 +4,23 @@
 
 //go:build transforms
 
+// danger, conflict with src of vendor packages
+
 package transforms
 
 import (
 	"cmd/compile/internal/syntax"
 )
 
-// LambdaTransform converts lambda expressions to function literals
-type LambdaTransform struct{}
+// AsCastTransform converts as cast expressions to type assertions
+// Transforms: x as T -> x.(T)
+type AsCastTransform struct{}
 
-type lambdaVisitor struct {
-	transform *LambdaTransform
-	ctx       *TransformContext
-	changed   bool
+func (t *AsCastTransform) Name() string {
+	return "as_cast_transform"
 }
 
-func (t *LambdaTransform) Name() string {
-	return "lambda_transform"
-}
-
-func (t *LambdaTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+func (t *AsCastTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	changed := false
 
 	// Transform all declarations
@@ -37,7 +34,7 @@ func (t *LambdaTransform) Transform(file *syntax.File, ctx *TransformContext) bo
 	return changed
 }
 
-func (t *LambdaTransform) transformDecl(decl syntax.Decl) syntax.Decl {
+func (t *AsCastTransform) transformDecl(decl syntax.Decl) syntax.Decl {
 	switch d := decl.(type) {
 	case *syntax.FuncDecl:
 		if newBody := t.transformStmt(d.Body); newBody != d.Body {
@@ -59,7 +56,7 @@ func (t *LambdaTransform) transformDecl(decl syntax.Decl) syntax.Decl {
 	return decl
 }
 
-func (t *LambdaTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
+func (t *AsCastTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 	if stmt == nil {
 		return nil
 	}
@@ -111,19 +108,20 @@ func (t *LambdaTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 				return &newStmt
 			}
 		}
+		// Skip the complex statement transformations for now to avoid type issues
 	}
 	return stmt
 }
 
-func (t *LambdaTransform) transformExpr(expr syntax.Expr) syntax.Expr {
+func (t *AsCastTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	if expr == nil {
 		return nil
 	}
 
 	switch e := expr.(type) {
-	case *syntax.LambdaExpr:
-		// This is what we're looking for! Convert to FuncLit
-		return t.convertLambdaToFuncLit(e)
+	case *syntax.AsCastExpr:
+		// This is what we're looking for! Convert x as T to x.(T)
+		return t.convertAsCastToAssert(e)
 	case *syntax.CallExpr:
 		funChanged := false
 		argsChanged := false
@@ -168,54 +166,68 @@ func (t *LambdaTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 			newOp.Y = newY
 			return &newOp
 		}
+	case *syntax.IndexExpr:
+		xChanged := false
+		indexChanged := false
+		newX := t.transformExpr(e.X)
+		if newX != e.X {
+			xChanged = true
+		}
+		newIndex := t.transformExpr(e.Index)
+		if newIndex != e.Index {
+			indexChanged = true
+		}
+		if xChanged || indexChanged {
+			newIndexExpr := *e
+			newIndexExpr.X = newX
+			newIndexExpr.Index = newIndex
+			return &newIndexExpr
+		}
+	case *syntax.ParenExpr:
+		if newX := t.transformExpr(e.X); newX != e.X {
+			newParen := *e
+			newParen.X = newX
+			return &newParen
+		}
+	case *syntax.SelectorExpr:
+		if newX := t.transformExpr(e.X); newX != e.X {
+			newSelector := *e
+			newSelector.X = newX
+			return &newSelector
+		}
+	case *syntax.SliceExpr:
+		changed := false
+		newSlice := *e
+		if newX := t.transformExpr(e.X); newX != e.X {
+			newSlice.X = newX
+			changed = true
+		}
+		for i, idx := range e.Index {
+			if idx != nil {
+				if newIdx := t.transformExpr(idx); newIdx != idx {
+					newSlice.Index[i] = newIdx
+					changed = true
+				}
+			}
+		}
+		if changed {
+			return &newSlice
+		}
 	}
 	return expr
 }
 
-func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syntax.FuncLit {
-	// Check if lambda body is nil
-	if lambda.Body == nil {
-		return nil
+func (t *AsCastTransform) convertAsCastToAssert(asCast *syntax.AsCastExpr) *syntax.AssertExpr {
+	// Create type assertion: x.(T)
+	assertExpr := &syntax.AssertExpr{
+		X:    asCast.X,
+		Type: asCast.Type,
 	}
+	assertExpr.SetPos(asCast.Pos())
 
-	// Create a return type (for now, use 'int' to match the parameter)
-	// TODO: Implement proper type inference
-	returnType := &syntax.Name{Value: "int"}
-	returnType.SetPos(lambda.Pos())
-
-	returnField := &syntax.Field{Type: returnType}
-	returnField.SetPos(lambda.Pos())
-
-	// Create function type
-	funcType := &syntax.FuncType{
-		ParamList:  lambda.ParamList,
-		ResultList: []*syntax.Field{returnField},
-	}
-	// Make sure to set the position
-	funcType.SetPos(lambda.Pos())
-
-	// Create return statement with lambda body
-	returnStmt := &syntax.ReturnStmt{
-		Results: lambda.Body,
-	}
-	returnStmt.SetPos(lambda.Body.Pos())
-
-	// Create block statement containing the return
-	blockStmt := &syntax.BlockStmt{
-		List: []syntax.Stmt{returnStmt},
-	}
-	blockStmt.SetPos(lambda.Pos())
-
-	// Create function literal
-	funcLit := &syntax.FuncLit{
-		Type: funcType,
-		Body: blockStmt,
-	}
-	funcLit.SetPos(lambda.Pos())
-
-	return funcLit
+	return assertExpr
 }
 
 func init() {
-	RegisterTransformer(&LambdaTransform{})
+	RegisterTransformer(&AsCastTransform{})
 }

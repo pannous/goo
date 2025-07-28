@@ -108,9 +108,9 @@ type argset struct {
 //go:nosplit
 //go:uintptrescapes
 func syscall_cgocaller(fn unsafe.Pointer, args ...uintptr) uintptr {
-	as := argset{args: unsafe.Pointer(&args[0])}
-	cgocall(fn, unsafe.Pointer(&as))
-	return as.retval
+	ass := argset{args: unsafe.Pointer(&args[0])}
+	cgocall(fn, unsafe.Pointer(&ass))
+	return ass.retval
 }
 
 var ncgocall uint64 // number of cgo calls in total for dead m

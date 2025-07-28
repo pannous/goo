@@ -15,7 +15,6 @@ import (
 	"cmd/internal/src"
 )
 
-
 func AssignExpr(n ir.Node) ir.Node { return typecheck(n, ctxExpr|ctxAssign) }
 func Expr(n ir.Node) ir.Node       { return typecheck(n, ctxExpr) }
 func Stmt(n ir.Node) ir.Node       { return typecheck(n, ctxStmt) }
@@ -442,7 +441,6 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.CallExpr)
 		return tcPrint(n)
 
-
 	case ir.OPANIC:
 		n := n.(*ir.UnaryExpr)
 		return tcPanic(n)
@@ -647,27 +645,27 @@ func RewriteNonNameCall(n *ir.CallExpr) {
 	}
 
 	tmp := TempAt(base.Pos, ir.CurFunc, (*np).Type())
-	as := ir.NewAssignStmt(base.Pos, tmp, *np)
-	as.PtrInit().Append(Stmt(ir.NewDecl(n.Pos(), ir.ODCL, tmp)))
+	ass := ir.NewAssignStmt(base.Pos, tmp, *np)
+	ass.PtrInit().Append(Stmt(ir.NewDecl(n.Pos(), ir.ODCL, tmp)))
 	*np = tmp
 
-	n.PtrInit().Append(Stmt(as))
+	n.PtrInit().Append(Stmt(ass))
 }
 
 // RewriteMultiValueCall rewrites multi-valued f() to use temporaries,
 // so the backend wouldn't need to worry about tuple-valued expressions.
 func RewriteMultiValueCall(n ir.InitNode, call ir.Node) {
-	as := ir.NewAssignListStmt(base.Pos, ir.OAS2, nil, []ir.Node{call})
+	ass := ir.NewAssignListStmt(base.Pos, ir.OAS2, nil, []ir.Node{call})
 	results := call.Type().Fields()
 	list := make([]ir.Node, len(results))
 	for i, result := range results {
 		tmp := TempAt(base.Pos, ir.CurFunc, result.Type)
-		as.PtrInit().Append(ir.NewDecl(base.Pos, ir.ODCL, tmp))
-		as.Lhs.Append(tmp)
+		ass.PtrInit().Append(ir.NewDecl(base.Pos, ir.ODCL, tmp))
+		ass.Lhs.Append(tmp)
 		list[i] = tmp
 	}
 
-	n.PtrInit().Append(Stmt(as))
+	n.PtrInit().Append(Stmt(ass))
 
 	switch n := n.(type) {
 	default:
@@ -680,7 +678,7 @@ func RewriteMultiValueCall(n ir.InitNode, call ir.Node) {
 		if n.Op() != ir.OAS2FUNC {
 			base.Fatalf("RewriteMultiValueCall: invalid op %v", n.Op())
 		}
-		as.SetOp(ir.OAS2FUNC)
+		ass.SetOp(ir.OAS2FUNC)
 		n.SetOp(ir.OAS2)
 		n.Rhs = make([]ir.Node, len(list))
 		for i, tmp := range list {
@@ -946,7 +944,7 @@ func Lookdot(n *ir.SelectorExpr, t *types.Type, dostrcmp int) *types.Field {
 		if t.IsPtr() {
 			baseType = t.Elem()
 		}
-		
+
 		if baseType.Kind() == types.TINT && baseType.Sym() != nil {
 			// This looks like an enum type (named int type)
 			// Create a synthetic method call that returns the enum name
@@ -963,21 +961,21 @@ func createEnumNameField(n *ir.SelectorExpr, enumType *types.Type) *types.Field 
 	stringType := types.Types[types.TSTRING]
 	returnField := types.NewField(src.NoXPos, nil, stringType)
 	methodType := types.NewSignature(nil, nil, []*types.Field{returnField})
-	
+
 	// Create a synthetic method symbol
 	nameSym := &types.Sym{
 		Name: "name",
 		Pkg:  types.LocalPkg,
 	}
-	
+
 	// Create the method field
 	field := types.NewField(n.Pos(), nameSym, methodType)
-	
+
 	// Set up the selector expression as a method
 	n.Selection = field
 	n.SetType(methodType)
 	n.SetOp(ir.ODOTMETH) // Treat as a method
-	
+
 	return field
 }
 

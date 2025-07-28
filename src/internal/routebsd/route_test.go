@@ -185,9 +185,9 @@ func (a *InetAddr) String() string {
 
 type addrs []Addr
 
-func (as addrs) String() string {
+func (ass addrs) String() string {
 	var s string
-	for _, a := range as {
+	for _, a := range ass {
 		if a == nil {
 			continue
 		}
@@ -207,14 +207,14 @@ func (as addrs) String() string {
 	return s
 }
 
-func (as addrs) match(attrs addrAttrs) error {
+func (ass addrs) match(attrs addrAttrs) error {
 	var ts addrAttrs
 	af := syscall.AF_UNSPEC
-	for i := range as {
-		if as[i] != nil {
+	for i := range ass {
+		if ass[i] != nil {
 			ts |= 1 << uint(i)
 		}
-		switch addr := as[i].(type) {
+		switch addr := ass[i].(type) {
 		case *InetAddr:
 			got := 0
 			if addr.IP.Is4() {
@@ -228,7 +228,7 @@ func (as addrs) match(attrs addrAttrs) error {
 				}
 			}
 			if got != 0 && af != got {
-				return fmt.Errorf("got %v; want %v", addrs(as), addrFamily(af))
+				return fmt.Errorf("got %v; want %v", addrs(ass), addrFamily(af))
 			}
 		}
 	}

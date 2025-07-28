@@ -13,8 +13,8 @@ import (
 
 // vop returns the opcode, element size and condition
 // setting for the given (possibly extended) mnemonic.
-func vop(as obj.As) (opcode, es, cs uint32) {
-	switch as {
+func vop(ass obj.As) (opcode, es, cs uint32) {
+	switch ass {
 	default:
 		return 0, 0, 0
 	case AVA:
@@ -1032,8 +1032,8 @@ func vop(as obj.As) (opcode, es, cs uint32) {
 
 // singleElementMask returns the single element mask bits required for the
 // given instruction.
-func singleElementMask(as obj.As) uint32 {
-	switch as {
+func singleElementMask(ass obj.As) uint32 {
+	switch ass {
 	case AWFADB,
 		AWFK,
 		AWFKDB,

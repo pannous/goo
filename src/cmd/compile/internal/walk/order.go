@@ -440,18 +440,18 @@ func orderMakeSliceCopy(s []ir.Node) {
 		return
 	}
 
-	as := s[0].(*ir.AssignStmt)
+	ass := s[0].(*ir.AssignStmt)
 	cp := s[1].(*ir.BinaryExpr)
-	if as.Y == nil || as.Y.Op() != ir.OMAKESLICE || ir.IsBlank(as.X) ||
-		as.X.Op() != ir.ONAME || cp.X.Op() != ir.ONAME || cp.Y.Op() != ir.ONAME ||
-		as.X.Name() != cp.X.Name() || cp.X.Name() == cp.Y.Name() {
+	if ass.Y == nil || ass.Y.Op() != ir.OMAKESLICE || ir.IsBlank(ass.X) ||
+		ass.X.Op() != ir.ONAME || cp.X.Op() != ir.ONAME || cp.Y.Op() != ir.ONAME ||
+		ass.X.Name() != cp.X.Name() || cp.X.Name() == cp.Y.Name() {
 		// The line above this one is correct with the differing equality operators:
 		// we want as.X and cp.X to be the same name,
 		// but we want the initial data to be coming from a different name.
 		return
 	}
 
-	mk := as.Y.(*ir.MakeExpr)
+	mk := ass.Y.(*ir.MakeExpr)
 	if mk.Esc() == ir.EscNone || mk.Len == nil || mk.Cap != nil {
 		return
 	}
@@ -459,7 +459,7 @@ func orderMakeSliceCopy(s []ir.Node) {
 	mk.Cap = cp.Y
 	// Set bounded when m = OMAKESLICE([]T, len(s)); OCOPY(m, s)
 	mk.SetBounded(mk.Len.Op() == ir.OLEN && ir.SameSafeExpr(mk.Len.(*ir.UnaryExpr).X, cp.Y))
-	as.Y = typecheck.Expr(mk)
+	ass.Y = typecheck.Expr(mk)
 	s[1] = nil // remove separate copy call
 }
 
@@ -722,8 +722,8 @@ func (o *orderState) stmt(n ir.Node) {
 			}
 			l2 = o.copyExpr(l2)
 			r := o.expr(typecheck.Expr(ir.NewBinaryExpr(n.Pos(), n.AsOp, l2, n.Y)), nil)
-			as := typecheck.Stmt(ir.NewAssignStmt(n.Pos(), l1, r))
-			o.mapAssign(as)
+			ass := typecheck.Stmt(ir.NewAssignStmt(n.Pos(), l1, r))
+			o.mapAssign(ass)
 			o.popTemp(t)
 			return
 		}
@@ -1057,8 +1057,8 @@ func (o *orderState) stmt(n ir.Node) {
 						ncas.PtrInit().Append(dcl)
 					}
 					tmp := o.newTemp(t, t.HasPointers())
-					as := typecheck.Stmt(ir.NewAssignStmt(base.Pos, n, typecheck.Conv(tmp, n.Type())))
-					ncas.PtrInit().Append(as)
+					ass := typecheck.Stmt(ir.NewAssignStmt(base.Pos, n, typecheck.Conv(tmp, n.Type())))
+					ncas.PtrInit().Append(ass)
 					r.Lhs[i] = tmp
 				}
 				do(0, recv.X.Type().Elem())
@@ -1522,9 +1522,9 @@ func (o *orderState) expr1(n, lhs ir.Node) ir.Node {
 
 		// Emit the creation of the map (with all its static entries).
 		m := o.newTemp(n.Type(), false)
-		as := ir.NewAssignStmt(base.Pos, m, n)
-		typecheck.Stmt(as)
-		o.stmt(as)
+		ass := ir.NewAssignStmt(base.Pos, m, n)
+		typecheck.Stmt(ass)
+		o.stmt(ass)
 
 		// Emit eval+insert of dynamic entries, one at a time.
 		for _, r := range dynamics {
@@ -1532,9 +1532,9 @@ func (o *orderState) expr1(n, lhs ir.Node) ir.Node {
 			base.AssertfAt(lhs.Op() == ir.OINDEXMAP, lhs.Pos(), "want OINDEXMAP, have %+v", lhs)
 			lhs.RType = n.RType
 
-			as := ir.NewAssignStmt(base.Pos, lhs, r.Value)
-			typecheck.Stmt(as)
-			o.stmt(as)
+			ass := ir.NewAssignStmt(base.Pos, lhs, r.Value)
+			typecheck.Stmt(ass)
+			o.stmt(ass)
 		}
 
 		// Remember that we issued these assignments so we can include that count
@@ -1565,38 +1565,38 @@ func (o *orderState) expr1(n, lhs ir.Node) ir.Node {
 // This is necessary to ensure left to right assignment order.
 func (o *orderState) as2func(n *ir.AssignListStmt) {
 	results := n.Rhs[0].Type()
-	as := ir.NewAssignListStmt(n.Pos(), ir.OAS2, nil, nil)
+	ass := ir.NewAssignListStmt(n.Pos(), ir.OAS2, nil, nil)
 	for i, nl := range n.Lhs {
 		if !ir.IsBlank(nl) {
 			typ := results.Field(i).Type
 			tmp := o.newTemp(typ, typ.HasPointers())
 			n.Lhs[i] = tmp
-			as.Lhs = append(as.Lhs, nl)
-			as.Rhs = append(as.Rhs, tmp)
+			ass.Lhs = append(ass.Lhs, nl)
+			ass.Rhs = append(ass.Rhs, tmp)
 		}
 	}
 
 	o.out = append(o.out, n)
-	o.stmt(typecheck.Stmt(as))
+	o.stmt(typecheck.Stmt(ass))
 }
 
 // as2ok orders OAS2XXX with ok.
 // Just like as2func, this also adds temporaries to ensure left-to-right assignment.
 func (o *orderState) as2ok(n *ir.AssignListStmt) {
-	as := ir.NewAssignListStmt(n.Pos(), ir.OAS2, nil, nil)
+	ass := ir.NewAssignListStmt(n.Pos(), ir.OAS2, nil, nil)
 
 	do := func(i int, typ *types.Type) {
 		if nl := n.Lhs[i]; !ir.IsBlank(nl) {
 			var tmp ir.Node = o.newTemp(typ, typ.HasPointers())
 			n.Lhs[i] = tmp
-			as.Lhs = append(as.Lhs, nl)
+			ass.Lhs = append(ass.Lhs, nl)
 			if i == 1 {
 				// The "ok" result is an untyped boolean according to the Go
 				// spec. We need to explicitly convert it to the LHS type in
 				// case the latter is a defined boolean type (#8475).
 				tmp = typecheck.Conv(tmp, nl.Type())
 			}
-			as.Rhs = append(as.Rhs, tmp)
+			ass.Rhs = append(ass.Rhs, tmp)
 		}
 	}
 
@@ -1604,5 +1604,5 @@ func (o *orderState) as2ok(n *ir.AssignListStmt) {
 	do(1, types.Types[types.TBOOL])
 
 	o.out = append(o.out, n)
-	o.stmt(typecheck.Stmt(as))
+	o.stmt(typecheck.Stmt(ass))
 }
