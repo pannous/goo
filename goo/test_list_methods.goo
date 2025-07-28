@@ -15,24 +15,24 @@ check aList.length() == 3
 check len([]int{}) == 0
 check len([]int{1}) == 1
 
-#check aList.reverse() == []int{3, 2, 1}
-#check aList.contains(2) == true
-#check aList.contains(5) == false
+check aList.reverse() == []int{3, 2, 1}
+check aList.contains(2) == true
+check aList.contains(5) == false
 
-#check aList.indexOf(2) == 1
-#check aList.indexOf(5) == -1
+check aList.indexOf(2) == 1
+check aList.indexOf(5) == -1
 
-#check aList.join("-") == "1-2-3"  // if all elements stringifiable
+check aList.join("-") == "1-2-3"  // if all elements stringifiable
 
-#check []int{3,1,2}.sort() == aList
-#check aList.sortDesc() == []int{3,2,1}
+check []int{3,1,2}.sort() == aList
+check aList.sortDesc() == []int{3,2,1}
 
 check aList.append(4) == []int{1,2,3,4}
-#check aList.prepend(0) == []int{0,1,2,3}
-#check aList.insert(1,1) == []int{1,1,2,3}  // 0: before index 0 == prepend
+check aList.prepend(0) == []int{0,1,2,3}
+check aList.insert(1,1) == []int{1,1,2,3}  // 0: before index 0 == prepend
 
-#check aList.pop() == 3 // and removes it
-#check aList.shift() == 1 // and removes it
+check aList.pop() == 3 // and removes it
+check aList.shift() == 1 // and removes it
 
 check aList.slice(1,2) == []int{2}
-#check aList.copy() == aList
+check aList.copy() == aList
