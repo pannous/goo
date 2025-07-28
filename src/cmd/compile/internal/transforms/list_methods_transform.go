@@ -12,13 +12,6 @@ import (
 // to their corresponding Go standard library function calls.
 type ListMethodsTransform struct{}
 
-type listMethodVisitor struct {
-	transform          *ListMethodsTransform
-	ctx                *TransformContext
-	changed            bool
-	needsSlicesImport  bool
-	needsSortImport    bool
-}
 
 func (t *ListMethodsTransform) Name() string {
 	return "list_methods_transform"
@@ -148,69 +141,181 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 
 func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	println("ListMethodsTransform.Transform called")
+	changed := false
 
-	visitor := &listMethodVisitor{transform: t, ctx: ctx}
-	syntax.Walk(file, visitor)
+	// Transform all declarations
+	for i, decl := range file.DeclList {
+		if newDecl := t.transformDecl(decl, ctx); newDecl != decl {
+			file.DeclList[i] = newDecl
+			changed = true
+		}
+	}
 
 	// Add required imports if needed and transformations were made
-	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-		println("Adding slices import")
-		t.addSlicesImport(file)
-	}
-	if visitor.needsSortImport && !t.hasImport(file, "sort") {
-		println("Adding sort import")
-		t.addSortImport(file)
-	}
+	// Note: Skip adding imports for now to focus on core functionality
+	// if changed && !t.hasImport(file, "slices") {
+	//     println("Adding slices import")
+	//     t.addSlicesImport(file)
+	// }
 
-	return visitor.changed
+	return changed
 }
 
-// Visit implements syntax.Visitor interface
-func (v *listMethodVisitor) Visit(node syntax.Node) syntax.Visitor {
-	if node == nil {
-		return nil
-	}
-
-	// Check for method calls on list/slice expressions
-	if call, ok := node.(*syntax.CallExpr); ok {
-		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
-			if v.transform.isListExpression(selector.X, v.ctx) {
-				methodName := selector.Sel.Value
-				if transformed := v.transform.transformListMethod(selector.X, methodName, call.ArgList); transformed != nil {
-					println("TRANSFORMING list method:", methodName)
-					// All transformations should return CallExpr now
-					if callExpr, ok := transformed.(*syntax.CallExpr); ok {
-						*call = *callExpr
-					}
-					v.changed = true
-					// Track required imports based on method name
-					slicesMethods := []string{
-						"contains", "includes", "indexOf", "find",
-						"reverse", "sort", "sortBy", "unique", "distinct",
-						"min", "max", "equals",
-					}
-					sortMethods := []string{
-						"sort", "sortBy",
-					}
-
-					for _, method := range slicesMethods {
-						if method == methodName {
-							v.needsSlicesImport = true
-							break
-						}
-					}
-					for _, method := range sortMethods {
-						if method == methodName {
-							v.needsSortImport = true
-							break
-						}
-					}
-				}
+func (t *ListMethodsTransform) transformDecl(decl syntax.Decl, ctx *TransformContext) syntax.Decl {
+	switch d := decl.(type) {
+	case *syntax.FuncDecl:
+		if newBody := t.transformStmt(d.Body, ctx); newBody != d.Body {
+			newDecl := *d
+			if blockStmt, ok := newBody.(*syntax.BlockStmt); ok {
+				newDecl.Body = blockStmt
+			}
+			return &newDecl
+		}
+	case *syntax.VarDecl:
+		if d.Values != nil {
+			if newValues := t.transformExpr(d.Values, ctx); newValues != d.Values {
+				newDecl := *d
+				newDecl.Values = newValues
+				return &newDecl
 			}
 		}
 	}
-	return v
+	return decl
 }
+
+func (t *ListMethodsTransform) transformStmt(stmt syntax.Stmt, ctx *TransformContext) syntax.Stmt {
+	if stmt == nil {
+		return nil
+	}
+
+	switch s := stmt.(type) {
+	case *syntax.BlockStmt:
+		changed := false
+		newList := make([]syntax.Stmt, len(s.List))
+		for i, stmt := range s.List {
+			newStmt := t.transformStmt(stmt, ctx)
+			newList[i] = newStmt
+			if newStmt != stmt {
+				changed = true
+			}
+		}
+		if changed {
+			newBlock := *s
+			newBlock.List = newList
+			return &newBlock
+		}
+	case *syntax.ExprStmt:
+		if newExpr := t.transformExpr(s.X, ctx); newExpr != s.X {
+			newStmt := *s
+			newStmt.X = newExpr
+			return &newStmt
+		}
+	case *syntax.AssignStmt:
+		lhsChanged := false
+		rhsChanged := false
+		newLhs := t.transformExpr(s.Lhs, ctx)
+		newRhs := t.transformExpr(s.Rhs, ctx)
+		if newLhs != s.Lhs {
+			lhsChanged = true
+		}
+		if newRhs != s.Rhs {
+			rhsChanged = true
+		}
+		if lhsChanged || rhsChanged {
+			newStmt := *s
+			newStmt.Lhs = newLhs
+			newStmt.Rhs = newRhs
+			return &newStmt
+		}
+	case *syntax.ReturnStmt:
+		if s.Results != nil {
+			if newResults := t.transformExpr(s.Results, ctx); newResults != s.Results {
+				newStmt := *s
+				newStmt.Results = newResults
+				return &newStmt
+			}
+		}
+	case *syntax.CheckStmt:
+		if newCond := t.transformExpr(s.Cond, ctx); newCond != s.Cond {
+			newStmt := *s
+			newStmt.Cond = newCond
+			return &newStmt
+		}
+	}
+	return stmt
+}
+
+func (t *ListMethodsTransform) transformExpr(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
+	if expr == nil {
+		return nil
+	}
+
+	switch e := expr.(type) {
+	case *syntax.CallExpr:
+		// Check if this is a list method call
+		if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
+			if t.isListExpression(selector.X, ctx) {
+				methodName := selector.Sel.Value
+				if transformed := t.transformListMethod(selector.X, methodName, e.ArgList); transformed != nil {
+					println("TRANSFORMING list method:", methodName)
+					return transformed
+				}
+			}
+		}
+		// Transform function and arguments
+		funChanged := false
+		argsChanged := false
+		newFun := t.transformExpr(e.Fun, ctx)
+		if newFun != e.Fun {
+			funChanged = true
+		}
+		var newArgList []syntax.Expr
+		if e.ArgList != nil {
+			newArgList = make([]syntax.Expr, len(e.ArgList))
+			for i, arg := range e.ArgList {
+				newArg := t.transformExpr(arg, ctx)
+				newArgList[i] = newArg
+				if newArg != arg {
+					argsChanged = true
+				}
+			}
+		}
+		if funChanged || argsChanged {
+			newCall := *e
+			newCall.Fun = newFun
+			newCall.ArgList = newArgList
+			return &newCall
+		}
+	case *syntax.Operation:
+		xChanged := false
+		yChanged := false
+		newX := t.transformExpr(e.X, ctx)
+		if newX != e.X {
+			xChanged = true
+		}
+		var newY syntax.Expr
+		if e.Y != nil {
+			newY = t.transformExpr(e.Y, ctx)
+			if newY != e.Y {
+				yChanged = true
+			}
+		}
+		if xChanged || yChanged {
+			newOp := *e
+			newOp.X = newX
+			newOp.Y = newY
+			return &newOp
+		}
+	case *syntax.ParenExpr:
+		if newX := t.transformExpr(e.X, ctx); newX != e.X {
+			newParen := *e
+			newParen.X = newX
+			return &newParen
+		}
+	}
+	return expr
+}
+
 
 // Basic list operations
 
@@ -240,30 +345,46 @@ func (t *ListMethodsTransform) createIsEmptyCall(receiver syntax.Expr) syntax.Ex
 	}
 }
 
-// createFirstCall creates receiver[0] as a helper call
+// createFirstCall creates receiver[0]
 func (t *ListMethodsTransform) createFirstCall(receiver syntax.Expr) syntax.Expr {
-	// For now, return a runtime helper that can be implemented later
-	// This avoids AST complexity of replacing function calls with index expressions
-	return &syntax.CallExpr{
-		Fun: &syntax.IndexExpr{
-			X:     receiver,
-			Index: &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
-		},
-		ArgList: []syntax.Expr{},
+	pos := receiver.Pos()
+
+	index := &syntax.IndexExpr{
+		X:     receiver,
+		Index: &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
 	}
+	index.SetPos(pos)
+
+	return index
 }
 
 // createLastCall creates receiver[len(receiver)-1]
 func (t *ListMethodsTransform) createLastCall(receiver syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
-	call := &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "listLast"},
+	// Create len(receiver)
+	lenCall := &syntax.CallExpr{
+		Fun:     &syntax.Name{Value: "len"},
 		ArgList: []syntax.Expr{receiver},
 	}
-	call.SetPos(pos)
+	lenCall.SetPos(pos)
 
-	return call
+	// Create len(receiver) - 1
+	minusOne := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  lenCall,
+		Y:  &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"},
+	}
+	minusOne.SetPos(pos)
+
+	// Create receiver[len(receiver)-1]
+	index := &syntax.IndexExpr{
+		X:     receiver,
+		Index: minusOne,
+	}
+	index.SetPos(pos)
+
+	return index
 }
 
 // createGetCall creates receiver[index]
@@ -353,13 +474,13 @@ func (t *ListMethodsTransform) createAppendCall(receiver syntax.Expr, args []syn
 func (t *ListMethodsTransform) createSliceCall(receiver, start, end syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
-	call := &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "listSlice"},
-		ArgList: []syntax.Expr{receiver, start, end},
+	slice := &syntax.SliceExpr{
+		X:     receiver,
+		Index: [3]syntax.Expr{start, end, nil},
 	}
-	call.SetPos(pos)
+	slice.SetPos(pos)
 
-	return call
+	return slice
 }
 
 // createFromCall creates receiver[start:]
