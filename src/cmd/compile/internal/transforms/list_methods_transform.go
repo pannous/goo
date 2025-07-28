@@ -622,9 +622,27 @@ func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr)
 }
 
 func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr) syntax.Expr {
-	// For now, create a compiler error since map/apply requires runtime support
-	// A full implementation would need generic function application across slice elements
-	return t.createCompilerError(receiver, "apply", "apply_function_to_each_element")
+	pos := receiver.Pos()
+
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+
+	mapName := &syntax.Name{Value: "Map"}
+	mapName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: mapName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, transform},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 func (t *ListMethodsTransform) createJoinCall(receiver, separator syntax.Expr) syntax.Expr {

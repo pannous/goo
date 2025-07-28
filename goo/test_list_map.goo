@@ -1,4 +1,6 @@
 #!/usr/bin/env goo
+import "slices"
+
 func double(x int) int {
     return x * 2
 }
