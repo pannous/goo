@@ -34,7 +34,7 @@ for test_file in goo/*.go goo/*.goo; do
         else
             echo "🔴 $filename"
             failed=$((failed + 1))
-            ./bin/go run "$test_file"
+            # ./bin/go run "$test_file"
         fi
     fi
 done
