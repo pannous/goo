@@ -26,6 +26,7 @@ const (
 	_Assign   // =
 	_Define   // :=
 	_Arrow    // <-
+	_Lambda   // =>
 	_Star     // *
 
 	// delimiters
@@ -110,6 +111,7 @@ var TokenNames = [...]string{
 	_Assign:      "=",
 	_Define:      ":=",
 	_Arrow:       "<-",
+	_Lambda:      "=>",
 	_Star:        "*",
 	_Lparen:      "(",
 	_Lbrack:      "[",

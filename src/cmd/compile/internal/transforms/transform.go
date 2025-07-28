@@ -202,6 +202,8 @@ func (w *SyntaxWalker) walkExpr(expr syntax.Expr) {
 		for _, elem := range e.ElemList {
 			w.walkExpr(elem)
 		}
+	case *syntax.LambdaExpr:
+		w.walkExpr(e.Body)
 	}
 }
 

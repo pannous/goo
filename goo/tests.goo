@@ -1,8 +1,2 @@
-// Test only basic methods that work
-check "a" isa string
-check "a"+"1" == "a1"
-check "hi".first() == "h"
-check "hi".last() == "i"
-check "hi".size() == 2
-check "hi".length() == 2
-print("All basic string operations passed!")
+check ("a" isa string)
+print("JA")

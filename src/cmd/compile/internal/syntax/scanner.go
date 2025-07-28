@@ -331,6 +331,11 @@ redo:
 			s.tok = _Operator
 			break
 		}
+		if s.ch == '>' {
+			s.nextch()
+			s.tok = _Lambda
+			break
+		}
 		s.tok = _Assign
 
 	case '!':

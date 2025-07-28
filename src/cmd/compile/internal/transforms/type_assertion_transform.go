@@ -1,6 +1,6 @@
 // Copyright 2025 The Goo Authors. All rights reserved.
 
-//go:build transforms
+//go:build DONT_USE_transforms
 
 package transforms
 
@@ -61,11 +61,11 @@ func (t *TypeAssertionTransform) transformIsOperation(op *syntax.Operation) *syn
 
 	// Create a call to the global instanceOf() runtime function that returns bool
 	return &syntax.CallExpr{
-		Fun: &syntax.Name{Value: "instanceOf"},
+		Fun:     &syntax.Name{Value: "instanceOf"},
 		ArgList: []syntax.Expr{variable, typeExpr},
 	}
 }
 
 func init() {
-	RegisterTransformer(&TypeAssertionTransform{})
+	//RegisterTransformer(&TypeAssertionTransform{})
 }

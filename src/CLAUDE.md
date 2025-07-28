@@ -78,23 +78,21 @@ Error handling via `errorf()`, position tracking
 
 
 ## Implementation Order for builtins
+tokens.so
+lexer.go
+parser.go
+transform.go  custom desugaring stage, best place to start
+typecheck.go in types2 should only be touched in the rarest cases, e.g. when adding new builtins that require type checking
+
 1. types2 declarations (universe.go)
 2. types2 handling (builtins.go)
 3. IR declarations (node.go)
 4. IR registration (typecheck/universe.go)
 5. IR handling (func.go, typecheck.go)
-Files:
-src/go/types/call.go
-src/cmd/compile/internal/ir/node.go
-src/cmd/compile/internal/typecheck/func.go
-src/cmd/compile/internal/typecheck/typecheck.go
-src/cmd/compile/internal/typecheck/universe.go
-src/cmd/compile/internal/types2/builtins.go
-src/cmd/compile/internal/types2/call.go
-src/cmd/compile/internal/types2/universe.go
-src/cmd/compile/internal/types2/typexpr.go
 
-For some reason modification in typecheck.go are mostly problematic so try other approaches first.
+Register runtime functions at /opt/other/go/src/cmd/compile/internal/typecheck/_builtin/runtime.go Which will code generate declaration lists
+If you change this file you must run "go generate" in cmd/compile/internal/typecheck to update builtin.go.
+Full rebuild needed: src/make.bash
 
 # Testing Guidelines
 ALWAYS RUN tests before doing any changes!
@@ -120,6 +118,8 @@ If all newly created tests in ./probes/ succed:
 Create exactly one new file <git_root>/goo/test_{feature}.goo to test cases for the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
 Only create ONE new test per feature and reuse existing tests for very similar features.
 Before committing quickly run these new tests with the freshly built ../bin/go 
+
+Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` increases, commit to git!
 
 # Test Writing
 Usually when you create one test there's no more need to modify it unless you really missed something
@@ -154,3 +154,5 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 
 ## Debugging
 • don't Temporarily disable To test functionality that worked before instead push forward to resolve the issue
+
+

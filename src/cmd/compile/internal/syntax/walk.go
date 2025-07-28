@@ -128,6 +128,10 @@ func (w walker) node(n Node) {
 		w.node(n.Type)
 		w.node(n.Body)
 
+	case *LambdaExpr:
+		w.fieldList(n.ParamList)
+		w.node(n.Body)
+
 	case *ParenExpr:
 		w.node(n.X)
 

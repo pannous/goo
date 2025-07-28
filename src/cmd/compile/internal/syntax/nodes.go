@@ -183,6 +183,13 @@ type (
 		expr
 	}
 
+	// x => expr
+	LambdaExpr struct {
+		ParamList []*Field
+		Body      Expr
+		expr
+	}
+
 	// (X)
 	ParenExpr struct {
 		X Expr

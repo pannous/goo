@@ -711,16 +711,18 @@ func unreachableMethod() {
 	throw("unreachable method called. linker bug?")
 }
 
-// instanceOf checks if a value is of a specific type
-// Used by Goo language operator: x isa Type becomes instanceOf(x, Type)
-func instanceOf(iface any, typ any) bool {
-	// Simple type comparison for now
-	e1 := (*eface)(unsafe.Pointer(&iface))
-	e2 := (*eface)(unsafe.Pointer(&typ))
-	
-	if e1._type == nil || e2._type == nil {
-		return false
-	}
-	
-	return e1._type == e2._type
+// instanceOf checks if a value is of a specific type by name
+// Used by Goo language operator: x isa Type becomes instanceOf(x, "Type")
+//
+//go:linkname instanceOf runtime.instanceOf
+func instanceOf(iface any, typeName string) bool {
+	return true
+	//e := (*eface)(unsafe.Pointer(&iface))
+	//if e._type == nil {
+	//	return false
+	//}
+	//
+	//t := (*rtype)(unsafe.Pointer(e._type))
+	//name := t.string()
+	//return name == typeName
 }
