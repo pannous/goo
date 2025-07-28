@@ -1,5 +1,8 @@
-a := 43
-print(a as int)
-#check ("a" is string) HARD!
+var f any = 3.14
+doubled := (f as float64) * 2
+# doubled := (f as int) * 2 // todo: cast!
+var f2 float64 = 3.14
+doubled2 := (f2 as float64) * 2  // (variable of type float64) is not an interface
+doubled2 := (f2 as float64) * 2 // todo: nothing
 
-print("JA")
+println(doubled) // outputs: 6.28

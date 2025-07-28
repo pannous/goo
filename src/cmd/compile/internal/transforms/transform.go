@@ -230,6 +230,22 @@ func collectTypes(file *syntax.File, ctx *TransformContext) {
 		if f, ok := decl.(*syntax.FuncDecl); ok {
 			collectFromStmt(f.Body, ctx)
 		}
+		// Also collect from top-level variable declarations
+		if v, ok := decl.(*syntax.VarDecl); ok {
+			collectFromVarDecl(v, ctx)
+		}
+	}
+}
+
+// collectFromVarDecl extracts type information from variable declarations
+func collectFromVarDecl(varDecl *syntax.VarDecl, ctx *TransformContext) {
+	if varDecl.Type != nil {
+		// Handle explicit type declarations like: var f2 float64
+		if typeName, ok := varDecl.Type.(*syntax.Name); ok {
+			for _, name := range varDecl.NameList {
+				ctx.Types[name.Value] = typeName.Value
+			}
+		}
 	}
 }
 
@@ -241,9 +257,8 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 		}
 	case *syntax.DeclStmt:
 		for _, decl := range s.DeclList {
-			if _, ok := decl.(*syntax.VarDecl); ok {
-				// Handle variable declarations with initialization
-				// This could be extended to handle more complex declarations
+			if varDecl, ok := decl.(*syntax.VarDecl); ok {
+				collectFromVarDecl(varDecl, ctx)
 			}
 		}
 	case *syntax.AssignStmt:
