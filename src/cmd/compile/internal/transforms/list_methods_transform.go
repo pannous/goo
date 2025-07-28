@@ -107,7 +107,7 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		if len(args) == 1 {
 			return t.createFilterCall(receiver, args[0])
 		}
-	case "map":
+	case "map", "apply":
 		if len(args) == 1 {
 			return t.createMapCall(receiver, args[0])
 		}
@@ -616,7 +616,9 @@ func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr)
 }
 
 func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr) syntax.Expr {
-	return t.createCompilerError(receiver, "map", "transform_elements")
+	// For now, create a compiler error since map/apply requires runtime support
+	// A full implementation would need generic function application across slice elements
+	return t.createCompilerError(receiver, "apply", "apply_function_to_each_element")
 }
 
 func (t *ListMethodsTransform) createJoinCall(receiver, separator syntax.Expr) syntax.Expr {
