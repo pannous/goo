@@ -168,7 +168,6 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			n.SetTypecheck(0) // re-typechecking new op is OK, not a loop
 			return typecheck(n, top)
 
-
 		case ir.OCAP, ir.OCLEAR, ir.OCLOSE, ir.OIMAG, ir.OLEN, ir.OPANIC, ir.OREAL, ir.OTYPEOF, ir.OUNSAFESTRINGDATA, ir.OUNSAFESLICEDATA:
 			typecheckargs(n)
 			fallthrough
@@ -331,7 +330,7 @@ func tcAppend(n *ir.CallExpr) ir.Node {
 			return n
 		}
 
-		// AssignConv is of args[1] not required here, as the
+		// AssignConv is of args[1] not required here, ass the
 		// types of args[0] and args[1] don't need to match
 		// (They will both have an underlying type which are
 		// slices of identical base types, or be []byte and string.)
@@ -339,13 +338,13 @@ func tcAppend(n *ir.CallExpr) ir.Node {
 		return n
 	}
 
-	as := args[1:]
-	for i, n := range as {
+	ass := args[1:]
+	for i, n := range ass {
 		if n.Type() == nil {
 			continue
 		}
-		as[i] = AssignConv(n, t.Elem(), "append")
-		types.CheckSize(as[i].Type()) // ensure width is calculated for backend
+		ass[i] = AssignConv(n, t.Elem(), "append")
+		types.CheckSize(ass[i].Type()) // ensure width is calculated for backend
 	}
 	return n
 }

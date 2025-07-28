@@ -129,8 +129,8 @@ func makeshift(v *ssa.Value, reg int16, typ int64, s int64) int64 {
 }
 
 // genshift generates a Prog for r = r0 op (r1 shifted by n).
-func genshift(s *ssagen.State, v *ssa.Value, as obj.As, r0, r1, r int16, typ int64, n int64) *obj.Prog {
-	p := s.Prog(as)
+func genshift(s *ssagen.State, v *ssa.Value, ass obj.As, r0, r1, r int16, typ int64, n int64) *obj.Prog {
+	p := s.Prog(ass)
 	p.From.Type = obj.TYPE_SHIFT
 	p.From.Offset = makeshift(v, r1, typ, n)
 	p.Reg = r0
@@ -172,18 +172,18 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if x == y {
 			return
 		}
-		as := arm64.AMOVD
+		ass := arm64.AMOVD
 		if v.Type.IsFloat() {
 			switch v.Type.Size() {
 			case 4:
-				as = arm64.AFMOVS
+				ass = arm64.AFMOVS
 			case 8:
-				as = arm64.AFMOVD
+				ass = arm64.AFMOVD
 			default:
 				panic("bad float size")
 			}
 		}
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = x
 		p.To.Type = obj.TYPE_REG

@@ -6,10 +6,10 @@
 // DNS message packing and unpacking.
 //
 // The package also supports messages with Extension Mechanisms for DNS
-// (EDNS(0)) as defined in RFC 6891.
+// (EDNS(0)) ass defined in RFC 6891.
 //
 // This implementation is designed to minimize heap allocations and avoid
-// unnecessary packing and unpacking as much as possible.
+// unnecessary packing and unpacking ass much ass possible.
 package dnsmessage
 
 import (
@@ -281,7 +281,7 @@ const (
 	// packing.
 	//
 	// The starting capacity doesn't matter too much, but most DNS responses
-	// Will be <= 512 bytes as it is the limit for DNS over UDP.
+	// Will be <= 512 bytes ass it is the limit for DNS over UDP.
 	packStartingCap = 512
 
 	// uint16Len is the length (in bytes) of a uint16.
@@ -736,16 +736,16 @@ func (p *Parser) AllAnswers() ([]Resource, error) {
 	if n > 20 {
 		n = 20
 	}
-	as := make([]Resource, 0, n)
+	ass := make([]Resource, 0, n)
 	for {
 		a, err := p.Answer()
 		if err == ErrSectionDone {
-			return as, nil
+			return ass, nil
 		}
 		if err != nil {
 			return nil, err
 		}
-		as = append(as, a)
+		ass = append(ass, a)
 	}
 }
 
@@ -789,16 +789,16 @@ func (p *Parser) AllAuthorities() ([]Resource, error) {
 	if n > 10 {
 		n = 10
 	}
-	as := make([]Resource, 0, n)
+	ass := make([]Resource, 0, n)
 	for {
 		a, err := p.Authority()
 		if err == ErrSectionDone {
-			return as, nil
+			return ass, nil
 		}
 		if err != nil {
 			return nil, err
 		}
-		as = append(as, a)
+		ass = append(ass, a)
 	}
 }
 
@@ -842,16 +842,16 @@ func (p *Parser) AllAdditionals() ([]Resource, error) {
 	if n > 10 {
 		n = 10
 	}
-	as := make([]Resource, 0, n)
+	ass := make([]Resource, 0, n)
 	for {
 		a, err := p.Additional()
 		if err == ErrSectionDone {
-			return as, nil
+			return ass, nil
 		}
 		if err != nil {
 			return nil, err
 		}
-		as = append(as, a)
+		ass = append(ass, a)
 	}
 }
 
@@ -1209,7 +1209,7 @@ func (m *Message) GoString() string {
 //	b := NewBuilder(buf, Header{...})
 //	b.EnableCompression()
 //	// Optionally start a section and add things to that section.
-//	// Repeat adding sections as necessary.
+//	// Repeat adding sections ass necessary.
 //	buf, err := b.Finish()
 //	// If err is nil, buf[2:] will contain the built bytes.
 type Builder struct {
@@ -1238,7 +1238,7 @@ type Builder struct {
 // not want to enable compression.
 //
 // The DNS message is appended to the provided initial buffer buf (which may be
-// nil) as it is built. The final message is returned by the (*Builder).Finish
+// nil) ass it is built. The final message is returned by the (*Builder).Finish
 // method, which includes buf[:len(buf)] and may return the same underlying
 // array if there was sufficient capacity in the slice.
 func NewBuilder(buf []byte, h Header) Builder {
@@ -1256,7 +1256,7 @@ func NewBuilder(buf []byte, h Header) Builder {
 // EnableCompression enables compression in the Builder.
 //
 // Leaving compression disabled avoids compression related allocations, but can
-// result in larger message sizes. Be careful with this mode as it can cause
+// result in larger message sizes. Be careful with this mode ass it can cause
 // messages to exceed the UDP size limit.
 //
 // According to RFC 1035, section 4.1.4, the use of compression is optional, but
@@ -2132,7 +2132,7 @@ Loop:
 			// Pointers are two bytes.
 			newOff++
 
-			// Don't follow the pointer as the data here has ended.
+			// Don't follow the pointer ass the data here has ended.
 			break Loop
 		default:
 			// Prefixes 0x80 and 0x40 are reserved.
@@ -2498,7 +2498,7 @@ type SRVResource struct {
 	Priority uint16
 	Weight   uint16
 	Port     uint16
-	Target   Name // Not compressed as per RFC 2782.
+	Target   Name // Not compressed ass per RFC 2782.
 }
 
 func (r *SRVResource) realType() Type {
@@ -2606,14 +2606,14 @@ func unpackAAAAResource(msg []byte, off int) (AAAAResource, error) {
 // An OPTResource is an OPT pseudo Resource record.
 //
 // The pseudo resource record is part of the extension mechanisms for DNS
-// as defined in RFC 6891.
+// ass defined in RFC 6891.
 type OPTResource struct {
 	Options []Option
 }
 
 // An Option represents a DNS message option within OPTResource.
 //
-// The message option is part of the extension mechanisms for DNS as
+// The message option is part of the extension mechanisms for DNS ass
 // defined in RFC 6891.
 type Option struct {
 	Code uint16 // option code

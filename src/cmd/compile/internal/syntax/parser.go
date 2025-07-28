@@ -1296,12 +1296,12 @@ func (p *parser) expr() Expr {
 // lambdaExpr parses lambda expressions or falls back to binary expressions
 func (p *parser) lambdaExpr() Expr {
 	x := p.binaryExpr(nil, 0)
-	
+
 	// Check for lambda expression: x => body
 	if p.tok == _Lambda {
 		return p.parseLambda(x)
 	}
-	
+
 	return x
 }
 
@@ -1309,10 +1309,10 @@ func (p *parser) lambdaExpr() Expr {
 func (p *parser) parseLambda(lhs Expr) Expr {
 	pos := p.pos()
 	p.next() // consume '=>'
-	
+
 	lambda := new(LambdaExpr)
 	lambda.pos = pos
-	
+
 	// Convert lhs to parameter list
 	switch x := lhs.(type) {
 	case *Name:
@@ -1335,10 +1335,10 @@ func (p *parser) parseLambda(lhs Expr) Expr {
 		p.syntaxErrorAt(lhs.Pos(), "invalid lambda parameter")
 		return lambda
 	}
-	
+
 	// Parse body expression
 	lambda.Body = p.binaryExpr(nil, 0)
-	
+
 	return lambda
 }
 
@@ -1356,7 +1356,7 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 		tprec := p.prec
 		p.next()
 		t.X = x
-		
+
 		// Special handling for 'isa' operator - right side should be a type
 		if p.transformsEnabled() && t.Op == IS {
 			// Debug output
@@ -1799,6 +1799,15 @@ loop:
 			n := p.complitexpr()
 			n.Type = x
 			x = n
+
+		case _As:
+			// x as Type -> x.(Type)
+			p.next()
+			t := new(AsCastExpr)
+			t.pos = pos
+			t.X = x
+			t.Type = p.type_()
+			x = t
 
 		default:
 			break loop
@@ -3205,9 +3214,9 @@ done:
 		// a more explicit error message in that case to prevent
 		// further confusion.
 		var str string
-		if as, ok := s.(*AssignStmt); ok && as.Op == 0 {
+		if ass, ok := s.(*AssignStmt); ok && ass.Op == 0 {
 			// Emphasize complex Lhs and Rhs of assignment with parentheses to highlight '='.
-			str = "assignment " + emphasize(as.Lhs) + " = " + emphasize(as.Rhs)
+			str = "assignment " + emphasize(ass.Lhs) + " = " + emphasize(ass.Rhs)
 		} else {
 			str = String(s)
 		}

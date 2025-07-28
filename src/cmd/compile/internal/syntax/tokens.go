@@ -44,6 +44,7 @@ const (
 	_Hash      // #
 
 	// keywords
+	_As          // as
 	_Break       // break
 	_Case        // case
 	_Chan        // chan
@@ -124,6 +125,7 @@ var TokenNames = [...]string{
 	_Colon:       ":",
 	_Dot:         ".",
 	_DotDotDot:   "...",
+	_As:          "as",
 	_Break:       "break",
 	_Case:        "case",
 	_Chan:        "chan",

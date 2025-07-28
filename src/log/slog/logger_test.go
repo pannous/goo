@@ -161,7 +161,7 @@ func (h wrappingHandler) Enabled(ctx context.Context, level Level) bool {
 	return h.h.Enabled(ctx, level)
 }
 func (h wrappingHandler) WithGroup(name string) Handler              { return h.h.WithGroup(name) }
-func (h wrappingHandler) WithAttrs(as []Attr) Handler                { return h.h.WithAttrs(as) }
+func (h wrappingHandler) WithAttrs(ass []Attr) Handler               { return h.h.WithAttrs(ass) }
 func (h wrappingHandler) Handle(ctx context.Context, r Record) error { return h.h.Handle(ctx, r) }
 
 func TestAttrs(t *testing.T) {
@@ -640,13 +640,13 @@ func (h *captureHandler) Handle(ctx context.Context, r Record) error {
 
 func (*captureHandler) Enabled(context.Context, Level) bool { return true }
 
-func (c *captureHandler) WithAttrs(as []Attr) Handler {
+func (c *captureHandler) WithAttrs(ass []Attr) Handler {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	var c2 captureHandler
 	c2.r = c.r
 	c2.groups = c.groups
-	c2.attrs = concat(c.attrs, as)
+	c2.attrs = concat(c.attrs, ass)
 	return &c2
 }
 
@@ -673,8 +673,8 @@ type discardTestHandler struct {
 
 func (d discardTestHandler) Enabled(context.Context, Level) bool { return true }
 func (discardTestHandler) Handle(context.Context, Record) error  { return nil }
-func (d discardTestHandler) WithAttrs(as []Attr) Handler {
-	d.attrs = concat(d.attrs, as)
+func (d discardTestHandler) WithAttrs(ass []Attr) Handler {
+	d.attrs = concat(d.attrs, ass)
 	return d
 }
 func (h discardTestHandler) WithGroup(name string) Handler {

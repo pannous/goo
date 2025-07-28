@@ -89,10 +89,10 @@ func testbasic() {
 		msi[s] = i
 		mss[s] = s10
 		mss[s] = s10
-		as := make([]string, 2)
-		as[0] = s10
-		as[1] = s10
-		mspa[s] = as
+		ass := make([]string, 2)
+		ass[0] = s10
+		ass[1] = s10
+		mspa[s] = ass
 		mipT[i] = apT[i]
 		mpTi[apT[i]] = i
 		mipM[i] = m

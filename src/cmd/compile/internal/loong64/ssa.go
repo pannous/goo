@@ -114,11 +114,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if x == y {
 			return
 		}
-		as := loong64.AMOVV
+		ass := loong64.AMOVV
 		if isFPreg(x) && isFPreg(y) {
-			as = loong64.AMOVD
+			ass = loong64.AMOVD
 		}
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = x
 		p.To.Type = obj.TYPE_REG
@@ -672,14 +672,14 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 	case ssa.OpLOONG64LoweredAtomicLoad8, ssa.OpLOONG64LoweredAtomicLoad32, ssa.OpLOONG64LoweredAtomicLoad64:
 		// MOVB	(Rarg0), Rout
 		// DBAR	0x14
-		as := loong64.AMOVV
+		ass := loong64.AMOVV
 		switch v.Op {
 		case ssa.OpLOONG64LoweredAtomicLoad8:
-			as = loong64.AMOVB
+			ass = loong64.AMOVB
 		case ssa.OpLOONG64LoweredAtomicLoad32:
-			as = loong64.AMOVW
+			ass = loong64.AMOVW
 		}
-		p := s.Prog(as)
+		p := s.Prog(ass)
 		p.From.Type = obj.TYPE_MEM
 		p.From.Reg = v.Args[0].Reg()
 		p.To.Type = obj.TYPE_REG

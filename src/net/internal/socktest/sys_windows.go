@@ -159,10 +159,10 @@ func (sw *Switch) Listen(s syscall.Handle, backlog int) (err error) {
 }
 
 // AcceptEx wraps [syscall.AcceptEx].
-func (sw *Switch) AcceptEx(ls syscall.Handle, as syscall.Handle, b *byte, rxdatalen uint32, laddrlen uint32, raddrlen uint32, rcvd *uint32, overlapped *syscall.Overlapped) error {
+func (sw *Switch) AcceptEx(ls syscall.Handle, ass syscall.Handle, b *byte, rxdatalen uint32, laddrlen uint32, raddrlen uint32, rcvd *uint32, overlapped *syscall.Overlapped) error {
 	so := sw.sockso(ls)
 	if so == nil {
-		return syscall.AcceptEx(ls, as, b, rxdatalen, laddrlen, raddrlen, rcvd, overlapped)
+		return syscall.AcceptEx(ls, ass, b, rxdatalen, laddrlen, raddrlen, rcvd, overlapped)
 	}
 	sw.fmu.RLock()
 	f, _ := sw.fltab[FilterAccept]
@@ -172,7 +172,7 @@ func (sw *Switch) AcceptEx(ls syscall.Handle, as syscall.Handle, b *byte, rxdata
 	if err != nil {
 		return err
 	}
-	so.Err = syscall.AcceptEx(ls, as, b, rxdatalen, laddrlen, raddrlen, rcvd, overlapped)
+	so.Err = syscall.AcceptEx(ls, ass, b, rxdatalen, laddrlen, raddrlen, rcvd, overlapped)
 	if err = af.apply(so); err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func (sw *Switch) AcceptEx(ls syscall.Handle, as syscall.Handle, b *byte, rxdata
 		sw.stats.getLocked(so.Cookie).AcceptFailed++
 		return so.Err
 	}
-	nso := sw.addLocked(as, so.Cookie.Family(), so.Cookie.Type(), so.Cookie.Protocol())
+	nso := sw.addLocked(ass, so.Cookie.Family(), so.Cookie.Type(), so.Cookie.Protocol())
 	sw.stats.getLocked(nso.Cookie).Accepted++
 	return nil
 }

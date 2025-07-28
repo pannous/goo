@@ -354,7 +354,7 @@ func normalizeGoDeferCall(pos src.XPos, op ir.Op, call ir.Node, init *ir.Nodes) 
 		stmtPos := base.Pos
 		callPos := base.Pos
 
-		as := ir.NewAssignListStmt(callPos, ir.OAS2, make([]ir.Node, len(argps)), make([]ir.Node, len(argps)))
+		ass := ir.NewAssignListStmt(callPos, ir.OAS2, make([]ir.Node, len(argps)), make([]ir.Node, len(argps)))
 		for i, argp := range argps {
 			arg := *argp
 
@@ -366,19 +366,19 @@ func normalizeGoDeferCall(pos src.XPos, op ir.Op, call ir.Node, init *ir.Nodes) 
 			// tmp := arg
 			tmp := TempAt(pos, ir.CurFunc, arg.Type())
 			init.Append(Stmt(ir.NewDecl(pos, ir.ODCL, tmp)))
-			tmp.Defn = as
-			as.Lhs[i] = tmp
-			as.Rhs[i] = arg
+			tmp.Defn = ass
+			ass.Lhs[i] = tmp
+			ass.Rhs[i] = arg
 
 			// Rewrite original expression to use/capture tmp.
 			*argp = ir.NewClosureVar(pos, wrapperFn, tmp)
 		}
-		init.Append(Stmt(as))
+		init.Append(Stmt(ass))
 
 		// For "go/defer iface.M()", if iface is nil, we need to panic at
 		// the point of the go/defer statement.
 		if call.Op() == ir.OCALLINTER {
-			iface := as.Lhs[0]
+			iface := ass.Lhs[0]
 			init.Append(Stmt(ir.NewUnaryExpr(stmtPos, ir.OCHECKNIL, ir.NewUnaryExpr(iface.Pos(), ir.OITAB, iface))))
 		}
 	}

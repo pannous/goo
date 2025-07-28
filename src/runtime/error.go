@@ -46,14 +46,14 @@ func (e *TypeAssertionError) Error() string {
 	if e._interface != nil {
 		inter = toRType(e._interface).string()
 	}
-	as := toRType(e.asserted).string()
+	ass := toRType(e.asserted).string()
 	if e.concrete == nil {
-		return "interface conversion: " + inter + " is nil, not " + as
+		return "interface conversion: " + inter + " is nil, not " + ass
 	}
 	cs := toRType(e.concrete).string()
 	if e.missingMethod == "" {
-		msg := "interface conversion: " + inter + " is " + cs + ", not " + as
-		if cs == as {
+		msg := "interface conversion: " + inter + " is " + cs + ", not " + ass
+		if cs == ass {
 			// provide slightly clearer error message
 			if toRType(e.concrete).pkgpath() != toRType(e.asserted).pkgpath() {
 				msg += " (types from different packages)"
@@ -63,7 +63,7 @@ func (e *TypeAssertionError) Error() string {
 		}
 		return msg
 	}
-	return "interface conversion: " + cs + " is not " + as +
+	return "interface conversion: " + cs + " is not " + ass +
 		": missing method " + e.missingMethod
 }
 

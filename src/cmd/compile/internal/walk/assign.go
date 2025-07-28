@@ -53,38 +53,38 @@ func walkAssign(init *ir.Nodes, n ir.Node) ir.Node {
 	} else {
 		n.(*ir.AssignStmt).X = left
 	}
-	as := n.(*ir.AssignStmt)
+	ass := n.(*ir.AssignStmt)
 
-	if oaslit(as, init) {
-		return ir.NewBlockStmt(as.Pos(), nil)
+	if oaslit(ass, init) {
+		return ir.NewBlockStmt(ass.Pos(), nil)
 	}
 
-	if as.Y == nil {
+	if ass.Y == nil {
 		// TODO(austin): Check all "implicit zeroing"
-		return as
+		return ass
 	}
 
-	if !base.Flag.Cfg.Instrumenting && ir.IsZero(as.Y) {
-		return as
+	if !base.Flag.Cfg.Instrumenting && ir.IsZero(ass.Y) {
+		return ass
 	}
 
-	switch as.Y.Op() {
+	switch ass.Y.Op() {
 	default:
-		as.Y = walkExpr(as.Y, init)
+		ass.Y = walkExpr(ass.Y, init)
 
 	case ir.ORECV:
 		// x = <-c; as.Left is x, as.Right.Left is c.
 		// order.stmt made sure x is addressable.
-		recv := as.Y.(*ir.UnaryExpr)
+		recv := ass.Y.(*ir.UnaryExpr)
 		recv.X = walkExpr(recv.X, init)
 
-		n1 := typecheck.NodAddr(as.X)
+		n1 := typecheck.NodAddr(ass.X)
 		r := recv.X // the channel
 		return mkcall1(chanfn("chanrecv1", 2, r.Type()), nil, init, r, n1)
 
 	case ir.OAPPEND:
 		// x = append(...)
-		call := as.Y.(*ir.CallExpr)
+		call := ass.Y.(*ir.CallExpr)
 		if call.Type().Elem().NotInHeap() {
 			base.Errorf("%v can't be allocated in Go; it is incomplete (or unallocatable)", call.Type().Elem())
 		}
@@ -96,25 +96,25 @@ func walkAssign(init *ir.Nodes, n ir.Node) ir.Node {
 		case call.IsDDD:
 			r = appendSlice(call, init) // also works for append(slice, string).
 		default:
-			r = walkAppend(call, init, as)
+			r = walkAppend(call, init, ass)
 		}
-		as.Y = r
+		ass.Y = r
 		if r.Op() == ir.OAPPEND {
 			r := r.(*ir.CallExpr)
 			// Left in place for back end.
 			// Do not add a new write barrier.
 			// Set up address of type for back end.
 			r.Fun = reflectdata.AppendElemRType(base.Pos, r)
-			return as
+			return ass
 		}
 		// Otherwise, lowered for race detector.
 		// Treat as ordinary assignment.
 	}
 
-	if as.X != nil && as.Y != nil {
-		return convas(as, init)
+	if ass.X != nil && ass.Y != nil {
+		return convas(ass, init)
 	}
-	return as
+	return ass
 }
 
 // walkAssignDotType walks an OAS2DOTTYPE node.
@@ -199,8 +199,8 @@ func walkAssignMapRead(init *ir.Nodes, n *ir.AssignListStmt) ir.Node {
 	n.Lhs[0] = var_
 	init.Append(walkExpr(n, init))
 
-	as := ir.NewAssignStmt(base.Pos, a, ir.NewStarExpr(base.Pos, var_))
-	return walkExpr(typecheck.Stmt(as), init)
+	ass := ir.NewAssignStmt(base.Pos, a, ir.NewStarExpr(base.Pos, var_))
+	return walkExpr(typecheck.Stmt(ass), init)
 }
 
 // walkAssignRecv walks an OAS2RECV node.

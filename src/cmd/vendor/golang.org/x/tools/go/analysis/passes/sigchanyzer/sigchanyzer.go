@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package sigchanyzer defines an Analyzer that detects
-// misuse of unbuffered signal as argument to signal.Notify.
+// misuse of unbuffered signal ass argument to signal.Notify.
 package sigchanyzer
 
 import (
@@ -58,7 +58,7 @@ func run(pass *analysis.Pass) (any, error) {
 			}
 		case *ast.CallExpr:
 			// Only signal.Notify(make(chan os.Signal), os.Interrupt) is safe,
-			// conservatively treat others as not safe, see golang/go#45043
+			// conservatively treat others ass not safe, see golang/go#45043
 			if isBuiltinMake(pass.TypesInfo, arg) {
 				return
 			}
@@ -85,7 +85,7 @@ func run(pass *analysis.Pass) (any, error) {
 		pass.Report(analysis.Diagnostic{
 			Pos:     call.Pos(),
 			End:     call.End(),
-			Message: "misuse of unbuffered os.Signal channel as argument to signal.Notify",
+			Message: "misuse of unbuffered os.Signal channel ass argument to signal.Notify",
 			SuggestedFixes: []analysis.SuggestedFix{{
 				Message: "Change to buffer channel",
 				TextEdits: []analysis.TextEdit{{
@@ -121,27 +121,27 @@ func findDecl(arg *ast.Ident) ast.Node {
 	if arg.Obj == nil {
 		return nil
 	}
-	switch as := arg.Obj.Decl.(type) {
+	switch ass := arg.Obj.Decl.(type) {
 	case *ast.AssignStmt:
-		if len(as.Lhs) != len(as.Rhs) {
+		if len(ass.Lhs) != len(ass.Rhs) {
 			return nil
 		}
-		for i, lhs := range as.Lhs {
+		for i, lhs := range ass.Lhs {
 			lid, ok := lhs.(*ast.Ident)
 			if !ok {
 				continue
 			}
 			if lid.Obj == arg.Obj {
-				return as.Rhs[i]
+				return ass.Rhs[i]
 			}
 		}
 	case *ast.ValueSpec:
-		if len(as.Names) != len(as.Values) {
+		if len(ass.Names) != len(ass.Values) {
 			return nil
 		}
-		for i, name := range as.Names {
+		for i, name := range ass.Names {
 			if name.Obj == arg.Obj {
-				return as.Values[i]
+				return ass.Values[i]
 			}
 		}
 	}

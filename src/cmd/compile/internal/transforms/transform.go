@@ -204,6 +204,9 @@ func (w *SyntaxWalker) walkExpr(expr syntax.Expr) {
 		}
 	case *syntax.LambdaExpr:
 		w.walkExpr(e.Body)
+	case *syntax.AsCastExpr:
+		w.walkExpr(e.X)
+		w.walkExpr(e.Type)
 	}
 }
 

@@ -103,9 +103,9 @@ type typedArshaler[Coder any] struct {
 
 func newMarshalers(ms ...*Marshalers) *Marshalers       { return newTypedArshalers(ms...) }
 func newUnmarshalers(us ...*Unmarshalers) *Unmarshalers { return newTypedArshalers(us...) }
-func newTypedArshalers[Coder any](as ...*typedArshalers[Coder]) *typedArshalers[Coder] {
+func newTypedArshalers[Coder any](ass ...*typedArshalers[Coder]) *typedArshalers[Coder] {
 	var a typedArshalers[Coder]
-	for _, a2 := range as {
+	for _, a2 := range ass {
 		if a2 != nil {
 			a.fncVals = append(a.fncVals, a2.fncVals...)
 			a.fromAny = a.fromAny || a2.fromAny

@@ -390,16 +390,16 @@ func TestUserArenaCloneString(t *testing.T) {
 	// Create a string as using the same memory as the byte slice, hence in
 	// the arena. This could be an arena API, but hasn't really been needed
 	// yet.
-	as := unsafe.String(&b[0], len(b))
+	ass := unsafe.String(&b[0], len(b))
 
 	// Clone should make a copy of as, since it is in the arena.
-	asCopy := UserArenaClone(as)
-	if unsafe.StringData(as) == unsafe.StringData(asCopy) {
+	asCopy := UserArenaClone(ass)
+	if unsafe.StringData(ass) == unsafe.StringData(asCopy) {
 		t.Error("Clone did not make a copy")
 	}
 
 	// Clone should make a copy of subAs, since subAs is just part of as and so is in the arena.
-	subAs := as[1:3]
+	subAs := ass[1:3]
 	subAsCopy := UserArenaClone(subAs)
 	if unsafe.StringData(subAs) == unsafe.StringData(subAsCopy) {
 		t.Error("Clone did not make a copy")
@@ -415,7 +415,7 @@ func TestUserArenaCloneString(t *testing.T) {
 	}
 
 	// Clone should not make a copy of doubleAs, since doubleAs will be on the heap.
-	doubleAs := as + as
+	doubleAs := ass + ass
 	doubleAsCopy := UserArenaClone(doubleAs)
 	if unsafe.StringData(doubleAs) != unsafe.StringData(doubleAsCopy) {
 		t.Error("Clone should not have made a copy")

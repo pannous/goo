@@ -1,2 +1,5 @@
-check ("a" isa string)
+a := 43
+print(a as int)
+#check ("a" is string) HARD!
+
 print("JA")

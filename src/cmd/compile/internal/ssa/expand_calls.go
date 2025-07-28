@@ -525,11 +525,11 @@ func (x *expandState) rewriteSelectOrArg(pos src.XPos, b *Block, container, a, m
 
 	addArg := func(a0 *Value) {
 		if a0 == nil {
-			as := "<nil>"
+			ass := "<nil>"
 			if a != nil {
-				as = a.LongString()
+				ass = a.LongString()
 			}
-			panic(fmt.Errorf("a0 should not be nil, a=%v, container=%v, at=%v", as, container.LongString(), at))
+			panic(fmt.Errorf("a0 should not be nil, a=%v, container=%v, at=%v", ass, container.LongString(), at))
 		}
 		args = append(args, a0)
 	}

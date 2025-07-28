@@ -61,7 +61,7 @@ type ctxt5 struct {
 }
 
 type Optab struct {
-	as       obj.As
+	ass      obj.As
 	a1       uint8
 	a2       int8
 	a3       uint8
@@ -1206,8 +1206,8 @@ func cmp(a int, b int) bool {
 }
 
 func ocmp(a, b Optab) int {
-	if a.as != b.as {
-		return int(a.as) - int(b.as)
+	if a.ass != b.ass {
+		return int(a.ass) - int(b.ass)
 	}
 	if a.a1 != b.a1 {
 		return int(a.a1) - int(b.a1)
@@ -1247,7 +1247,7 @@ func buildop(ctxt *obj.Link) {
 			}
 		}
 	}
-	for n = 0; optab[n].as != obj.AXXX; n++ {
+	for n = 0; optab[n].ass != obj.AXXX; n++ {
 		if optab[n].flag&LPCREL != 0 {
 			if ctxt.Flag_shared {
 				optab[n].size += int8(optab[n].pcrelsiz)
@@ -1259,10 +1259,10 @@ func buildop(ctxt *obj.Link) {
 
 	slices.SortFunc(optab[:n], ocmp)
 	for i := 0; i < n; i++ {
-		r := optab[i].as
+		r := optab[i].ass
 		r0 := r & obj.AMask
 		start := i
-		for optab[i].as == r {
+		for optab[i].ass == r {
 			i++
 		}
 		oprange[r0] = optab[start:i]

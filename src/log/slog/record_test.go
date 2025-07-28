@@ -13,14 +13,14 @@ import (
 )
 
 func TestRecordAttrs(t *testing.T) {
-	as := []Attr{Int("k1", 1), String("k2", "foo"), Int("k3", 3),
+	ass := []Attr{Int("k1", 1), String("k2", "foo"), Int("k3", 3),
 		Int64("k4", -1), Float64("f", 3.1), Uint64("u", 999)}
-	r := newRecordWithAttrs(as)
-	if g, w := r.NumAttrs(), len(as); g != w {
+	r := newRecordWithAttrs(ass)
+	if g, w := r.NumAttrs(), len(ass); g != w {
 		t.Errorf("NumAttrs: got %d, want %d", g, w)
 	}
-	if got := attrsSlice(r); !attrsEqual(got, as) {
-		t.Errorf("got %v, want %v", got, as)
+	if got := attrsSlice(r); !attrsEqual(got, ass) {
+		t.Errorf("got %v, want %v", got, ass)
 	}
 
 	// Early return.
@@ -31,7 +31,7 @@ func TestRecordAttrs(t *testing.T) {
 			got = append(got, a)
 			return len(got) < stop
 		})
-		want := as[:stop]
+		want := ass[:stop]
 		if !attrsEqual(got, want) {
 			t.Errorf("got %v, want %v", got, want)
 		}
@@ -82,11 +82,11 @@ func TestRecordSource(t *testing.T) {
 
 func TestAliasingAndClone(t *testing.T) {
 	intAttrs := func(from, to int) []Attr {
-		var as []Attr
+		var ass []Attr
 		for i := from; i < to; i++ {
-			as = append(as, Int("k", i))
+			ass = append(ass, Int("k", i))
 		}
-		return as
+		return ass
 	}
 
 	checks := func(r Record, want []Attr) {
@@ -124,9 +124,9 @@ func TestAliasingAndClone(t *testing.T) {
 	checks(r2, append(slices.Clip(r1Attrs), Int("p", 2)))
 }
 
-func newRecordWithAttrs(as []Attr) Record {
+func newRecordWithAttrs(ass []Attr) Record {
 	r := NewRecord(time.Now(), LevelInfo, "", 0)
-	r.AddAttrs(as...)
+	r.AddAttrs(ass...)
 	return r
 }
 

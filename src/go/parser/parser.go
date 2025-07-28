@@ -2411,30 +2411,30 @@ func (p *parser) parseForStmt() ast.Stmt {
 	p.expectSemi()
 
 	if isRange {
-		as := s2.(*ast.AssignStmt)
+		ass := s2.(*ast.AssignStmt)
 		// check lhs
 		var key, value ast.Expr
-		switch len(as.Lhs) {
+		switch len(ass.Lhs) {
 		case 0:
 			// nothing to do
 		case 1:
-			key = as.Lhs[0]
+			key = ass.Lhs[0]
 		case 2:
-			key, value = as.Lhs[0], as.Lhs[1]
+			key, value = ass.Lhs[0], ass.Lhs[1]
 		default:
-			p.errorExpected(as.Lhs[len(as.Lhs)-1].Pos(), "at most 2 expressions")
+			p.errorExpected(ass.Lhs[len(ass.Lhs)-1].Pos(), "at most 2 expressions")
 			return &ast.BadStmt{From: pos, To: p.safePos(body.End())}
 		}
 		// parseSimpleStmt returned a right-hand side that
 		// is a single unary expression of the form "range x"
-		x := as.Rhs[0].(*ast.UnaryExpr).X
+		x := ass.Rhs[0].(*ast.UnaryExpr).X
 		return &ast.RangeStmt{
 			For:    pos,
 			Key:    key,
 			Value:  value,
-			TokPos: as.TokPos,
-			Tok:    as.Tok,
-			Range:  as.Rhs[0].Pos(),
+			TokPos: ass.TokPos,
+			Tok:    ass.Tok,
+			Range:  ass.Rhs[0].Pos(),
 			X:      x,
 			Body:   body,
 		}
@@ -2910,7 +2910,7 @@ func (p *parser) parseFile() *ast.File {
 		pos = p.pos
 		ident = &ast.Ident{
 			NamePos: pos,
-			Name:     "main",
+			Name:    "main",
 		}
 	}
 
@@ -2928,7 +2928,7 @@ func (p *parser) parseFile() *ast.File {
 			decls = append(decls, p.parseGenDecl(token.IMPORT, p.parseImportSpec))
 			hasImports = true
 		}
-		
+
 		// Auto-inject fmt import if no imports found and it's a .goo file
 		if !hasImports && strings.HasSuffix(p.file.Name(), ".goo") {
 			fmtImport := &ast.GenDecl{
