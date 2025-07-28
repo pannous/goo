@@ -5,4 +5,5 @@ func double(x int) int {
 
 xs := []int{1, 2, 3}
 ys := xs.map(double) // should return []int{2, 4, 6}
+check ys == []int{2, 4, 6}
 

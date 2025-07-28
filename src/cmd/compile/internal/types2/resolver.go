@@ -240,6 +240,7 @@ func (checks *Checker) collectObjects() {
 		// Auto-inject import "fmt" for .goo files if file uses printf but doesn't import fmt
 		if strings.HasSuffix(file.PkgName.Pos().RelFilename(), ".goo") {
 			injectFmtImportIfNeeded(file, fileDir, checks, fileScope)
+			injectSlicesImportIfNeeded(file, fileDir, checks, fileScope)
 		}
 
 		first := -1                // index of first ConstDecl in the current group, or -1
@@ -835,5 +836,96 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 
 		// NOTE: Don't add to file.DeclList - just handle the import programmatically
 		// The AST transformation in call.go will handle the printf -> fmt.Printf conversion
+	}
+}
+
+// injectSlicesImportIfNeeded scans the file for list method usage and automatically
+// injects import "slices" if list methods are used but slices is not already imported.
+func injectSlicesImportIfNeeded(file *syntax.File, fileDir string, checks *Checker, fileScope *Scope) {
+	needsSlicesImport := false
+	hasSlicesImport := false
+
+	// First check if slices is already imported
+	for _, decl := range file.DeclList {
+		if imp, ok := decl.(*syntax.ImportDecl); ok && imp.Path != nil {
+			if path, _ := strconv.Unquote(imp.Path.Value); path == "slices" {
+				hasSlicesImport = true
+				break
+			}
+		}
+	}
+
+	// If slices not imported, scan for list method usage
+	if !hasSlicesImport {
+		syntax.Inspect(file, func(n syntax.Node) bool {
+			if call, ok := n.(*syntax.CallExpr); ok {
+				if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
+					// Check if this is a slices.Method call (after transform)
+					if receiverName, ok := selector.X.(*syntax.Name); ok && receiverName.Value == "slices" {
+						methodName := selector.Sel.Value
+						if methodName == "Contains" || methodName == "Index" || 
+						   methodName == "Reverse" || methodName == "Sort" ||
+						   methodName == "Clone" || methodName == "Equal" ||
+						   methodName == "Min" || methodName == "Max" {
+							needsSlicesImport = true
+							return false // found list method, stop searching
+						}
+					}
+				}
+			}
+			return true
+		})
+	}
+
+	// Inject import "slices" by processing it exactly like a regular import
+	if needsSlicesImport {
+		// Create synthetic import declaration
+		importPath := &syntax.BasicLit{
+			Value: `"slices"`,
+			Kind:  syntax.StringLit,
+		}
+		importPath.SetPos(file.PkgName.Pos())
+
+		slicesImport := &syntax.ImportDecl{
+			Path: importPath,
+		}
+		slicesImport.SetPos(importPath.Pos())
+
+		// Process this import using the exact same logic as regular imports
+		path, err := validatedImportPath(importPath.Value)
+		if err != nil {
+			checks.errorf(importPath, BadImportPath, "invalid import path (%s)", err)
+			return
+		}
+
+		imp := checks.importPackage(importPath.Pos(), path, fileDir)
+		if imp == nil {
+			// Import failed - don't inject the import declaration
+			return
+		}
+
+		// Create package name - use the imported package name
+		pkgName := NewPkgName(slicesImport.Pos(), checks.pkg, imp.name, imp)
+
+		// Declare the imported package in file scope
+		checks.declare(fileScope, nil, pkgName, nopos)
+
+		// Add to package imports list (avoid duplicates)
+		found := false
+		for _, existing := range checks.pkg.imports {
+			if existing == imp {
+				found = true
+				break
+			}
+		}
+		if !found {
+			checks.pkg.imports = append(checks.pkg.imports, imp)
+		}
+
+		// Add to checks.imports for consistency
+		checks.imports = append(checks.imports, pkgName)
+
+		// NOTE: Don't add to file.DeclList - just handle the import programmatically
+		// The list method transformations will handle the method -> slices.Function conversion
 	}
 }

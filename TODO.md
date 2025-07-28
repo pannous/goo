@@ -101,3 +101,14 @@ or use GOROOT=/opt/other/go /opt/other/go/bin/go instead of global go!
      func main() {  
          result := stringfromint(42)  
          println("stringfromint(42):", result)  
+
+Allow or enforce trailing! For modifying functions.
+for isLetter(ch) || isDigit(ch) {
+    next()
+}
+if ch == '!' {
+    next()
+}         
+
+
+auto import "slices" not working, need to import "slices" manually
