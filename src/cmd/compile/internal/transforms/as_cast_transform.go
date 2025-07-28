@@ -14,13 +14,16 @@ import (
 
 // AsCastTransform converts as cast expressions to type assertions
 // Transforms: x as T -> x.(T)
-type AsCastTransform struct{}
+type AsCastTransform struct{
+	ctx *TransformContext
+}
 
 func (t *AsCastTransform) Name() string {
 	return "as_cast_transform"
 }
 
 func (t *AsCastTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	t.ctx = ctx // Store context for use in methods
 	changed := false
 
 	// Transform all declarations
@@ -121,7 +124,7 @@ func (t *AsCastTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	switch e := expr.(type) {
 	case *syntax.AsCastExpr:
 		// This is what we're looking for! Convert x as T to x.(T)
-		return t.convertAsCastToAssert(e)
+		return t.convertAsCastToAssert(e, t.ctx)
 	case *syntax.CallExpr:
 		funChanged := false
 		argsChanged := false
@@ -217,15 +220,41 @@ func (t *AsCastTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	return expr
 }
 
-func (t *AsCastTransform) convertAsCastToAssert(asCast *syntax.AsCastExpr) *syntax.AssertExpr {
+func (t *AsCastTransform) convertAsCastToAssert(asCast *syntax.AsCastExpr, ctx *TransformContext) syntax.Expr {
+	// Check if this is a no-op cast (same type)
+	// For now, we'll implement a simple optimization for obvious cases
+	// TODO: Add more sophisticated type checking
+	
+	// If casting to the same type name, just return the original expression
+	if t.isSameType(asCast.X, asCast.Type, ctx) {
+		return asCast.X
+	}
+	
 	// Create type assertion: x.(T)
 	assertExpr := &syntax.AssertExpr{
 		X:    asCast.X,
 		Type: asCast.Type,
 	}
 	assertExpr.SetPos(asCast.Pos())
-
+	
 	return assertExpr
+}
+
+// isSameType checks if the expression and type are the same
+// This is a simple heuristic - in a full implementation, we'd need proper type checking
+func (t *AsCastTransform) isSameType(expr syntax.Expr, targetType syntax.Expr, ctx *TransformContext) bool {
+	// Look up the variable's declared type in the context if available
+	if exprName, ok := expr.(*syntax.Name); ok {
+		if typeName, ok := targetType.(*syntax.Name); ok {
+			// Check if we have type information for this variable
+			if declaredType, exists := ctx.Types[exprName.Value]; exists {
+				// If the declared type matches the target type, it's a no-op
+				return declaredType == typeName.Value
+			}
+		}
+	}
+	
+	return false
 }
 
 func init() {
