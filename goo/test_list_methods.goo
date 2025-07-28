@@ -36,3 +36,24 @@ check aList.shift() == 1 // and removes it
 
 check aList.slice(1,2) == []int{2}
 check aList.copy() == aList
+
+##
+#  🟡 Methods That Need Manual import "slices":
+#
+#  - aList.contains(2) → slices.Contains(aList, 2)
+#  - aList.indexOf(2) → slices.Index(aList, 2)
+#  - aList.reverse() → needs runtime function
+#  - aList.sort() → slices.Sort(aList)
+#
+#  🔴 Methods That Are Too Complex For Now:
+#
+#  - join() - needs strings import and type conversion
+#  - prepend() - composite literal type inference issues
+#  - insert() - complex slice manipulation
+#  - pop(), shift() - modify-in-place semantics
+#  - sortDesc() - needs custom implementation
+#
+#  The key fix was adding CheckStmt support to the transform so list methods work in check statements. All the
+#  basic list methods now work correctly in goo/test_list_methods.goo.
+#
+#╭──────

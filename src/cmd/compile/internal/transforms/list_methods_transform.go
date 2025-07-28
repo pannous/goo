@@ -152,11 +152,10 @@ func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContex
 	}
 
 	// Add required imports if needed and transformations were made
-	// Disabled for now due to import resolution issues
-	// if changed && !t.hasImport(file, "slices") {
-	//     println("Adding slices import")
-	//     t.addSlicesImport(file)
-	// }
+	if changed && !t.hasImport(file, "slices") {
+		println("Adding slices import")
+		t.addSlicesImport(file)
+	}
 
 	return changed
 }
