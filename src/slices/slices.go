@@ -527,3 +527,16 @@ func Repeat[S ~[]E, E any](x S, count int) S {
 	}
 	return newslice
 }
+
+// Map returns a new slice with the results of applying the given function
+// to each element of the input slice.
+func Map[S ~[]E, E any, R any](s S, f func(E) R) []R {
+	if len(s) == 0 {
+		return nil
+	}
+	result := make([]R, len(s))
+	for i, v := range s {
+		result[i] = f(v)
+	}
+	return result
+}

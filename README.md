@@ -34,10 +34,11 @@ check not x == false =>   falsey(x)
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
 ✅ String methods "abc".contains("a")
 ✅ 3.14 as int … 
+✅ x => x * 2   lambda syntax
 ✅ class via type struct  
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
-✅ func test() int { 42 } => func test() int { return 42 }  auto return  
+✅ func test() int { 42 } => func test() int { return 42 }  auto return
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
@@ -51,8 +52,9 @@ check not x == false =>   falsey(x)
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
-☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  
-  
+☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  HARD!  
+☐ try{x}catch e{y} => func() {defer func() {if r := recover(); r != nil {y} }() x } // x, y blocks
+
 ☐ plugin.Open() is for loading .so files at runtime  
 ☐ cross off all done tasks from this list  
 ☐ any other pain points you and I might have  
