@@ -152,10 +152,12 @@ func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContex
 	}
 
 	// Add required imports if needed and transformations were made
-	if changed && !t.hasImport(file, "slices") {
-		println("Adding slices import")
-		t.addSlicesImport(file)
-	}
+	// NOTE: Auto-import is now handled at the type-checking level in types2/resolver.go
+	// by injectSlicesImportIfNeeded, so we don't need to do it here
+	// if changed && !t.hasImport(file, "slices") {
+	//     println("Adding slices import")
+	//     t.addSlicesImport(file)
+	// }
 
 	return changed
 }

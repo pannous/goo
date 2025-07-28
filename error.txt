@@ -1,0 +1,26 @@
+# command-line-arguments
+Applied transformer: as_cast_transform to package: main
+Applied transformer: auto_return to package: main
+Applied transformer: class_transform to package: main
+Applied transformer: lambda_transform to package: main
+ListMethodsTransform.Transform called
+transformListMethod: contains
+TRANSFORMING list method: contains
+transformListMethod: indexOf
+TRANSFORMING list method: indexOf
+Applied transformer: list_methods_transform to package: main
+Applied transformer: string_concat_transform to package: main
+StringMethodsTransform.Transform called
+Applied transformer: string_methods_transform to package: main
+Applied transformer: void_return to package: main
+DEBUG: injectSlicesImportIfNeeded called for file: probes/test_slices_autoimport.goo
+DEBUG: Scanning for slices methods...
+DEBUG: Found slices package call: Contains
+DEBUG: Found slices method: Contains
+DEBUG: Found slices package call: Index
+DEBUG: Found slices method: Index
+DEBUG: needsSlicesImport = true
+DEBUG: Injecting slices import
+DEBUG: Attempting to import slices package from path: slices
+DEBUG: Successfully imported slices package
+probes/test_slices_autoimport.goo:1:1: could not import slices (open : no such file or directory)
