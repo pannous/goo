@@ -33,9 +33,9 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		return t.createIsEmptyCall(receiver)
 
 	// Element access
-	case "first", "head":
+	case "first", "head", "start", "begin":
 		return t.createFirstCall(receiver)
-	case "last", "tail":
+	case "last", "tail", "end", "final":
 		return t.createLastCall(receiver)
 	case "get":
 		if len(args) == 1 {
@@ -43,11 +43,11 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		}
 
 	// Search methods
-	case "contains", "includes":
+	case "contains", "includes", "has", "holds":
 		if len(args) == 1 {
 			return t.createContainsCall(receiver, args[0])
 		}
-	case "indexOf", "find":
+	case "indexOf", "find", "search", "locate":
 		if len(args) == 1 {
 			return t.createIndexCall(receiver, args[0])
 		}
@@ -57,11 +57,11 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		}
 
 	// Modification methods (return new slice)
-	case "append", "add":
+	case "append", "add", "push", "concat":
 		if len(args) >= 1 {
 			return t.createAppendCall(receiver, args)
 		}
-	case "prepend":
+	case "prepend", "unshift", "prefix":
 		if len(args) == 1 {
 			return t.createPrependCall(receiver, args[0])
 		}
@@ -103,25 +103,25 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		}
 	case "unique", "distinct":
 		return t.createUniqueCall(receiver)
-	case "filter":
+	case "filter", "where", "chose", "that", "which":
 		if len(args) == 1 {
 			return t.createFilterCall(receiver, args[0])
 		}
-	case "map", "apply":
+	case "apply", "transform", "convert":
 		if len(args) == 1 {
 			return t.createMapCall(receiver, args[0])
 		}
 
 	// Aggregation methods
-	case "join":
+	case "join", "combine", "merge":
 		if len(args) == 1 {
 			return t.createJoinCall(receiver, args[0])
 		}
-	case "sum":
+	case "sum", "total":
 		return t.createSumCall(receiver)
-	case "min":
+	case "min", "minimum", "smallest":
 		return t.createMinCall(receiver)
-	case "max":
+	case "max", "maximum", "largest":
 		return t.createMaxCall(receiver)
 
 	// Comparison methods

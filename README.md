@@ -18,6 +18,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }  
 ✅ z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
 ✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator  
+✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]
 ✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
 ✅ go command default to run => `go test.go` OK  
 ✅ def as synonym for func, e.g. def main() { ... }  
@@ -44,6 +45,7 @@ check not x == false =>   falsey(x)
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 
+☐✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
