@@ -397,6 +397,11 @@ func (s *scanner) ident() {
 		}
 	}
 
+	// allow '!' as final character in identifier
+	if s.ch == '!' {
+		s.nextch()
+	}
+
 	// possibly a keyword
 	lit := s.segment()
 	if len(lit) >= 2 {
