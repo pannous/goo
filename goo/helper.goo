@@ -1,0 +1,4 @@
+def helper() {
+	printf("Helper function called")
+}
+helper()

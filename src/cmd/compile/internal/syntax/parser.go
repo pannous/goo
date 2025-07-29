@@ -2174,44 +2174,109 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	pos := p.pos()
 	p.want(_Lbrace)
 
-	// Create map type with any key/value types (map[any]any)
-	mapType := new(MapType)
-	mapType.pos = pos
-	anyName := new(Name)
-	anyName.pos = pos
-	anyName.Value = "any"
-	mapType.Key = anyName
-	mapType.Value = anyName
-
-	// Create composite literal
-	lit := new(CompositeLit)
-	lit.pos = pos
-	lit.Type = mapType
-
-	// Parse elements
+	// Parse elements first to analyze types
+	var elements []Expr
+	var valueExprs []Expr
+	
 	for p.tok != _Rbrace && p.tok != _EOF {
 		keyExpr := p.expr()
 		keyExpr = p.convertSymbolKeyToString(keyExpr)
 
 		p.want(_Colon)
 		valueExpr := p.expr()
+		valueExprs = append(valueExprs, valueExpr)
 
 		// Create key-value pair
 		kvExpr := new(KeyValueExpr)
 		kvExpr.pos = keyExpr.Pos()
 		kvExpr.Key = keyExpr
 		kvExpr.Value = valueExpr
-		lit.ElemList = append(lit.ElemList, kvExpr)
-		lit.NKeys++
+		elements = append(elements, kvExpr)
 
 		if !p.got(_Comma) {
 			break
 		}
 	}
 
-	lit.Rbrace = p.pos()
+	rbrace := p.pos()
 	p.want(_Rbrace)
+
+	// Infer map type based on content
+	mapType := new(MapType)
+	mapType.pos = pos
+	
+	// Key type is always string for {a: 1, b: 2} syntax
+	keyName := new(Name)
+	keyName.pos = pos
+	keyName.Value = "string"
+	mapType.Key = keyName
+	
+	// Infer value type from all values
+	valueType := p.inferValueType(valueExprs)
+	valueName := new(Name)
+	valueName.pos = pos
+	valueName.Value = valueType
+	mapType.Value = valueName
+
+	// Create composite literal with inferred type
+	lit := new(CompositeLit)
+	lit.pos = pos
+	lit.Type = mapType
+	lit.ElemList = elements
+	lit.NKeys = len(elements)
+	lit.Rbrace = rbrace
 	return lit
+}
+
+// inferValueType analyzes a list of value expressions and returns the most specific common type
+func (p *parser) inferValueType(valueExprs []Expr) string {
+	if len(valueExprs) == 0 {
+		return "any"
+	}
+
+	// Analyze each value to determine its likely type
+	types := make(map[string]int)
+	for _, expr := range valueExprs {
+		typ := p.guessExprType(expr)
+		types[typ]++
+	}
+
+	// If all values have the same type, use that type
+	if len(types) == 1 {
+		for typ := range types {
+			return typ
+		}
+	}
+
+	// If mixed types, use 'any'
+	return "any"
+}
+
+// guessExprType attempts to guess the type of an expression based on its syntax
+func (p *parser) guessExprType(expr Expr) string {
+	switch e := expr.(type) {
+	case *Name:
+		// Look for common boolean identifiers
+		switch e.Value {
+		case "true", "false":
+			return "bool"
+		case "nil":
+			return "any" // nil can be any type
+		}
+		return "any" // Unknown identifier
+	case *BasicLit:
+		switch e.Kind {
+		case IntLit:
+			return "int"
+		case FloatLit:
+			return "float64"
+		case StringLit:  
+			return "string"
+		case RuneLit:
+			return "rune"
+		}
+	}
+	return "any" // Default for complex expressions
 }
 
 func (p *parser) typeInstance(typ Expr) Expr {
