@@ -38,6 +38,7 @@ check not x == false =>   falsey(x)
 ✅ class via type struct  
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
+✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
