@@ -67,7 +67,7 @@ printf("Numbers array:", numbers)
 person := {
     name: "Alice",
     age: 30,
-    city: "Gooville"
+    city: "Gooville",
 }
 printf("Person map:", person)
 
