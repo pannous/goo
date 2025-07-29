@@ -495,6 +495,12 @@ func (p *parser) fileOrNil() *File {
 				f.DeclList = append(f.DeclList, d)
 			}
 
+		case _Void:
+			p.next()
+			if d := p.funcDeclOrNil(); d != nil {
+				f.DeclList = append(f.DeclList, d)
+			}
+
 		case _Name:
 			if p.lit == "def" {
 				p.next()
@@ -557,6 +563,43 @@ func (p *parser) fileOrNil() *File {
 			f.DeclList = append(f.DeclList, mainFunc)
 			// Clear TopLevelStmts since they're now in main
 			f.TopLevelStmts = nil
+		}
+	}
+
+	// Auto-inject imports for .goo files
+	if strings.HasSuffix(p.file.filename, ".goo") {
+		// Auto-inject fmt import if needed
+		if p.needsFmtImport(f) {
+			fmtLit := &BasicLit{
+				Value: `"fmt"`,
+				Kind:  StringLit,
+			}
+			fmtLit.pos = f.pos
+			
+			fmtImport := &ImportDecl{
+				Path: fmtLit,
+			}
+			fmtImport.pos = f.pos
+			
+			// Insert at the beginning of DeclList
+			f.DeclList = append([]Decl{fmtImport}, f.DeclList...)
+		}
+
+		// Auto-inject slices import if needed
+		if p.needsSlicesImport(f) {
+			slicesLit := &BasicLit{
+				Value: `"slices"`,
+				Kind:  StringLit,
+			}
+			slicesLit.pos = f.pos
+			
+			slicesImport := &ImportDecl{
+				Path: slicesLit,
+			}
+			slicesImport.pos = f.pos
+			
+			// Insert at the beginning of DeclList (after fmt if it was added)
+			f.DeclList = append([]Decl{slicesImport}, f.DeclList...)
 		}
 	}
 
@@ -3363,6 +3406,51 @@ func (p *parser) needsFmtImport(f *File) bool {
 		}
 		// Look for printf function calls
 		if strings.Contains(line, "printf(") || strings.Contains(line, "put(") {
+			return true
+		}
+	}
+	return false
+}
+
+// needsSlicesImport checks if the file uses list methods and doesn't already import slices
+func (p *parser) needsSlicesImport(f *File) bool {
+	// Check if slices is already imported
+	for _, decl := range f.DeclList {
+		if imp, ok := decl.(*ImportDecl); ok && imp.Path != nil {
+			if imp.Path.Value == `"slices"` {
+				return false
+			}
+		}
+	}
+
+	text := string(p.scanner.source.buf)
+	lines := strings.Split(text, "\n")
+
+	// Check if slices is already imported in the source text
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		// Skip comment lines starting with #
+		if strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		// Look for slices import statements
+		if strings.Contains(line, `import "slices"`) || strings.Contains(line, `import("slices")`) {
+			return false
+		}
+	}
+
+	// Check if list methods are used by scanning the source text directly
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		// Skip comment lines starting with #
+		if strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		// Look for list method calls that will be transformed to slices functions
+		if strings.Contains(line, ".filter(") || strings.Contains(line, ".contains(") ||
+		   strings.Contains(line, ".indexOf(") || strings.Contains(line, ".reverse(") ||
+		   strings.Contains(line, ".sort(") || strings.Contains(line, ".map(") ||
+		   strings.Contains(line, ".apply(") {
 			return true
 		}
 	}

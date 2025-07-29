@@ -78,6 +78,7 @@ const (
 	_Check          // check ≈ assert
 	_Hash           // # as comment or index
 	_Try            // try
+	_Void           // void
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -161,6 +162,7 @@ var TokenNames = [...]string{
 	_Class:          "class",
 	_Try:            "try",
 	_Catch:          "catch",
+	_Void:           "void",
 	_CUSTOM_TOKENS_: "avoid_hash_collision",
 }
 
