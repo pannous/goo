@@ -26,8 +26,8 @@ const (
 	_Assign   // =
 	_Define   // :=
 	_Arrow    // <-
-	_Lambda   // =>
 	_Star     // *
+	_Lambda   // =>
 
 	// delimiters
 	_Lparen    // (
@@ -41,40 +41,43 @@ const (
 	_Colon     // :
 	_Dot       // .
 	_DotDotDot // ...
-	_Hash      // #
+	// … .. ..? ..<
 
 	// keywords
-	_As          // as
-	_Break       // break
-	_Case        // case
-	_Chan        // chan
-	_Check       // check
-	_Const       // const
-	_Enum        // enum
-	_Continue    // continue
-	_Default     // default
-	_Defer       // defer
-	_Else        // else
-	_Fallthrough // fallthrough
-	_For         // for
-	_Func        // func
-	_Go          // go
-	_Goto        // goto
-	_If          // if
-	_Import      // import
-	_Interface   // interface
-	_Map         // map
-	_Package     // package
-	_Range       // range
-	_Return      // return
-	_Select      // select
-	_Struct      // struct
-	_Switch      // switch
-	_Type        // type
-	_Var         // var
-	_Class       // class
-	_Try         // try
-	_Catch       // catch
+	_keywords_start
+	_Break          // break
+	_Case           // case
+	_Chan           // chan
+	_Const          // const
+	_Continue       // continue
+	_Default        // default
+	_Defer          // defer
+	_Else           // else
+	_Fallthrough    // fallthrough
+	_For            // for
+	_Func           // func
+	_Go             // go
+	_Goto           // goto (wtf)
+	_If             // if
+	_Import         // import
+	_Interface      // interface
+	_Map            // map
+	_Package        // package
+	_Range          // range
+	_Return         // return
+	_Select         // select
+	_Struct         // struct
+	_Switch         // switch
+	_Type           // type
+	_Var            // var
+	_CUSTOM_TOKENS_ // the following tokens are only for .goo files:
+	_As             // as cast
+	_Enum           // enum
+	_Catch          // catch + try
+	_Class          // class
+	_Check          // check ≈ assert
+	_Hash           // # as comment or index
+	_Try            // try
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -101,63 +104,64 @@ func contains(tokset uint64, tok token) bool {
 }
 
 // TokenNames provides string representations for tokens, indexed by token value.
-// This replaces the stringer-generated token_string.go file.
+// This replaces the fragile stringer-generated token_string.go file.
 // Tokens start at 1, so index 0 is unused.
 var TokenNames = [...]string{
-	0:            "", // unused (token 0)
-	_EOF:         "EOF",
-	_Name:        "name",
-	_Literal:     "literal",
-	_Operator:    "op",
-	_AssignOp:    "op=",
-	_IncOp:       "opop",
-	_Assign:      "=",
-	_Define:      ":=",
-	_Arrow:       "<-",
-	_Lambda:      "=>",
-	_Star:        "*",
-	_Lparen:      "(",
-	_Lbrack:      "[",
-	_Lbrace:      "{",
-	_Rparen:      ")",
-	_Rbrack:      "]",
-	_Rbrace:      "}",
-	_Comma:       ",",
-	_Semi:        ";",
-	_Colon:       ":",
-	_Dot:         ".",
-	_DotDotDot:   "...",
-	_As:          "as",
-	_Break:       "break",
-	_Case:        "case",
-	_Chan:        "chan",
-	_Check:       "check",
-	_Const:       "const",
-	_Enum:        "enum",
-	_Continue:    "continue",
-	_Default:     "default",
-	_Defer:       "defer",
-	_Else:        "else",
-	_Fallthrough: "fallthrough",
-	_For:         "for",
-	_Func:        "func",
-	_Go:          "go",
-	_Goto:        "goto",
-	_If:          "if",
-	_Import:      "import",
-	_Interface:   "interface",
-	_Map:         "map",
-	_Package:     "package",
-	_Range:       "range",
-	_Return:      "return",
-	_Select:      "select",
-	_Struct:      "struct",
-	_Switch:      "switch",
-	_Type:        "type",
-	_Var:         "var",
-	_Class:       "class",
-	_Try:         "try",
-	_Catch:       "catch",
+	0:               "", // unused (token 0)
+	_EOF:            "EOF",
+	_Name:           "name",
+	_Literal:        "literal",
+	_Operator:       "op",
+	_AssignOp:       "op=",
+	_IncOp:          "opop",
+	_Assign:         "=",
+	_Define:         ":=",
+	_Arrow:          "<-",
+	_Lambda:         "=>",
+	_Star:           "*",
+	_Lparen:         "(",
+	_Lbrack:         "[",
+	_Lbrace:         "{",
+	_Rparen:         ")",
+	_Rbrack:         "]",
+	_Rbrace:         "}",
+	_Comma:          ",",
+	_Semi:           ";",
+	_Colon:          ":",
+	_Dot:            ".",
+	_DotDotDot:      "...",
+	_As:             "as",
+	_Break:          "break",
+	_Case:           "case",
+	_Chan:           "chan",
+	_Check:          "check",
+	_Const:          "const",
+	_Enum:           "enum",
+	_Continue:       "continue",
+	_Default:        "default",
+	_Defer:          "defer",
+	_Else:           "else",
+	_Fallthrough:    "fallthrough",
+	_For:            "for",
+	_Func:           "func",
+	_Go:             "go",
+	_Goto:           "goto",
+	_If:             "if",
+	_Import:         "import",
+	_Interface:      "interface",
+	_Map:            "map",
+	_Package:        "package",
+	_Range:          "range",
+	_Return:         "return",
+	_Select:         "select",
+	_Struct:         "struct",
+	_Switch:         "switch",
+	_Type:           "type",
+	_Var:            "var",
+	_Class:          "class",
+	_Try:            "try",
+	_Catch:          "catch",
+	_CUSTOM_TOKENS_: "avoid_hash_collision",
 }
 
 // String returns the string representation of the token.
@@ -214,7 +218,7 @@ const (
 	AndNot // &^
 	Shl    // <<
 	Shr    // >>
-	IS     // isa
+	IS     // is
 )
 
 // OperatorNames provides string representations for Operator constants, replacing stringer-generated operator_string.go
@@ -243,7 +247,7 @@ var OperatorNames = [...]string{
 	AndNot: "&^",
 	Shl:    "<<",
 	Shr:    ">>",
-	IS:     "isa",
+	IS:     "is",
 }
 
 // String returns the string representation of the Operator.

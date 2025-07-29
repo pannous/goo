@@ -1,0 +1,30 @@
+// Test different map types with dot notation
+user := map[string]string{"name": "John", "city": "NYC"}
+scores := map[string]int{"math": 95, "english": 87}
+settings := map[string]bool{"debug": true, "verbose": false}
+data := map[string]any{"count": 42, "message": "hello"}
+
+// Test basic access
+printf("User: %v from %v\n", user.name, user.city)
+printf("Scores: Math=%v, English=%v\n", scores.math, scores.english)
+printf("Settings: Debug=%v, Verbose=%v\n", settings.debug, settings.verbose)
+printf("Data: Count=%v, Message=%v\n", data.count, data.message)
+
+// Test in expressions
+total := scores.math + scores.english
+printf("Total score: %v\n", total)
+
+// Test in conditionals
+if settings.debug {
+    printf("Debug mode is enabled\n")
+}
+
+// Test assignments
+newScore := scores.math
+printf("New score: %v\n", newScore)
+
+// Test function calls with dot notation
+printf("Function call test: %v\n", data.count)
+
+// Test compatibility with bracket notation
+printf("Bracket notation still works: %v\n", user["name"])

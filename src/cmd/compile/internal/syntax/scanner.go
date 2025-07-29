@@ -500,26 +500,29 @@ func hash(s []byte) uint {
 	return (uint(s[0])<<4 ^ uint(s[1]) + uint(len(s))) & uint(len(keywordMap)-1)
 }
 
-var keywordMap [1 << 7]token // size must be power of two
+var keywordMap [1 << 10]token // size must be power of two
 
 func init() {
 	// populate keywordMap
-	for tok := _As; tok <= _Var; tok++ {
+	last_keyword := _CUSTOM_TOKENS_
+	if useTransforms() {
+		last_keyword = tokenCount // include all tokens if transformers are enabled
+	}
+	for tok := _keywords_start + 1; tok < last_keyword; tok++ {
 		h := hash([]byte(tok.String()))
 		if keywordMap[h] != 0 {
+			print(h)
+			print(keywordMap[h].String())
+			print(tok.String())
 			panic("imperfect hash")
 		}
 		keywordMap[h] = tok
 	}
-	
-	// Add try and catch keywords
-	for _, tok := range []token{_Try, _Catch} {
-		h := hash([]byte(tok.String()))
-		if keywordMap[h] != 0 {
-			panic("imperfect hash")
-		}
-		keywordMap[h] = tok
-	}
+
+}
+
+func useTransforms() bool {
+	return os.Getenv("GOO_USE_TRANSFORMERS") == "1"
 }
 
 func lower(ch rune) rune     { return ('a' - 'A') | ch } // returns lower-case ch iff ch is ASCII letter

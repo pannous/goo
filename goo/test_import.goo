@@ -1,4 +1,9 @@
 import "os"
+# import "lib" // with helper.go  NOPE! only with mod.go
+# use "helper.go"
+
+helper()
+
 path := "."
 
 // Test that both imports work together
