@@ -318,9 +318,17 @@ func (w walker) node(n Node) {
 
 	case *CheckStmt:
 		w.node(n.Cond)
+	case *TryCatchStmt:
+		w.node(n.TryBlock)
+		if n.CatchVar != nil {
+			w.node(n.CatchVar)
+		}
+		if n.CatchBlock != nil {
+			w.node(n.CatchBlock)
+		}
 
 	default:
-		panic(fmt.Sprintf("internal error: unknown node type %T", n))
+		panic(fmt.Sprintf("internal error: walk.go:331 unregistered node type %T", n))
 	}
 
 	w.v.Visit(nil)

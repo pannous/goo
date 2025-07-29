@@ -1,6 +1,6 @@
 try {
 	panic("something went wrong")
 } catch err {
-	printf("Caught error: %v\n",err)
+	println("Caught error: %v\n",err)
 }
 print("After try-catch")

@@ -38,6 +38,7 @@ check not x == false =>   falsey(x)
 ✅ class via type struct  
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
+✅ try{x}catch e{y} => func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
@@ -53,8 +54,7 @@ check not x == false =>   falsey(x)
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
-☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  HARD!  
-☐ try{x}catch e{y} => func() {defer func() {if r := recover(); r != nil {y} }() x } // x, y blocks
+instanceOf(a, reflect.TypeOf((*T)(nil)).Elem()) // or generated static checks
 
 ☐ plugin.Open() is for loading .so files at runtime  
 ☐ cross off all done tasks from this list  
@@ -62,18 +62,12 @@ check not x == false =>   falsey(x)
 𐄂 AAA Game Engine Core? Never  
   
   
-HARD  
-  
-map(x => x * 2)  
-Desugared form (your compiler should expand this):  
-map(func(x any) any { return x * 2 })  
-filter(x => x % 2 == 1)  
-reduce((a, b) => a + b, 0)  
-If types are known ([]int, etc.), generate func(int) int instead of func(any) any.  
+If types are known ([]int, etc.), generate func(int) int instead of func(any) any.
 ☐ 1 is int        surprisingly hard to implement
 ☐ [1, 2, 3] is []any  HARD!!  
 ☐ [1, 2, 3] is []int  
 ☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
+☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... } 
   
   
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}  

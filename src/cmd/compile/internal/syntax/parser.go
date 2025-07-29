@@ -3520,9 +3520,6 @@ func (p *parser) stmtOrNil() Stmt {
 	case _If:
 		return p.ifStmt()
 
-	case _Try:
-		return p.tryCatchStmt()
-
 	case _Fallthrough:
 		s := new(BranchStmt)
 		s.pos = p.pos()
@@ -3539,14 +3536,6 @@ func (p *parser) stmtOrNil() Stmt {
 			s.Label = p.name()
 		}
 		return s
-
-	case _Check:
-		s := new(CheckStmt)
-		s.pos = p.pos()
-		p.next()
-		s.Cond = p.expr()
-		return s
-
 	case _Go, _Defer:
 		return p.callStmt()
 
@@ -3570,6 +3559,15 @@ func (p *parser) stmtOrNil() Stmt {
 	case _Semi:
 		s := new(EmptyStmt)
 		s.pos = p.pos()
+		return s
+
+	case _Try: // try-catch statement should only be active with transformers tag
+		return p.tryCatchStmt()
+	case _Check:
+		s := new(CheckStmt)
+		s.pos = p.pos()
+		p.next()
+		s.Cond = p.expr()
 		return s
 	}
 
