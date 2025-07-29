@@ -1587,6 +1587,11 @@ func (p *parser) operand(keep_parens bool) Expr {
 			return p.sliceLiteral(pos, first)
 		}
 
+		// If ] follows immediately, it could be single-element slice [42] 
+		if p.tok == _Rbrack {
+			return p.sliceLiteral(pos, first)
+		}
+
 		// Otherwise it's array type [expr]Type
 		p.want(_Rbrack)
 		t := new(ArrayType)
@@ -2057,21 +2062,8 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 		defer p.trace("sliceLiteral")()
 	}
 
-	// Create slice type with inferred element type ([]any)
-	sliceType := new(SliceType)
-	sliceType.pos = pos
-	anyName := new(Name)
-	anyName.pos = pos
-	anyName.Value = "any"
-	sliceType.Elem = anyName
-
-	// Create composite literal
-	lit := new(CompositeLit)
-	lit.pos = pos
-	lit.Type = sliceType
-
-	// Add first element - for slice literals, elements are just expressions, not key-value pairs
-	lit.ElemList = append(lit.ElemList, first)
+	// Collect all elements first to analyze types
+	elements := []Expr{first}
 
 	// Parse remaining elements
 	for p.tok == _Comma {
@@ -2081,11 +2073,29 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 		}
 
 		expr := p.expr()
-		lit.ElemList = append(lit.ElemList, expr)
+		elements = append(elements, expr)
 	}
 
-	lit.Rbrace = p.pos()
+	rbrace := p.pos()
 	p.want(_Rbrack)
+
+	// Infer element type from all elements
+	elemType := p.inferValueType(elements)
+	
+	// Create slice type with inferred element type
+	sliceType := new(SliceType)
+	sliceType.pos = pos
+	elemName := new(Name)
+	elemName.pos = pos
+	elemName.Value = elemType
+	sliceType.Elem = elemName
+
+	// Create composite literal with inferred type
+	lit := new(CompositeLit)
+	lit.pos = pos
+	lit.Type = sliceType
+	lit.ElemList = elements
+	lit.Rbrace = rbrace
 	return lit
 }
 

@@ -1,0 +1,35 @@
+// Test slice type inference: [2, 4, 6] == []int{2, 4, 6}
+
+// Test 1: Integer values infer to []int
+numbers := [2, 4, 6, 8]
+put("Integer inference:", numbers)
+
+// Test 2: String values infer to []string  
+words := ["hello", "world", "go"]
+put("String inference:", words)
+
+// Test 3: Boolean values infer to []bool
+flags := [true, false, true]
+put("Bool inference:", flags)
+
+// Test 4: Mixed values infer to []any
+mixed := [1, "hello", true, 3.14]
+put("Mixed inference:", mixed)
+
+// Test 5: Single element works
+single := [42]
+put("Single element:", single)
+
+// Test 6: Assignment compatibility
+var scores []int = [95, 87, 92, 88]
+put("Assignment works:", scores)
+
+// Test 7: Function parameter compatibility
+func printNums(nums []int) {
+    put("Function param:", nums)
+}
+printNums([10, 20, 30, 40])
+
+// Test 8: Nested slices
+matrix := [[1, 2], [3, 4], [5, 6]]
+put("Nested slices:", matrix)

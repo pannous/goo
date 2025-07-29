@@ -1,11 +1,17 @@
+import "slices"
+
 # depends on test_list_typed.goo and map function test_list_map.goo
 #xs := [1, 2, 3]
 xs := []int{1, 2, 3}
-#ys := xs.map(x=>x*2) // should return []int{2, 4, 6}
 ys := xs.apply(x=>x*2) // should return []int{2, 4, 6}
 
 check ys == []int{2, 4, 6}
+check xs.apply(x=>x*2)  == []int{2, 4, 6}
+check xs.apply(x=>x*2)  == [2, 4, 6]
 
 #check aList.map(x => x*2) == []int{2, 4, 6}
 #check aList.filter(x => x%2==1) == []int{1, 3}
 #check aList.reduce((a,b)=>a+b, 0) == 6
+
+print("All OK")
+
