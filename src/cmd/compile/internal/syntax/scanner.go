@@ -504,7 +504,7 @@ var keywordMap [1 << 7]token // size must be power of two
 
 func init() {
 	// populate keywordMap
-	for tok := _As; tok <= _Var; tok++ {
+	for tok := _As; tok <= _Class; tok++ {
 		h := hash([]byte(tok.String()))
 		if keywordMap[h] != 0 {
 			panic("imperfect hash")
