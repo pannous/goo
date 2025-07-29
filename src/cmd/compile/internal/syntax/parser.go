@@ -2079,8 +2079,8 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	rbrace := p.pos()
 	p.want(_Rbrack)
 
-	// Only do type inference when transforms are enabled
-	if useTransforms() {
+	// Only do type inference when specifically enabled
+	if os.Getenv("GOO_TYPE_INFERENCE") == "1" {
 		// Infer element type from all elements
 		elemType := p.inferValueType(elements)
 		
@@ -2222,8 +2222,8 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	rbrace := p.pos()
 	p.want(_Rbrace)
 
-	// Only do type inference when transforms are enabled
-	if useTransforms() {
+	// Only do type inference when specifically enabled
+	if os.Getenv("GOO_TYPE_INFERENCE") == "1" {
 		// Infer map type based on content
 		mapType := new(MapType)
 		mapType.pos = pos

@@ -8,6 +8,9 @@ import (
 	"cmd/compile/internal/syntax"
 )
 
+// Type aliases for convenience
+type Expr = syntax.Expr
+
 // ListMethodsTransform handles automatic transformation of list/slice method calls
 // to their corresponding Go standard library function calls.
 type ListMethodsTransform struct{}
@@ -483,7 +486,7 @@ func (t *ListMethodsTransform) createSliceCall(receiver, start, end syntax.Expr)
 
 	slice := &syntax.SliceExpr{
 		X:     receiver,
-		Index: [3]syntax.Expr{start, end, nil},
+		Index: [3]Expr{start, end, nil},
 	}
 	slice.SetPos(pos)
 
@@ -496,7 +499,7 @@ func (t *ListMethodsTransform) createFromCall(receiver, start syntax.Expr) synta
 
 	slice := &syntax.SliceExpr{
 		X:     receiver,
-		Index: [3]syntax.Expr{start, nil, nil},
+		Index: [3]Expr{start, nil, nil},
 	}
 	slice.SetPos(pos)
 
@@ -509,7 +512,7 @@ func (t *ListMethodsTransform) createToCall(receiver, end syntax.Expr) syntax.Ex
 
 	slice := &syntax.SliceExpr{
 		X:     receiver,
-		Index: [3]syntax.Expr{nil, end, nil},
+		Index: [3]Expr{nil, end, nil},
 	}
 	slice.SetPos(pos)
 
@@ -541,7 +544,7 @@ func (t *ListMethodsTransform) createCopyCall(receiver syntax.Expr) syntax.Expr 
 	// Create receiver[:0:0] to get an empty slice of the same type
 	emptySlice := &syntax.SliceExpr{
 		X:     receiver,
-		Index: [3]syntax.Expr{
+		Index: [3]Expr{
 			&syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
 			&syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
 			&syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
