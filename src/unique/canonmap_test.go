@@ -76,7 +76,7 @@ func testCanonMap(t *testing.T, newMap func() *canonMap[string]) {
 			// insertions and cleanups to overlap.
 			m := newMap()
 			gmp := runtime.GOMAXPROCS(-1)
-			for try := range 3 {
+			for try_ := range 3 {
 				var wg sync.WaitGroup
 				for i := range gmp {
 					wg.Add(1)
@@ -86,7 +86,7 @@ func testCanonMap(t *testing.T, newMap func() *canonMap[string]) {
 						var refs []*string
 						for _, s := range testData {
 							key := makeKey(s, id)
-							if try == 0 {
+							if try_ == 0 {
 								expectMissing(t, key)(m.Load(key))
 							}
 							refs = append(refs, expectPresent(t, key)(m.LoadOrStore(key)))

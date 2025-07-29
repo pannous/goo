@@ -444,6 +444,13 @@ type (
 		stmt
 	}
 
+	TryCatchStmt struct {
+		TryBlock   *BlockStmt
+		CatchVar   *Name
+		CatchBlock *BlockStmt
+		stmt
+	}
+
 	SwitchStmt struct {
 		Init   SimpleStmt
 		Tag    Expr // incl. *TypeSwitchGuard

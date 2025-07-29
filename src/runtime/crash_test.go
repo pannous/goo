@@ -642,10 +642,10 @@ func TestMemPprof(t *testing.T) {
 	fn := strings.TrimSpace(string(got))
 	defer os.Remove(fn)
 
-	for try := 0; try < 2; try++ {
+	for try_ := 0; try_ < 2; try_++ {
 		cmd := testenv.CleanCmdEnv(exec.Command(testenv.GoToolPath(t), "tool", "pprof", "-alloc_space", "-top"))
 		// Check that pprof works both with and without explicit executable on command line.
-		if try == 0 {
+		if try_ == 0 {
 			cmd.Args = append(cmd.Args, exe, fn)
 		} else {
 			cmd.Args = append(cmd.Args, fn)

@@ -13,15 +13,15 @@ import (
 
 type I interface{ M() }
 
-func F[P I](p P) { defer catch(); p.M() }
-func G[T any]()  { defer catch(); interface{ M() T }.M(nil) }
+func F[P I](p P) { defer catcher(); p.M() }
+func G[T any]()  { defer catcher(); interface{ M() T }.M(nil) }
 
 func main() {
 	F[I](nil)
 	G[int]()
 }
 
-func catch() {
+func catcher() {
 	err := recover()
 	if err, ok := err.(error); ok && strings.Contains(err.Error(), "nil pointer dereference") {
 		return

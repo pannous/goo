@@ -357,6 +357,7 @@ const stopset uint64 = 1<<_Break |
 	1<<_Return |
 	1<<_Select |
 	1<<_Switch |
+	1<<_Try |
 	1<<_Type |
 	1<<_Var
 
@@ -508,7 +509,7 @@ func (p *parser) fileOrNil() *File {
 			if p.tok == _Lbrace && len(f.DeclList) > 0 && isEmptyFuncDecl(f.DeclList[len(f.DeclList)-1]) {
 				// opening { of function declaration on next line
 				p.syntaxError("unexpected semicolon or newline before {")
-				p.advance(_Import, _Const, _Class, _Type, _Var, _Func)
+				p.advance(_Import, _Const, _Class, _Try, _Type, _Var, _Func)
 				continue
 			} else {
 				// Parse as a top-level statement for implicit main
@@ -524,7 +525,7 @@ func (p *parser) fileOrNil() *File {
 
 		if p.tok != _EOF && !p.got(_Semi) {
 			p.syntaxError("after top level declaration")
-			p.advance(_Import, _Const, _Class, _Type, _Var, _Func)
+			p.advance(_Import, _Const, _Class, _Try, _Type, _Var, _Func)
 		}
 	}
 	// p.tok == _EOF
@@ -3306,6 +3307,39 @@ func (p *parser) ifStmt() *IfStmt {
 	return s
 }
 
+func (p *parser) tryCatchStmt() *TryCatchStmt {
+	if trace {
+		defer p.trace("tryCatchStmt")()
+	}
+
+	s := new(TryCatchStmt)
+	s.pos = p.pos()
+
+	// consume 'try'
+	p.next()
+
+	// parse try block
+	s.TryBlock = p.blockStmt("try clause")
+
+	// expect 'catch'
+	if !p.got(_Catch) {
+		p.syntaxError("expected 'catch' after try block")
+		return s
+	}
+
+	// parse catch variable
+	if p.tok != _Name {
+		p.syntaxError("expected variable name after 'catch'")
+		p.advance(_Name, _Lbrace)
+	}
+	s.CatchVar = p.name()
+
+	// parse catch block
+	s.CatchBlock = p.blockStmt("catch clause")
+
+	return s
+}
+
 func (p *parser) switchStmt() *SwitchStmt {
 	if trace {
 		defer p.trace("switchStmt")()
@@ -3485,6 +3519,9 @@ func (p *parser) stmtOrNil() Stmt {
 
 	case _If:
 		return p.ifStmt()
+
+	case _Try:
+		return p.tryCatchStmt()
 
 	case _Fallthrough:
 		s := new(BranchStmt)

@@ -62,7 +62,7 @@ func TestMapIterOrder(t *testing.T) {
 			}
 			first := ord()
 			ok := false
-			for try := 0; try < 100; try++ {
+			for try_ := 0; try_ < 100; try_++ {
 				if !slices.Equal(first, ord()) {
 					ok = true
 					break

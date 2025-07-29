@@ -559,8 +559,8 @@ func TestRelroSectionOverlapIssue67261(t *testing.T) {
 	} else {
 		ccprog := strings.TrimSpace(string(out))
 		tries := []string{"strip", "llvm-strip"}
-		for _, try := range tries {
-			cmd := testenv.Command(t, ccprog, "-print-prog-name="+try)
+		for _, try_ := range tries {
+			cmd := testenv.Command(t, ccprog, "-print-prog-name="+try_)
 			if out, err := cmd.CombinedOutput(); err != nil {
 				t.Fatalf("print-prog-name failed: %+v %v:\n%s",
 					cmd.Args, err, out)

@@ -43,12 +43,12 @@ func CreateTemp(dir, pattern string) (*File, error) {
 	}
 	prefix = joinPath(dir, prefix)
 
-	try := 0
+	try_ := 0
 	for {
 		name := prefix + nextRandom() + suffix
 		f, err := OpenFile(name, O_RDWR|O_CREATE|O_EXCL, 0600)
 		if IsExist(err) {
-			if try++; try < 10000 {
+			if try_++; try_ < 10000 {
 				continue
 			}
 			return nil, &PathError{Op: "createtemp", Path: prefix + "*" + suffix, Err: ErrExist}
@@ -94,7 +94,7 @@ func MkdirTemp(dir, pattern string) (string, error) {
 	}
 	prefix = joinPath(dir, prefix)
 
-	try := 0
+	try_ := 0
 	for {
 		name := prefix + nextRandom() + suffix
 		err := Mkdir(name, 0700)
@@ -102,7 +102,7 @@ func MkdirTemp(dir, pattern string) (string, error) {
 			return name, nil
 		}
 		if IsExist(err) {
-			if try++; try < 10000 {
+			if try_++; try_ < 10000 {
 				continue
 			}
 			return "", &PathError{Op: "mkdirtemp", Path: dir + string(PathSeparator) + prefix + "*" + suffix, Err: ErrExist}

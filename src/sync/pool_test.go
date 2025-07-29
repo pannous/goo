@@ -116,8 +116,8 @@ func testPool(t *testing.T, drain bool) {
 
 	var p Pool
 	const N = 100
-	for try := 0; try < 3; try++ {
-		if try == 1 && testing.Short() {
+	for try_ := 0; try_ < 3; try_++ {
+		if try_ == 1 && testing.Short() {
 			break
 		}
 		var cln, cln1 uint32
@@ -141,7 +141,7 @@ func testPool(t *testing.T, drain bool) {
 
 		// 1 pointer can remain on stack or elsewhere
 		if cln1 = atomic.LoadUint32(&cln); cln1 < N-1 {
-			t.Fatalf("only %v out of %v resources are cleaned up on try %v", cln1, N, try)
+			t.Fatalf("only %v out of %v resources are cleaned up on try %v", cln1, N, try_)
 		}
 	}
 }
@@ -260,7 +260,7 @@ func testPoolDequeue(t *testing.T, d PoolDequeue) {
 }
 
 func TestNilPool(t *testing.T) {
-	catch := func() {
+	catcher := func() {
 		if recover() == nil {
 			t.Error("expected panic")
 		}
@@ -268,14 +268,14 @@ func TestNilPool(t *testing.T) {
 
 	var p *Pool
 	t.Run("Get", func(t *testing.T) {
-		defer catch()
+		defer catcher()
 		if p.Get() != nil {
 			t.Error("expected empty")
 		}
 		t.Error("should have panicked already")
 	})
 	t.Run("Put", func(t *testing.T) {
-		defer catch()
+		defer catcher()
 		p.Put("a")
 		t.Error("should have panicked already")
 	})

@@ -212,11 +212,11 @@ func TestLongAdjustTimers(t *testing.T) {
 	}()
 
 	for i := range 50000 {
-		const try = 20
-		for range try {
+		const try_ = 20
+		for range try_ {
 			inQ <- func() {}
 		}
-		for range try {
+		for range try_ {
 			select {
 			case _, ok := <-outQ:
 				if !ok {

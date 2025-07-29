@@ -73,6 +73,8 @@ const (
 	_Type        // type
 	_Var         // var
 	_Class       // class
+	_Try         // try
+	_Catch       // catch
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -154,6 +156,8 @@ var TokenNames = [...]string{
 	_Type:        "type",
 	_Var:         "var",
 	_Class:       "class",
+	_Try:         "try",
+	_Catch:       "catch",
 }
 
 // String returns the string representation of the token.
