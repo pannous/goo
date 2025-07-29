@@ -209,10 +209,27 @@ func (checks *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 				}
 				selector.SetPos(name.Pos())
 
-				// Create format string "%v\n"
+				// Create format string with spaces between arguments, e.g. "%v %v %v\n"
+				numArgs := len(call.ArgList)
+				var formatValue string
+				if numArgs == 0 {
+					formatValue = "\"\\n\""
+				} else if numArgs == 1 {
+					formatValue = "\"%v\\n\""
+				} else {
+					// Build format string with spaces: "%v %v %v\n"
+					formatValue = "\""
+					for i := 0; i < numArgs; i++ {
+						if i > 0 {
+							formatValue += " "
+						}
+						formatValue += "%v"
+					}
+					formatValue += "\\n\""
+				}
 				formatStr := &syntax.BasicLit{
 					Kind:  syntax.StringLit,
-					Value: "\"%v\\n\"",
+					Value: formatValue,
 				}
 				formatStr.SetPos(name.Pos())
 

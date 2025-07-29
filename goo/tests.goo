@@ -1,6 +1,11 @@
-try {
-	panic("something went wrong")
-} catch err {
-	println("Caught error: %v\n",err)
-}
-print("After try-catch")
+x:={a:1,b:2}; put(x) // => fmt.Printf("%v\n",x)
+y:={a:1,b:2}
+#check x==map[a:1 b:2]
+check x==y
+#
+#try {
+#	panic("something went wrong")
+#} catch err {
+#	println("Caught error: %v\n",err)
+#}
+#print("After try-catch")
