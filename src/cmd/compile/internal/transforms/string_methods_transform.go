@@ -30,11 +30,11 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 	println("transformStringMethod:", methodName)
 	switch methodName {
 	// Basic string info
-	case "reverse":
+	case "reverse", "flip":
 		return t.createReverseCall(receiver)
-	case "first":
+	case "first", "head", "start":
 		return t.createFirstCall(receiver)
-	case "last":
+	case "last", "tail", "end":
 		return t.createLastCall(receiver)
 	case "size", "length", "len":
 		return t.createLenCall(receiver)
@@ -47,11 +47,11 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createIsEmptyCall(receiver)
 
 	// Search methods
-	case "contains", "includes":
+	case "contains", "includes", "has", "holds":
 		if len(args) == 1 {
 			return t.createContainsCall(receiver, args[0])
 		}
-	case "indexOf", "find":
+	case "indexOf", "find", "search", "locate":
 		if len(args) == 1 {
 			return t.createIndexCall(receiver, args[0])
 		}
@@ -75,7 +75,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		}
 
 	// Replace methods
-	case "replace", "replaceAll":
+	case "replace", "replaceAll", "substitute", "swap":
 		if len(args) == 2 {
 			return t.createReplaceCall(receiver, args[0], args[1])
 		}
@@ -141,7 +141,9 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 	// Padding methods
 	case "center":
 		if len(args) >= 1 {
-			var fillChar syntax.Expr = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			var fillChar syntax.Expr
+			fillChar = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			fillChar.SetPos(receiver.Pos())
 			if len(args) == 2 {
 				fillChar = args[1]
 			}
@@ -149,7 +151,9 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		}
 	case "ljust", "padLeft":
 		if len(args) >= 1 {
-			var fillChar syntax.Expr = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			var fillChar syntax.Expr
+			fillChar = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			fillChar.SetPos(receiver.Pos())
 			if len(args) == 2 {
 				fillChar = args[1]
 			}
@@ -157,7 +161,9 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		}
 	case "rjust", "padRight":
 		if len(args) >= 1 {
-			var fillChar syntax.Expr = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			var fillChar syntax.Expr
+			fillChar = &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+			fillChar.SetPos(receiver.Pos())
 			if len(args) == 2 {
 				fillChar = args[1]
 			}
@@ -265,10 +271,15 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 						*call = *expr
 					case *syntax.SliceExpr:
 						// For slice expressions, we just need to update the call directly
-						*call = *(&syntax.CallExpr{
-							Fun:     &syntax.Name{Value: "string"},
+						pos := expr.Pos()
+						stringName := &syntax.Name{Value: "string"}
+						stringName.SetPos(pos)
+						newCall := &syntax.CallExpr{
+							Fun:     stringName,
 							ArgList: []syntax.Expr{expr},
-						})
+						}
+						newCall.SetPos(pos)
+						*call = *newCall
 					}
 					v.changed = true
 					// Track required imports based on method name
@@ -318,49 +329,75 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// createReverseCall creates strings.Reverse(receiver)
+// createReverseCall creates a TODO error for string reverse (needs runtime implementation)
 func (t *StringMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Reverse"},
-		},
-		ArgList: []syntax.Expr{receiver},
-	}
+	return t.createCompilerError(receiver, "reverse", "string_reversal_not_implemented")
 }
 
 // createFirstCall creates receiver[0:1] for first character
 func (t *StringMethodsTransform) createFirstCall(receiver syntax.Expr) syntax.Expr {
-	// Create a slice expression receiver[0:1]
-	return &syntax.CallExpr{
-		Fun: &syntax.Name{Value: "string"},
-		ArgList: []syntax.Expr{
-			&syntax.IndexExpr{
-				X:     receiver,
-				Index: &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
-			},
-		},
+	pos := receiver.Pos()
+
+	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zeroLit.SetPos(pos)
+
+	index := &syntax.IndexExpr{
+		X:     receiver,
+		Index: zeroLit,
 	}
+	index.SetPos(pos)
+
+	stringName := &syntax.Name{Value: "string"}
+	stringName.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     stringName,
+		ArgList: []syntax.Expr{index},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createLastCall creates string(receiver[len(receiver)-1]) for last character
 func (t *StringMethodsTransform) createLastCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.Name{Value: "string"},
-		ArgList: []syntax.Expr{
-			&syntax.IndexExpr{
-				X: receiver,
-				Index: &syntax.Operation{
-					Op: syntax.Sub,
-					X: &syntax.CallExpr{
-						Fun:     &syntax.Name{Value: "len"},
-						ArgList: []syntax.Expr{receiver},
-					},
-					Y: &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"},
-				},
-			},
-		},
+	pos := receiver.Pos()
+
+	lenName := &syntax.Name{Value: "len"}
+	lenName.SetPos(pos)
+
+	lenCall := &syntax.CallExpr{
+		Fun:     lenName,
+		ArgList: []syntax.Expr{receiver},
 	}
+	lenCall.SetPos(pos)
+
+	oneLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+	oneLit.SetPos(pos)
+
+	minus := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  lenCall,
+		Y:  oneLit,
+	}
+	minus.SetPos(pos)
+
+	index := &syntax.IndexExpr{
+		X:     receiver,
+		Index: minus,
+	}
+	index.SetPos(pos)
+
+	stringName := &syntax.Name{Value: "string"}
+	stringName.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     stringName,
+		ArgList: []syntax.Expr{index},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createLenCall creates len(receiver)
@@ -499,6 +536,7 @@ func (t *StringMethodsTransform) addStringsImport(file *syntax.File) {
 			Kind:  syntax.StringLit,
 		},
 	}
+	stringsImport.SetPos(syntax.Pos{})
 
 	var insertPos int
 	for i, decl := range file.DeclList {
@@ -532,13 +570,27 @@ func (t *StringMethodsTransform) hasImport(file *syntax.File, name string) bool 
 
 // createReplaceCall creates strings.ReplaceAll(receiver, old, new)
 func (t *StringMethodsTransform) createReplaceCall(receiver, old, new syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "ReplaceAll"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "ReplaceAll"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, old, new},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createToUpperCall creates strings.ToUpper(receiver)
@@ -568,70 +620,151 @@ func (t *StringMethodsTransform) createToUpperCall(receiver syntax.Expr) syntax.
 
 // createToLowerCall creates strings.ToLower(receiver)
 func (t *StringMethodsTransform) createToLowerCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "ToLower"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "ToLower"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createCapitalizeCall creates strings.Title(receiver)
 func (t *StringMethodsTransform) createCapitalizeCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Title"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Title"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createTrimCall creates strings.TrimSpace(receiver)
 func (t *StringMethodsTransform) createTrimCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "TrimSpace"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "TrimSpace"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createSplitCall creates strings.Split(receiver, sep)
 func (t *StringMethodsTransform) createSplitCall(receiver, sep syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Split"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Split"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, sep},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createSplitsCall creates strings.Split(receiver, "")
 func (t *StringMethodsTransform) createSplitsCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Split"},
-		},
-		ArgList: []syntax.Expr{
-			receiver,
-			&syntax.BasicLit{Kind: syntax.StringLit, Value: `""`},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Split"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
 	}
+	selector.SetPos(pos)
+
+	emptyString := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
+	emptyString.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, emptyString},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createRunesCall creates []rune(receiver)
 func (t *StringMethodsTransform) createRunesCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.ArrayType{
-			Elem: &syntax.Name{Value: "rune"},
-		},
+	pos := receiver.Pos()
+
+	runeName := &syntax.Name{Value: "rune"}
+	runeName.SetPos(pos)
+
+	arrayType := &syntax.ArrayType{
+		Elem: runeName,
+	}
+	arrayType.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     arrayType,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createJoinCall creates strings.Join(receiver.splits(), sep)
@@ -650,50 +783,97 @@ func (t *StringMethodsTransform) createJoinCall(receiver, sep syntax.Expr) synta
 
 // createStartsWithCall creates strings.HasPrefix(receiver, prefix)
 func (t *StringMethodsTransform) createStartsWithCall(receiver, prefix syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "HasPrefix"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "HasPrefix"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, prefix},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createEndsWithCall creates strings.HasSuffix(receiver, suffix)
 func (t *StringMethodsTransform) createEndsWithCall(receiver, suffix syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "HasSuffix"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "HasSuffix"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, suffix},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createToIntCall creates helper function call for string to int conversion
 func (t *StringMethodsTransform) createToIntCall(receiver syntax.Expr, base syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
 	if base == nil {
 		// Call runtime helper: stringToInt(receiver)
-		return &syntax.CallExpr{
-			Fun:     &syntax.Name{Value: "stringToInt"},
+		funcName := &syntax.Name{Value: "stringToInt"}
+		funcName.SetPos(pos)
+
+		call := &syntax.CallExpr{
+			Fun:     funcName,
 			ArgList: []syntax.Expr{receiver},
 		}
+		call.SetPos(pos)
+		return call
 	} else {
 		// Call runtime helper: stringToIntBase(receiver, base)
-		return &syntax.CallExpr{
-			Fun:     &syntax.Name{Value: "stringToIntBase"},
+		funcName := &syntax.Name{Value: "stringToIntBase"}
+		funcName.SetPos(pos)
+
+		call := &syntax.CallExpr{
+			Fun:     funcName,
 			ArgList: []syntax.Expr{receiver, base},
 		}
+		call.SetPos(pos)
+		return call
 	}
 }
 
 // createToFloatCall creates helper function call for string to float conversion
 func (t *StringMethodsTransform) createToFloatCall(receiver syntax.Expr) syntax.Expr {
-	// Call runtime helper: stringToFloat(receiver)
-	return &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "stringToFloat"},
+	pos := receiver.Pos()
+
+	funcName := &syntax.Name{Value: "stringToFloat"}
+	funcName.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     funcName,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 func (t *StringMethodsTransform) addStrconvImport(file *syntax.File) {
@@ -707,6 +887,7 @@ func (t *StringMethodsTransform) addStrconvImport(file *syntax.File) {
 			Kind:  syntax.StringLit,
 		},
 	}
+	strconvImport.SetPos(syntax.Pos{})
 
 	var insertPos int
 	for i, decl := range file.DeclList {
@@ -735,6 +916,7 @@ func (t *StringMethodsTransform) addUnicodeImport(file *syntax.File) {
 			Kind:  syntax.StringLit,
 		},
 	}
+	unicodeImport.SetPos(syntax.Pos{})
 
 	var insertPos int
 	for i, decl := range file.DeclList {
@@ -767,47 +949,106 @@ func (t *StringMethodsTransform) createCompilerError(receiver syntax.Expr, metho
 
 // createCountCall creates strings.Count(receiver, substr)
 func (t *StringMethodsTransform) createCountCall(receiver, substr syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Count"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Count"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, substr},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createIsEmptyCall creates len(receiver) == 0
 func (t *StringMethodsTransform) createIsEmptyCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.Operation{
-		Op: syntax.Eql,
-		X: &syntax.CallExpr{
-			Fun:     &syntax.Name{Value: "len"},
-			ArgList: []syntax.Expr{receiver},
-		},
-		Y: &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
+	pos := receiver.Pos()
+
+	lenName := &syntax.Name{Value: "len"}
+	lenName.SetPos(pos)
+
+	lenCall := &syntax.CallExpr{
+		Fun:     lenName,
+		ArgList: []syntax.Expr{receiver},
 	}
+	lenCall.SetPos(pos)
+
+	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zeroLit.SetPos(pos)
+
+	op := &syntax.Operation{
+		Op: syntax.Eql,
+		X:  lenCall,
+		Y:  zeroLit,
+	}
+	op.SetPos(pos)
+
+	return op
 }
 
 // createLastIndexCall creates strings.LastIndex(receiver, substr)
 func (t *StringMethodsTransform) createLastIndexCall(receiver, substr syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "LastIndex"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "LastIndex"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, substr},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createReplaceFirstCall creates strings.Replace(receiver, old, new, 1)
 func (t *StringMethodsTransform) createReplaceFirstCall(receiver, old, new syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Replace"},
-		},
-		ArgList: []syntax.Expr{receiver, old, new, &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Replace"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
 	}
+	selector.SetPos(pos)
+
+	oneLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+	oneLit.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, old, new, oneLit},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createSwapCaseCall creates TODO error (needs runtime implementation)
@@ -817,79 +1058,186 @@ func (t *StringMethodsTransform) createSwapCaseCall(receiver syntax.Expr) syntax
 
 // createTrimLeftCall creates strings.TrimLeft(receiver, " ")
 func (t *StringMethodsTransform) createTrimLeftCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "TrimLeft"},
-		},
-		ArgList: []syntax.Expr{receiver, &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "TrimLeft"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
 	}
+	selector.SetPos(pos)
+
+	spaceLit := &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+	spaceLit.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, spaceLit},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createTrimRightCall creates strings.TrimRight(receiver, " ")
 func (t *StringMethodsTransform) createTrimRightCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "TrimRight"},
-		},
-		ArgList: []syntax.Expr{receiver, &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "TrimRight"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
 	}
+	selector.SetPos(pos)
+
+	spaceLit := &syntax.BasicLit{Kind: syntax.StringLit, Value: `" "`}
+	spaceLit.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, spaceLit},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createLinesCall creates strings.Split(receiver, "\n")
 func (t *StringMethodsTransform) createLinesCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Split"},
-		},
-		ArgList: []syntax.Expr{receiver, &syntax.BasicLit{Kind: syntax.StringLit, Value: `"\n"`}},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Split"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
 	}
+	selector.SetPos(pos)
+
+	newlineLit := &syntax.BasicLit{Kind: syntax.StringLit, Value: `"\n"`}
+	newlineLit.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, newlineLit},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createWordsCall creates strings.Fields(receiver)
 func (t *StringMethodsTransform) createWordsCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Fields"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Fields"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createRemovePrefixCall creates strings.TrimPrefix(receiver, prefix)
 func (t *StringMethodsTransform) createRemovePrefixCall(receiver, prefix syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "TrimPrefix"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "TrimPrefix"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, prefix},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createRemoveSuffixCall creates strings.TrimSuffix(receiver, suffix)
 func (t *StringMethodsTransform) createRemoveSuffixCall(receiver, suffix syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "TrimSuffix"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "TrimSuffix"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, suffix},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createRepeatCall creates strings.Repeat(receiver, count)
 func (t *StringMethodsTransform) createRepeatCall(receiver, count syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Repeat"},
-		},
+	pos := receiver.Pos()
+
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "Repeat"}
+	funcName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, count},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // Padding methods (need runtime implementation)
@@ -940,11 +1288,18 @@ func (t *StringMethodsTransform) createIsPrintableCall(receiver syntax.Expr) syn
 
 // createToBoolCall creates helper function call for string to bool conversion
 func (t *StringMethodsTransform) createToBoolCall(receiver syntax.Expr) syntax.Expr {
-	// Call runtime helper: stringToBool(receiver)
-	return &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "stringToBool"},
+	pos := receiver.Pos()
+
+	funcName := &syntax.Name{Value: "stringToBool"}
+	funcName.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     funcName,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+
+	return call
 }
 
 func init() {
