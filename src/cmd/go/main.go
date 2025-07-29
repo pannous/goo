@@ -49,7 +49,6 @@ import (
 )
 
 func init() {
-	os.Setenv("GOO_USE_TRANSFORMERS", "1") // Enable transformers by default for .goo files
 	base.Go.Commands = []*base.Command{
 		bug.CmdBug,
 		work.CmdBuild,
@@ -306,6 +305,11 @@ func lookupCmd(args []string) (cmd *base.Command, used int) {
 }
 
 func invoke(cmd *base.Command, args []string) {
+	if strings.HasSuffix(args[len(args)-1], ".goo") {
+		println("GOO_USE_TRANSFORMERS")
+		os.Setenv("GOO_USE_TRANSFORMERS", "1") // Enable transformers by default for .goo files
+	}
+
 	// 'go env' handles checking the build config
 	if cmd != envcmd.CmdEnv {
 		buildcfg.Check()

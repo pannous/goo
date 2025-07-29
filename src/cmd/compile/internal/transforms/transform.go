@@ -215,6 +215,9 @@ var TransformRegistry []Transformer
 
 // RegisterTransformer adds a transformer to the global registry.
 func RegisterTransformer(t Transformer) {
+	if t.Name() != "try_catch_transform" {
+		return
+	} // DEBUG ONE!
 	// Check if the transformer is already registered
 	for _, existing := range TransformRegistry {
 		if existing.Name() == t.Name() {
