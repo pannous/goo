@@ -618,7 +618,27 @@ func (t *ListMethodsTransform) createUniqueCall(receiver syntax.Expr) syntax.Exp
 }
 
 func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr) syntax.Expr {
-	return t.createCompilerError(receiver, "filter", "filter_elements")
+	pos := receiver.Pos()
+
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+
+	filterName := &syntax.Name{Value: "Filter"}
+	filterName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: filterName,
+	}
+	selector.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, predicate},
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr) syntax.Expr {

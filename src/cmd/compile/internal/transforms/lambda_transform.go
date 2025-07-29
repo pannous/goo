@@ -184,9 +184,9 @@ func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syn
 		return nil
 	}
 
-	// Create a return type (for now, use 'int' to match the parameter)
-	// TODO: Implement proper type inference
-	returnType := &syntax.Name{Value: "int"}
+	// Infer return type based on lambda body expression
+	returnTypeName := t.inferReturnType(lambda.Body)
+	returnType := &syntax.Name{Value: returnTypeName}
 	returnType.SetPos(lambda.Pos())
 
 	returnField := &syntax.Field{Type: returnType}
@@ -220,6 +220,48 @@ func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syn
 	funcLit.SetPos(lambda.Pos())
 
 	return funcLit
+}
+
+// inferReturnType analyzes the lambda body expression to infer the return type
+func (t *LambdaTransform) inferReturnType(expr syntax.Expr) string {
+	switch e := expr.(type) {
+	case *syntax.Operation:
+		switch e.Op {
+		// Comparison operators return bool
+		case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq:
+			return "bool"
+		// Logical operators return bool
+		case syntax.AndAnd, syntax.OrOr:
+			return "bool"
+		// Arithmetic operators typically return int (simplified)
+		case syntax.Add, syntax.Sub, syntax.Mul, syntax.Div, syntax.Rem:
+			return "int"
+		// Bitwise operators return int
+		case syntax.And, syntax.Or, syntax.Xor, syntax.Shl, syntax.Shr, syntax.AndNot:
+			return "int"
+		}
+	case *syntax.BasicLit:
+		switch e.Kind {
+		case syntax.IntLit:
+			return "int"
+		case syntax.FloatLit:
+			return "float64"
+		case syntax.StringLit:
+			return "string"
+		case syntax.RuneLit:
+			return "rune"
+		}
+	case *syntax.Name:
+		// For variable references, we can't easily determine the type without more context
+		// Default to int for now
+		return "int"
+	case *syntax.CallExpr:
+		// Function call - would need more complex analysis
+		return "int"
+	}
+	
+	// Default to int if we can't determine the type
+	return "int"
 }
 
 func init() {
