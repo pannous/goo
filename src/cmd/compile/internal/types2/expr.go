@@ -520,6 +520,19 @@ func (checks *Checker) comparison(x, y *operand, op syntax.Operator, switchCase 
 		goto Error
 	}
 
+	// Transform map comparisons to function calls before checking comparability
+	if (op == syntax.Eql || op == syntax.Neq) && 
+	   under(x.typ) != nil && under(y.typ) != nil &&
+	   !x.isNil() && !y.isNil() {
+		if _, xIsMap := under(x.typ).(*Map); xIsMap {
+			if _, yIsMap := under(y.typ).(*Map); yIsMap {
+				// Transform map comparison to function call
+				checks.transformMapComparison(x, y, op)
+				return
+			}
+		}
+	}
+
 	// check if comparison is defined for operands
 	code = UndefinedOp
 	switch op {
@@ -1480,4 +1493,50 @@ var op2tok = [...]token.Token{
 	syntax.AndNot: token.AND_NOT,
 	syntax.Shl:    token.SHL,
 	syntax.Shr:    token.SHR,
+}
+
+// transformMapComparison transforms map == map and map != map comparisons 
+// into function calls that perform element-wise comparison
+func (checks *Checker) transformMapComparison(x, y *operand, op syntax.Operator) {
+	// Create a closure that performs the map comparison
+	// For x == y: func() bool { 
+	//   if len(x) != len(y) { return false }
+	//   for k, v := range x { if y[k] != v { return false } }
+	//   return true 
+	// }()
+	
+	// For now, create a simple function call expression that will be handled at runtime
+	// This approach is similar to how put() creates fmt.Printf calls
+	
+	// Create reflect.DeepEqual(x, y) call
+	reflectName := syntax.NewName(x.expr.Pos(), "reflect")
+	deepEqualName := syntax.NewName(x.expr.Pos(), "DeepEqual")
+	selector := &syntax.SelectorExpr{
+		X:   reflectName,
+		Sel: deepEqualName,
+	}
+	selector.SetPos(x.expr.Pos())
+	
+	// Create call expression: reflect.DeepEqual(x, y)
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{x.expr, y.expr},
+	}
+	call.SetPos(x.expr.Pos())
+	
+	// For != operation, we'll need to negate the result
+	var resultExpr syntax.Expr = call
+	if op == syntax.Neq {
+		// Create !__mapEqual(x, y)
+		resultExpr = &syntax.Operation{
+			Op: syntax.Not,
+			X:  call,
+		}
+		resultExpr.SetPos(x.expr.Pos())
+	}
+	
+	// Set the operand to represent the result of this comparison
+	x.mode = value
+	x.typ = Typ[Bool]
+	x.expr = resultExpr
 }

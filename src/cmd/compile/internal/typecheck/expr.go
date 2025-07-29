@@ -135,8 +135,9 @@ func tcArith(n ir.Node, op ir.Op, l, r ir.Node) (ir.Node, ir.Node, *types.Type) 
 	// Slices are now comparable - remove restriction
 
 	if l.Type().IsMap() && !ir.IsNil(l) && !ir.IsNil(r) {
-		base.Errorf("invalid operation: %v (map can only be compared to nil)", n)
-		return l, r, nil
+		// Allow map comparisons - they will be transformed to reflect.DeepEqual
+		// base.Errorf("invalid operation: %v (map can only be compared to nil)", n)
+		// return l, r, nil
 	}
 
 	if l.Type().Kind() == types.TFUNC && !ir.IsNil(l) && !ir.IsNil(r) {
