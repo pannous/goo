@@ -122,13 +122,13 @@ func rootMkdirAll(r *Root, fullname string, perm FileMode) error {
 	// The usual default openDirFunc just opens directories with O_DIRECTORY.
 	// We replace it here with one that creates missing directories along the way.
 	openDirFunc := func(parent sysfdType, name string) (sysfdType, error) {
-		for try := range 2 {
+		for try_ := range 2 {
 			fd, err := rootOpenDir(parent, name)
 			switch err.(type) {
 			case nil, errSymlink:
 				return fd, err
 			}
-			if try > 0 || !IsNotExist(err) {
+			if try_ > 0 || !IsNotExist(err) {
 				return 0, &PathError{Op: "openat", Err: err}
 			}
 			if err := mkdirat(parent, name, perm); err != nil {

@@ -26,16 +26,16 @@ var (
 //
 // The arg is an interface index or 0 for all.
 func fetchRIB(typ, arg int) ([]byte, error) {
-	try := 0
+	try_ := 0
 	for {
-		try++
+		try_++
 		b, err := syscall.RouteRIB(typ, arg)
 
 		// If the sysctl failed because the data got larger
 		// between the two sysctl calls, try a few times
 		// before failing (issue #45736).
 		const maxTries = 3
-		if err == syscall.ENOMEM && try < maxTries {
+		if err == syscall.ENOMEM && try_ < maxTries {
 			continue
 		}
 

@@ -219,7 +219,7 @@ func RunErr(cmdargs ...any) error {
 func RunStdin(cmdline []string) {
 	env := slices.Clip(cfg.OrigEnv)
 	env = AppendPATH(env)
-	for try := range 3 {
+	for try_ := range 3 {
 		cmd := exec.Command(cmdline[0], cmdline[1:]...)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
@@ -242,7 +242,7 @@ func RunStdin(cmdline []string) {
 		// we may get an ETXTBSY. That should resolve once that process closes the file
 		// so attempt a couple more times. See the discussion in #22220 and also
 		// (*runTestActor).Act in cmd/go/internal/test, which does something similar.
-		time.Sleep(100 * time.Millisecond << uint(try))
+		time.Sleep(100 * time.Millisecond << uint(try_))
 	}
 }
 

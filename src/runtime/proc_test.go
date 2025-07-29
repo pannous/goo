@@ -123,7 +123,7 @@ func TestGoroutineParallelism(t *testing.T) {
 	// also preempts at the start of the sweep phase, so make sure that's
 	// done too. See #45867.
 	runtime.GC()
-	for try := 0; try < N; try++ {
+	for try_ := 0; try_ < N; try_++ {
 		done := make(chan bool)
 		x := uint32(0)
 		for p := 0; p < P; p++ {
@@ -171,7 +171,7 @@ func testGoroutineParallelism2(t *testing.T, load, netpoll bool) {
 	// also preempts at the start of the sweep phase, so make sure that's
 	// done too. See #45867.
 	runtime.GC()
-	for try := 0; try < N; try++ {
+	for try_ := 0; try_ < N; try_++ {
 		if load {
 			// Create P goroutines and wait until they all run.
 			// When we run the actual test below, worker threads

@@ -110,15 +110,15 @@ func main() {
 		}
 
 		go i32receiver(c32, sync)
-		try := 0
+		try_ := 0
 	Send32:
 		for {
 			select {
 			case c32 <- 123:
 				break Send32
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					println("i32receiver buffer=", buffer)
 					panic("fail")
 				}
@@ -131,15 +131,15 @@ func main() {
 		if buffer > 0 {
 			<-sync
 		}
-		try = 0
+		try_ = 0
 	Recv32:
 		for {
 			select {
 			case i32 = <-c32:
 				break Recv32
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					println("i32sender buffer=", buffer)
 					panic("fail")
 				}
@@ -154,15 +154,15 @@ func main() {
 		}
 
 		go i64receiver(c64, sync)
-		try = 0
+		try_ = 0
 	Send64:
 		for {
 			select {
 			case c64 <- 123456:
 				break Send64
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					panic("i64receiver")
 				}
 				sleep()
@@ -174,15 +174,15 @@ func main() {
 		if buffer > 0 {
 			<-sync
 		}
-		try = 0
+		try_ = 0
 	Recv64:
 		for {
 			select {
 			case i64 = <-c64:
 				break Recv64
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					panic("i64sender")
 				}
 				sleep()
@@ -196,15 +196,15 @@ func main() {
 		}
 
 		go breceiver(cb, sync)
-		try = 0
+		try_ = 0
 	SendBool:
 		for {
 			select {
 			case cb <- true:
 				break SendBool
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					panic("breceiver")
 				}
 				sleep()
@@ -216,15 +216,15 @@ func main() {
 		if buffer > 0 {
 			<-sync
 		}
-		try = 0
+		try_ = 0
 	RecvBool:
 		for {
 			select {
 			case b = <-cb:
 				break RecvBool
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					panic("bsender")
 				}
 				sleep()
@@ -238,15 +238,15 @@ func main() {
 		}
 
 		go sreceiver(cs, sync)
-		try = 0
+		try_ = 0
 	SendString:
 		for {
 			select {
 			case cs <- "hello":
 				break SendString
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					panic("sreceiver")
 				}
 				sleep()
@@ -258,15 +258,15 @@ func main() {
 		if buffer > 0 {
 			<-sync
 		}
-		try = 0
+		try_ = 0
 	RecvString:
 		for {
 			select {
 			case s = <-cs:
 				break RecvString
 			default:
-				try++
-				if try > maxTries {
+				try_++
+				if try_ > maxTries {
 					panic("ssender")
 				}
 				sleep()

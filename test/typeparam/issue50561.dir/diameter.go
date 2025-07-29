@@ -32,7 +32,7 @@ type Future[T any] interface {
 	OnFailure(cb func(err error), ctx ...Executor)
 	OnSuccess(cb func(success T), ctx ...Executor)
 	Foreach(f func(v T), ctx ...Executor)
-	OnComplete(cb func(try Try[T]), ctx ...Executor)
+	OnComplete(cb func(try_ Try[T]), ctx ...Executor)
 	IsCompleted() bool
 	//	Value() Option[Try[T]]
 	Failed() Future[error]

@@ -1,7 +1,6 @@
-var f any = 3.14
-doubled := (f as float64) * 2
-# doubled := (f as int) * 2 // todo: cast!
-var f2 float64 = 3.14
-doubled2 := (f2 as float64) * 2 // todo: nothing
-
-println(doubled) // outputs: 6.28
+try {
+	panic("something went wrong")
+} catch err {
+	printf("Caught error: %v\n", err)
+}
+put("After try-catch")

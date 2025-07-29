@@ -11,7 +11,7 @@ import (
 	"log"
 )
 
-func try[T any](v T, err error) T {
+func try_[T any](v T, err error) T {
 	if err != nil {
 		panic(err)
 	}
@@ -30,5 +30,5 @@ func handle(handle func(error)) {
 
 func main() {
 	defer handle(func(e error) { log.Fatalln(e) })
-	_ = try(fmt.Print(""))
+	_ = try_(fmt.Print(""))
 }
