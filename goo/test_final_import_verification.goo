@@ -1,0 +1,15 @@
+// Test that standard imports work
+import "fmt"
+
+fmt.Println("Standard import works")
+
+// Test that helper() call works when defined locally
+func Helper() string {
+    return "Local helper works"
+}
+
+printf("Local function test: %v\n", Helper())
+
+// Now test the actual import we want to achieve
+// This should fail until import is implemented
+// import "helper.goo"

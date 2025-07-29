@@ -32,10 +32,11 @@ Running all tests in ./goo/ directory...
 ✅ test_default_run.goo
 ✅ test_enum.goo
 ✅ test_explicit_main.goo
+✅ test_final_import_verification.goo
 ✅ test_fmt.goo
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
-✅ test_import.goo
+🔴 test_import.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
@@ -45,6 +46,9 @@ Running all tests in ./goo/ directory...
 🔴 test_list_methods.goo
 🔴 test_list_typed.goo
 ✅ test_list.goo
+🔴 test_local_import_simple.goo
+✅ test_map_dot_comprehensive.goo
+✅ test_map_dot_notation.goo
 🔴 test_map_fields.goo
 ✅ test_map.goo
 ✅ test_minimal_conflict.goo
@@ -69,6 +73,7 @@ Running all tests in ./goo/ directory...
 🔴 test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_truthy.goo
+✅ test_try_catch.goo
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
@@ -78,6 +83,7 @@ Running all tests in ./goo/ directory...
 ✅ debug_list_transform.goo
 🔴 debug_op.goo
 ✅ exact_problem.goo
+🔴 helper.goo
 ✅ return_problem.goo
 ✅ simple_test.goo
 ✅ simple_void_test.goo
@@ -95,7 +101,7 @@ Running all tests in ./goo/ directory...
 ✅ test_chained_concat.goo
 ✅ test_check_simple.goo
 ✅ test_class_keyword.goo
-🔴 test_class_methods_advanced.goo
+✅ test_class_methods_advanced.goo
 ✅ test_class_methods_simple.goo
 ✅ test_class_methods_working.goo
 ✅ test_class_parse_only.goo
@@ -129,11 +135,16 @@ Running all tests in ./goo/ directory...
 ✅ test_list_simple.goo
 🔴 test_list_with_import.goo
 ✅ test_list_working.goo
+🔴 test_local_import.goo
 ✅ test_manual_import.goo
 ✅ test_manual_slices_contains.goo
 🔴 test_manual_slices.goo
 ✅ test_manual_strings_reverse.goo
 ✅ test_manual_strings.goo
+✅ test_map_dot_detailed.goo
+✅ test_map_dot_edge_cases.goo
+✅ test_map_dot_notation.goo
+✅ test_map_dot.goo
 ✅ test_minimal_isa.goo
 🔴 test_new_methods.goo
 🔴 test_new_string_functions.goo
@@ -157,6 +168,7 @@ Running all tests in ./goo/ directory...
 ✅ test_strings_manual.goo
 ✅ test_strings_manual2.goo
 ✅ test_toupper_method.goo
+✅ test_try_catch_simple.goo
 🔴 test_type_assertion_binary.goo
 🔴 test_type_assertion_simple.goo
 🔴 test_type_assertion.goo
@@ -164,7 +176,6 @@ Running all tests in ./goo/ directory...
 🔴 test_user_example.goo
 ✅ test_working_methods.goo
 ✅ test_working_transforms.goo
-🔴 try_catch.goo
 ========================================
-Summary: 113/165 passed, 52 failed
+Summary: 122/176 passed, 54 failed
 ⚠️  Some tests failed
