@@ -3404,8 +3404,9 @@ func (p *parser) needsFmtImport(f *File) bool {
 		if strings.HasPrefix(trimmed, "#") {
 			continue
 		}
-		// Look for printf function calls
-		if strings.Contains(line, "printf(") || strings.Contains(line, "put(") {
+		// Look for printf function calls or fmt package usage
+		if strings.Contains(line, "printf(") || strings.Contains(line, "put(") || 
+		   strings.Contains(line, "fmt.") {
 			return true
 		}
 	}

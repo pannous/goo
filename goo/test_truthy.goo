@@ -1,9 +1,4 @@
-#!/usr/bin/env goo
-package main
 
-import "fmt"
-
-func main() {
 	// Test numeric truthiness
 	if 0 {
 		fmt.Println("FAIL: 0 should be falsy")
@@ -64,4 +59,3 @@ func main() {
 	} else {
 		fmt.Println("PASS: false is falsy")
 	}
-}
