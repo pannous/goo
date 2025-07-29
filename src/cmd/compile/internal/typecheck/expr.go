@@ -135,9 +135,8 @@ func tcArith(n ir.Node, op ir.Op, l, r ir.Node) (ir.Node, ir.Node, *types.Type) 
 	// Slices are now comparable - remove restriction
 
 	if l.Type().IsMap() && !ir.IsNil(l) && !ir.IsNil(r) {
-		// Allow map comparisons - they will be transformed to reflect.DeepEqual
-		// base.Errorf("invalid operation: %v (map can only be compared to nil)", n)
-		// return l, r, nil
+		// Allow map comparisons - uses Go's default comparison (pointer-based)
+		// TODO: Transform to reflect.DeepEqual for content-based comparison
 	}
 
 	if l.Type().Kind() == types.TFUNC && !ir.IsNil(l) && !ir.IsNil(r) {
@@ -911,4 +910,42 @@ func tcUnaryArith(n *ir.UnaryExpr) ir.Node {
 
 	n.SetType(t)
 	return n
+}
+
+// transformMapEqualityCheck transforms map == map and map != map comparisons 
+// into reflect.DeepEqual calls for content-based comparison
+func transformMapEqualityCheck(n ir.Node, op ir.Op, l, r ir.Node) (ir.Node, ir.Node, *types.Type) {
+	pos := n.Pos()
+	
+	// Create reflect.DeepEqual(l, r) call
+	// First, create the selector for reflect.DeepEqual
+	reflectPkg := types.NewPkg("reflect", "reflect")
+	deepEqualSym := reflectPkg.Lookup("DeepEqual")
+	
+	// Create the function reference
+	deepEqualName := ir.NewNameAt(pos, deepEqualSym, nil)
+	deepEqualName.SetType(types.NewSignature(nil,
+		[]*types.Field{
+			types.NewField(pos, nil, types.Types[types.TINTER]),  // interface{} x
+			types.NewField(pos, nil, types.Types[types.TINTER]),  // interface{} y  
+		},
+		[]*types.Field{
+			types.NewField(pos, nil, types.Types[types.TBOOL]),   // bool result
+		}))
+	deepEqualName.SetTypecheck(1)
+	
+	// Create the function call using the proper Call function
+	args := []ir.Node{l, r}
+	call := Call(pos, deepEqualName, args, false)
+	
+	// For != operation, negate the result
+	var result ir.Node = call
+	if op == ir.ONE { // ONE is "not equal"
+		result = ir.NewUnaryExpr(pos, ir.ONOT, call)
+		result.SetType(types.Types[types.TBOOL])
+		result.SetTypecheck(1)
+	}
+	
+	// Return the transformed call as the left operand, nil as right, bool as type
+	return result, nil, types.Types[types.TBOOL]
 }
