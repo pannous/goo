@@ -184,9 +184,8 @@ func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syn
 		return nil
 	}
 
-	// Create a return type (for now, use 'int' to match the parameter)
-	// TODO: Implement proper type inference
-	returnType := &syntax.Name{Value: "int"}
+	// Infer return type from lambda body
+	returnType := &syntax.Name{Value: t.inferReturnType(lambda.Body)}
 	returnType.SetPos(lambda.Pos())
 
 	returnField := &syntax.Field{Type: returnType}
@@ -220,6 +219,100 @@ func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syn
 	funcLit.SetPos(lambda.Pos())
 
 	return funcLit
+}
+
+// inferReturnType analyzes the lambda body expression to determine the return type
+func (t *LambdaTransform) inferReturnType(expr syntax.Expr) string {
+	if expr == nil {
+		return "any"
+	}
+
+	switch e := expr.(type) {
+	case *syntax.Operation:
+		// Handle comparison operations
+		switch e.Op {
+		case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq:
+			return "bool" // Comparison operators return bool
+		case syntax.Land, syntax.Lor:
+			return "bool" // Logical operators return bool
+		case syntax.Add, syntax.Sub, syntax.Mul, syntax.Div, syntax.Rem:
+			// Arithmetic operations - infer from operands
+			return t.inferArithmeticType(e.X, e.Y)
+		default:
+			// For other operations, try to infer from left operand
+			return t.inferExpressionType(e.X)
+		}
+	case *syntax.BasicLit:
+		return t.inferLiteralType(e)
+	case *syntax.Name:
+		// For variable references, we can't easily infer the type
+		// In a full implementation, we'd need a symbol table
+		return "any"
+	case *syntax.CallExpr:
+		// Function calls - would need more context to determine return type
+		return "any"
+	default:
+		return "any"
+	}
+}
+
+// inferLiteralType determines the type of a literal expression
+func (t *LambdaTransform) inferLiteralType(lit *syntax.BasicLit) string {
+	switch lit.Kind {
+	case syntax.IntLit:
+		return "int"
+	case syntax.FloatLit:
+		return "float64"
+	case syntax.StringLit:
+		return "string"
+	case syntax.CharLit:
+		return "rune"
+	default:
+		return "any"
+	}
+}
+
+// inferArithmeticType determines the result type of arithmetic operations
+func (t *LambdaTransform) inferArithmeticType(left, right syntax.Expr) string {
+	leftType := t.inferExpressionType(left)
+	rightType := t.inferExpressionType(right)
+	
+	// Simple rule: if both are int, result is int
+	// if either is float, result is float
+	if leftType == "float64" || rightType == "float64" {
+		return "float64"
+	}
+	if leftType == "int" && rightType == "int" {
+		return "int"
+	}
+	return "any"
+}
+
+// inferExpressionType determines the type of an expression
+func (t *LambdaTransform) inferExpressionType(expr syntax.Expr) string {
+	if expr == nil {
+		return "any"
+	}
+	
+	switch e := expr.(type) {
+	case *syntax.BasicLit:
+		return t.inferLiteralType(e)
+	case *syntax.Operation:
+		switch e.Op {
+		case syntax.Rem: // % operator
+			// Modulo operation typically returns int
+			return "int"
+		case syntax.Add, syntax.Sub, syntax.Mul, syntax.Div:
+			return t.inferArithmeticType(e.X, e.Y)
+		default:
+			return "any"
+		}
+	case *syntax.Name:
+		// Variable reference - would need symbol table for proper inference
+		return "any"
+	default:
+		return "any"
+	}
 }
 
 func init() {
