@@ -28,6 +28,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ map[active:true age:30 name:Alice]  
 ✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
+✅ map type inference: {math: 95, english: 87} == map[string]int{"math": 95, "english": 87}
 ✅ enum Status { OK, BAD } with generated .String() method  
 ✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)  
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
@@ -42,6 +43,7 @@ check not x == false =>   falsey(x)
 ✅ try{x}catch e{y} => func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
+
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
@@ -70,7 +72,6 @@ If types are known ([]int, etc.), generate func(int) int instead of func(any) an
 ☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
 ☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... } 
   
-☐ map type inference: {math: 95, english: 87} == map[string]int{"math": 95, "english": 87}
 ☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}  
 ☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)  
 ☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)  
