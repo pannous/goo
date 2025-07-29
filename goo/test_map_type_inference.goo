@@ -2,26 +2,26 @@
 
 // Test 1: Integer values infer to map[string]int
 scores := {math: 95, english: 87, science: 92}
-print("Integer inference:", scores.math)
+put("Integer inference:", scores.math)
 
 // Test 2: String values infer to map[string]string  
 names := {first: "John", last: "Doe"}
-print("String inference:", names.first)
+put("String inference:", names.first)
 
 // Test 3: Boolean values infer to map[string]bool
 flags := {active: true, verified: false}
-print("Bool inference:", flags.active)
+put("Bool inference:", flags.active)
 
 // Test 4: Mixed values infer to map[string]any
 mixed := {name: "John", age: 25, active: true}
-print("Mixed inference - name:", mixed.name)
+put("Mixed inference - name:", mixed.name)
 
 // Test 5: Assignment compatibility
 var grades map[string]int = {math: 95, english: 87}
-print("Assignment works:", grades)
+put("Assignment works:", grades)
 
 // Test 6: Function parameter compatibility
 func printGrades(g map[string]int) {
-    print("Function param:", g)
+    put("Function param:", g)
 }
 printGrades({physics: 88, chemistry: 91})
