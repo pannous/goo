@@ -540,3 +540,17 @@ func Map[S ~[]E, E any, R any](s S, f func(E) R) []R {
 	}
 	return result
 }
+
+// Filter returns a new slice containing only the elements that satisfy the predicate.
+func Filter[S ~[]E, E any](s S, f func(E) bool) S {
+	if len(s) == 0 {
+		return nil
+	}
+	result := make(S, 0, len(s))
+	for _, v := range s {
+		if f(v) {
+			result = append(result, v)
+		}
+	}
+	return result
+}
