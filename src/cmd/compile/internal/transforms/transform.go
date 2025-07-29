@@ -215,9 +215,9 @@ var TransformRegistry []Transformer
 
 // RegisterTransformer adds a transformer to the global registry.
 func RegisterTransformer(t Transformer) {
-	if t.Name() != "try_catch_transform" {
+	if t.Name() != "try_catch_transform" && t.Name() != "map_dot_transform" {
 		return
-	} // DEBUG ONE!
+	} // DEBUG - only allow specific transformers
 	// Check if the transformer is already registered
 	for _, existing := range TransformRegistry {
 		if existing.Name() == t.Name() {
@@ -340,6 +340,17 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 							ctx.Types[lhs.Value] = "array"
 						}
 					}
+				} else if mapType, ok3 := rhsComp.Type.(*syntax.MapType); ok3 {
+					// This is a map type like map[string]int
+					keyType := "unknown"
+					valueType := "unknown"
+					if keyName, ok4 := mapType.Key.(*syntax.Name); ok4 {
+						keyType = keyName.Value
+					}
+					if valueName, ok4 := mapType.Value.(*syntax.Name); ok4 {
+						valueType = valueName.Value
+					}
+					ctx.Types[lhs.Value] = "map[" + keyType + "]" + valueType
 				}
 			}
 		}
