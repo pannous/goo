@@ -2079,21 +2079,32 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	rbrace := p.pos()
 	p.want(_Rbrack)
 
-	// Infer element type from all elements
-	elemType := p.inferValueType(elements)
-	
-	// Create slice type with inferred element type
-	sliceType := new(SliceType)
-	sliceType.pos = pos
-	elemName := new(Name)
-	elemName.pos = pos
-	elemName.Value = elemType
-	sliceType.Elem = elemName
+	// Only do type inference when transforms are enabled
+	if useTransforms() {
+		// Infer element type from all elements
+		elemType := p.inferValueType(elements)
+		
+		// Create slice type with inferred element type
+		sliceType := new(SliceType)
+		sliceType.pos = pos
+		elemName := new(Name)
+		elemName.pos = pos
+		elemName.Value = elemType
+		sliceType.Elem = elemName
 
-	// Create composite literal with inferred type
+		// Create composite literal with inferred type
+		lit := new(CompositeLit)
+		lit.pos = pos
+		lit.Type = sliceType
+		lit.ElemList = elements
+		lit.Rbrace = rbrace
+		return lit
+	}
+
+	// Without transforms, create basic slice literal without explicit type
 	lit := new(CompositeLit)
 	lit.pos = pos
-	lit.Type = sliceType
+	lit.Type = nil // No explicit type - will be inferred by type checker
 	lit.ElemList = elements
 	lit.Rbrace = rbrace
 	return lit
@@ -2211,27 +2222,39 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	rbrace := p.pos()
 	p.want(_Rbrace)
 
-	// Infer map type based on content
-	mapType := new(MapType)
-	mapType.pos = pos
-	
-	// Key type is always string for {a: 1, b: 2} syntax
-	keyName := new(Name)
-	keyName.pos = pos
-	keyName.Value = "string"
-	mapType.Key = keyName
-	
-	// Infer value type from all values
-	valueType := p.inferValueType(valueExprs)
-	valueName := new(Name)
-	valueName.pos = pos
-	valueName.Value = valueType
-	mapType.Value = valueName
+	// Only do type inference when transforms are enabled
+	if useTransforms() {
+		// Infer map type based on content
+		mapType := new(MapType)
+		mapType.pos = pos
+		
+		// Key type is always string for {a: 1, b: 2} syntax
+		keyName := new(Name)
+		keyName.pos = pos
+		keyName.Value = "string"
+		mapType.Key = keyName
+		
+		// Infer value type from all values
+		valueType := p.inferValueType(valueExprs)
+		valueName := new(Name)
+		valueName.pos = pos
+		valueName.Value = valueType
+		mapType.Value = valueName
 
-	// Create composite literal with inferred type
+		// Create composite literal with inferred type
+		lit := new(CompositeLit)
+		lit.pos = pos
+		lit.Type = mapType
+		lit.ElemList = elements
+		lit.NKeys = len(elements)
+		lit.Rbrace = rbrace
+		return lit
+	}
+
+	// Without transforms, create basic map literal without explicit type
 	lit := new(CompositeLit)
 	lit.pos = pos
-	lit.Type = mapType
+	lit.Type = nil // No explicit type - will be inferred by type checker
 	lit.ElemList = elements
 	lit.NKeys = len(elements)
 	lit.Rbrace = rbrace
