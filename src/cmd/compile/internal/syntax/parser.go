@@ -1587,7 +1587,20 @@ func (p *parser) operand(keep_parens bool) Expr {
 			return p.sliceLiteral(pos, first)
 		}
 
-		// Otherwise it's array type [expr]Type
+		// If ] follows immediately, check context to disambiguate [42] cases  
+		if p.tok == _Rbrack {
+			// For now, conservatively assume single bracket expressions are array types
+			// This preserves the existing behavior and avoids breaking [3]syntax.Expr{...}
+			// Single-element slice literals [42] will need explicit syntax: []int{42}
+			p.want(_Rbrack)
+			t := new(ArrayType)
+			t.pos = pos
+			t.Len = first
+			t.Elem = p.type_()
+			return t
+		}
+
+		// Otherwise it's array type [expr]Type (shouldn't happen with current tokens)
 		p.want(_Rbrack)
 		t := new(ArrayType)
 		t.pos = pos
@@ -2051,27 +2064,14 @@ func (p *parser) mapTypeOrLiteral() Expr {
 	}
 }
 
-// sliceLiteral parses [1,2,3] style slice literals
+// sliceLiteral parses [1,2,3] style slice literals with type inference
 func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	if trace {
 		defer p.trace("sliceLiteral")()
 	}
 
-	// Create slice type with inferred element type ([]any)
-	sliceType := new(SliceType)
-	sliceType.pos = pos
-	anyName := new(Name)
-	anyName.pos = pos
-	anyName.Value = "any"
-	sliceType.Elem = anyName
-
-	// Create composite literal
-	lit := new(CompositeLit)
-	lit.pos = pos
-	lit.Type = sliceType
-
-	// Add first element - for slice literals, elements are just expressions, not key-value pairs
-	lit.ElemList = append(lit.ElemList, first)
+	// Collect all elements first to analyze types
+	elements := []Expr{first}
 
 	// Parse remaining elements
 	for p.tok == _Comma {
@@ -2081,11 +2081,29 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 		}
 
 		expr := p.expr()
-		lit.ElemList = append(lit.ElemList, expr)
+		elements = append(elements, expr)
 	}
 
-	lit.Rbrace = p.pos()
+	rbrace := p.pos()
 	p.want(_Rbrack)
+
+	// Infer element type from all elements
+	elemType := p.inferValueType(elements)
+	
+	// Create slice type with inferred element type
+	sliceType := new(SliceType)
+	sliceType.pos = pos
+	elemName := new(Name)
+	elemName.pos = pos
+	elemName.Value = elemType
+	sliceType.Elem = elemName
+
+	// Create composite literal with inferred type
+	lit := new(CompositeLit)
+	lit.pos = pos
+	lit.Type = sliceType
+	lit.ElemList = elements
+	lit.Rbrace = rbrace
 	return lit
 }
 
@@ -2252,6 +2270,7 @@ func (p *parser) inferValueType(valueExprs []Expr) string {
 	return "any"
 }
 
+
 // guessExprType attempts to guess the type of an expression based on its syntax
 func (p *parser) guessExprType(expr Expr) string {
 	switch e := expr.(type) {
@@ -2275,6 +2294,10 @@ func (p *parser) guessExprType(expr Expr) string {
 		case RuneLit:
 			return "rune"
 		}
+	case *CompositeLit:
+		// For now, treat all composite literals (including nested slices) as 'any'
+		// TODO: Implement proper nested slice type inference
+		return "any"
 	}
 	return "any" // Default for complex expressions
 }
