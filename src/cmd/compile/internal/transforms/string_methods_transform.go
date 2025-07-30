@@ -46,6 +46,12 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 	case "isEmpty":
 		return t.createIsEmptyCall(receiver)
 
+	// Character access
+	case "charAt", "at", "char":
+		if len(args) == 1 {
+			return t.createCharAtCall(receiver, args[0])
+		}
+
 	// Search methods
 	case "contains", "includes", "has", "holds":
 		if len(args) == 1 {
@@ -409,6 +415,30 @@ func (t *StringMethodsTransform) createLenCall(receiver syntax.Expr) syntax.Expr
 	call := &syntax.CallExpr{
 		Fun:     lenName,
 		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+
+	return call
+}
+
+// createCharAtCall creates string(receiver[index])
+func (t *StringMethodsTransform) createCharAtCall(receiver, index syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
+	// Create receiver[index] 
+	indexExpr := &syntax.IndexExpr{
+		X:     receiver,
+		Index: index,
+	}
+	indexExpr.SetPos(pos)
+
+	// Wrap in string() conversion to get a string instead of byte
+	stringName := &syntax.Name{Value: "string"}
+	stringName.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     stringName,
+		ArgList: []syntax.Expr{indexExpr},
 	}
 	call.SetPos(pos)
 

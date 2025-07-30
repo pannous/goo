@@ -1,0 +1,5 @@
+import "fmt"
+
+s := "hello"
+c := s.charAt(1)
+fmt.Printf("charAt(1) = %s\n", c)
