@@ -107,6 +107,7 @@ func slicecopy(toPtr *any, toLen int, fromPtr *any, fromLen int, wid uintptr) in
 
 func decoderune(string, int) (retv rune, retk int)
 func countrunes(string) int
+func stringRuneAt(s string, i int) string
 
 // Convert non-interface type to the data word of a (empty or nonempty) interface.
 func convT(typ *byte, elem *any) unsafe.Pointer

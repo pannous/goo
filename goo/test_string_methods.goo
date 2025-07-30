@@ -45,9 +45,10 @@ check "hello".startsWith("he") == true
 check "hello".startsWith("lo") == false
 check "hello".endsWith("lo") == true
 check "hello".endsWith("he") == false
-check "hello".charAt(i)
-check "hello".runeAt(i)
-check "hello".codePointAt(i)
+i := 1
+check "你好".charAt(i)
+check "你好".runeAt(i)
+check "你好".codePointAt(i)
 #check "hello".bytes() == [104, 101, 108, 108, 111] // returns a list of bytes (ASCII values)
 #invalid use of [...] array (outside a composite literal)
 #check "hello".codePoints() == [104, 101, 108, 108, 111] // returns a list of code points (Unicode values)
