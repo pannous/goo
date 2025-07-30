@@ -59,9 +59,9 @@ Running all tests in ./goo/ directory...
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
 ✅ test_modify.goo
-🔴 test_nil.goo
+✅ test_nil.goo
 ✅ test_not.goo
-🔴 test_print_comparison.goo
+✅ test_print_comparison.goo
 ✅ test_printf.goo
 ✅ test_put_no_import.goo
 ✅ test_put.goo
@@ -81,9 +81,9 @@ Running all tests in ./goo/ directory...
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
 ✅ test_transform_synonyms.goo
-🔴 test_truthy.goo
+✅ test_truthy.goo
 ✅ test_try_catch.goo
-🔴 test_typeof.goo
+✅ test_typeof.goo
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
@@ -99,5 +99,5 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_direct.goo
 ✅ test_slices_manual.goo
 ========================================
-Summary: 76/98 passed, 22 failed
+Summary: 80/98 passed, 18 failed
 ⚠️  Some tests failed
