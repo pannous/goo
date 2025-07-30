@@ -12,58 +12,63 @@ import (
 // It transforms: return println("OK") --> println("OK"); return
 type VoidReturnTransform struct{}
 
+// voidReturnVisitor implements the visitor pattern for void return transformation
+type voidReturnVisitor struct {
+	transform       *VoidReturnTransform
+	ctx             *TransformContext
+	changed         bool
+	currentFunction *syntax.FuncDecl // Track current function context
+}
+
 func (t *VoidReturnTransform) Name() string {
 	return "void_return_transform"
 }
 
 func (t *VoidReturnTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	changed := false
+	visitor := &voidReturnVisitor{transform: t, ctx: ctx}
+	
+	// Use the general visitor pattern to walk all nodes
+	syntax.Walk(file, visitor)
+	
+	return visitor.changed
+}
 
-	// Walk through all declarations in the file
-	for _, decl := range file.DeclList {
-		if funcDecl, ok := decl.(*syntax.FuncDecl); ok {
-			if t.isVoidFunction(funcDecl) {
-				walker := &voidReturnWalker{transform: t}
-				if walker.walkFunction(funcDecl) {
-					changed = true
-				}
+// Visit implements syntax.Visitor - hybrid approach
+func (v *voidReturnVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
+		return nil
+	}
+	
+	// Look for void functions and transform them using the existing logic
+	if funcDecl, ok := node.(*syntax.FuncDecl); ok {
+		if v.transform.isVoidFunction(funcDecl) {
+			// Use the existing block transformation logic for complex statement manipulation
+			if v.transformVoidFunction(funcDecl) {
+				v.changed = true
 			}
 		}
 	}
-
-	return changed
+	
+	// Continue visiting child nodes
+	return v
 }
 
-// isVoidFunction checks if a function has no return types
-func (t *VoidReturnTransform) isVoidFunction(funcDecl *syntax.FuncDecl) bool {
-	return funcDecl.Type == nil ||
-		funcDecl.Type.ResultList == nil ||
-		len(funcDecl.Type.ResultList) == 0
-}
-
-// voidReturnWalker walks the AST looking for problematic return statements
-type voidReturnWalker struct {
-	transform *VoidReturnTransform
-	changed   bool
-}
-
-// walkFunction walks through a function's body
-func (w *voidReturnWalker) walkFunction(funcDecl *syntax.FuncDecl) bool {
+// transformVoidFunction transforms a void function using the existing block logic
+func (v *voidReturnVisitor) transformVoidFunction(funcDecl *syntax.FuncDecl) bool {
 	if funcDecl.Body == nil {
 		return false
 	}
-
-	w.changed = false
-	w.walkBlock(funcDecl.Body)
-	return w.changed
+	
+	return v.walkBlock(funcDecl.Body)
 }
 
-// walkBlock walks through statements in a block
-func (w *voidReturnWalker) walkBlock(block *syntax.BlockStmt) {
+// walkBlock walks through statements in a block (reused existing logic)
+func (v *voidReturnVisitor) walkBlock(block *syntax.BlockStmt) bool {
 	if block == nil {
-		return
+		return false
 	}
-
+	
+	changed := false
 	for i := 0; i < len(block.List); i++ {
 		stmt := block.List[i]
 
@@ -87,33 +92,53 @@ func (w *voidReturnWalker) walkBlock(block *syntax.BlockStmt) {
 				newStmts = append(newStmts, block.List[i+1:]...)
 				block.List = newStmts
 
-				w.changed = true
+				changed = true
 				i++ // Skip the newly inserted return statement
 			}
 		} else {
 			// Recursively walk nested statements
-			w.walkStatement(stmt)
+			if v.walkStatement(stmt) {
+				changed = true
+			}
 		}
 	}
+	return changed
 }
 
-// walkStatement walks nested statements
-func (w *voidReturnWalker) walkStatement(stmt syntax.Stmt) {
+// walkStatement walks nested statements (reused existing logic)
+func (v *voidReturnVisitor) walkStatement(stmt syntax.Stmt) bool {
+	changed := false
 	switch s := stmt.(type) {
 	case *syntax.IfStmt:
 		if s.Then != nil {
-			w.walkBlock(s.Then)
+			if v.walkBlock(s.Then) {
+				changed = true
+			}
 		}
 		if s.Else != nil {
-			w.walkStatement(s.Else)
+			if v.walkStatement(s.Else) {
+				changed = true
+			}
 		}
 	case *syntax.BlockStmt:
-		w.walkBlock(s)
+		if v.walkBlock(s) {
+			changed = true
+		}
 	case *syntax.ForStmt:
 		if s.Body != nil {
-			w.walkBlock(s.Body)
+			if v.walkBlock(s.Body) {
+				changed = true
+			}
 		}
 	}
+	return changed
+}
+
+// isVoidFunction checks if a function has no return types
+func (t *VoidReturnTransform) isVoidFunction(funcDecl *syntax.FuncDecl) bool {
+	return funcDecl.Type == nil ||
+		funcDecl.Type.ResultList == nil ||
+		len(funcDecl.Type.ResultList) == 0
 }
 
 func init() {
