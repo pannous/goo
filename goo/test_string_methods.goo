@@ -46,7 +46,8 @@ check "hello".startsWith("lo") == false
 check "hello".endsWith("lo") == true
 check "hello".endsWith("he") == false
 i := 1
-check "你好".charAt(i)
+check "你" == '你'
+check "你好".charAt(i) == '你' // charAt returns a rune at the given index
 check "你好".runeAt(i)
 check "你好".codePointAt(i)
 #check "hello".bytes() == [104, 101, 108, 108, 111] // returns a list of bytes (ASCII values)
