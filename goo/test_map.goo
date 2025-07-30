@@ -1,4 +1,4 @@
-import "fmt"
+#import "fmt"  not needed 3398e71181
 // Test different map syntax forms
 
 // 1. map{"key": value} syntax

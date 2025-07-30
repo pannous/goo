@@ -23,17 +23,17 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ go command default to run => `go test.go` OK  
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
-✅ z := map{"a": 1, "b": 2}  => map[any]any{…}  
-✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2}
-✅ z := {a: 1, b: 2}  // dot access to map keys, e.g. z.a == 1
-✅ map[active:true age:30 name:Alice]  
-✅ test_list_comparison.goo [1,2]==[1,2]  
-✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
-✅ map type inference: {math: 95, english: 87} == map[string]int{"math": 95, "english": 87}
 ✅ enum Status { OK, BAD } with generated .String() method  
+✅ z := {a: 1, b: 2}  // symbol keys to strings => z := {"a": 1, "b": 2} 
+✅ z := {a: 1, b: 2}  // => map[string]int{"a": 1, "b": 2} auto-type inference
+✅ z := {a: 1, b: 2}  // dot access to map keys,  z.a == 1  z.b == 2
+✅ map[active:true age:30 name:Alice]  // read back print("%v") format
+✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
+✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)  
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
-check not x == false =>   falsey(x)  
+check not x == false =>   falsey(x)
+check not ""
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
 ✅ String methods "abc".contains("a")
 ✅ 3.14 as int … 
