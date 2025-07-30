@@ -19,39 +19,31 @@ func (t *ClassTransform) Name() string {
 }
 
 func (t *ClassTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	visitor := &classVisitor{transform: t, ctx: ctx}
-	
-	// Use the visitor pattern to walk all nodes
-	syntax.Walk(file, visitor)
-	
-	return visitor.changed
-}
+	changed := false
 
-type classVisitor struct {
-	transform *ClassTransform
-	ctx       *TransformContext
-	changed   bool
-}
+	// Walk through all declarations in the file
+	for i, decl := range file.DeclList {
+		if typeDecl, ok := decl.(*syntax.TypeDecl); ok {
+			if t.isClassDeclaration(typeDecl) {
+				if transformed := t.transformClassDeclaration(typeDecl, ctx); transformed != nil {
+					file.DeclList[i] = transformed
 
-// Visit implements syntax.Visitor
-func (v *classVisitor) Visit(node syntax.Node) syntax.Visitor {
-	if node == nil {
-		return nil
-	}
-	
-	// Look for type declarations that might be class declarations
-	if typeDecl, ok := node.(*syntax.TypeDecl); ok {
-		if v.transform.isClassDeclaration(typeDecl) {
-			if transformed := v.transform.transformClassDeclaration(typeDecl, v.ctx); transformed != nil {
-				// Note: Direct replacement in visitor pattern is complex for declarations
-				// This would need to be handled at a different level or use a hybrid approach
-				v.changed = true
+					// Add class methods to the file
+					methods := syntax.GetClassMethods(typeDecl.Name.Value)
+					if len(methods) > 0 {
+						// Add methods to the file (no transformation needed with self.field syntax)
+						for _, method := range methods {
+							file.DeclList = append(file.DeclList, method)
+						}
+					}
+
+					changed = true
+				}
 			}
 		}
 	}
-	
-	// Continue visiting child nodes
-	return v
+
+	return changed
 }
 
 // isClassDeclaration checks if this is a class declaration
