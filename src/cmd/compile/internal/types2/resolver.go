@@ -867,7 +867,7 @@ func injectSlicesImportIfNeeded(file *syntax.File, fileDir string, checks *Check
 						   methodName == "Reverse" || methodName == "Sort" ||
 						   methodName == "Clone" || methodName == "Equal" ||
 						   methodName == "Min" || methodName == "Max" ||
-						   methodName == "Map" {
+						   methodName == "Map" || methodName == "Filter" {
 							needsSlicesImport = true
 							return false // found list method, stop searching
 						}

@@ -1,48 +1,45 @@
-#!/usr/bin/env goo
-package main
-
-import "fmt"
-
-func main() {
-	a := true
-	b := false
-	c := true
-	// Test 'and' operator (should work like &&)
-	if a and c {
-		fmt.Println("a and c works!")
-	}
-	
-	if a and b {
-		fmt.Println("This should not print")
-	} else {
-		fmt.Println("a and b correctly false")
-	}
-	
-	// Test 'or' operator (should work like ||)
-	if b or c {
-		fmt.Println("b or c works!")
-	}
-	
-	if b or false {
-		fmt.Println("This should not print")
-	} else {
-		fmt.Println("b or false correctly false")
-	}
-	
-	// Test complex expressions
-	if (a and c) or (b and false) {
-		fmt.Println("Complex expression works!")
-	}
-	
-	// Test with comparisons
-	x := 5
-	y := 10
-	
-	if x < y and y > 0 {
-		fmt.Println("x < y and y > 0 works!")
-	}
-	
-	if x > y or y == 10 {
-		fmt.Println("x > y or y == 10 works!")
-	}
+a := true
+b := false
+c := true
+// Test 'and' operator (should work like &&)
+if a and c {
+	put("a and c works!")
 }
+
+if a and b {
+	put("This should not print")
+} else {
+	put("a and b correctly false")
+}
+
+// Test 'or' operator (should work like ||)
+if b or c {
+	put("b or c works!")
+}
+
+if b or false {
+	put("This should not print")
+} else {
+	put("b or false correctly false")
+}
+
+// Test complex expressions
+if (a and c) or (b and false) {
+	put("Complex expression works!")
+}
+
+// Test with comparisons
+x := 5
+y := 10
+
+if x < y and y > 0 {
+	put("x < y and y > 0 works!")
+}
+
+if x > y or y == 10 {
+	put("x > y or y == 10 works!")
+}
+check x < y and y > 0 == true
+check x > y or y == 10 == true
+
+printf("All checks passed!\n")

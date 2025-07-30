@@ -59,8 +59,5 @@ src/test.go
 src/test
 main.wasm
 
-
-probes
-
 src/probes
 /src/cmd/compile/compile

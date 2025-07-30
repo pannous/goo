@@ -155,4 +155,5 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 ## Debugging
 • don't Temporarily disable To test functionality that worked before instead push forward to resolve the issue
 
-
+## Testing Best Practices
+• Before declaring a bug/task as fixed run the test again.

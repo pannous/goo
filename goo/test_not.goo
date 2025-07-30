@@ -1,14 +1,6 @@
-#!/usr/bin/env goo
-package main
 
-import "fmt"
+a := 5
+b := 10
 
-func main() {
-	a := 5
-	b := 10
-	
-	// Test ¬ operator with comparison
-	if ¬(a == b) {
-		fmt.Println("¬(a == b) works")
-	}
-}
+// Test ¬ operator with comparison
+check ¬(a == b)

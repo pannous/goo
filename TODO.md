@@ -112,3 +112,26 @@ if ch == '!' {
 
 
 auto import "slices" not working, need to import "slices" manually
+
+
+BLA:
+ The put() function works because:
+
+  1. It's a BUILTIN registered in universe.go and builtins.go
+  2. AST transformation happens in
+  3.   But for slices methods like .filter(), the flow is:
+  1. Transformer converts .filter() to slices.Filter() calls
+  2. Auto-injection tries to add slices import but fails
+
+  So the real question is: Why does checks.lookup("fmt") work but slices import injection fails?
+
+  Let me check if the issue is that the slices injection happens too late, after the transformer has already
+  tried to use it. The timing might be:
+
+  1. Transformers run and add slices.Filter() calls
+  2. Type checker starts, tries to resolve slices.Filter()
+  3. Auto-injection tries to add slices import but it's too late
+
+  This would explain why manual imports work (available from the start) but auto-injection fails (too late in the
+   process).
+
