@@ -12,12 +12,6 @@ import (
 // to their corresponding Go standard library function calls.
 type ListMethodsTransform struct{}
 
-type listMethodsVisitor struct {
-	transform *ListMethodsTransform
-	ctx       *TransformContext
-	changed   bool
-}
-
 
 func (t *ListMethodsTransform) Name() string {
 	return "list_methods_transform"
@@ -147,44 +141,187 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 
 func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	println("ListMethodsTransform.Transform called")
-	visitor := &listMethodsVisitor{transform: t, ctx: ctx}
-	
-	// Use the visitor pattern to walk all nodes
-	syntax.Walk(file, visitor)
-	
-	return visitor.changed
+	changed := false
+
+	// Transform all declarations
+	for i, decl := range file.DeclList {
+		if newDecl := t.transformDecl(decl, ctx); newDecl != decl {
+			file.DeclList[i] = newDecl
+			changed = true
+		}
+	}
+
+	// Add required imports if needed and transformations were made
+	// NOTE: Auto-import is now handled at the type-checking level in types2/resolver.go
+	// by injectSlicesImportIfNeeded, so we don't need to do it here
+	// if changed && !t.hasImport(file, "slices") {
+	//     println("Adding slices import")
+	//     t.addSlicesImport(file)
+	// }
+
+	return changed
 }
 
-// Visit implements syntax.Visitor
-func (v *listMethodsVisitor) Visit(node syntax.Node) syntax.Visitor {
-	if node == nil {
-		return nil
-	}
-	
-	// Look for nodes that contain list method calls we can replace
-	switch n := node.(type) {
-	case *syntax.CallExpr:
-		// Check if this is a list method call
-		if selector, ok := n.Fun.(*syntax.SelectorExpr); ok {
-			if v.transform.isListExpression(selector.X, v.ctx) {
-				methodName := selector.Sel.Value
-				if transformed := v.transform.transformListMethod(selector.X, methodName, n.ArgList); transformed != nil {
-					println("TRANSFORMING list method:", methodName)
-					// We can replace the CallExpr in place by updating its contents
-					if newCall, ok := transformed.(*syntax.CallExpr); ok {
-						*n = *newCall
-						v.changed = true
-					}
-				}
+func (t *ListMethodsTransform) transformDecl(decl syntax.Decl, ctx *TransformContext) syntax.Decl {
+	switch d := decl.(type) {
+	case *syntax.FuncDecl:
+		if newBody := t.transformStmt(d.Body, ctx); newBody != d.Body {
+			newDecl := *d
+			if blockStmt, ok := newBody.(*syntax.BlockStmt); ok {
+				newDecl.Body = blockStmt
+			}
+			return &newDecl
+		}
+	case *syntax.VarDecl:
+		if d.Values != nil {
+			if newValues := t.transformExpr(d.Values, ctx); newValues != d.Values {
+				newDecl := *d
+				newDecl.Values = newValues
+				return &newDecl
 			}
 		}
 	}
-	
-	// Continue visiting child nodes
-	return v
+	return decl
 }
 
+func (t *ListMethodsTransform) transformStmt(stmt syntax.Stmt, ctx *TransformContext) syntax.Stmt {
+	if stmt == nil {
+		return nil
+	}
 
+	switch s := stmt.(type) {
+	case *syntax.BlockStmt:
+		changed := false
+		newList := make([]syntax.Stmt, len(s.List))
+		for i, stmt := range s.List {
+			newStmt := t.transformStmt(stmt, ctx)
+			newList[i] = newStmt
+			if newStmt != stmt {
+				changed = true
+			}
+		}
+		if changed {
+			newBlock := *s
+			newBlock.List = newList
+			return &newBlock
+		}
+	case *syntax.ExprStmt:
+		if newExpr := t.transformExpr(s.X, ctx); newExpr != s.X {
+			newStmt := *s
+			newStmt.X = newExpr
+			return &newStmt
+		}
+	case *syntax.AssignStmt:
+		lhsChanged := false
+		rhsChanged := false
+		newLhs := t.transformExpr(s.Lhs, ctx)
+		newRhs := t.transformExpr(s.Rhs, ctx)
+		if newLhs != s.Lhs {
+			lhsChanged = true
+		}
+		if newRhs != s.Rhs {
+			rhsChanged = true
+		}
+		if lhsChanged || rhsChanged {
+			newStmt := *s
+			newStmt.Lhs = newLhs
+			newStmt.Rhs = newRhs
+			return &newStmt
+		}
+	case *syntax.ReturnStmt:
+		if s.Results != nil {
+			if newResults := t.transformExpr(s.Results, ctx); newResults != s.Results {
+				newStmt := *s
+				newStmt.Results = newResults
+				return &newStmt
+			}
+		}
+	case *syntax.CheckStmt:
+		if newCond := t.transformExpr(s.Cond, ctx); newCond != s.Cond {
+			newStmt := *s
+			newStmt.Cond = newCond
+			return &newStmt
+		}
+	}
+	return stmt
+}
+
+func (t *ListMethodsTransform) transformExpr(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
+	if expr == nil {
+		return nil
+	}
+
+	switch e := expr.(type) {
+	case *syntax.CallExpr:
+		// Check if this is a list method call
+		if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
+			if t.isListExpression(selector.X, ctx) {
+				methodName := selector.Sel.Value
+				if transformed := t.transformListMethod(selector.X, methodName, e.ArgList); transformed != nil {
+					println("TRANSFORMING list method:", methodName)
+					return transformed
+				}
+			}
+		}
+		// Transform function and arguments
+		funChanged := false
+		argsChanged := false
+		newFun := t.transformExpr(e.Fun, ctx)
+		if newFun != e.Fun {
+			funChanged = true
+		}
+		var newArgList []syntax.Expr
+		if e.ArgList != nil {
+			newArgList = make([]syntax.Expr, len(e.ArgList))
+			for i, arg := range e.ArgList {
+				newArg := t.transformExpr(arg, ctx)
+				newArgList[i] = newArg
+				if newArg != arg {
+					argsChanged = true
+				}
+			}
+		}
+		if funChanged || argsChanged {
+			newCall := *e
+			newCall.Fun = newFun
+			newCall.ArgList = newArgList
+			return &newCall
+		}
+	case *syntax.Operation:
+		xChanged := false
+		yChanged := false
+		newX := t.transformExpr(e.X, ctx)
+		if newX != e.X {
+			xChanged = true
+		}
+		var newY syntax.Expr
+		if e.Y != nil {
+			newY = t.transformExpr(e.Y, ctx)
+			if newY != e.Y {
+				yChanged = true
+			}
+		}
+		if xChanged || yChanged {
+			newOp := *e
+			newOp.X = newX
+			newOp.Y = newY
+			return &newOp
+		}
+	case *syntax.ParenExpr:
+		if newX := t.transformExpr(e.X, ctx); newX != e.X {
+			newParen := *e
+			newParen.X = newX
+			return &newParen
+		}
+	case *syntax.LambdaExpr:
+		if newBody := t.transformExpr(e.Body, ctx); newBody != e.Body {
+			newLambda := *e
+			newLambda.Body = newBody
+			return &newLambda
+		}
+	}
+	return expr
+}
 
 
 // Basic list operations
