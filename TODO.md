@@ -1,3 +1,7 @@
+When We started off I didn't have the transformer technology can we go back and turn some of our earliest features into beautiful Transformers as well
+
+./probes/test_map_dot_edge_cases.goo
+
 if newExpr := w.VisitExpr(expr); newExpr != nil {  
 if newExpr := w.VisitExpr(expr) { OK??  
   

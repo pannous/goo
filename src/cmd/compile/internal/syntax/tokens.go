@@ -76,6 +76,7 @@ const (
 	_Catch          // catch + try
 	_Class          // class
 	_Check          // check ≈ assert
+	_Def            // def
 	_Hash           // # as comment or index
 	_Try            // try
 	_Void           // void
@@ -136,6 +137,7 @@ var TokenNames = [...]string{
 	_Case:           "case",
 	_Chan:           "chan",
 	_Check:          "check",
+	_Def:            "def",
 	_Const:          "const",
 	_Enum:           "enum",
 	_Continue:       "continue",

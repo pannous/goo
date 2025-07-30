@@ -501,14 +501,13 @@ func (p *parser) fileOrNil() *File {
 				f.DeclList = append(f.DeclList, d)
 			}
 
-		case _Name:
-			if p.lit == "def" {
-				p.next()
-				if d := p.funcDeclOrNil(); d != nil {
-					f.DeclList = append(f.DeclList, d)
-				}
-				break
+		case _Def:
+			p.next()
+			if d := p.funcDeclOrNil(); d != nil {
+				f.DeclList = append(f.DeclList, d)
 			}
+
+		case _Name:
 			fallthrough
 
 		default:
@@ -568,22 +567,7 @@ func (p *parser) fileOrNil() *File {
 
 	// Auto-inject imports for .goo files
 	if strings.HasSuffix(p.file.filename, ".goo") {
-		// Auto-inject fmt import if needed
-		if p.needsFmtImport(f) {
-			fmtLit := &BasicLit{
-				Value: `"fmt"`,
-				Kind:  StringLit,
-			}
-			fmtLit.pos = f.pos
-			
-			fmtImport := &ImportDecl{
-				Path: fmtLit,
-			}
-			fmtImport.pos = f.pos
-			
-			// Insert at the beginning of DeclList
-			f.DeclList = append([]Decl{fmtImport}, f.DeclList...)
-		}
+		// fmt auto-import moved to printf_transform for cleaner architecture
 
 		// Auto-inject slices import if needed
 		if p.needsSlicesImport(f) {
@@ -3370,8 +3354,11 @@ func emphasize(x Expr) string {
 	return s
 }
 
-// needsFmtImport checks if the file uses printf and doesn't already import fmt
+// needsFmtImport functionality moved to printf_transform
 func (p *parser) needsFmtImport(f *File) bool {
+	// This function is deprecated - functionality moved to printf_transform
+	return false
+	/*
 	// Check if fmt is already imported
 	for _, decl := range f.DeclList {
 		if imp, ok := decl.(*ImportDecl); ok && imp.Path != nil {
@@ -3411,6 +3398,7 @@ func (p *parser) needsFmtImport(f *File) bool {
 		}
 	}
 	return false
+	*/
 }
 
 // needsSlicesImport checks if the file uses list methods and doesn't already import slices
