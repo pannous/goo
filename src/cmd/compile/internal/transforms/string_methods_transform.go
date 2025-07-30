@@ -570,7 +570,7 @@ func (t *StringMethodsTransform) hasImport(file *syntax.File, name string) bool 
 
 // createReplaceCall creates strings.ReplaceAll(receiver, old, new)
 func (t *StringMethodsTransform) createReplaceCall(receiver, old, new syntax.Expr) syntax.Expr {
-	pos := receiver.Pos()
+	pos := old.Pos()
 
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)

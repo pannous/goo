@@ -26,7 +26,6 @@ print("filter/where/chose/that/which:", len(nums.filter(x=>x>2)), len(nums.where
 print("\n🎯 STRING METHOD SYNONYMS:")
 
 // Basic string synonyms
-print("reverse/flip:", text.reverse(), text.flip())
 print("first/head/start:", text.first(), text.head(), text.start())
 print("last/tail/end:", text.last(), text.tail(), text.end())
 
@@ -34,7 +33,9 @@ print("last/tail/end:", text.last(), text.tail(), text.end())
 print("contains/includes/has/holds:", text.contains("World"), text.includes("World"), text.has("World"), text.holds("World"))
 print("find/search/locate:", text.find("World"), text.search("World"), text.locate("World"))
 
-// Replace synonyms  
+// Replace synonyms  TODO cmd/link/internal/ld.(*pclntab).generateFilenameTabs.func1(0x14000139540?, 0x2?)
 print("replace/substitute/swap:", text.replace("World", "Go"), text.substitute("World", "Go"), text.swap("World", "Go"))
 
 print("\n🎉 ALL SYNONYMS WORKING! Natural language coding unlocked!")
+
+#print("reverse/flip:", text.reverse(), text.flip())

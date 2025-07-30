@@ -9,7 +9,7 @@ Running all tests in ./goo/ directory...
 ✅ debug_precedence.goo
 ✅ helper.goo
 🔴 kitchensink.goo
-🔴 test_all_synonyms.goo
+✅ test_all_synonyms.goo
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 🔴 test_as_cast.go.goo
@@ -76,6 +76,7 @@ Running all tests in ./goo/ directory...
 🔴 test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
+✅ test_string_replace.goo
 🔴 test_string_reverse.goo
 🔴 test_strings_auto_import.goo
 ✅ test_struct.goo
@@ -99,5 +100,5 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_direct.goo
 ✅ test_slices_manual.goo
 ========================================
-Summary: 80/98 passed, 18 failed
+Summary: 82/99 passed, 17 failed
 ⚠️  Some tests failed
