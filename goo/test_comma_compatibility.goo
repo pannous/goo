@@ -1,0 +1,28 @@
+
+// Test all existing syntaxes still work
+fmt.Println("=== Testing all syntax variations ===")
+
+// Original syntaxes
+z1 := map{"a": 1, "b": 2}
+z2 := {a: 1, b: 2}
+printf("map{}: %v\n", z1)
+printf("{}: %v\n", z2)
+
+// New bracket syntax - with commas (backward compatible)
+z3 := map[active: true, age: 30, name: "Alice"]
+printf("map[] with commas: %v\n", z3)
+
+// New bracket syntax - without commas (new feature!)
+z4 := map[x: 10 y: 20 z: 30]
+printf("map[] no commas: %v\n", z4)
+
+// Edge cases
+empty := map[]
+trailing := map[a: 1, b: 2,]
+trailingNoComma := map[a: 1 b: 2]
+
+printf("Empty: %v\n", empty)
+printf("Trailing comma: %v\n", trailing)
+printf("No trailing comma: %v\n", trailingNoComma)
+
+printf("All types: %T %T %T %T\n", z1, z2, z3, z4)

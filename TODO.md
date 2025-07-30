@@ -1,4 +1,9 @@
 When We started off I didn't have the transformer technology can we go back and turn some of our earliest features into beautiful Transformers as well
+A lot has changed since our earliest commit:
+07c2f23e93 2025-07-22 22:01 Merge branch 'master' of https://github.com/pannous/goo
+
+Do you think it's reasonable to do git diff and see what we have changed and maybe clean up some of the old mess without affecting functionality
+
 
 ./probes/test_map_dot_edge_cases.goo
 

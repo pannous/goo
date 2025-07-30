@@ -31,7 +31,7 @@ Running all tests in ./goo/ directory...
 ✅ test_def.goo
 ✅ test_enum.goo
 ✅ test_explicit_main.goo
-🔴 test_filter_basic.goo
+✅ test_filter_basic.goo
 ✅ test_filter_simple.goo
 ✅ test_filter_synonyms.goo
 ✅ test_final_import_verification.goo
@@ -92,15 +92,18 @@ Running all tests in ./goo/ directory...
 ✅ test_cmp_manual.goo
 ✅ test_exclamation.goo
 🔴 test_filter_clean.goo
+🔴 test_list_visitor.goo
 ✅ test_map_dot_check_debug.goo
 🔴 test_map_dot_edge_cases.goo
 ✅ test_map_dot_printf_only.goo
+✅ test_printf_transform.goo
 ✅ test_put_auto.goo
 ✅ test_put_parser.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
 ✅ test_slices_direct.goo
 ✅ test_slices_manual.goo
+🔴 test_typeof_debug.goo
 ========================================
-Summary: 85/101 passed, 16 failed
+Summary: 87/104 passed, 17 failed
 ⚠️  Some tests failed

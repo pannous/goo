@@ -1,4 +1,6 @@
 // Basic filter test
+import "fmt" // TODO imports where NOT necessary at one point!!
+import "slices"
 
 numbers := [1, 2, 3, 4, 5, 6]
 

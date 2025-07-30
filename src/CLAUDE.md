@@ -161,3 +161,7 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 With the visitor pattern, we can only replace nodes in place, so not always applicable? 
 we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
 Or use a hybrid.
+
+# Assume mishearings
+I am using speech recognition which might misunderstand some words:
+parcel => parser , fights => files
