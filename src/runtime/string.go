@@ -251,6 +251,15 @@ func stringtoslicerune(buf *[tmpStringBufSize]rune, s string) []rune {
 	return a
 }
 
+// stringRuneAt returns the rune at index i in string s as a string
+func stringRuneAt(s string, i int) string {
+	runes := stringtoslicerune(nil, s)
+	if i < 0 || i >= len(runes) {
+		panicIndex(i, len(runes))
+	}
+	return string(runes[i])
+}
+
 func slicerunetostring(buf *tmpBuf, a []rune) string {
 	if raceenabled && len(a) > 0 {
 		racereadrangepc(unsafe.Pointer(&a[0]),

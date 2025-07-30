@@ -51,6 +51,10 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		if len(args) == 1 {
 			return t.createCharAtCall(receiver, args[0])
 		}
+	case "runeAt", "rune":
+		if len(args) == 1 {
+			return t.createRuneAtCall(receiver, args[0])
+		}
 
 	// Search methods
 	case "contains", "includes", "has", "holds":
@@ -443,6 +447,13 @@ func (t *StringMethodsTransform) createCharAtCall(receiver, index syntax.Expr) s
 	call.SetPos(pos)
 
 	return call
+}
+
+// createRuneAtCall creates a placeholder for runeAt - TODO: implement proper []rune conversion
+func (t *StringMethodsTransform) createRuneAtCall(receiver, index syntax.Expr) syntax.Expr {
+	// For now, fall back to charAt behavior until we implement proper runtime support
+	// TODO: Replace with proper string([]rune(receiver)[index]) when runtime is working
+	return t.createCharAtCall(receiver, index)
 }
 
 // createContainsCall creates strings.Contains(receiver, arg)
