@@ -20,12 +20,8 @@ func (t *MapDotTransform) Name() string {
 func (t *MapDotTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &mapDotVisitor{ctx: ctx}
 	
-	// Transform function declarations
-	for _, decl := range file.DeclList {
-		if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
-			visitor.walkBlockStmt(funcDecl.Body)
-		}
-	}
+	// Use the general visitor pattern to walk all nodes
+	syntax.Walk(file, visitor)
 	
 	return visitor.changed
 }
@@ -36,93 +32,81 @@ type mapDotVisitor struct {
 	changed bool
 }
 
-// walkBlockStmt walks through all statements in a block
-func (v *mapDotVisitor) walkBlockStmt(block *syntax.BlockStmt) {
-	for _, stmt := range block.List {
-		v.walkStmt(stmt)
+// Visit implements syntax.Visitor
+func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
+		return nil
 	}
-}
-
-// walkStmt walks a statement and transforms any map dot notation expressions
-func (v *mapDotVisitor) walkStmt(stmt syntax.Stmt) {
-	switch s := stmt.(type) {
+	
+	// Look for nodes that contain selector expressions we can replace
+	switch n := node.(type) {
 	case *syntax.ExprStmt:
-		v.walkExpr(&s.X)
-	case *syntax.AssignStmt:
-		v.walkExpr(&s.Lhs)
-		v.walkExpr(&s.Rhs)
-	case *syntax.BlockStmt:
-		v.walkBlockStmt(s)
-	case *syntax.IfStmt:
-		if s.Init != nil {
-			v.walkStmt(s.Init)
-		}
-		v.walkExpr(&s.Cond)
-		if s.Then != nil {
-			v.walkBlockStmt(s.Then)
-		}
-		if s.Else != nil {
-			v.walkStmt(s.Else)
-		}
-	case *syntax.ForStmt:
-		if s.Init != nil {
-			v.walkStmt(s.Init)
-		}
-		if s.Cond != nil {
-			v.walkExpr(&s.Cond)
-		}
-		if s.Post != nil {
-			v.walkStmt(s.Post)
-		}
-		if s.Body != nil {
-			v.walkBlockStmt(s.Body)
-		}
-	case *syntax.ReturnStmt:
-		if s.Results != nil {
-			v.walkExpr(&s.Results)
-		}
-	}
-}
-
-// walkExpr walks an expression and transforms selectors
-func (v *mapDotVisitor) walkExpr(exprPtr *syntax.Expr) {
-	if exprPtr == nil || *exprPtr == nil {
-		return
-	}
-	
-	expr := *exprPtr
-	
-	switch e := expr.(type) {
-	case *syntax.SelectorExpr:
-		// First check if this selector should be transformed
-		if newExpr := v.transformSelector(e); newExpr != nil {
-			*exprPtr = newExpr
-			v.changed = true
-		}
-		// Also walk the base expression
-		v.walkExpr(&e.X)
-	case *syntax.CallExpr:
-		v.walkExpr(&e.Fun)
-		if e.ArgList != nil {
-			for i := range e.ArgList {
-				v.walkExpr(&e.ArgList[i])
+		if sel, ok := n.X.(*syntax.SelectorExpr); ok {
+			if newExpr := v.transformSelector(sel); newExpr != nil {
+				n.X = newExpr
+				v.changed = true
 			}
 		}
-	case *syntax.IndexExpr:
-		v.walkExpr(&e.X)
-		v.walkExpr(&e.Index)
-	case *syntax.Operation:
-		v.walkExpr(&e.X)
-		if e.Y != nil {
-			v.walkExpr(&e.Y)
+	case *syntax.AssignStmt:
+		if sel, ok := n.Rhs.(*syntax.SelectorExpr); ok {
+			if newExpr := v.transformSelector(sel); newExpr != nil {
+				n.Rhs = newExpr
+				v.changed = true
+			}
 		}
-	case *syntax.ListExpr:
-		for i := range e.ElemList {
-			v.walkExpr(&e.ElemList[i])
+	case *syntax.Operation:
+		if sel, ok := n.X.(*syntax.SelectorExpr); ok {
+			if newExpr := v.transformSelector(sel); newExpr != nil {
+				n.X = newExpr
+				v.changed = true
+			}
+		}
+		if sel, ok := n.Y.(*syntax.SelectorExpr); ok {
+			if newExpr := v.transformSelector(sel); newExpr != nil {
+				n.Y = newExpr
+				v.changed = true
+			}
+		}
+	case *syntax.CallExpr:
+		// Handle selectors in function arguments
+		for i, arg := range n.ArgList {
+			if sel, ok := arg.(*syntax.SelectorExpr); ok {
+				if newExpr := v.transformSelector(sel); newExpr != nil {
+					n.ArgList[i] = newExpr
+					v.changed = true
+				}
+			}
+		}
+	case *syntax.CheckStmt:
+		// Handle selectors in check conditions
+		if sel, ok := n.Cond.(*syntax.SelectorExpr); ok {
+			if newExpr := v.transformSelector(sel); newExpr != nil {
+				n.Cond = newExpr
+				v.changed = true
+			}
+		}
+		// Also handle nested operations in check conditions
+		if op, ok := n.Cond.(*syntax.Operation); ok {
+			if sel, ok := op.X.(*syntax.SelectorExpr); ok {
+				if newExpr := v.transformSelector(sel); newExpr != nil {
+					op.X = newExpr
+					v.changed = true
+				}
+			}
+			if sel, ok := op.Y.(*syntax.SelectorExpr); ok {
+				if newExpr := v.transformSelector(sel); newExpr != nil {
+					op.Y = newExpr
+					v.changed = true
+				}
+			}
 		}
 	}
+	
+	// Continue visiting child nodes
+	return v
 }
 
+// transformSelector transforms a selector expression if it's a map access
 func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr {
 	// Check if the base expression is a variable we know is a map with string keys
 	if name, ok := sel.X.(*syntax.Name); ok {
@@ -134,10 +118,13 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Kind:  syntax.StringLit,
 				Value: `"` + keyName + `"`,
 			}
-			return &syntax.IndexExpr{
+			indexExpr := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
 			}
+			// Preserve position information
+			indexExpr.SetPos(sel.Pos())
+			return indexExpr
 		}
 	}
 	return nil
