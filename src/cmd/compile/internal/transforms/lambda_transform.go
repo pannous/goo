@@ -24,158 +24,88 @@ func (t *LambdaTransform) Name() string {
 }
 
 func (t *LambdaTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	changed := false
-
-	// Transform all declarations
-	for i, decl := range file.DeclList {
-		if newDecl := t.transformDecl(decl); newDecl != decl {
-			file.DeclList[i] = newDecl
-			changed = true
-		}
-	}
-
-	return changed
+	visitor := &lambdaVisitor{transform: t, ctx: ctx}
+	
+	// Use the general visitor pattern to walk all nodes
+	syntax.Walk(file, visitor)
+	
+	return visitor.changed
 }
 
-func (t *LambdaTransform) transformDecl(decl syntax.Decl) syntax.Decl {
-	switch d := decl.(type) {
-	case *syntax.FuncDecl:
-		if newBody := t.transformStmt(d.Body); newBody != d.Body {
-			newDecl := *d
-			if blockStmt, ok := newBody.(*syntax.BlockStmt); ok {
-				newDecl.Body = blockStmt
-			}
-			return &newDecl
-		}
-	case *syntax.VarDecl:
-		if d.Values != nil {
-			if newValues := t.transformExpr(d.Values); newValues != d.Values {
-				newDecl := *d
-				newDecl.Values = newValues
-				return &newDecl
-			}
-		}
-	}
-	return decl
-}
-
-func (t *LambdaTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
-	if stmt == nil {
+// Visit implements syntax.Visitor
+func (v *lambdaVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
 		return nil
 	}
-
-	switch s := stmt.(type) {
-	case *syntax.BlockStmt:
-		changed := false
-		newList := make([]syntax.Stmt, len(s.List))
-		for i, stmt := range s.List {
-			newStmt := t.transformStmt(stmt)
-			newList[i] = newStmt
-			if newStmt != stmt {
-				changed = true
-			}
-		}
-		if changed {
-			newBlock := *s
-			newBlock.List = newList
-			return &newBlock
-		}
+	
+	// Look for nodes that contain lambda expressions we can replace
+	switch n := node.(type) {
 	case *syntax.ExprStmt:
-		if newExpr := t.transformExpr(s.X); newExpr != s.X {
-			newStmt := *s
-			newStmt.X = newExpr
-			return &newStmt
+		if lambda, ok := n.X.(*syntax.LambdaExpr); ok {
+			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+				n.X = newExpr
+				v.changed = true
+			}
 		}
 	case *syntax.AssignStmt:
-		lhsChanged := false
-		rhsChanged := false
-		newLhs := t.transformExpr(s.Lhs)
-		newRhs := t.transformExpr(s.Rhs)
-		if newLhs != s.Lhs {
-			lhsChanged = true
-		}
-		if newRhs != s.Rhs {
-			rhsChanged = true
-		}
-		if lhsChanged || rhsChanged {
-			newStmt := *s
-			newStmt.Lhs = newLhs
-			newStmt.Rhs = newRhs
-			return &newStmt
-		}
-	case *syntax.ReturnStmt:
-		if s.Results != nil {
-			if newResults := t.transformExpr(s.Results); newResults != s.Results {
-				newStmt := *s
-				newStmt.Results = newResults
-				return &newStmt
+		if lambda, ok := n.Rhs.(*syntax.LambdaExpr); ok {
+			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+				n.Rhs = newExpr
+				v.changed = true
 			}
 		}
-	case *syntax.CheckStmt:
-		if newCond := t.transformExpr(s.Cond); newCond != s.Cond {
-			newStmt := *s
-			newStmt.Cond = newCond
-			return &newStmt
-		}
-	}
-	return stmt
-}
-
-func (t *LambdaTransform) transformExpr(expr syntax.Expr) syntax.Expr {
-	if expr == nil {
-		return nil
-	}
-
-	switch e := expr.(type) {
-	case *syntax.LambdaExpr:
-		// This is what we're looking for! Convert to FuncLit
-		return t.convertLambdaToFuncLit(e)
-	case *syntax.CallExpr:
-		funChanged := false
-		argsChanged := false
-		newFun := t.transformExpr(e.Fun)
-		if newFun != e.Fun {
-			funChanged = true
-		}
-		var newArgList []syntax.Expr
-		if e.ArgList != nil {
-			newArgList = make([]syntax.Expr, len(e.ArgList))
-			for i, arg := range e.ArgList {
-				newArg := t.transformExpr(arg)
-				newArgList[i] = newArg
-				if newArg != arg {
-					argsChanged = true
+	case *syntax.VarDecl:
+		if n.Values != nil {
+			if lambda, ok := n.Values.(*syntax.LambdaExpr); ok {
+				if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+					n.Values = newExpr
+					v.changed = true
 				}
 			}
 		}
-		if funChanged || argsChanged {
-			newCall := *e
-			newCall.Fun = newFun
-			newCall.ArgList = newArgList
-			return &newCall
-		}
-	case *syntax.Operation:
-		xChanged := false
-		yChanged := false
-		newX := t.transformExpr(e.X)
-		if newX != e.X {
-			xChanged = true
-		}
-		var newY syntax.Expr
-		if e.Y != nil {
-			newY = t.transformExpr(e.Y)
-			if newY != e.Y {
-				yChanged = true
+	case *syntax.CallExpr:
+		// Handle lambda expressions in function arguments
+		for i, arg := range n.ArgList {
+			if lambda, ok := arg.(*syntax.LambdaExpr); ok {
+				if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+					n.ArgList[i] = newExpr
+					v.changed = true
+				}
 			}
 		}
-		if xChanged || yChanged {
-			newOp := *e
-			newOp.X = newX
-			newOp.Y = newY
-			return &newOp
+	case *syntax.ReturnStmt:
+		if n.Results != nil {
+			if lambda, ok := n.Results.(*syntax.LambdaExpr); ok {
+				if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+					n.Results = newExpr
+					v.changed = true
+				}
+			}
+		}
+	case *syntax.CheckStmt:
+		if lambda, ok := n.Cond.(*syntax.LambdaExpr); ok {
+			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+				n.Cond = newExpr
+				v.changed = true
+			}
+		}
+	case *syntax.Operation:
+		if lambda, ok := n.X.(*syntax.LambdaExpr); ok {
+			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+				n.X = newExpr
+				v.changed = true
+			}
+		}
+		if lambda, ok := n.Y.(*syntax.LambdaExpr); ok {
+			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
+				n.Y = newExpr
+				v.changed = true
+			}
 		}
 	}
-	return expr
+	
+	// Continue visiting child nodes
+	return v
 }
 
 func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syntax.FuncLit {
