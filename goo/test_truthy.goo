@@ -1,4 +1,6 @@
 
+import "fmt"
+
 	// Test numeric truthiness
 	if 0 {
 		fmt.Println("FAIL: 0 should be falsy")
