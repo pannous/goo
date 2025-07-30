@@ -1,0 +1,22 @@
+import "fmt"
+
+// Test various string-rune comparisons
+s1 := "A"
+c1 := 'A'
+s2 := "你"
+c2 := '你'
+c3 := 'B'
+
+fmt.Printf("String-rune comparisons:\n")
+fmt.Printf("s1=\"A\", c1='A': s1 == c1 = %t\n", s1 == c1)
+fmt.Printf("s2=\"你\", c2='你': s2 == c2 = %t\n", s2 == c2)
+fmt.Printf("s1=\"A\", c3='B': s1 == c3 = %t\n", s1 == c3)
+
+fmt.Printf("\nLiteral comparisons:\n")
+fmt.Printf("\"A\" == 'A' = %t\n", "A" == 'A')
+fmt.Printf("\"你\" == '你' = %t\n", "你" == '你')
+fmt.Printf("\"A\" == 'B' = %t\n", "A" == 'B')
+
+fmt.Printf("\nReversed comparisons:\n")
+fmt.Printf("c1 == s1 = %t\n", c1 == s1)
+fmt.Printf("'你' == \"你\" = %t\n", '你' == "你")

@@ -1,0 +1,9 @@
+import "fmt"
+
+// Test string to character comparison
+s := "你"
+c := '你'
+
+fmt.Printf("String: %s\n", s)
+fmt.Printf("Char: %c\n", c)
+fmt.Printf("s == c: %t\n", s == c)
