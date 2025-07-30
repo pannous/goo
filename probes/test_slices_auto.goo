@@ -1,0 +1,4 @@
+list := [1, 2, 3]
+result := list.contains(2)
+check result
+printf("Contains: %v\n", result)

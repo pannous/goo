@@ -1,0 +1,7 @@
+import "fmt"
+
+s := "hello world"
+fmt.Printf("charAt(0) = %s\n", s.charAt(0))
+fmt.Printf("charAt(6) = %s\n", s.charAt(6))
+fmt.Printf("at(4) = %s\n", s.at(4))
+fmt.Printf("char(1) = %s\n", s.char(1))

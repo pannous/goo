@@ -1,0 +1,7 @@
+import "strings"
+
+func main() {
+    str := "hello"
+    result := strings.ToUpper(str)
+    printf("Upper: %s\n", result)
+}

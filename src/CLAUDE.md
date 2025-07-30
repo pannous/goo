@@ -165,3 +165,6 @@ Or use a hybrid.
 # Assume mishearings
 I am using speech recognition which might misunderstand some words:
 parcel => parser , fights => files
+
+# Keep code
+Never randomly disable code
