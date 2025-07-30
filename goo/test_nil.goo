@@ -1,4 +1,6 @@
 
+import "fmt"
+
 var ptr *int
 if ptr == ø {
 	fmt.Println("ptr is nil using ø")
