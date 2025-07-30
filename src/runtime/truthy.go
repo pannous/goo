@@ -76,7 +76,7 @@ func truthy(i interface{}) bool {
 		}
 
 		// Handle slice, map, channel - zero length/nil is falsy
-		switch typ.Kind() & abi.KindMask {
+		switch typ.Kind() {
 		case abi.Slice:
 			slice := (*slice)(eface.data)
 			return slice.len != 0

@@ -320,11 +320,15 @@ func (checks *Checker) cycleError(cycle []Object, start int) {
 	// If obj is a type alias, mark it as valid (not broken) in order to avoid follow-on errors.
 	obj := cycle[start]
 	tname, _ := obj.(*TypeName)
-	if tname != nil && tname.IsAlias() {
-		// If we use Alias nodes, it is initialized with Typ[Invalid].
-		// TODO(gri) Adjust this code if we initialize with nil.
-		if !checks.conf.EnableAlias {
-			checks.validAlias(tname, Typ[Invalid])
+	if tname != nil {
+		if checks.conf.EnableAlias {
+			if a, ok := tname.Type().(*Alias); ok {
+				a.fromRHS = Typ[Invalid]
+			}
+		} else {
+			if tname.IsAlias() {
+				checks.validAlias(tname, Typ[Invalid])
+			}
 		}
 	}
 
@@ -507,16 +511,17 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, defi *Typ
 		}
 
 		if checks.conf.EnableAlias {
-			// TODO(gri) Should be able to use nil instead of Typ[Invalid] to mark
-			//           the alias as incomplete. Currently this causes problems
-			//           with certain cycles. Investigate.
-			//
-			// NOTE(adonovan): to avoid the Invalid being prematurely observed
-			// by (e.g.) a var whose type is an unfinished cycle,
-			// Unalias does not memoize if Invalid. Perhaps we should use a
-			// special sentinel distinct from Invalid.
-			alias := checks.newAlias(obj, Typ[Invalid])
+			alias := checks.newAlias(obj, nil)
 			setDefType(defi, alias)
+
+			// If we could not type the RHS, set it to invalid. This should
+			// only ever happen if we panic before setting.
+			defer func() {
+				if alias.fromRHS == nil {
+					alias.fromRHS = Typ[Invalid]
+					unalias(alias)
+				}
+			}()
 
 			// handle type parameters even if not allowed (Alias type is supported)
 			if tparam0 != nil {
@@ -531,8 +536,9 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, defi *Typ
 
 			rhs = checks.definedType(tdecl.Type, obj)
 			assert(rhs != nil)
+
 			alias.fromRHS = rhs
-			Unalias(alias) // resolve alias.actual
+			unalias(alias) // resolve alias.actual
 		} else {
 			if !versionErr && tparam0 != nil {
 				checks.error(tdecl, UnsupportedFeature, "generic type alias requires GODEBUG=gotypesalias=1 or unset")

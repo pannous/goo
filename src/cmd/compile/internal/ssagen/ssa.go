@@ -137,6 +137,8 @@ func InitConfig() {
 	ir.Syms.Asanwrite = typecheck.LookupRuntimeFunc("asanwrite")
 	ir.Syms.Newobject = typecheck.LookupRuntimeFunc("newobject")
 	ir.Syms.Newproc = typecheck.LookupRuntimeFunc("newproc")
+	ir.Syms.PanicBounds = typecheck.LookupRuntimeFunc("panicBounds")
+	ir.Syms.PanicExtend = typecheck.LookupRuntimeFunc("panicExtend")
 	ir.Syms.Panicdivide = typecheck.LookupRuntimeFunc("panicdivide")
 	ir.Syms.PanicdottypeE = typecheck.LookupRuntimeFunc("panicdottypeE")
 	ir.Syms.PanicdottypeI = typecheck.LookupRuntimeFunc("panicdottypeI")
@@ -6960,6 +6962,9 @@ func genssa(f *ssa.Func, pp *objw.Progs) {
 	if base.Ctxt.Flag_locationlists {
 		var debugInfo *ssa.FuncDebug
 		debugInfo = e.curfn.DebugInfo.(*ssa.FuncDebug)
+		// Save off entry ID in case we need it later for DWARF generation
+		// for return values promoted to the heap.
+		debugInfo.EntryID = f.Entry.ID
 		if e.curfn.ABI == obj.ABIInternal && base.Flag.N != 0 {
 			ssa.BuildFuncDebugNoOptimized(base.Ctxt, f, base.Debug.LocationLists > 1, StackOffset, debugInfo)
 		} else {

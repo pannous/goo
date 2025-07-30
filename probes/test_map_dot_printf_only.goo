@@ -1,0 +1,6 @@
+// Test to verify map dot notation works in printf
+test_map := map[string]string{"key": "value"}
+
+// This should work
+printf("Value: %s\n", test_map.key)
+printf("Done!\n")

@@ -1,0 +1,10 @@
+// Test to understand why map dot notation works in printf but not in check
+test_map := map[string]string{"key": "value"}
+
+// This should work (according to the problem description)
+printf("Value: %s\n", test_map.key)
+
+// This should fail (according to the problem description)
+check test_map.key == "value"
+
+printf("If we reach here, check worked!\n")

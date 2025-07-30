@@ -1,0 +1,3 @@
+printf("Hello from printf:", 42)
+put("Hello from put:", "world")
+println("Hello from println:", true)

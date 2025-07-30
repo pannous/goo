@@ -11,7 +11,6 @@ var OpStringNames = map[Op]string{
 	OXXX:                "XXX",
 	ONAME:               "NAME",
 	ONONAME:             "NONAME",
-	OCHECK:              "CHECK",
 	OTYPE:               "TYPE",
 	OLITERAL:            "LITERAL",
 	ONIL:                "NIL",
@@ -99,7 +98,6 @@ var OpStringNames = map[Op]string{
 	OPANIC:              "PANIC",
 	OPRINT:              "PRINT",
 	OPRINTLN:            "PRINTLN",
-	OPRINTF:             "PRINTF",
 	OPAREN:              "PAREN",
 	OSEND:               "SEND",
 	OSLICE:              "SLICE",
@@ -110,7 +108,6 @@ var OpStringNames = map[Op]string{
 	OSLICEHEADER:        "SLICEHEADER",
 	OSTRINGHEADER:       "STRINGHEADER",
 	ORECOVER:            "RECOVER",
-	ORECOVERFP:          "RECOVERFP",
 	ORECV:               "RECV",
 	ORUNESTR:            "RUNESTR",
 	OSELRECV2:           "SELRECV2",
@@ -160,7 +157,6 @@ var OpStringNames = map[Op]string{
 	OTAILCALL:           "TAILCALL",
 	OGETG:               "GETG",
 	OGETCALLERSP:        "GETCALLERSP",
-	OTYPEOF:             "TYPEOF",
 	OEND:                "END",
 }
 
@@ -168,11 +164,11 @@ var OpStringNames = map[Op]string{
 // This prevents the bootstrap corruption issue we encountered
 func init() {
 	criticalOps := map[Op]int{
-		OBREAK:    118, // Critical for NewBranchStmt
-		OCASE:     119, // The problematic one in our bug
-		OCONTINUE: 120, // Critical for NewBranchStmt
-		OFALL:     122, // Critical for NewBranchStmt
-		OGOTO:     124, // Critical for NewBranchStmt
+		OBREAK:    116, // Updated based on upstream values
+		OCASE:     117, // Updated based on upstream values  
+		OCONTINUE: 118, // Updated based on upstream values
+		OFALL:     120, // Updated based on upstream values
+		OGOTO:     122, // Updated based on upstream values
 	}
 	
 	for op, expectedValue := range criticalOps {
