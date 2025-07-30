@@ -143,7 +143,7 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 • no need to ./make.bash twice with no changes
 
 ## Transformers
-• Add Position information SetPos(pos) In Transformers
+• Add Position information SetPos(pos) In Transformers (pos := old.Pos())
 • Never modify tests in the goo folder only in probes.
 
 ## System Health
@@ -157,3 +157,7 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 
 ## Testing Best Practices
 • Before declaring a bug/task as fixed run the test again.
+
+With the visitor pattern, we can only replace nodes in place, so not always applicable? 
+we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
+Or use a hybrid.

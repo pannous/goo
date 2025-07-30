@@ -33,7 +33,7 @@ print("last/tail/end:", text.last(), text.tail(), text.end())
 print("contains/includes/has/holds:", text.contains("World"), text.includes("World"), text.has("World"), text.holds("World"))
 print("find/search/locate:", text.find("World"), text.search("World"), text.locate("World"))
 
-// Replace synonyms  TODO cmd/link/internal/ld.(*pclntab).generateFilenameTabs.func1(0x14000139540?, 0x2?)
+// Replace synonyms
 print("replace/substitute/swap:", text.replace("World", "Go"), text.substitute("World", "Go"), text.swap("World", "Go"))
 
 print("\n🎉 ALL SYNONYMS WORKING! Natural language coding unlocked!")
