@@ -14,8 +14,13 @@ import (
 
 // AsCastTransform converts as cast expressions to type assertions
 // Transforms: x as T -> x.(T)
-type AsCastTransform struct{
-	ctx *TransformContext
+type AsCastTransform struct{}
+
+// asCastVisitor implements the visitor pattern for as-cast transformation
+type asCastVisitor struct {
+	transform *AsCastTransform
+	ctx       *TransformContext
+	changed   bool
 }
 
 func (t *AsCastTransform) Name() string {
@@ -23,201 +28,81 @@ func (t *AsCastTransform) Name() string {
 }
 
 func (t *AsCastTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	t.ctx = ctx // Store context for use in methods
-	changed := false
-
-	// Transform all declarations
-	for i, decl := range file.DeclList {
-		if newDecl := t.transformDecl(decl); newDecl != decl {
-			file.DeclList[i] = newDecl
-			changed = true
-		}
-	}
-
-	return changed
+	visitor := &asCastVisitor{transform: t, ctx: ctx}
+	
+	// Use the general visitor pattern to walk all nodes
+	syntax.Walk(file, visitor)
+	
+	return visitor.changed
 }
 
-func (t *AsCastTransform) transformDecl(decl syntax.Decl) syntax.Decl {
-	switch d := decl.(type) {
-	case *syntax.FuncDecl:
-		if newBody := t.transformStmt(d.Body); newBody != d.Body {
-			newDecl := *d
-			if blockStmt, ok := newBody.(*syntax.BlockStmt); ok {
-				newDecl.Body = blockStmt
-			}
-			return &newDecl
-		}
-	case *syntax.VarDecl:
-		if d.Values != nil {
-			if newValues := t.transformExpr(d.Values); newValues != d.Values {
-				newDecl := *d
-				newDecl.Values = newValues
-				return &newDecl
-			}
-		}
-	}
-	return decl
-}
-
-func (t *AsCastTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
-	if stmt == nil {
+// Visit implements syntax.Visitor
+func (v *asCastVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
 		return nil
 	}
-
-	switch s := stmt.(type) {
-	case *syntax.BlockStmt:
-		changed := false
-		newList := make([]syntax.Stmt, len(s.List))
-		for i, stmt := range s.List {
-			newStmt := t.transformStmt(stmt)
-			newList[i] = newStmt
-			if newStmt != stmt {
-				changed = true
-			}
-		}
-		if changed {
-			newBlock := *s
-			newBlock.List = newList
-			return &newBlock
-		}
+	
+	// Look for nodes that contain as-cast expressions we can replace
+	switch n := node.(type) {
 	case *syntax.ExprStmt:
-		if newExpr := t.transformExpr(s.X); newExpr != s.X {
-			newStmt := *s
-			newStmt.X = newExpr
-			return &newStmt
+		if asCast, ok := n.X.(*syntax.AsCastExpr); ok {
+			if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+				n.X = newExpr
+				v.changed = true
+			}
 		}
 	case *syntax.AssignStmt:
-		lhsChanged := false
-		rhsChanged := false
-		newLhs := t.transformExpr(s.Lhs)
-		newRhs := t.transformExpr(s.Rhs)
-		if newLhs != s.Lhs {
-			lhsChanged = true
+		if asCast, ok := n.Rhs.(*syntax.AsCastExpr); ok {
+			if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+				n.Rhs = newExpr
+				v.changed = true
+			}
 		}
-		if newRhs != s.Rhs {
-			rhsChanged = true
+	case *syntax.VarDecl:
+		if n.Values != nil {
+			if asCast, ok := n.Values.(*syntax.AsCastExpr); ok {
+				if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+					n.Values = newExpr
+					v.changed = true
+				}
+			}
 		}
-		if lhsChanged || rhsChanged {
-			newStmt := *s
-			newStmt.Lhs = newLhs
-			newStmt.Rhs = newRhs
-			return &newStmt
+	case *syntax.CallExpr:
+		// Handle as-cast expressions in function arguments
+		for i, arg := range n.ArgList {
+			if asCast, ok := arg.(*syntax.AsCastExpr); ok {
+				if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+					n.ArgList[i] = newExpr
+					v.changed = true
+				}
+			}
 		}
 	case *syntax.ReturnStmt:
-		if s.Results != nil {
-			if newResults := t.transformExpr(s.Results); newResults != s.Results {
-				newStmt := *s
-				newStmt.Results = newResults
-				return &newStmt
-			}
-		}
-		// Skip the complex statement transformations for now to avoid type issues
-	}
-	return stmt
-}
-
-func (t *AsCastTransform) transformExpr(expr syntax.Expr) syntax.Expr {
-	if expr == nil {
-		return nil
-	}
-
-	switch e := expr.(type) {
-	case *syntax.AsCastExpr:
-		// This is what we're looking for! Convert x as T to x.(T)
-		return t.convertAsCastToAssert(e, t.ctx)
-	case *syntax.CallExpr:
-		funChanged := false
-		argsChanged := false
-		newFun := t.transformExpr(e.Fun)
-		if newFun != e.Fun {
-			funChanged = true
-		}
-		var newArgList []syntax.Expr
-		if e.ArgList != nil {
-			newArgList = make([]syntax.Expr, len(e.ArgList))
-			for i, arg := range e.ArgList {
-				newArg := t.transformExpr(arg)
-				newArgList[i] = newArg
-				if newArg != arg {
-					argsChanged = true
+		if n.Results != nil {
+			if asCast, ok := n.Results.(*syntax.AsCastExpr); ok {
+				if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+					n.Results = newExpr
+					v.changed = true
 				}
 			}
-		}
-		if funChanged || argsChanged {
-			newCall := *e
-			newCall.Fun = newFun
-			newCall.ArgList = newArgList
-			return &newCall
 		}
 	case *syntax.Operation:
-		xChanged := false
-		yChanged := false
-		newX := t.transformExpr(e.X)
-		if newX != e.X {
-			xChanged = true
-		}
-		var newY syntax.Expr
-		if e.Y != nil {
-			newY = t.transformExpr(e.Y)
-			if newY != e.Y {
-				yChanged = true
+		if asCast, ok := n.X.(*syntax.AsCastExpr); ok {
+			if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+				n.X = newExpr
+				v.changed = true
 			}
 		}
-		if xChanged || yChanged {
-			newOp := *e
-			newOp.X = newX
-			newOp.Y = newY
-			return &newOp
-		}
-	case *syntax.IndexExpr:
-		xChanged := false
-		indexChanged := false
-		newX := t.transformExpr(e.X)
-		if newX != e.X {
-			xChanged = true
-		}
-		newIndex := t.transformExpr(e.Index)
-		if newIndex != e.Index {
-			indexChanged = true
-		}
-		if xChanged || indexChanged {
-			newIndexExpr := *e
-			newIndexExpr.X = newX
-			newIndexExpr.Index = newIndex
-			return &newIndexExpr
-		}
-	case *syntax.ParenExpr:
-		if newX := t.transformExpr(e.X); newX != e.X {
-			newParen := *e
-			newParen.X = newX
-			return &newParen
-		}
-	case *syntax.SelectorExpr:
-		if newX := t.transformExpr(e.X); newX != e.X {
-			newSelector := *e
-			newSelector.X = newX
-			return &newSelector
-		}
-	case *syntax.SliceExpr:
-		changed := false
-		newSlice := *e
-		if newX := t.transformExpr(e.X); newX != e.X {
-			newSlice.X = newX
-			changed = true
-		}
-		for i, idx := range e.Index {
-			if idx != nil {
-				if newIdx := t.transformExpr(idx); newIdx != idx {
-					newSlice.Index[i] = newIdx
-					changed = true
-				}
+		if asCast, ok := n.Y.(*syntax.AsCastExpr); ok {
+			if newExpr := v.transform.convertAsCastToAssert(asCast, v.ctx); newExpr != asCast {
+				n.Y = newExpr
+				v.changed = true
 			}
-		}
-		if changed {
-			return &newSlice
 		}
 	}
-	return expr
+	
+	// Continue visiting child nodes
+	return v
 }
 
 func (t *AsCastTransform) convertAsCastToAssert(asCast *syntax.AsCastExpr, ctx *TransformContext) syntax.Expr {
