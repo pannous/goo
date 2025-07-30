@@ -103,7 +103,7 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_fmt.goo
 ✅ test_slices_direct.goo
 ✅ test_slices_manual.goo
-🔴 test_typeof_debug.goo
+✅ test_typeof_debug.goo
 ========================================
-Summary: 87/104 passed, 17 failed
+Summary: 88/104 passed, 16 failed
 ⚠️  Some tests failed
