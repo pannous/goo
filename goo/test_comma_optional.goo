@@ -1,0 +1,20 @@
+
+// Test without commas - the goal!
+m1 := map[x: 10 y: 20]
+printf("No commas: %v\n", m1)
+
+// Test mixed - some commas, some not
+m2 := map[a: 1, b: 2 c: 3]
+printf("Mixed commas: %v\n", m2)
+
+// Test with commas (backward compatibility)
+m3 := map[active: true, age: 30, name: "Alice"]
+printf("With commas: %v\n", m3)
+
+// Single element without comma
+m4 := map[single: "value"]
+printf("Single: %v\n", m4)
+
+// Multiple elements, no commas
+m5 := map[count: 42 enabled: true title: "test" score: 98.5]
+printf("Multiple no commas: %v\n", m5)
