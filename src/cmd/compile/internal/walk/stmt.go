@@ -54,7 +54,7 @@ func walkStmt(n ir.Node) ir.Node {
 		ir.OPRINTLN,
 		ir.OPRINTF,
 		ir.OPANIC,
-		ir.ORECOVERFP,
+		ir.ORECOVER,
 		ir.OGETG:
 		if n.Typecheck() == 0 {
 			base.Fatalf("missing typecheck: %+v", n)

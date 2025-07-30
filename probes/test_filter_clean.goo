@@ -1,0 +1,4 @@
+numbers := [1, 2, 3, 4, 5, 6]
+
+evens := numbers.filter(x => x % 2 == 0)
+put("Filter result:", evens)

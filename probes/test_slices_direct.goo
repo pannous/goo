@@ -1,0 +1,4 @@
+import "slices" 
+numbers := []int{1, 2, 3}
+result := slices.Contains(numbers, 2)
+println(result)
