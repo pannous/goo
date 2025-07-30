@@ -235,7 +235,6 @@ func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformCont
 	visitor := &methodVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
 
-	// Add required imports if needed and transformations were made
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
 		println("Adding strings import")
 		t.addStringsImport(file)

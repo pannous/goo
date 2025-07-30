@@ -12,7 +12,6 @@ import (
 // to their corresponding Go standard library function calls.
 type ListMethodsTransform struct{}
 
-
 func (t *ListMethodsTransform) Name() string {
 	return "list_methods_transform"
 }
@@ -152,12 +151,10 @@ func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContex
 	}
 
 	// Add required imports if needed and transformations were made
-	// NOTE: Auto-import is now handled at the type-checking level in types2/resolver.go
-	// by injectSlicesImportIfNeeded, so we don't need to do it here
-	// if changed && !t.hasImport(file, "slices") {
-	//     println("Adding slices import")
-	//     t.addSlicesImport(file)
-	// }
+	if changed && !t.hasImport(file, "slices") {
+		println("Adding slices import")
+		t.addSlicesImport(file)
+	}
 
 	return changed
 }
@@ -322,7 +319,6 @@ func (t *ListMethodsTransform) transformExpr(expr syntax.Expr, ctx *TransformCon
 	}
 	return expr
 }
-
 
 // Basic list operations
 
@@ -523,24 +519,32 @@ func (t *ListMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Ex
 	return t.createCompilerError(receiver, "reverse", "reverse_slice_elements")
 }
 
-// createSortCall creates slices.Sort(receiver)
 func (t *ListMethodsTransform) createSortCall(receiver syntax.Expr) syntax.Expr {
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "slices"},
-			Sel: &syntax.Name{Value: "Sort"},
-		},
+	pos := receiver.Pos() // ok?
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	sortName := &syntax.Name{Value: "Sort"}
+	sortName.SetPos(pos)
+	selector := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: sortName,
+	}
+	selector.SetPos(pos)
+	call := &syntax.CallExpr{
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver},
 	}
+	call.SetPos(pos)
+	return call
 }
 
 // createCopyCall creates append(receiver[:0:0], receiver...)
 func (t *ListMethodsTransform) createCopyCall(receiver syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
-	
+
 	// Create receiver[:0:0] to get an empty slice of the same type
 	emptySlice := &syntax.SliceExpr{
-		X:     receiver,
+		X: receiver,
 		Index: [3]syntax.Expr{
 			&syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
 			&syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
@@ -548,7 +552,7 @@ func (t *ListMethodsTransform) createCopyCall(receiver syntax.Expr) syntax.Expr 
 		},
 	}
 	emptySlice.SetPos(pos)
-	
+
 	// Create append(receiver[:0:0], receiver...)
 	appendName := &syntax.Name{Value: "append"}
 	appendName.SetPos(pos)

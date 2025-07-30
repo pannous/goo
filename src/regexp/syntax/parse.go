@@ -31,8 +31,8 @@ const (
 	ErrInternalError ErrorCode = "regexp/syntax: internal error"
 
 	// Parse errors
-	ErrInvalidCharClass      ErrorCode = "invalid character class"
-	ErrInvalidCharRange      ErrorCode = "invalid character class range"
+	ErrInvalidCharClass      ErrorCode = "invalid character classe"
+	ErrInvalidCharRange      ErrorCode = "invalid character classe range"
 	ErrInvalidEscape         ErrorCode = "invalid escape sequence"
 	ErrInvalidNamedCapture   ErrorCode = "invalid named capture"
 	ErrInvalidPerlOp         ErrorCode = "invalid or unsupported Perl syntax"
@@ -130,7 +130,7 @@ type parser struct {
 	free        *Regexp
 	numCap      int // number of capturing groups seen
 	wholeRegexp string
-	tmpClass    []rune            // temporary char class work space
+	tmpClass    []rune            // temporary char classe work space
 	numRegexp   int               // number of regexps allocated
 	numRunes    int               // number of runes in char classes
 	repeats     int64             // product of all repetitions seen
@@ -504,7 +504,7 @@ func (p *parser) alternate() *Regexp {
 	subs := p.stack[i:]
 	p.stack = p.stack[:i]
 
-	// Make sure top class is clean.
+	// Make sure top classe is clean.
 	// All the others already are (see swapVerticalBar).
 	if len(subs) > 0 {
 		cleanAlt(subs[len(subs)-1])
@@ -583,7 +583,7 @@ func (p *parser) collapse(subs []*Regexp, op Op) *Regexp {
 //
 //	A(B(C|D)|EF)|BC(X|Y)
 //
-// which simplifies by character class introduction to
+// which simplifies by character classe introduction to
 //
 //	A(B[CD]|EF)|BC[XY]
 func (p *parser) factor(sub []*Regexp) []*Regexp {
@@ -676,7 +676,7 @@ func (p *parser) factor(sub []*Regexp) []*Regexp {
 		if i < len(sub) {
 			ifirst = p.leadingRegexp(sub[i])
 			if first != nil && first.Equal(ifirst) &&
-				// first must be a character class OR a fixed repeat of a character class.
+				// first must be a character classe OR a fixed repeat of a character classe.
 				(isCharClass(first) || (first.Op == OpRepeat && first.Min == first.Max && isCharClass(first.Sub[0]))) {
 				continue
 			}
@@ -726,14 +726,14 @@ func (p *parser) factor(sub []*Regexp) []*Regexp {
 			continue
 		}
 
-		// sub[i] is not a char or char class;
-		// emit char class for sub[start:i]...
+		// sub[i] is not a char or char classe;
+		// emit char classe for sub[start:i]...
 		if i == start {
 			// Nothing to do - run of length 0.
 		} else if i == start+1 {
 			out = append(out, sub[start])
 		} else {
-			// Make new char class.
+			// Make new char classe.
 			// Start with most complex regexp in sub[start].
 			max := start
 			for j := start + 1; j < i; j++ {
@@ -1064,7 +1064,7 @@ func parse(s string, flags Flags) (_ *Regexp, err error) {
 				}
 			}
 
-			// Perl character class escape.
+			// Perl character classe escape.
 			if r, rest := p.parsePerlClassEscape(t, re.Rune0[:0]); r != nil {
 				re.Rune = r
 				t = rest
@@ -1297,8 +1297,8 @@ func (p *parser) parseInt(s string) (n int, rest string, ok bool) {
 	return
 }
 
-// can this be represented as a character class?
-// single-rune literal string, char class, ., and .|\n.
+// can this be represented as a character classe?
+// single-rune literal string, char classe, ., and .|\n.
 func isCharClass(re *Regexp) bool {
 	return re.Op == OpLiteral && len(re.Rune) == 1 ||
 		re.Op == OpCharClass ||
@@ -1352,7 +1352,7 @@ func mergeCharClass(dst, src *Regexp) {
 			dst.Op = OpAnyChar
 		}
 	case OpCharClass:
-		// src is simpler, so either literal or char class
+		// src is simpler, so either literal or char classe
 		if src.Op == OpLiteral {
 			dst.Rune = appendLiteral(dst.Rune, src.Rune[0], src.Flags)
 		} else {
@@ -1373,8 +1373,8 @@ func mergeCharClass(dst, src *Regexp) {
 // swapVerticalBar swaps the two and returns true.
 // Otherwise it returns false.
 func (p *parser) swapVerticalBar() bool {
-	// If above and below vertical bar are literal or char class,
-	// can merge into a single char class.
+	// If above and below vertical bar are literal or char classe,
+	// can merge into a single char classe.
 	n := len(p.stack)
 	if n >= 3 && p.stack[n-2].Op == opVerticalBar && isCharClass(p.stack[n-1]) && isCharClass(p.stack[n-3]) {
 		re1 := p.stack[n-1]
@@ -1556,7 +1556,7 @@ Switch:
 	return 0, "", &Error{ErrInvalidEscape, s[:len(s)-len(t)]}
 }
 
-// parseClassChar parses a character class character at the beginning of s
+// parseClassChar parses a character classe character at the beginning of s
 // and returns it.
 func (p *parser) parseClassChar(s, wholeClass string) (r rune, rest string, err error) {
 	if s == "" {
@@ -1573,13 +1573,13 @@ func (p *parser) parseClassChar(s, wholeClass string) (r rune, rest string, err 
 }
 
 type charGroup struct {
-	sign  int
-	class []rune
+	sign   int
+	classe []rune
 }
 
 //go:generate perl make_perl_groups.pl perl_groups.go
 
-// parsePerlClassEscape parses a leading Perl character class escape like \d
+// parsePerlClassEscape parses a leading Perl character classe escape like \d
 // from the beginning of s. If one is present, it appends the characters to r
 // and returns the new slice r and the remainder of the string.
 func (p *parser) parsePerlClassEscape(s string, r []rune) (out []rune, rest string) {
@@ -1593,7 +1593,7 @@ func (p *parser) parsePerlClassEscape(s string, r []rune) (out []rune, rest stri
 	return p.appendGroup(r, g), s[2:]
 }
 
-// parseNamedClass parses a leading POSIX named character class like [:alnum:]
+// parseNamedClass parses a leading POSIX named character classe like [:alnum:]
 // from the beginning of s. If one is present, it appends the characters to r
 // and returns the new slice r and the remainder of the string.
 func (p *parser) parseNamedClass(s string, r []rune) (out []rune, rest string, err error) {
@@ -1617,13 +1617,13 @@ func (p *parser) parseNamedClass(s string, r []rune) (out []rune, rest string, e
 func (p *parser) appendGroup(r []rune, g charGroup) []rune {
 	if p.flags&FoldCase == 0 {
 		if g.sign < 0 {
-			r = appendNegatedClass(r, g.class)
+			r = appendNegatedClass(r, g.classe)
 		} else {
-			r = appendClass(r, g.class)
+			r = appendClass(r, g.classe)
 		}
 	} else {
 		tmp := p.tmpClass[:0]
-		tmp = appendFoldedClass(tmp, g.class)
+		tmp = appendFoldedClass(tmp, g.classe)
 		p.tmpClass = tmp
 		tmp = cleanClass(&p.tmpClass)
 		if g.sign < 0 {
@@ -1745,7 +1745,7 @@ func unicodeTable(name string) (tab, fold *unicode.RangeTable, sign int) {
 	return nil, nil, 0
 }
 
-// parseUnicodeClass parses a leading Unicode character class like \p{Han}
+// parseUnicodeClass parses a leading Unicode character classe like \p{Han}
 // from the beginning of s. If one is present, it appends the characters to r
 // and returns the new slice r and the remainder of the string.
 func (p *parser) parseUnicodeClass(s string, r []rune) (out []rune, rest string, err error) {
@@ -1822,7 +1822,7 @@ func (p *parser) parseUnicodeClass(s string, r []rune) (out []rune, rest string,
 	return r, t, nil
 }
 
-// parseClass parses a character class at the beginning of s
+// parseClass parses a character classe at the beginning of s
 // and pushes it onto the parse stack.
 func (p *parser) parseClass(s string) (rest string, err error) {
 	t := s[1:] // chop [
@@ -1835,17 +1835,17 @@ func (p *parser) parseClass(s string) (rest string, err error) {
 		sign = -1
 		t = t[1:]
 
-		// If character class does not match \n, add it here,
+		// If character classe does not match \n, add it here,
 		// so that negation later will do the right thing.
 		if p.flags&ClassNL == 0 {
 			re.Rune = append(re.Rune, '\n', '\n')
 		}
 	}
 
-	class := re.Rune
-	first := true // ] and - are okay as first char in class
+	classe := re.Rune
+	first := true // ] and - are okay as first char in classe
 	for t == "" || t[0] != ']' || first {
-		// POSIX: - is only okay unescaped as first or last in class.
+		// POSIX: - is only okay unescaped as first or last in classe.
 		// Perl: - is okay anywhere.
 		if t != "" && t[0] == '-' && p.flags&PerlX == 0 && !first && (len(t) == 1 || t[1] != ']') {
 			_, size := utf8.DecodeRuneInString(t[1:])
@@ -1855,29 +1855,29 @@ func (p *parser) parseClass(s string) (rest string, err error) {
 
 		// Look for POSIX [:alnum:] etc.
 		if len(t) > 2 && t[0] == '[' && t[1] == ':' {
-			nclass, nt, err := p.parseNamedClass(t, class)
+			nclass, nt, err := p.parseNamedClass(t, classe)
 			if err != nil {
 				return "", err
 			}
 			if nclass != nil {
-				class, t = nclass, nt
+				classe, t = nclass, nt
 				continue
 			}
 		}
 
 		// Look for Unicode character group like \p{Han}.
-		nclass, nt, err := p.parseUnicodeClass(t, class)
+		nclass, nt, err := p.parseUnicodeClass(t, classe)
 		if err != nil {
 			return "", err
 		}
 		if nclass != nil {
-			class, t = nclass, nt
+			classe, t = nclass, nt
 			continue
 		}
 
-		// Look for Perl character class symbols (extension).
-		if nclass, nt := p.parsePerlClassEscape(t, class); nclass != nil {
-			class, t = nclass, nt
+		// Look for Perl character classe symbols (extension).
+		if nclass, nt := p.parsePerlClassEscape(t, classe); nclass != nil {
+			classe, t = nclass, nt
 			continue
 		}
 
@@ -1900,20 +1900,20 @@ func (p *parser) parseClass(s string) (rest string, err error) {
 			}
 		}
 		if p.flags&FoldCase == 0 {
-			class = appendRange(class, lo, hi)
+			classe = appendRange(classe, lo, hi)
 		} else {
-			class = appendFoldedRange(class, lo, hi)
+			classe = appendFoldedRange(classe, lo, hi)
 		}
 	}
 	t = t[1:] // chop ]
 
-	// Use &re.Rune instead of &class to avoid allocation.
-	re.Rune = class
-	class = cleanClass(&re.Rune)
+	// Use &re.Rune instead of &classe to avoid allocation.
+	re.Rune = classe
+	classe = cleanClass(&re.Rune)
 	if sign < 0 {
-		class = negateClass(class)
+		classe = negateClass(classe)
 	}
-	re.Rune = class
+	re.Rune = classe
 	p.push(re)
 	return t, nil
 }
@@ -1950,11 +1950,11 @@ func cleanClass(rp *[]rune) []rune {
 	return r[:w]
 }
 
-// inCharClass reports whether r is in the class.
-// It assumes the class has been cleaned by cleanClass.
-func inCharClass(r rune, class []rune) bool {
-	_, ok := sort.Find(len(class)/2, func(i int) int {
-		lo, hi := class[2*i], class[2*i+1]
+// inCharClass reports whether r is in the classe.
+// It assumes the classe has been cleaned by cleanClass.
+func inCharClass(r rune, classe []rune) bool {
+	_, ok := sort.Find(len(classe)/2, func(i int) int {
+		lo, hi := classe[2*i], classe[2*i+1]
 		if r > hi {
 			return +1
 		}
@@ -1966,7 +1966,7 @@ func inCharClass(r rune, class []rune) bool {
 	return ok
 }
 
-// appendLiteral returns the result of appending the literal x to the class r.
+// appendLiteral returns the result of appending the literal x to the classe r.
 func appendLiteral(r []rune, x rune, flags Flags) []rune {
 	if flags&FoldCase != 0 {
 		return appendFoldedRange(r, x, x)
@@ -1974,7 +1974,7 @@ func appendLiteral(r []rune, x rune, flags Flags) []rune {
 	return appendRange(r, x, x)
 }
 
-// appendRange returns the result of appending the range lo-hi to the class r.
+// appendRange returns the result of appending the range lo-hi to the classe r.
 func appendRange(r []rune, lo, hi rune) []rune {
 	// Expand last range or next to last range if it overlaps or abuts.
 	// Checking two ranges helps when appending case-folded
@@ -2007,7 +2007,7 @@ const (
 )
 
 // appendFoldedRange returns the result of appending the range lo-hi
-// and its case folding-equivalent runes to the class r.
+// and its case folding-equivalent runes to the classe r.
 func appendFoldedRange(r []rune, lo, hi rune) []rune {
 	// Optimizations.
 	if lo <= minFold && hi >= maxFold {
@@ -2041,7 +2041,7 @@ func appendFoldedRange(r []rune, lo, hi rune) []rune {
 	return r
 }
 
-// appendClass returns the result of appending the class x to the class r.
+// appendClass returns the result of appending the classe x to the classe r.
 // It assume x is clean.
 func appendClass(r []rune, x []rune) []rune {
 	for i := 0; i < len(x); i += 2 {
@@ -2050,7 +2050,7 @@ func appendClass(r []rune, x []rune) []rune {
 	return r
 }
 
-// appendFoldedClass returns the result of appending the case folding of the class x to the class r.
+// appendFoldedClass returns the result of appending the case folding of the classe x to the classe r.
 func appendFoldedClass(r []rune, x []rune) []rune {
 	for i := 0; i < len(x); i += 2 {
 		r = appendFoldedRange(r, x[i], x[i+1])
@@ -2058,7 +2058,7 @@ func appendFoldedClass(r []rune, x []rune) []rune {
 	return r
 }
 
-// appendNegatedClass returns the result of appending the negation of the class x to the class r.
+// appendNegatedClass returns the result of appending the negation of the classe x to the classe r.
 // It assumes x is clean.
 func appendNegatedClass(r []rune, x []rune) []rune {
 	nextLo := '\u0000'
@@ -2075,7 +2075,7 @@ func appendNegatedClass(r []rune, x []rune) []rune {
 	return r
 }
 
-// appendTable returns the result of appending x to the class r.
+// appendTable returns the result of appending x to the classe r.
 func appendTable(r []rune, x *unicode.RangeTable) []rune {
 	for _, xr := range x.R16 {
 		lo, hi, stride := rune(xr.Lo), rune(xr.Hi), rune(xr.Stride)
@@ -2100,9 +2100,9 @@ func appendTable(r []rune, x *unicode.RangeTable) []rune {
 	return r
 }
 
-// appendNegatedTable returns the result of appending the negation of x to the class r.
+// appendNegatedTable returns the result of appending the negation of x to the classe r.
 func appendNegatedTable(r []rune, x *unicode.RangeTable) []rune {
-	nextLo := '\u0000' // lo end of next class to add
+	nextLo := '\u0000' // lo end of next classe to add
 	for _, xr := range x.R16 {
 		lo, hi, stride := rune(xr.Lo), rune(xr.Hi), rune(xr.Stride)
 		if stride == 1 {
@@ -2142,9 +2142,9 @@ func appendNegatedTable(r []rune, x *unicode.RangeTable) []rune {
 }
 
 // negateClass overwrites r and returns r's negation.
-// It assumes the class r is already clean.
+// It assumes the classe r is already clean.
 func negateClass(r []rune) []rune {
-	nextLo := '\u0000' // lo end of next class to add
+	nextLo := '\u0000' // lo end of next classe to add
 	w := 0             // write index
 	for i := 0; i < len(r); i += 2 {
 		lo, hi := r[i], r[i+1]
@@ -2158,7 +2158,7 @@ func negateClass(r []rune) []rune {
 	r = r[:w]
 	if nextLo <= unicode.MaxRune {
 		// It's possible for the negation to have one more
-		// range - this one - than the original class, so use append.
+		// range - this one - than the original classe, so use append.
 		r = append(r, nextLo, unicode.MaxRune)
 	}
 	return r

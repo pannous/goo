@@ -831,6 +831,24 @@ OverlayLoop:
 		fmt.Fprintf(&icfg, "packagefile %s=%s\n", p1.ImportPath, a1.built)
 	}
 
+	// Add auto-imports for .goo files that need strings/slices but don't explicitly import them
+	// NOTE: This approach is currently incomplete due to build system architecture.
+	// The importcfg is generated before transforms run, so transform-added imports
+	// don't get included in the package file resolution. This would require
+	// restructuring the build pipeline to run transforms before dependency resolution.
+	if needsAutoImports(p) {
+		if needsStringsImport(p) && !hasImportInDeps(a, "strings") {
+			if stringsPath := findStdlibPackagePath("strings"); stringsPath != "" {
+				fmt.Fprintf(&icfg, "packagefile strings=%s\n", stringsPath)
+			}
+		}
+		if needsSlicesImport(p) && !hasImportInDeps(a, "slices") {
+			if slicesPath := findStdlibPackagePath("slices"); slicesPath != "" {
+				fmt.Fprintf(&icfg, "packagefile slices=%s\n", slicesPath)
+			}
+		}
+	}
+
 	// Prepare Go embed config if needed.
 	// Unlike the import config, it's okay for the embed config to be empty.
 	var embedcfg []byte
@@ -3439,4 +3457,114 @@ func encodeArg(arg string) string {
 		}
 	}
 	return b.String()
+}
+
+// Auto-import helper functions for .goo files
+func needsAutoImports(p *load.Package) bool {
+	// Only check .goo files
+	for _, file := range p.GoFiles {
+		if strings.HasSuffix(file, ".goo") {
+			return true
+		}
+	}
+	return false
+}
+
+func needsStringsImport(p *load.Package) bool {
+	// Check if strings is already imported
+	for _, imp := range p.Imports {
+		if imp == "strings" {
+			return false
+		}
+	}
+
+	// Check if any .goo files use string methods that require strings import
+	for _, file := range p.GoFiles {
+		if !strings.HasSuffix(file, ".goo") {
+			continue
+		}
+		
+		fullPath := filepath.Join(p.Dir, file)
+		content, err := os.ReadFile(fullPath)
+		if err != nil {
+			continue
+		}
+		
+		contentStr := string(content)
+		// Look for string method patterns that will be transformed to strings.* calls
+		stringMethods := []string{".toUpper(", ".toLower(", ".contains(", ".indexOf(", ".replace(", ".trim(", ".split("}
+		for _, method := range stringMethods {
+			if strings.Contains(contentStr, method) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func needsSlicesImport(p *load.Package) bool {
+	// Check if slices is already imported
+	for _, imp := range p.Imports {
+		if imp == "slices" {
+			return false
+		}
+	}
+
+	// Check if any .goo files use slice methods that require slices import
+	for _, file := range p.GoFiles {
+		if !strings.HasSuffix(file, ".goo") {
+			continue
+		}
+		
+		fullPath := filepath.Join(p.Dir, file)
+		content, err := os.ReadFile(fullPath)
+		if err != nil {
+			continue
+		}
+		
+		contentStr := string(content)
+		// Look for slice method patterns that will be transformed to slices.* calls
+		sliceMethods := []string{".contains(", ".indexOf(", ".reverse(", ".sort(", ".min(", ".max("}
+		for _, method := range sliceMethods {
+			if strings.Contains(contentStr, method) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func hasImportInDeps(a *Action, importPath string) bool {
+	for _, a1 := range a.Deps {
+		if a1.Package != nil && a1.Package.ImportPath == importPath {
+			return true
+		}
+	}
+	return false
+}
+
+func findStdlibPackagePath(pkg string) string {
+	// For standard library packages, we need to find their compiled .a file
+	// This is a simplified approach - in reality we'd need to ensure they're built
+	// For now, let's try to find them in the standard locations
+	
+	// Try to find in GOROOT/pkg
+	goroot := runtime.GOROOT()
+	if goroot == "" {
+		goroot = os.Getenv("GOROOT")
+	}
+	if goroot == "" {
+		goroot = "/opt/other/go" // Our custom GOROOT
+	}
+	
+	// Standard library packages are typically in $GOROOT/pkg/$GOOS_$GOARCH/
+	pkgDir := filepath.Join(goroot, "pkg", runtime.GOOS+"_"+runtime.GOARCH)
+	pkgPath := filepath.Join(pkgDir, pkg+".a")
+	
+	if _, err := os.Stat(pkgPath); err == nil {
+		return pkgPath
+	}
+	
+	// If not found in standard location, return empty (will be handled by regular build system)
+	return ""
 }

@@ -1938,6 +1938,16 @@ func (p *Package) load(ctx context.Context, opts PackageOpts, path string, stk *
 			addImport("fmt", true)
 		}
 
+		// Auto-inject strings import for .goo files that use string methods but don't import strings
+		if needsStringsImport(p) {
+			addImport("strings", true)
+		}
+
+		// Auto-inject slices import for .goo files that use slice methods but don't import slices
+		if needsSlicesImport(p) {
+			addImport("slices", true)
+		}
+
 		// The linker loads implicit dependencies.
 		if p.Name == "main" && !p.Internal.ForceLibrary {
 			ldDeps, err := LinkerDeps(p)
@@ -3657,6 +3667,82 @@ func needsFmtImport(p *Package) bool {
 			}
 			// Look for printf function calls
 			if strings.Contains(line, "printf(") {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func needsStringsImport(p *Package) bool {
+	// Only check .goo files
+	for _, file := range p.GoFiles {
+		if !strings.HasSuffix(file, ".goo") {
+			continue
+		}
+
+		// Check if strings is already imported
+		hasStrings := false
+		for _, imp := range p.Imports {
+			if imp == "strings" {
+				hasStrings = true
+				break
+			}
+		}
+		if hasStrings {
+			return false
+		}
+
+		// Check if file uses string methods that require strings import
+		fullPath := filepath.Join(p.Dir, file)
+		content, err := os.ReadFile(fullPath)
+		if err != nil {
+			continue
+		}
+
+		contentStr := string(content)
+		// Look for string method patterns that will be transformed to strings.* calls
+		stringMethods := []string{".toUpper(", ".toLower(", ".contains(", ".indexOf(", ".replace(", ".trim(", ".split("}
+		for _, method := range stringMethods {
+			if strings.Contains(contentStr, method) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func needsSlicesImport(p *Package) bool {
+	// Only check .goo files
+	for _, file := range p.GoFiles {
+		if !strings.HasSuffix(file, ".goo") {
+			continue
+		}
+
+		// Check if slices is already imported
+		hasSlices := false
+		for _, imp := range p.Imports {
+			if imp == "slices" {
+				hasSlices = true
+				break
+			}
+		}
+		if hasSlices {
+			return false
+		}
+
+		// Check if file uses slice methods that require slices import
+		fullPath := filepath.Join(p.Dir, file)
+		content, err := os.ReadFile(fullPath)
+		if err != nil {
+			continue
+		}
+
+		contentStr := string(content)
+		// Look for slice method patterns that will be transformed to slices.* calls
+		sliceMethods := []string{".contains(", ".indexOf(", ".reverse(", ".sort(", ".min(", ".max("}
+		for _, method := range sliceMethods {
+			if strings.Contains(contentStr, method) {
 				return true
 			}
 		}
