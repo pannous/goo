@@ -407,7 +407,7 @@ func (s *scanner) ident() {
 	if len(lit) >= 2 {
 		if tok := keywordMap[hash(lit)]; tok != 0 && tokStrFast(tok) == string(lit) {
 			// Check if this is a transform-only token
-			if (tok == _Class || tok == _Check) && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
+			if (tok == _Class || tok == _Check || tok == _Def) && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
 				// Treat as regular identifier when transforms disabled
 				s.tok = _Name
 				s.lit = string(lit)

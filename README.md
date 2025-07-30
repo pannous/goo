@@ -46,7 +46,7 @@ check not "" == ![]int{} // falsy string and falsy slice
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 
-☐✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
+✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
@@ -75,13 +75,14 @@ If types are known ([]int, etc.), generate func(int) int instead of func(any) an
 ☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
 ☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... } 
   
-☐ map can only be compared to nil {a: 1, b: 2} == {b: 2, a: 1}  
+
 ☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)  
 ☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)  
   
   
 x := 1  
-y := "test"  
+y := "test"
+string interpolation:
 myAutoConcat := "The value of x is " x " and the value of y is " y  
 myString := fmt.Sprint("The value of x is ", x, " and the value of y is ", y)  
 myTemplate := `The value of x is ${x} and the value of y is ${y}!`  

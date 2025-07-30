@@ -1,6 +1,5 @@
-#!/usr/bin/env goo
-
 // Test string interpolation feature: "a" x "b" => "a" + x + "b"
+
 
 // String interpolation with integer
 result2 := "value:" 42 "units"
