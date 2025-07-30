@@ -209,7 +209,7 @@ func (i *Inst) MatchRunePos(r rune) int {
 		return noMatch
 
 	case 1:
-		// Special case: single-rune slice is from literal string, not char class.
+		// Special case: single-rune slice is from literal string, not char classe.
 		r0 := rune[0]
 		if r == r0 {
 			return 0

@@ -46,10 +46,11 @@ Running all tests in ./goo/ directory...
 ✅ test_list_comparison2.goo
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
-🔴 test_list_methods.goo
+✅ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
 ✅ test_list_typed.goo
 ✅ test_list.goo
+✅ test_manual_strings.goo
 ✅ test_map_dot_comprehensive.goo
 ✅ test_map_dot_notation.goo
 ✅ test_map_fields.goo
@@ -57,7 +58,7 @@ Running all tests in ./goo/ directory...
 ✅ test_map.goo
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
-✅ test_modify.goo
+🔴 test_modify.goo
 ✅ test_nil.goo
 ✅ test_not.goo
 ✅ test_print_comparison.goo
@@ -77,7 +78,7 @@ Running all tests in ./goo/ directory...
 ✅ test_string_ops.goo
 ✅ test_string_replace.goo
 🔴 test_string_reverse.goo
-🔴 test_strings_auto_import.goo
+✅ test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
 ✅ test_transform_synonyms.goo
@@ -88,11 +89,13 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
 ✅ tests.goo
-🔴 test_both_auto.goo
+✅ test_both_auto.goo
 ✅ test_cmp_manual.goo
 ✅ test_exclamation.goo
-🔴 test_filter_clean.goo
-🔴 test_list_visitor.goo
+✅ test_filter_clean.goo
+✅ test_list_visitor.goo
+✅ test_manual_slices.goo
+✅ test_manual_strings.goo
 ✅ test_map_dot_check_debug.goo
 🔴 test_map_dot_edge_cases.goo
 ✅ test_map_dot_printf_only.goo
@@ -101,9 +104,13 @@ Running all tests in ./goo/ directory...
 ✅ test_put_parser.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
+✅ test_slices_auto.goo
 ✅ test_slices_direct.goo
+✅ test_slices_import.goo
 ✅ test_slices_manual.goo
+✅ test_string_auto.goo
+✅ test_string_simple.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 89/104 passed, 15 failed
+Summary: 100/111 passed, 11 failed
 ⚠️  Some tests failed

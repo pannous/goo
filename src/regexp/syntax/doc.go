@@ -17,16 +17,16 @@ Parts of the syntax can be disabled by passing alternate flags to [Parse].
 Single characters:
 
 	.              any character, possibly including newline (flag s=true)
-	[xyz]          character class
-	[^xyz]         negated character class
-	\d             Perl character class
-	\D             negated Perl character class
-	[[:alpha:]]    ASCII character class
-	[[:^alpha:]]   negated ASCII character class
-	\pN            Unicode character class (one-letter name)
-	\p{Greek}      Unicode character class
-	\PN            negated Unicode character class (one-letter name)
-	\P{Greek}      negated Unicode character class
+	[xyz]          character classe
+	[^xyz]         negated character classe
+	\d             Perl character classe
+	\D             negated Perl character classe
+	[[:alpha:]]    ASCII character classe
+	[[:^alpha:]]   negated ASCII character classe
+	\pN            Unicode character classe (one-letter name)
+	\p{Greek}      Unicode character classe
+	\PN            negated Unicode character classe (one-letter name)
+	\P{Greek}      negated Unicode character classe
 
 Composites:
 
@@ -91,25 +91,25 @@ Escape sequences:
 	\x{10FFFF}     hex character code
 	\Q...\E        literal text ... even if ... has punctuation
 
-Character class elements:
+Character classe elements:
 
 	x              single character
 	A-Z            character range (inclusive)
-	\d             Perl character class
-	[:foo:]        ASCII character class foo
-	\p{Foo}        Unicode character class Foo
-	\pF            Unicode character class F (one-letter name)
+	\d             Perl character classe
+	[:foo:]        ASCII character classe foo
+	\p{Foo}        Unicode character classe Foo
+	\pF            Unicode character classe F (one-letter name)
 
-Named character classes as character class elements:
+Named character classes as character classe elements:
 
 	[\d]           digits (== \d)
 	[^\d]          not digits (== \D)
 	[\D]           not digits (== \D)
 	[^\D]          not not digits (== \d)
-	[[:name:]]     named ASCII class inside character class (== [:name:])
-	[^[:name:]]    named ASCII class inside negated character class (== [:^name:])
-	[\p{Name}]     named Unicode property inside character class (== \p{Name})
-	[^\p{Name}]    named Unicode property inside negated character class (== \P{Name})
+	[[:name:]]     named ASCII classe inside character classe (== [:name:])
+	[^[:name:]]    named ASCII classe inside negated character classe (== [:^name:])
+	[\p{Name}]     named Unicode property inside character classe (== \p{Name})
+	[^\p{Name}]    named Unicode property inside negated character classe (== \P{Name})
 
 Perl character classes (all ASCII-only):
 

@@ -1,5 +1,13 @@
-// modify in place enforced by "!" !
+// allow modify in place enforced by "!" !
 
 def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } 
 xs:=[1,2,3]
 modify!(xs)
+
+ Minimal Patch (in scanner.go or equivalent):
+for isLetter(ch) || isDigit(ch) {
+    next()
+}
+if ch == '!' {
+    next()
+}

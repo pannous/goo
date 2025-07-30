@@ -81,7 +81,7 @@ var simplifyTests = []struct {
 	{``, `(?:)`},
 	{`a{0}`, `(?:)`},
 
-	// Character class simplification
+	// Character classe simplification
 	{`[ab]`, `[ab]`},
 	{`[abc]`, `[a-c]`},
 	{`[a-za-za-z]`, `[a-z]`},
