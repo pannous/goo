@@ -13,25 +13,43 @@ import (
 // def meaning() int {42} --> def meaning() int {return 42}
 type AutoReturnTransform struct{}
 
+// autoReturnVisitor implements the visitor pattern for auto-return transformation
+type autoReturnVisitor struct {
+	transform *AutoReturnTransform
+	ctx       *TransformContext
+	changed   bool
+}
+
 func (t *AutoReturnTransform) Name() string {
 	return "auto_return"
 }
 
 func (t *AutoReturnTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	changed := false
+	visitor := &autoReturnVisitor{transform: t, ctx: ctx}
 	
-	// Walk through all declarations in the file
-	for _, decl := range file.DeclList {
-		if funcDecl, ok := decl.(*syntax.FuncDecl); ok {
-			if t.needsAutoReturn(funcDecl) {
-				if t.transformFunction(funcDecl, ctx) {
-					changed = true
-				}
+	// Use the general visitor pattern to walk all nodes
+	syntax.Walk(file, visitor)
+	
+	return visitor.changed
+}
+
+// Visit implements syntax.Visitor
+func (v *autoReturnVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
+		return nil
+	}
+	
+	// Look for function declarations that need auto-return transformation
+	if funcDecl, ok := node.(*syntax.FuncDecl); ok {
+		if v.transform.needsAutoReturn(funcDecl) {
+			if v.transform.transformFunction(funcDecl, v.ctx) {
+				v.changed = true
 			}
 		}
 	}
-
-	return changed
+	
+	// Continue visiting child nodes
+	return v
 }
 
 // needsAutoReturn checks if a function needs automatic return transformation
