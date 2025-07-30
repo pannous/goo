@@ -9,7 +9,7 @@ Running all tests in ./goo/ directory...
 ✅ debug_precedence.goo
 ✅ helper.goo
 🔴 kitchensink.goo
-✅ test_all_synonyms.goo
+🔴 test_all_synonyms.goo
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 🔴 test_as_cast.go.goo
@@ -19,9 +19,9 @@ Running all tests in ./goo/ directory...
 ✅ test_check.goo
 🔴 test_class_classic.goo
 🔴 test_class_constructors.goo
-✅ test_class_funcs.goo
+🔴 test_class_funcs.goo
 🔴 test_class_methods_no_self.goo
-✅ test_class_methods.goo
+🔴 test_class_methods.goo
 ✅ test_class.goo
 ✅ test_comma_compatibility.goo
 ✅ test_comma_optional.goo
@@ -47,18 +47,18 @@ Running all tests in ./goo/ directory...
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
 🔴 test_list_methods.goo
-✅ test_list_synonyms_only.goo
+🔴 test_list_synonyms_only.goo
 ✅ test_list_typed.goo
 ✅ test_list.goo
-✅ test_map_dot_comprehensive.goo
-✅ test_map_dot_notation.goo
+🔴 test_map_dot_comprehensive.goo
+🔴 test_map_dot_notation.goo
 ✅ test_map_fields.goo
 ✅ test_map_type_inference.goo
 ✅ test_map.goo
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
 ✅ test_modify.goo
-✅ test_nil.goo
+🔴 test_nil.goo
 ✅ test_not.goo
 ✅ test_print_comparison.goo
 ✅ test_printf.goo
@@ -79,10 +79,10 @@ Running all tests in ./goo/ directory...
 🔴 test_string_reverse.goo
 🔴 test_strings_auto_import.goo
 ✅ test_struct.goo
-✅ test_synonyms_simple.goo
+🔴 test_synonyms_simple.goo
 ✅ test_transform_synonyms.goo
-✅ test_truthy.goo
-✅ test_try_catch.goo
+🔴 test_truthy.goo
+🔴 test_try_catch.goo
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
@@ -105,5 +105,5 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_manual.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 88/104 passed, 16 failed
+Summary: 78/104 passed, 26 failed
 ⚠️  Some tests failed
