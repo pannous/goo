@@ -39,7 +39,7 @@ Running all tests in ./goo/ directory...
 ✅ test_for_loop.goo
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
-🔴 test_import.goo
+✅ test_import.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
@@ -81,7 +81,7 @@ Running all tests in ./goo/ directory...
 ✅ test_struct.goo
 🔴 test_synonyms_simple.goo
 ✅ test_transform_synonyms.goo
-🔴 test_truthy.goo
+✅ test_truthy.goo
 🔴 test_try_catch.goo
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
@@ -105,5 +105,5 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_manual.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 78/104 passed, 26 failed
+Summary: 80/104 passed, 24 failed
 ⚠️  Some tests failed

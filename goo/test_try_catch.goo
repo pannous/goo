@@ -3,4 +3,4 @@ try {
 } catch err {
 	printf("Caught error: %v\n",err)
 }
-print("After try-catch")
+printf("After try-catch")
