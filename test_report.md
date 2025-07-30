@@ -15,7 +15,6 @@ Running all tests in ./goo/ directory...
 🔴 test_as_cast.go.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
-🔴 test_both.goo
 🔴 test_check_reverse.goo
 ✅ test_check.goo
 🔴 test_class_classic.goo
@@ -23,7 +22,7 @@ Running all tests in ./goo/ directory...
 ✅ test_class_funcs.goo
 🔴 test_class_methods_no_self.goo
 ✅ test_class_methods.goo
-🔴 test_class.goo
+✅ test_class.goo
 ✅ test_comma_compatibility.goo
 ✅ test_comma_optional.goo
 ✅ test_continue.goo
@@ -93,6 +92,9 @@ Running all tests in ./goo/ directory...
 ✅ test_cmp_manual.goo
 ✅ test_exclamation.goo
 🔴 test_filter_clean.goo
+✅ test_map_dot_check_debug.goo
+🔴 test_map_dot_edge_cases.goo
+✅ test_map_dot_printf_only.goo
 ✅ test_put_auto.goo
 ✅ test_put_parser.goo
 ✅ test_simple_concat.goo
@@ -100,5 +102,5 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_direct.goo
 ✅ test_slices_manual.goo
 ========================================
-Summary: 82/99 passed, 17 failed
+Summary: 85/101 passed, 16 failed
 ⚠️  Some tests failed
