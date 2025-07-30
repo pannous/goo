@@ -322,13 +322,13 @@ func (checks *Checker) cycleError(cycle []Object, start int) {
 	obj := cycle[start]
 	tname, _ := obj.(*TypeName)
 	if tname != nil {
-		if check.conf._EnableAlias {
+		if checks.conf._EnableAlias {
 			if a, ok := tname.Type().(*Alias); ok {
 				a.fromRHS = Typ[Invalid]
 			}
 		} else {
 			if tname.IsAlias() {
-				check.validAlias(tname, Typ[Invalid])
+				checks.validAlias(tname, Typ[Invalid])
 			}
 		}
 	}
@@ -581,13 +581,13 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, defi *TypeNa
 		if !versionErr && tparam0 != nil && !checks.verifyVersionf(tparam0, go1_23, "generic type alias") {
 			versionErr = true
 		}
-		if !versionErr && !check.verifyVersionf(atPos(tdecl.Assign), go1_9, "type alias") {
+		if !versionErr && !checks.verifyVersionf(atPos(tdecl.Assign), go1_9, "type alias") {
 			versionErr = true
 		}
 
-		if check.conf._EnableAlias {
-			alias := check.newAlias(obj, nil)
-			setDefType(def, alias)
+		if checks.conf._EnableAlias {
+			alias := checks.newAlias(obj, nil)
+			setDefType(defi, alias)
 
 			// If we could not type the RHS, set it to invalid. This should
 			// only ever happen if we panic before setting.
