@@ -885,8 +885,16 @@ func loadPackageData(ctx context.Context, path, parentPath, parentDir, parentRoo
 		} else if cfg.ModulesEnabled {
 			r.dir, r.path, r.err = modload.Lookup(parentPath, parentIsStd, path)
 		} else if build.IsLocalImport(path) {
-			r.dir = filepath.Join(parentDir, path)
-			r.path = dirToImportPath(r.dir)
+			if strings.HasSuffix(path, ".goo") {
+				// For .goo file imports, create a placeholder that transforms can resolve
+				baseName := strings.TrimSuffix(filepath.Base(path), ".goo")
+				r.dir = filepath.Join(parentDir, baseName)
+				r.path = dirToImportPath(r.dir)
+				// Don't error if the directory doesn't exist yet - transforms may create it
+			} else {
+				r.dir = filepath.Join(parentDir, path)
+				r.path = dirToImportPath(r.dir)
+			}
 		} else if mode&ResolveImport != 0 {
 			// We do our own path resolution, because we want to
 			// find out the key to use in packageCache without the

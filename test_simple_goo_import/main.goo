@@ -1,0 +1,5 @@
+import "fmt" 
+import "math.goo"
+
+result := math.Square(5)
+fmt.Printf("Square of 5 is %d\n", result)

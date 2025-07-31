@@ -2042,10 +2042,11 @@ func (ctxt *Context) goodOSArchFile(name string, allTags map[string]bool) bool {
 var ToolDir = getToolDir()
 
 // IsLocalImport reports whether the import path is
-// a local import path, like ".", "..", "./foo", or "../foo".
+// a local import path, like ".", "..", "./foo", "../foo", or "file.goo".
 func IsLocalImport(path string) bool {
 	return path == "." || path == ".." ||
-		strings.HasPrefix(path, "./") || strings.HasPrefix(path, "../")
+		strings.HasPrefix(path, "./") || strings.HasPrefix(path, "../") ||
+		strings.HasSuffix(path, ".goo")
 }
 
 // ArchChar returns "?" and an error.
