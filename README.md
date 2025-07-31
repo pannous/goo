@@ -1,4 +1,4 @@
-# The Goo Programming Language  
+# The Goo Programming Language
   
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
@@ -45,7 +45,7 @@ check not "" == ![]int{} // falsy string and falsy slice
 ✅ try{x}catch e{y} => func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
-
+✅ "你" == '你'
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
@@ -97,9 +97,9 @@ There is a mirror of the repository at https://github.com/golang/go.
 Unless otherwise noted, the Go source files are distributed under the  
 BSD-style license found in the LICENSE file.  
   
-### Download and Install  
+### Download and Install
   
-#### Binary Distributions  
+#### Binary Distributions
   
 Official binary distributions are available at https://github.com/pannous/goo/releases.  
   
@@ -116,7 +116,7 @@ export PATH=$PATH:/usr/local/goo/bin
 export GOROOT=/usr/local/goo/  
 ```  
   
-#### Install From Source  
+#### Install From Source
   
 ```  
 git clone --recursive https://github.com/pannous/goo  
@@ -126,7 +126,7 @@ cd goo/src
   
 https://go.dev/doc/install/source for more source installation instructions.  
   
-### Test new features  
+### Test new features
 ```  
 ./bin/go run goo/test.goo  
 ```  
