@@ -8,7 +8,7 @@ import (
 	"cmd/compile/internal/syntax"
 )
 
-// PrintfTransform converts printf/put calls to fmt.Println and adds fmt import
+// PrintfTransform converts printf/put calls to fmt.Printf and adds fmt import
 type PrintfTransform struct{}
 
 type printfVisitor struct {
@@ -56,18 +56,18 @@ func (v *printfVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// convertPrintfCall converts printf() and put() calls to fmt.Println()
+// convertPrintfCall converts printf() and put() calls to fmt.Printf()
 func (v *printfVisitor) convertPrintfCall(call *syntax.CallExpr) bool {
 	// Check if this is a printf or put function call
 	if name, ok := call.Fun.(*syntax.Name); ok {
 		switch name.Value {
 		case "printf":
-			// Convert printf() to fmt.Println()
-			v.convertToFmtPrintln(call, name)
+			// Convert printf() to fmt.Printf()
+			v.convertToFmtPrintf(call, name)
 			return true
 		case "put":
-			// Convert put() to fmt.Println()  
-			v.convertToFmtPrintln(call, name)
+			// Convert put() to fmt.Printf()  
+			v.convertToFmtPrintf(call, name)
 			return true
 		}
 	}
@@ -75,27 +75,27 @@ func (v *printfVisitor) convertPrintfCall(call *syntax.CallExpr) bool {
 	return false
 }
 
-// convertToFmtPrintln converts a call to fmt.Println
-func (v *printfVisitor) convertToFmtPrintln(call *syntax.CallExpr, name *syntax.Name) {
+// convertToFmtPrintf converts a call to fmt.Printf
+func (v *printfVisitor) convertToFmtPrintf(call *syntax.CallExpr, name *syntax.Name) {
 	pos := call.Pos()
 	
 	// Create fmt identifier
 	fmtName := &syntax.Name{Value: "fmt"}
 	fmtName.SetPos(pos)
 	
-	// Create Println identifier
-	printlnName := &syntax.Name{Value: "Println"}
-	printlnName.SetPos(pos)
+	// Create Printf identifier
+	printfName := &syntax.Name{Value: "Printf"}
+	printfName.SetPos(pos)
 	
-	// Create fmt.Println selector
-	fmtPrintln := &syntax.SelectorExpr{
+	// Create fmt.Printf selector
+	fmtPrintf := &syntax.SelectorExpr{
 		X:   fmtName,
-		Sel: printlnName,
+		Sel: printfName,
 	}
-	fmtPrintln.SetPos(pos)
+	fmtPrintf.SetPos(pos)
 	
-	// Replace the function with fmt.Println
-	call.Fun = fmtPrintln
+	// Replace the function with fmt.Printf
+	call.Fun = fmtPrintf
 }
 
 // hasImport checks if the file already imports the specified package
