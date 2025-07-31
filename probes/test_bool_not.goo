@@ -1,0 +1,4 @@
+// Test with boolean
+b := true
+result := not b
+printf("not true = %v\n", result)

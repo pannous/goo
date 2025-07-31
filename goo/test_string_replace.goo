@@ -1,3 +1,2 @@
-import "strings"
 check "hello".replace("h","H") == "Hello"
 printf("All checks passed!\n")

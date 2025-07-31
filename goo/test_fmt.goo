@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "fmt"  // must not conflict with auto import
 
 func main() {
 	printf("Hello, world!")

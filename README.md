@@ -33,7 +33,12 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)  
 check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
 check not x == false =>   falsey(x)
-check not "" == ![]int{} // falsy string and falsy slice
+check not "" == true // falsy string
+check not "x" == true // falsy string
+check not ø == true // falsy string
+check not []int{} == true // falsy slice
+check not []int{1,2} == false // truthy slice
+check not "" == ! // falsy string and falsy slice
 
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
 ✅ String methods "abc".contains("a")

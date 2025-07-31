@@ -1,6 +1,5 @@
 import "os"
 import "fmt"
-# import "lib" // with helper.go  NOPE! only with mod.go
-import "helper.goo"
+import "helper.goo" // current directory only see test_import_folder.goo
 
 helper() 

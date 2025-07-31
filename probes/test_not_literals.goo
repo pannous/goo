@@ -1,0 +1,9 @@
+// Test with literals
+result1 := not 0
+printf("not 0 = %v\n", result1)
+
+result2 := not ""
+printf("not \"\" = %v\n", result2)
+
+result3 := not "x"  
+printf("not \"x\" = %v\n", result3)

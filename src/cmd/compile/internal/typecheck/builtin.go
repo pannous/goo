@@ -130,6 +130,7 @@ var runtimeDecls = [...]struct {
 	{"rand", funcTag, 78},
 	{"rand32", funcTag, 79},
 	{"truthy", funcTag, 80},
+	{"falsey", funcTag, 80},
 	{"makemap64", funcTag, 82},
 	{"makemap", funcTag, 83},
 	{"makemap_small", funcTag, 84},
