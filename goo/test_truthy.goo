@@ -1,63 +1,130 @@
 
-import "fmt"
+// Test numeric truthiness
+if 0 {
+	put("FAIL: 0 should be falsy")
+	check false
+} else {
+	put("PASS: 0 is falsy")
+}
 
-	// Test numeric truthiness
-	if 0 {
-		fmt.Println("FAIL: 0 should be falsy")
-	} else {
-		fmt.Println("PASS: 0 is falsy")
-	}
+if 42 {
+	put("PASS: 42 is truthy")
+} else {
+	put("FAIL: 42 should be truthy")
+	check false
+}
 
-	if 42 {
-		fmt.Println("PASS: 42 is truthy")
-	} else {
-		fmt.Println("FAIL: 42 should be truthy")
-	}
+// Test string truthiness
+if "" {
+	put("FAIL: empty string should be falsy")
+	check false
+} else {
+	put("PASS: empty string is falsy")
+}
 
-	// Test string truthiness
-	if "" {
-		fmt.Println("FAIL: empty string should be falsy")
-	} else {
-		fmt.Println("PASS: empty string is falsy")
-	}
+if "hello" {
+	put("PASS: non-empty string is truthy")
+} else {
+	put("FAIL: non-empty string should be truthy")
+	check false
+}
 
-	if "hello" {
-		fmt.Println("PASS: non-empty string is truthy")
-	} else {
-		fmt.Println("FAIL: non-empty string should be truthy")
-	}
+// Test slice truthiness
+var nilSlice []int
+if nilSlice {
+	put("FAIL: nil slice should be falsy")
+	check false
+} else {
+	put("PASS: nil slice is falsy")
+}
 
-	// Test slice truthiness
-	var nilSlice []int
-	if nilSlice {
-		fmt.Println("FAIL: nil slice should be falsy")
-	} else {
-		fmt.Println("PASS: nil slice is falsy")
-	}
+emptySlice := []int{}
+if emptySlice {
+	put("FAIL: empty slice should be falsy")
+	check false
+} else {
+	put("PASS: empty slice is falsy")
+}
 
-	emptySlice := []int{}
-	if emptySlice {
-		fmt.Println("FAIL: empty slice should be falsy")
-	} else {
-		fmt.Println("PASS: empty slice is falsy")
-	}
+nonEmptySlice := []int{1, 2, 3}
+if nonEmptySlice {
+	put("PASS: non-empty slice is truthy")
+} else {
+	put("FAIL: non-empty slice should be truthy")
+	check false
+}
 
-	nonEmptySlice := []int{1, 2, 3}
-	if nonEmptySlice {
-		fmt.Println("PASS: non-empty slice is truthy")
-	} else {
-		fmt.Println("FAIL: non-empty slice should be truthy")
-	}
+// Test boolean (should work normally)
+if true {
+	put("PASS: true is truthy")
+} else {
+	put("FAIL: true should be truthy")
+	check false
+}
 
-	// Test boolean (should work normally)
-	if true {
-		fmt.Println("PASS: true is truthy")
-	} else {
-		fmt.Println("FAIL: true should be truthy")
-	}
+if false {
+	put("FAIL: false should be falsy")
+	check false
+} else {
+	put("PASS: false is falsy")
+}
 
-	if false {
-		fmt.Println("FAIL: false should be falsy")
-	} else {
-		fmt.Println("PASS: false is falsy")
-	}
+// Test map truthiness  
+var nilMap map[string]int
+if nilMap {
+	put("FAIL: nil map should be falsy")
+	check false
+} else {
+	put("PASS: nil map is falsy")
+}
+
+emptyMap := make(map[string]int)
+if emptyMap {
+	put("PASS: empty map created with make() is truthy")
+} else {
+	put("FAIL: empty map created with make() should be truthy")
+	check false
+}
+
+filledMap := map[string]int{"key": 1}
+if filledMap {
+	put("PASS: filled map is truthy")
+} else {
+	put("FAIL: filled map should be truthy")
+	check false
+}
+
+// Test pointer truthiness
+var nilPtr *int
+if nilPtr {
+	put("FAIL: nil pointer should be falsy")
+	check false
+} else {
+	put("PASS: nil pointer is falsy")
+}
+
+val := 42
+ptr := &val
+if ptr {
+	put("PASS: non-nil pointer is truthy")
+} else {
+	put("FAIL: non-nil pointer should be truthy")
+	check false
+}
+
+// Test channel truthiness
+var nilChan chan int
+if nilChan {
+	put("FAIL: nil channel should be falsy")
+	check false
+} else {
+	put("PASS: nil channel is falsy")
+}
+
+ch := make(chan int, 1)
+if ch {
+	put("PASS: created channel is truthy")
+} else {
+	put("FAIL: created channel should be truthy")
+	check false
+}

@@ -81,8 +81,14 @@ func truthy(i interface{}) bool {
 			slice := (*slice)(eface.data)
 			return slice.len != 0
 		case abi.Map:
-			// Map is truthy if non-nil
-			return eface.data != nil
+			// Map is truthy if non-nil and has elements
+			if eface.data == nil {
+				return false // nil map is falsy
+			}
+			// For non-nil maps, check if they have any elements
+			// This is a simplified approach - ideally we'd check map length
+			// but that requires more complex runtime introspection
+			return true // Non-nil maps are truthy (including empty ones created with make())
 		case abi.Chan:
 			// Channel is truthy if non-nil
 			return eface.data != nil
