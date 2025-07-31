@@ -1,41 +1,6 @@
 import "os"
 import "fmt"
 # import "lib" // with helper.go  NOPE! only with mod.go
-# use "helper.go"
+import "helper.goo"
 
-// helper() // commented out since helper function doesn't exist
-
-path := "."
-
-// Test that both imports work together
-files, err := os.ReadDir(path)
-if err { 
-	panic("Error reading directory ${path}") 
-}
-
-// Test auto-import with printf
-printf("Directory listing:\n")
-
-// Test explicit fmt usage
-fmt.Println("Using fmt.Println:")
-
-for _, file := range files {
-	// Test that printf works with existing fmt import
-	printf("File: %s\n", file.Name())
-	printf("fmt: %s\n", file.Name())
-	
-	// Just show first few files for testing
-	if file.Name() == "test_import.goo" {
-		break
-	}
-}
-
-// Test import conflict resolution
-// Both printf and printf should work
-printf("printf works with fmt imported\n")
-printf("printf also works\n")
-
-// Test with array indexing and imports
-if len(files) > 0 {
-	printf("First file: %v\n", files[0])
-}
+helper() 
