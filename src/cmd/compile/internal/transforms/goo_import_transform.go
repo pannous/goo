@@ -6,7 +6,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"os"
 	"path/filepath"
 	"strings"
 )
@@ -83,26 +82,10 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 
 // shouldConvertToLocalImport checks if a bare import should be treated as local directory
 func (t *GooImportTransform) shouldConvertToLocalImport(importPath string) bool {
-	// Skip if already relative or absolute
-	if strings.HasPrefix(importPath, "./") || strings.HasPrefix(importPath, "../") || filepath.IsAbs(importPath) {
-		return false
-	}
-	
-	// Skip standard library packages (simple heuristic: no dots or well-known names)  
-	if t.isStandardLibrary(importPath) {
-		return false
-	}
-	
-	// Skip if it looks like a module path (contains dots/slashes)
-	if strings.Contains(importPath, ".") || strings.Contains(importPath, "/") {
-		return false
-	}
-	
-	// Check if local directory exists
-	if _, err := os.Stat(importPath); err == nil {
-		return true
-	}
-	
+	// DISABLED: This was interfering with auto-import system
+	// The auto-import system needs to see bare package names like "strings" 
+	// to know when to auto-inject imports. Converting them to "./strings"
+	// breaks this detection.
 	return false
 }
 

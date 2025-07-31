@@ -32,7 +32,7 @@ for test_file in goo/*.go goo/*.goo probes/*.goo; do
             echo "✅ $filename"
             passed=$((passed + 1))
         else
-            echo "🔴 $filename"
+            echo "❌ $filename"
             failed=$((failed + 1))
             # ./bin/go run "$test_file"
         fi

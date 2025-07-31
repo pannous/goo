@@ -8,19 +8,19 @@ Running all tests in ./goo/ directory...
 ✅ tests.go
 ✅ debug_precedence.goo
 ✅ helper.goo
-🔴 kitchensink.goo
+❌ kitchensink.goo
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
-🔴 test_as_cast.go.goo
+❌ test_as_cast.go.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
-🔴 test_check_reverse.goo
+❌ test_check_reverse.goo
 ✅ test_check.goo
-🔴 test_class_classic.goo
-🔴 test_class_constructors.goo
+❌ test_class_classic.goo
+❌ test_class_constructors.goo
 ✅ test_class_funcs.goo
-🔴 test_class_methods_no_self.goo
+❌ test_class_methods_no_self.goo
 ✅ test_class_methods.goo
 ✅ test_class.goo
 ✅ test_comma_compatibility.goo
@@ -39,7 +39,8 @@ Running all tests in ./goo/ directory...
 ✅ test_for_loop.goo
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
-✅ test_import.goo
+✅ test_import_folder.goo
+❌ test_import.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
@@ -58,7 +59,7 @@ Running all tests in ./goo/ directory...
 ✅ test_map.goo
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
-🔴 test_modify.goo
+✅ test_modify.goo
 ✅ test_nil.goo
 ✅ test_not.goo
 ✅ test_print_comparison.goo
@@ -72,12 +73,12 @@ Running all tests in ./goo/ directory...
 ✅ test_slice_inference_core.goo
 ✅ test_slice_inference_final.goo
 ✅ test_string_concat.goo
-🔴 test_string_interpolation.goo
-🔴 test_string_methods.goo
+❌ test_string_interpolation.goo
+❌ test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
 ✅ test_string_replace.goo
-🔴 test_string_reverse.goo
+❌ test_string_reverse.goo
 ✅ test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
@@ -90,18 +91,26 @@ Running all tests in ./goo/ directory...
 ✅ test_user_defined_put.goo
 ✅ tests.goo
 ✅ test_both_auto.goo
+✅ test_charAt_comprehensive.goo
+✅ test_charAt_vs_runeAt.goo
+✅ test_charAt.goo
 ✅ test_cmp_manual.goo
 ✅ test_exclamation.goo
 ✅ test_filter_clean.goo
 ✅ test_list_visitor.goo
+✅ test_local_import.goo
 ✅ test_manual_slices.goo
 ✅ test_manual_strings.goo
+✅ test_map_check.goo
 ✅ test_map_dot_check_debug.goo
-🔴 test_map_dot_edge_cases.goo
+❌ test_map_dot_edge_cases.goo
 ✅ test_map_dot_printf_only.goo
+✅ test_map_dot_simple.goo
 ✅ test_printf_transform.goo
 ✅ test_put_auto.goo
 ✅ test_put_parser.goo
+✅ test_runeAt_simple.goo
+✅ test_runeAt.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
 ✅ test_slices_auto.goo
@@ -109,8 +118,11 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_import.goo
 ✅ test_slices_manual.goo
 ✅ test_string_auto.goo
+✅ test_string_char_comparison.goo
+✅ test_string_char_comprehensive.goo
+✅ test_string_char_literal.goo
 ✅ test_string_simple.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 100/111 passed, 11 failed
+Summary: 112/123 passed, 11 failed
 ⚠️  Some tests failed

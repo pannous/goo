@@ -81,6 +81,10 @@ func (v *mapDotVisitor) walkStmt(stmt syntax.Stmt) {
 		if s.Results != nil {
 			v.walkExpr(&s.Results)
 		}
+	case *syntax.CheckStmt:
+		if s.Cond != nil {
+			v.walkExpr(&s.Cond)
+		}
 	}
 }
 
