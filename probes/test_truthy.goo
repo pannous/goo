@@ -1,2 +1,0 @@
-check truthy("hello")
-check !truthy("")

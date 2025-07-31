@@ -147,6 +147,13 @@ func (v *falseyVisitor) createNotTruthyCall(expr syntax.Expr) syntax.Expr {
 			eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: empty}
 			eq.SetPos(expr.Pos())
 			return eq
+		case syntax.FloatLit:
+			// not 0.0 -> 0.0 == 0.0 (true), not 3.14 -> 3.14 == 0.0 (false)
+			zero := &syntax.BasicLit{Kind: syntax.FloatLit, Value: "0.0"}
+			zero.SetPos(expr.Pos())
+			eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: zero}
+			eq.SetPos(expr.Pos())
+			return eq
 		}
 	case *syntax.Name:
 		// For variables, use type information to generate appropriate zero comparison
@@ -187,6 +194,35 @@ func (v *falseyVisitor) createNotTruthyCall(expr syntax.Expr) syntax.Expr {
 				zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
 				zero.SetPos(expr.Pos())
 				eq := &syntax.Operation{Op: syntax.Eql, X: lenCall, Y: zero}
+				eq.SetPos(expr.Pos())
+				return eq
+			}
+			// Handle map types
+			if strings.HasPrefix(varType, "map[") {
+				// For maps: not map -> map == nil
+				// This handles the nil case, but misses empty vs filled distinction
+				// Runtime truthiness would be better but requires different approach
+				nilName := &syntax.Name{Value: "nil"}
+				nilName.SetPos(expr.Pos())
+				eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: nilName}
+				eq.SetPos(expr.Pos())
+				return eq
+			}
+			// Handle pointer types  
+			if strings.HasPrefix(varType, "*") {
+				// For pointers: not ptr -> ptr == nil
+				nilName := &syntax.Name{Value: "nil"}
+				nilName.SetPos(expr.Pos())
+				eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: nilName}
+				eq.SetPos(expr.Pos())
+				return eq
+			}
+			// Handle channel types
+			if strings.HasPrefix(varType, "chan ") {
+				// For channels: not chan -> chan == nil
+				nilName := &syntax.Name{Value: "nil"}
+				nilName.SetPos(expr.Pos())
+				eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: nilName}
 				eq.SetPos(expr.Pos())
 				return eq
 			}
