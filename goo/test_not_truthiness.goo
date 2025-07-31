@@ -1,0 +1,24 @@
+// Test not operator with truthiness evaluation
+check not 0 == true
+check not "" == true
+check not "x" == false
+check not []int{} == true
+check not []int{1,2} == false
+check not true == false
+check not false == true
+
+// Test with variables  
+x := 0
+check not x == true
+
+s := "hello"
+check not s == false
+
+empty := ""
+check not empty == true
+
+slice := []int{1,2,3}
+check not slice == false
+
+empty_slice := []int{}
+check not empty_slice == true

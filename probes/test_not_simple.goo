@@ -1,0 +1,3 @@
+x := 0
+result := not x
+printf("not 0 = %v\n", result)

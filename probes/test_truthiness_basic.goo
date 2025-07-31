@@ -1,0 +1,14 @@
+// Test basic truthiness in if statements
+s := ""
+if s {
+    printf("empty string is truthy\n")
+} else {
+    printf("empty string is falsy\n")
+}
+
+n := 0
+if n {
+    printf("zero is truthy\n")  
+} else {
+    printf("zero is falsy\n")
+}

@@ -100,3 +100,8 @@ func truthy(i interface{}) bool {
 		}
 	}
 }
+
+// falsey is the opposite of truthy - returns true for falsy values
+func falsey(i interface{}) bool {
+	return !truthy(i)
+}

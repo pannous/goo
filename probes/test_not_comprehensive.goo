@@ -1,0 +1,28 @@
+// Comprehensive test of not operator with various types
+printf("=== Integer tests ===\n")
+check not 0 == true
+check not 42 == false
+
+printf("=== String tests ===\n") 
+check not "" == true
+check not "hello" == false
+
+printf("=== Boolean tests ===\n")
+check not true == false
+check not false == true
+
+printf("=== Slice tests ===\n")
+check not []int{} == true
+check not []int{1,2,3} == false
+
+printf("=== Variable tests ===\n")
+x := 0
+check not x == true
+
+s := "world"
+check not s == false
+
+empty := ""
+check not empty == true
+
+printf("All tests passed!\n")

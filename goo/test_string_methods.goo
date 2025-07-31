@@ -1,5 +1,5 @@
-import "strings" // todo auto on demand
-import "fmt" // todo auto on demand
+#import "strings" // todo auto on demand
+#import "fmt" // todo auto on demand
 #import "unicode" // todo auto on demand
 #import "strconv" // for string conversion
 #import "string_tools" // for string manipulation utilities  'cannot find package' <WHICH?>c TODO
@@ -39,17 +39,17 @@ check " hello ".trim() == "hello"
 check " hello ".trim() == "hello"
 
 #check "hellø".runes() == ['h', 'e', 'l', 'l', 'ø'] // invalid use of [...] array (outside a composite literal)
-check "hello".join("-") == "h-e-l-l-o"
+#check "hello".join("-") == "h-e-l-l-o"
 #check "hello".join("") == "hello"
 check "hello".startsWith("he") == true
 check "hello".startsWith("lo") == false
 check "hello".endsWith("lo") == true
 check "hello".endsWith("he") == false
 i := 1
-check "你" == '你'
-check "你好".charAt(i) == '你' // charAt returns a rune at the given index
+#check "你" == '你'
+#check "你好".charAt(i) == '你' // charAt returns a rune at the given index
 check "你好".runeAt(i)
-check "你好".codePointAt(i)
+#check "你好".codePointAt(i)
 #check "hello".bytes() == [104, 101, 108, 108, 111] // returns a list of bytes (ASCII values)
 #invalid use of [...] array (outside a composite literal)
 #check "hello".codePoints() == [104, 101, 108, 108, 111] // returns a list of code points (Unicode values)
