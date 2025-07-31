@@ -1,0 +1,6 @@
+package helper
+
+const MaxValue = 100
+const MinValue = 0
+
+var DefaultGreeting = "Hi there"

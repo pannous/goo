@@ -1,8 +1,0 @@
-import "fmt"
-import "helper.goo"
-
-result1 := helper.Greet("World")
-result2 := helper.Add(5, 3)
-
-fmt.Printf("Greeting: %s\n", result1)
-fmt.Printf("Sum: %d\n", result2)
