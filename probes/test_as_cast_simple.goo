@@ -1,0 +1,3 @@
+// Simple as cast test
+val := 3 as float
+printf("3 as float: %f\n", val)
