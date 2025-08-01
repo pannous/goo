@@ -17,6 +17,7 @@ type InOperatorTransform struct{}
 type inVisitor struct {
 	transform           *InOperatorTransform
 	ctx                 *TransformContext
+	file                *syntax.File
 	changed             bool
 	needsStringsImport  bool
 	needsSlicesImport   bool
@@ -28,7 +29,7 @@ func (t *InOperatorTransform) Name() string {
 
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	fmt.Printf("DEBUG: InOperatorTransform running\n")
-	visitor := &inVisitor{transform: t, ctx: ctx}
+	visitor := &inVisitor{transform: t, ctx: ctx, file: file}
 	
 	// Walk all declarations and transform them
 	for _, decl := range file.DeclList {
@@ -38,13 +39,14 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	fmt.Printf("DEBUG: needsStringsImport: %v\n", visitor.needsStringsImport)
 	fmt.Printf("DEBUG: hasImport: %v\n", t.hasImport(file, "strings"))
 	
-	// Add imports if needed
+	// Add imports if needed - manual import addition works better than automatic resolver
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
 		fmt.Printf("Adding strings import\n")
 		t.addStringsImport(file)
 		visitor.changed = true
 	}
 	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
+		fmt.Printf("Adding slices import\n")
 		t.addSlicesImport(file)
 		visitor.changed = true
 	}
@@ -125,7 +127,7 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 		println("DEBUG: Found operation:", syntax.String(op), "Op:", int(op.Op))
 		if op.Op == syntax.In {
 			println("DEBUG: Found In operation!")
-			if transformed := t.convertInOperation(op, visitor); transformed != nil {
+			if transformed := t.convertInOperation(op, visitor, visitor.file); transformed != nil {
 				visitor.changed = true
 				return transformed
 			}
@@ -157,14 +159,19 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 }
 
 // convertInOperation converts "item in collection" to appropriate Go code
-func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *inVisitor) syntax.Expr {
+func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *inVisitor, file *syntax.File) syntax.Expr {
 	pos := op.Pos()
 	
 	println("DEBUG: Converting in operation:", syntax.String(op))
-	println("DEBUG: About to create strings.Contains call")
 	
 	// For now, assume string containment: "substr" in "string" -> strings.Contains("string", "substr")
 	// Later we can add type checking to determine if it's a slice/map/etc.
+	
+	// Add strings import immediately if not present
+	if !t.hasImport(file, "strings") {
+		println("DEBUG: Adding strings import directly")
+		t.addStringsImport(file)
+	}
 	
 	// Create strings.Contains call
 	stringsName := &syntax.Name{Value: "strings"}
@@ -187,13 +194,6 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
 	call.SetPos(pos)
 	
 	visitor.needsStringsImport = true
-	// Immediately add the strings import since the transform is working
-	// but the post-processing import logic might not be running correctly
-	if visitor.ctx != nil {
-		// Access the file through the transform's context if possible
-		// For now, just set the flag and hope the Transform method processes it
-	}
-	println("DEBUG: Set needsStringsImport = true")
 	println("DEBUG: Converted to:", syntax.String(call))
 	return call
 }

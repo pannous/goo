@@ -1,6 +1,5 @@
 import "fmt"
 import "reflect"
-
 // Create maps with type inference
 x := {a: 1, b: 2}  // map[string]int
 y := {a: 1, b: 2}  // map[string]int

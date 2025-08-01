@@ -405,6 +405,13 @@ func (s *scanner) ident() {
 	// possibly a keyword
 	lit := s.segment()
 	if len(lit) >= 2 {
+		// Special case for 'in' operator when transforms are enabled
+		if string(lit) == "in" && os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
+			s.op, s.prec = In, precCmp
+			s.tok = _Operator
+			return
+		}
+		
 		h := hash(lit)
 		for keywordMap[h] != 0 {
 			if tok := keywordMap[h]; tokStrFast(tok) == string(lit) {
@@ -413,12 +420,6 @@ func (s *scanner) ident() {
 					// Treat as regular identifier when transforms disabled
 					s.tok = _Name
 					s.lit = string(lit)
-					return
-				}
-				// Special handling for 'in' keyword as an operator (only for .goo files)
-				if tok == _In && os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
-					s.op, s.prec = In, precCmp
-					s.tok = _Operator
 					return
 				}
 				s.nlsemi = contains(1<<_Break|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
