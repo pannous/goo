@@ -286,9 +286,9 @@ func (t *StringConcatTransform) buildInterpolationChain(parts []syntax.Expr, ctx
 	for i := 1; i < len(parts); i++ {
 		var rightSide syntax.Expr
 
-		// If this is a non-string part, wrap it with fmt.Sprintf
+		// If this is a non-string part, wrap it with fmt.Sprintf with spaces
 		if !t.isStringExpression(parts[i], ctx) {
-			rightSide = t.createSprintfCall(parts[i])
+			rightSide = t.createSprintfCallWithSpacing(parts[i])
 		} else {
 			rightSide = parts[i]
 		}
@@ -440,6 +440,37 @@ func (t *StringConcatTransform) createSprintfCall(expr syntax.Expr) syntax.Expr 
 	formatLit := &syntax.BasicLit{
 		Kind:  syntax.StringLit,
 		Value: "\"%v\"",
+	}
+	formatLit.SetPos(pos)
+
+	call := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{formatLit, expr},
+	}
+	call.SetPos(pos)
+
+	return call
+}
+
+// createSprintfCallWithSpacing creates a fmt.Sprintf call with spaces around the value
+func (t *StringConcatTransform) createSprintfCallWithSpacing(expr syntax.Expr) syntax.Expr {
+	pos := expr.Pos()
+
+	fmtName := &syntax.Name{Value: "fmt"}
+	fmtName.SetPos(pos)
+
+	sprintfName := &syntax.Name{Value: "Sprintf"}
+	sprintfName.SetPos(pos)
+
+	selector := &syntax.SelectorExpr{
+		X:   fmtName,
+		Sel: sprintfName,
+	}
+	selector.SetPos(pos)
+
+	formatLit := &syntax.BasicLit{
+		Kind:  syntax.StringLit,
+		Value: "\" %v \"",  // Note the spaces around %v
 	}
 	formatLit.SetPos(pos)
 
