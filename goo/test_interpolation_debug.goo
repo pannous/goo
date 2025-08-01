@@ -1,0 +1,3 @@
+// Debug what happens with just two parts
+result := "result:" (2 + 3)
+printf("Result: %s\n", result)

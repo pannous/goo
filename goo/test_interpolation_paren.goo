@@ -1,0 +1,3 @@
+// Test string interpolation with parenthesized expression
+result := "result:" (2 + 3) "total"
+printf("Result: %s\n", result)
