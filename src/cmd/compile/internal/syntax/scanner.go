@@ -405,17 +405,27 @@ func (s *scanner) ident() {
 	// possibly a keyword
 	lit := s.segment()
 	if len(lit) >= 2 {
-		if tok := keywordMap[hash(lit)]; tok != 0 && tokStrFast(tok) == string(lit) {
-			// Check if this is a transform-only token
-			if (tok == _Class || tok == _Check || tok == _Def) && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
-				// Treat as regular identifier when transforms disabled
-				s.tok = _Name
-				s.lit = string(lit)
+		h := hash(lit)
+		for keywordMap[h] != 0 {
+			if tok := keywordMap[h]; tokStrFast(tok) == string(lit) {
+				// Check if this is a transform-only token
+				if (tok == _Class || tok == _Check || tok == _Def) && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
+					// Treat as regular identifier when transforms disabled
+					s.tok = _Name
+					s.lit = string(lit)
+					return
+				}
+				// Special handling for 'in' keyword as an operator (only for .goo files)
+				if tok == _In && os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
+					s.op, s.prec = In, precCmp
+					s.tok = _Operator
+					return
+				}
+				s.nlsemi = contains(1<<_Break|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
+				s.tok = tok
 				return
 			}
-			s.nlsemi = contains(1<<_Break|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
-			s.tok = tok
-			return
+			h = (h + 1) & uint(len(keywordMap)-1)
 		}
 	}
 
@@ -505,7 +515,7 @@ func hash(s []byte) uint {
 	return (uint(s[0])<<4 ^ uint(s[1]) + uint(len(s))) & uint(len(keywordMap)-1)
 }
 
-var keywordMap [1 << 10]token // size must be power of two
+var keywordMap [1 << 12]token // size must be power of two
 
 func init() {
 	// populate keywordMap
@@ -515,11 +525,9 @@ func init() {
 	}
 	for tok := _keywords_start + 1; tok < last_keyword; tok++ {
 		h := hash([]byte(tok.String()))
-		if keywordMap[h] != 0 {
-			print(h)
-			print(keywordMap[h].String())
-			print(tok.String())
-			panic("imperfect hash")
+		// Handle hash collisions with linear probing
+		for keywordMap[h] != 0 {
+			h = (h + 1) & uint(len(keywordMap)-1)
 		}
 		keywordMap[h] = tok
 	}
