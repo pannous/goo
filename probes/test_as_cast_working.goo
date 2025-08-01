@@ -1,0 +1,7 @@
+// Test working as cast conversions
+check 1 as string == "1"
+check 1 as rune == '1'
+check '1' as int == 49  // rune value of '1'
+check 3 as float == 3.0
+
+printf("Working as cast conversions: PASSED\n")
