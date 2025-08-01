@@ -1377,6 +1377,13 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 	if x == nil {
 		x = p.unaryExpr()
 	}
+	
+	// Handle string interpolation: detect consecutive expressions without operators
+	// Only do this at the top level (prec == 0) to avoid interfering with operator precedence
+	if p.transformsEnabled() && prec == 0 {
+		x = p.handleStringInterpolation(x)
+	}
+	
 	for (p.tok == _Operator || p.tok == _Star) && p.prec > prec {
 		t := new(Operation)
 		t.pos = p.pos()
@@ -1398,6 +1405,62 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 		x = t
 	}
 	return x
+}
+
+// handleStringInterpolation detects and parses string interpolation patterns
+// like "str" expr "str" and converts them to explicit addition operations
+func (p *parser) handleStringInterpolation(x Expr) Expr {
+	// Only handle string interpolation if the first expression is a string literal
+	if !p.isStringLiteral(x) {
+		return x
+	}
+	
+	// Collect all consecutive expressions that form an interpolation pattern
+	parts := []Expr{x}
+	
+	// Continue collecting expressions as long as we see them without operators
+	for p.canStartExpr() && p.tok != _Operator && p.tok != _Star && p.tok != _Semi && p.tok != _EOF && 
+		p.tok != _Rbrace && p.tok != _Rparen && p.tok != _Rbrack && p.tok != _Comma {
+		// Parse the next expression
+		nextExpr := p.unaryExpr()
+		parts = append(parts, nextExpr)
+	}
+	
+	// If we only have one part, no interpolation occurred
+	if len(parts) == 1 {
+		return x
+	}
+	
+	// Build a chain of addition operations: parts[0] + parts[1] + parts[2] + ...
+	result := parts[0]
+	for i := 1; i < len(parts); i++ {
+		op := new(Operation)
+		op.pos = result.Pos()
+		op.Op = Add
+		op.X = result
+		op.Y = parts[i]
+		result = op
+	}
+	
+	return result
+}
+
+// isStringLiteral checks if an expression is a string literal
+func (p *parser) isStringLiteral(expr Expr) bool {
+	if lit, ok := expr.(*BasicLit); ok {
+		return lit.Kind == StringLit
+	}
+	return false
+}
+
+// canStartExpr checks if the current token can start an expression
+func (p *parser) canStartExpr() bool {
+	switch p.tok {
+	case _Name, _Literal, _Lparen, _Lbrack, _Struct, _Map, _Chan, _Interface,
+		 _Func, _Arrow, _Star, _Operator:
+		return true
+	}
+	return false
 }
 
 // UnaryExpr = PrimaryExpr | unary_op UnaryExpr .
@@ -1802,12 +1865,54 @@ loop:
 			x = t
 
 		case _Lparen:
-			t := new(CallExpr)
-			t.pos = pos
-			p.next()
-			t.Fun = x
-			t.ArgList, t.HasDots = p.argList()
-			x = t
+			// Check if this could be string interpolation instead of a function call
+			if p.transformsEnabled() && p.isStringLiteral(x) {
+				// This looks like "string"(...) which should be interpolation
+				// Parse the parenthesized expression and continue looking for more parts
+				p.next() // consume (
+				parenExpr := p.expr()
+				p.want(_Rparen)
+				
+				// Create a parenthesized expression
+				parenWrapper := new(ParenExpr)
+				parenWrapper.pos = pos
+				parenWrapper.X = parenExpr
+				
+				// Try to parse this as string interpolation
+				parts := []Expr{x, parenWrapper}
+				
+				// Continue collecting more expressions for interpolation
+				for p.canStartExpr() && p.tok != _Operator && p.tok != _Star && p.tok != _Semi && p.tok != _EOF && 
+					p.tok != _Rbrace && p.tok != _Rparen && p.tok != _Rbrack && p.tok != _Comma {
+					nextExpr := p.unaryExpr()
+					parts = append(parts, nextExpr)
+				}
+				
+				// Build addition chain for interpolation
+				if len(parts) > 1 {
+					result := parts[0]
+					for i := 1; i < len(parts); i++ {
+						op := new(Operation)
+						op.pos = result.Pos()
+						op.Op = Add
+						op.X = result
+						op.Y = parts[i]
+						result = op
+					}
+					x = result
+				} else {
+					// This shouldn't happen, but fallback
+					x = parenWrapper
+				}
+			} else {
+				// Normal function call
+				t := new(CallExpr)
+				t.pos = pos
+				p.next()
+				t.Fun = x
+				t.ArgList, t.HasDots = p.argList()
+				x = t
+			}
 
 		case _Lbrace:
 			// operand may have returned a parenthesized complit
