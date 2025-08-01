@@ -80,6 +80,7 @@ const (
 	_Hash           // # as comment or index
 	_Try            // try
 	_Void           // void
+	_In             // in
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -207,6 +208,7 @@ const (
 	Leq // <=
 	Gtr // >
 	Geq // >=
+	In  // in
 
 	// precAdd
 	Add // +
@@ -240,6 +242,7 @@ var OperatorNames = [...]string{
 	Leq:    "<=",
 	Gtr:    ">",
 	Geq:    ">=",
+	In:     "in",
 	Add:    "+",
 	Sub:    "-",
 	Or:     "|",
