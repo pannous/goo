@@ -166,5 +166,9 @@ Or use a hybrid.
 I am using speech recognition which might misunderstand some words:
 parcel => parser , fights => files
 
-# Keep code
-Never randomly disable code
+# automatic imports.
+since we moved the import resolver in the pipeline to after the Transformers all the import issues were gone
+If you ever encounter automatic import problems again just look at: 
+goo/test_strings_auto_import.goo                                                                   │
+goo/test_list_methods.goo
+(together with their implementation and maybe their commits)

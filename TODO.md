@@ -1,3 +1,9 @@
+# BAD ADVICE:
+Put stuff here which might negatively affect claudes capabilities
+Never randomly disable code
+
+
+
 When We started off I didn't have the transformer technology can we go back and turn some of our earliest features into beautiful Transformers as well
 A lot has changed since our earliest commit:
 07c2f23e93 2025-07-22 22:01 Merge branch 'master' of https://github.com/pannous/goo

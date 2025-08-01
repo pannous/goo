@@ -6,7 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
+	"strings"
 )
 
 // InOperatorTransform handles the 'in' operator for strings and collections
@@ -28,92 +28,74 @@ func (t *InOperatorTransform) Name() string {
 }
 
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	fmt.Printf("DEBUG: InOperatorTransform running\n")
 	visitor := &inVisitor{transform: t, ctx: ctx, file: file}
 	
-	// Walk all declarations and transform them
-	for _, decl := range file.DeclList {
-		t.walkAndTransform(decl, visitor)
-	}
+	// Use syntax.Walk to traverse the entire AST
+	syntax.Walk(file, visitor)
 	
-	fmt.Printf("DEBUG: needsStringsImport: %v\n", visitor.needsStringsImport)
-	fmt.Printf("DEBUG: hasImport: %v\n", t.hasImport(file, "strings"))
-	
-	// Add imports if needed - manual import addition works better than automatic resolver
+	// Add imports if needed
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
-		fmt.Printf("Adding strings import\n")
 		t.addStringsImport(file)
-		visitor.changed = true
 	}
 	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-		fmt.Printf("Adding slices import\n")
 		t.addSlicesImport(file)
-		visitor.changed = true
 	}
 	
 	return visitor.changed
 }
 
-// walkAndTransform walks the AST and transforms in operations
-func (t *InOperatorTransform) walkAndTransform(node syntax.Node, visitor *inVisitor) {
+// Visit implements syntax.Visitor interface
+func (v *inVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if node == nil {
-		return
+		return nil
 	}
 	
+	// Transform nodes that contain expressions that might have 'in' operations
 	switch n := node.(type) {
-	case *syntax.FuncDecl:
-		if n.Body != nil {
-			t.transformStmtList(n.Body.List, visitor)
-		}
 	case *syntax.VarDecl:
 		if n.Values != nil {
-			n.Values = t.transformExpr(n.Values, visitor)
+			if transformed := v.transform.transformExpr(n.Values, v); transformed != n.Values {
+				n.Values = transformed
+				v.changed = true
+			}
 		}
-	}
-}
-
-// transformStmtList transforms a list of statements
-func (t *InOperatorTransform) transformStmtList(stmts []syntax.Stmt, visitor *inVisitor) {
-	for _, stmt := range stmts {
-		t.transformStmt(stmt, visitor)
-	}
-}
-
-// transformStmt transforms a single statement
-func (t *InOperatorTransform) transformStmt(stmt syntax.Stmt, visitor *inVisitor) {
-	if stmt == nil {
-		return
-	}
-	
-	switch s := stmt.(type) {
-	case *syntax.ExprStmt:
-		s.X = t.transformExpr(s.X, visitor)
 	case *syntax.AssignStmt:
-		if s.Rhs != nil {
-			s.Rhs = t.transformExpr(s.Rhs, visitor)
+		if n.Rhs != nil {
+			if transformed := v.transform.transformExpr(n.Rhs, v); transformed != n.Rhs {
+				n.Rhs = transformed
+				v.changed = true
+			}
 		}
-	case *syntax.BlockStmt:
-		t.transformStmtList(s.List, visitor)
+	case *syntax.CheckStmt:
+		if n.Cond != nil {
+			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
+				n.Cond = transformed
+				v.changed = true
+			}
+		}
+	case *syntax.ExprStmt:
+		if transformed := v.transform.transformExpr(n.X, v); transformed != n.X {
+			n.X = transformed
+			v.changed = true
+		}
 	case *syntax.IfStmt:
-		if s.Cond != nil {
-			s.Cond = t.transformExpr(s.Cond, visitor)
-		}
-		t.transformStmt(s.Then, visitor)
-		if s.Else != nil {
-			t.transformStmt(s.Else, visitor)
+		if n.Cond != nil {
+			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
+				n.Cond = transformed
+				v.changed = true
+			}
 		}
 	case *syntax.ForStmt:
-		if s.Cond != nil {
-			s.Cond = t.transformExpr(s.Cond, visitor)
+		if n.Cond != nil {
+			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
+				n.Cond = transformed
+				v.changed = true
+			}
 		}
-		if s.Init != nil {
-			t.transformStmt(s.Init, visitor)
-		}
-		if s.Post != nil {
-			t.transformStmt(s.Post, visitor)
-		}
-		t.transformStmt(s.Body, visitor)
 	}
+	
+	// Continue visiting child nodes
+	return v
 }
 
 // transformExpr transforms a single expression
@@ -124,9 +106,7 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 	
 	// Check for 'in' operations
 	if op, ok := expr.(*syntax.Operation); ok {
-		println("DEBUG: Found operation:", syntax.String(op), "Op:", int(op.Op))
 		if op.Op == syntax.In {
-			println("DEBUG: Found In operation!")
 			if transformed := t.convertInOperation(op, visitor, visitor.file); transformed != nil {
 				visitor.changed = true
 				return transformed
@@ -162,18 +142,72 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *inVisitor, file *syntax.File) syntax.Expr {
 	pos := op.Pos()
 	
-	println("DEBUG: Converting in operation:", syntax.String(op))
+	// Determine the type of operation based on the container (op.Y)
+	containerType := t.inferContainerType(op.Y, visitor.ctx)
 	
-	// For now, assume string containment: "substr" in "string" -> strings.Contains("string", "substr")
-	// Later we can add type checking to determine if it's a slice/map/etc.
-	
-	// Add strings import immediately if not present
-	if !t.hasImport(file, "strings") {
-		println("DEBUG: Adding strings import directly")
-		t.addStringsImport(file)
+	switch containerType {
+	case "string":
+		return t.createStringContainsCall(op, visitor, pos)
+	case "slice":
+		return t.createSliceContainsCall(op, visitor, pos)
+	case "map":
+		return t.createMapContainsCall(op, visitor, pos)
+	default:
+		// Try to determine at runtime or fall back to string
+		return t.createStringContainsCall(op, visitor, pos)
+	}
+}
+
+// inferContainerType tries to determine if the container is a string, slice, or map
+func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *TransformContext) string {
+	// Check for string literals
+	if basic, ok := container.(*syntax.BasicLit); ok {
+		if basic.Kind == syntax.StringLit {
+			return "string"
+		}
 	}
 	
-	// Create strings.Contains call
+	// Check for composite literals (slices/arrays/maps)
+	if comp, ok := container.(*syntax.CompositeLit); ok {
+		if comp.Type != nil {
+			// Check for map types
+			if _, isMap := comp.Type.(*syntax.MapType); isMap {
+				return "map"
+			}
+			// Check for slice/array types
+			if _, isSlice := comp.Type.(*syntax.SliceType); isSlice {
+				return "slice"
+			}
+			if _, isArray := comp.Type.(*syntax.ArrayType); isArray {
+				return "slice"
+			}
+		}
+		// If no explicit type, infer from usage - composite literals are usually slices
+		return "slice"
+	}
+	
+	// Check context for variable types
+	if name, ok := container.(*syntax.Name); ok && ctx != nil && ctx.Types != nil {
+		if varType, exists := ctx.Types[name.Value]; exists {
+			if strings.Contains(varType, "[]") {
+				return "slice"
+			}
+			if strings.Contains(varType, "map[") {
+				return "map"
+			}
+			if varType == "string" {
+				return "string"
+			}
+		}
+	}
+	
+	return "unknown"
+}
+
+// createStringContainsCall creates strings.Contains(container, item)
+func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
+	visitor.needsStringsImport = true
+	
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
 	
@@ -186,16 +220,45 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
 	}
 	stringsContains.SetPos(pos)
 	
-	// strings.Contains(haystack, needle) - note the argument order is swapped
 	call := &syntax.CallExpr{
 		Fun:     stringsContains,
-		ArgList: []syntax.Expr{op.Y, op.X}, // Y is the container, X is the item
+		ArgList: []syntax.Expr{op.Y, op.X}, // Y is container, X is item
 	}
 	call.SetPos(pos)
 	
-	visitor.needsStringsImport = true
-	println("DEBUG: Converted to:", syntax.String(call))
 	return call
+}
+
+// createSliceContainsCall creates slices.Contains(container, item)
+func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
+	visitor.needsSlicesImport = true
+	
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	
+	containsName := &syntax.Name{Value: "Contains"}
+	containsName.SetPos(pos)
+	
+	slicesContains := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: containsName,
+	}
+	slicesContains.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesContains,
+		ArgList: []syntax.Expr{op.Y, op.X}, // Y is container, X is item
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+// createMapContainsCall creates map key existence check (simplified for now)
+func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
+	// For now, fall back to treating as slice
+	// TODO: Implement proper map[key] existence check
+	return t.createSliceContainsCall(op, visitor, pos)
 }
 
 func (t *InOperatorTransform) hasImport(file *syntax.File, name string) bool {
