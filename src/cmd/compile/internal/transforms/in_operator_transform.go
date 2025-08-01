@@ -220,9 +220,15 @@ func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, vis
 	}
 	stringsContains.SetPos(pos)
 	
+	// Check if the item (op.X) is a rune literal that needs conversion
+	item := op.X
+	if t.isRuneLiteral(op.X) {
+		item = t.convertRuneToString(op.X, pos)
+	}
+	
 	call := &syntax.CallExpr{
 		Fun:     stringsContains,
-		ArgList: []syntax.Expr{op.Y, op.X}, // Y is container, X is item
+		ArgList: []syntax.Expr{op.Y, item}, // Y is container, X is item
 	}
 	call.SetPos(pos)
 	
@@ -331,6 +337,29 @@ func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
 	newDeclList = append(newDeclList, slicesImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
+}
+
+// isRuneLiteral checks if an expression is a rune literal (e.g., 'a')
+func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {
+	if basic, ok := expr.(*syntax.BasicLit); ok {
+		return basic.Kind == syntax.RuneLit
+	}
+	return false
+}
+
+// convertRuneToString converts a rune literal to string(rune) call
+func (t *InOperatorTransform) convertRuneToString(runeExpr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create string(rune) call
+	stringName := &syntax.Name{Value: "string"}
+	stringName.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     stringName,
+		ArgList: []syntax.Expr{runeExpr},
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 func init() {
