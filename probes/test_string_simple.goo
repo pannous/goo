@@ -1,5 +1,0 @@
-func main() {
-    str := "hello"
-    result := str.toUpper()
-    printf("Upper: %s\n", result)
-}
