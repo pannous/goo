@@ -1,0 +1,6 @@
+// Test put() with string concatenation
+result := "test"
+put("Simple: " + result)
+put("Another line")
+printf("Printf line\n")
+put("Final line")

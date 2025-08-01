@@ -1,0 +1,6 @@
+// Simple test of what we expect
+result := "value:" 42 "units"
+expected := "value: 42 units"
+printf("Result: '%s'\n", result)
+printf("Expected: '%s'\n", expected)
+printf("Match: %t\n", result == expected)

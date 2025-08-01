@@ -1,0 +1,3 @@
+enum Status { OK, BAD }
+printf("OK values: %%v=%v %%d=%d %%s=%s\n", OK, OK, OK)
+printf("BAD values: %%v=%v %%d=%d %%s=%s\n", BAD, BAD, BAD)
