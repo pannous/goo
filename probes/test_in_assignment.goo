@@ -1,0 +1,5 @@
+// Test in operator in assignment context
+text := "hello world"
+needle := "world"
+result := needle in text
+printf("Result: %t\n", result)

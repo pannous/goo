@@ -1,0 +1,33 @@
+import "strings"
+import "slices"
+
+// These cases work from the comprehensive test
+text := "hello world"
+result1 := "hello" in text  // WORKS
+result2 := "xyz" in text    // WORKS
+
+numbers := [1, 2, 3, 4, 5]
+result3 := 3 in numbers     // WORKS
+result4 := 7 in numbers     // WORKS
+
+words := ["hello", "world", "test"]
+result5 := "hello" in words // WORKS
+
+// Test precedence of 'not' with 'in'
+result6 := not "xyz" in text      // Should be: not (false) = true
+result7 := not "hello" in text    // Should be: not (true) = false
+result8 := not 7 in numbers       // Should be: not (false) = true
+result9 := not 3 in numbers       // Should be: not (true) = false
+
+printf("Working cases:\n")
+printf("'hello' in text: %t\n", result1)
+printf("'xyz' in text: %t\n", result2)
+printf("3 in numbers: %t\n", result3)
+printf("7 in numbers: %t\n", result4)
+printf("'hello' in words: %t\n", result5)
+
+printf("\nPrecedence cases:\n")
+printf("not 'xyz' in text: %t (expected: true)\n", result6)
+printf("not 'hello' in text: %t (expected: false)\n", result7)
+printf("not 7 in numbers: %t (expected: true)\n", result8)
+printf("not 3 in numbers: %t (expected: false)\n", result9)

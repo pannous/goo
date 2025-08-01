@@ -14,3 +14,9 @@ printf("'%s' in '%s': %t\n", substr, text, result1)
 printf("'world' in '%s': %t\n", text, result2)
 printf("'hello' in 'hello world': %t\n", result3)
 printf("'xyz' in '%s': %t\n", text, result4)
+check result1  // true
+check result2  // true
+check result3  // true
+check not result4  // false
+
+#check 'a' in "abc"  // true

@@ -1477,7 +1477,12 @@ func (p *parser) unaryExpr() Expr {
 			x.pos = p.pos()
 			x.Op = p.op
 			p.next()
-			x.X = p.unaryExpr()
+			// For 'not', allow binary expressions with higher precedence (like 'in')
+			if x.Op == Not {
+				x.X = p.binaryExpr(nil, precOrOr) // Allow all binary ops except ||
+			} else {
+				x.X = p.unaryExpr()
+			}
 			return x
 
 		case And:

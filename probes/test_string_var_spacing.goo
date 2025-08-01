@@ -1,0 +1,4 @@
+// Test string variable interpolation with spacing
+name := "world"
+result := "hello" name "!"
+printf("String var result: '%s'\n", result)

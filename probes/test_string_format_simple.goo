@@ -1,0 +1,2 @@
+result := "my %v modulo" % "cool"
+printf("Result: %s\n", result)

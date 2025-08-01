@@ -1,0 +1,23 @@
+// Test precedence of 'in' operator with 'not'
+
+printf("Testing 'in' operator precedence with 'not':\\n")
+
+// Should parse as: not (4 in [1, 2, 3]) = not (false) = true
+result1 := not 4 in [1, 2, 3]
+printf("not 4 in [1, 2, 3]: %t (expected: true)\\n", result1)
+
+// Should parse as: not ("hello" in "world") = not (false) = true  
+result2 := not "hello" in "world"
+printf("not \"hello\" in \"world\": %t (expected: true)\\n", result2)
+
+// Should parse as: not ("world" in "hello world") = not (true) = false
+result3 := not "world" in "hello world"
+printf("not \"world\" in \"hello world\": %t (expected: false)\\n", result3)
+
+// Should parse as: not (3 in [1, 2, 3]) = not (true) = false
+result4 := not 3 in [1, 2, 3]
+printf("not 3 in [1, 2, 3]: %t (expected: false)\\n", result4)
+
+// Test with check statements too
+check not 4 in [1, 2, 3]   // Should be true (4 not in list)
+check not "xyz" in "hello"  // Should be true ("xyz" not in string)

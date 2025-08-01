@@ -1,0 +1,24 @@
+import "strings"
+import "slices"
+
+// Comprehensive test of in operator for all supported types
+printf("=== String Containment ===\n")
+text := "hello world"
+result1 := "hello" in text
+result2 := "xyz" in text
+printf("'hello' in 'hello world': %t\n", result1)
+printf("'xyz' in 'hello world': %t\n", result2)
+
+printf("\n=== Slice Containment ===\n")
+numbers := [1, 2, 3, 4, 5]
+result3 := 3 in numbers
+result4 := 7 in numbers
+printf("3 in [1,2,3,4,5]: %t\n", result3)
+printf("7 in [1,2,3,4,5]: %t\n", result4)
+
+words := ["hello", "world", "test"]
+result5 := "hello" in words
+result6 := "goodbye" in words
+printf("'hello' in ['hello','world','test']: %t\n", result5)
+printf("'goodbye' in ['hello','world','test']: %t\n", result6)
+

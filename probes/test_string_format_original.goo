@@ -1,0 +1,10 @@
+result := "my %v modulo" % "cool"
+printf("Original example: %s\n", result)
+
+// Test if it equals the expected result
+expected := "my cool modulo"
+if result == expected {
+    printf("SUCCESS: result matches expected\n")
+} else {
+    printf("FAIL: result='%s', expected='%s'\n", result, expected)
+}

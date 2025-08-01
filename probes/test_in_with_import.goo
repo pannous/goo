@@ -1,0 +1,5 @@
+import "strings"
+
+// Simple test of in operator
+result := "a" in "abc"
+printf("Result: %t\n", result)

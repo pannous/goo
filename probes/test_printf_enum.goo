@@ -1,0 +1,5 @@
+enum Status { OK, BAD }
+printf("OK = %v\n", OK)
+printf("OK = %d\n", OK)
+printf("OK = %s\n", OK)
+printf("BAD = %v\n", BAD)

@@ -1,0 +1,8 @@
+result := "my %v modulo" % "cool"
+printf("Result: %s\n", result)
+
+// Test with different values
+name := "Alice"
+age := 25
+greeting := "Hello %s, you are %d years old" % name % age
+printf("Greeting: %s\n", greeting)

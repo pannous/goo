@@ -1,3 +1,5 @@
+import "strings"
+import "slices"
 check 2 in [1,2,3]
 check 'b' in ['a','b','c']
 check "hello" in ["hello", "world"]
@@ -13,7 +15,7 @@ haystack := ['a', 'b', 'c']
 check needle in haystack  // true
 text := "hello world"
 check "hello" in text  // true
-check "xyz" in text  // false
+check not "xyz" in text  // false
 needleText := "world"
 check needleText in text  // true
 pi := 3.14
@@ -40,7 +42,7 @@ text2 := "goodbye world"
 check not "hello" in text2  // false
 check not "xyz" in text2  // false
 needleText2 := "goodbye"
-check not needleText2 in text2  // false
+check needleText2 in text2  // false
 pi2 := 1.618
 ps2 := [3.14, 2.71]
 check not pi2 in ps2  // false
@@ -50,4 +52,4 @@ check not ok2 in bools2  // false
 // counterexamples with string literals
 check not "x" in "abc"  // false
 check not "123" in "456"  // false
-
+printf("All in operator tests passed!\n")

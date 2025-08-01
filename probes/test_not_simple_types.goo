@@ -1,0 +1,4 @@
+// Test individual cases
+var nil_map map[string]int
+result1 := not nil_map
+printf("not nil_map = %v\n", result1)

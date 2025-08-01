@@ -1,0 +1,3 @@
+// Test automatic import addition by in operator transform
+result := "test" in "testing"
+printf("Result: %t\n", result)

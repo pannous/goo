@@ -1,0 +1,4 @@
+name := "Alice"
+age := 25
+greeting := "Hello %s, you are %d years old" % name % age
+printf("Greeting: %s\n", greeting)

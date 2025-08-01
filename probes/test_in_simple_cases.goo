@@ -1,0 +1,3 @@
+// Test simple cases that should work
+result1 := "hello" in "hello world"
+printf("String in string: %t\n", result1)

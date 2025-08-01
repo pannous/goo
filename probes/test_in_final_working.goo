@@ -1,0 +1,16 @@
+import "strings"
+
+// Final working test of in operator - proves the implementation works
+text := "hello world"
+result1 := "hello" in text
+result2 := "xyz" in text
+
+printf("'hello' in 'hello world': %t (expected: true)\n", result1)
+printf("'xyz' in 'hello world': %t (expected: false)\n", result2)
+
+// Test string literals
+result3 := "a" in "abc"
+result4 := "d" in "abc"
+
+printf("'a' in 'abc': %t (expected: true)\n", result3)
+printf("'d' in 'abc': %t (expected: false)\n", result4)

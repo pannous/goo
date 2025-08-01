@@ -1,11 +1,10 @@
 // Copyright 2025 The Goo Authors. All rights reserved.
 
-//go:build transforms
-
 package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 	"strings"
 )
 
@@ -35,9 +34,11 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	
 	// Add imports if needed
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
+		println("Adding strings import")
 		t.addStringsImport(file)
 	}
 	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
+		println("Adding slices import")
 		t.addSlicesImport(file)
 	}
 	
@@ -49,6 +50,7 @@ func (v *inVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if node == nil {
 		return nil
 	}
+	
 	
 	// Transform nodes that contain expressions that might have 'in' operations
 	switch n := node.(type) {
