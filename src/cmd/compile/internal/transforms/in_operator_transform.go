@@ -29,75 +29,88 @@ func (t *InOperatorTransform) Name() string {
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &inVisitor{transform: t, ctx: ctx, file: file}
 	
-	// Use syntax.Walk to traverse the entire AST
-	syntax.Walk(file, visitor)
+	// Walk all declarations and transform them
+	for _, decl := range file.DeclList {
+		t.walkAndTransform(decl, visitor)
+	}
 	
-	// Add imports if needed
-	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
-		println("Adding strings import")
-		t.addStringsImport(file)
-	}
-	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-		println("Adding slices import")
-		t.addSlicesImport(file)
-	}
+	// Add imports if needed - let automatic import resolver handle it
+	// if visitor.needsStringsImport && !t.hasImport(file, "strings") {
+	//	println("Adding strings import")
+	//	t.addStringsImport(file)
+	// }
+	// if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
+	//	println("Adding slices import")
+	//	t.addSlicesImport(file)
+	// }
 	
 	return visitor.changed
 }
 
-// Visit implements syntax.Visitor interface
-func (v *inVisitor) Visit(node syntax.Node) syntax.Visitor {
+// walkAndTransform walks the AST and transforms in operations
+func (t *InOperatorTransform) walkAndTransform(node syntax.Node, visitor *inVisitor) {
 	if node == nil {
-		return nil
+		return
 	}
 	
-	
-	// Transform nodes that contain expressions that might have 'in' operations
 	switch n := node.(type) {
+	case *syntax.FuncDecl:
+		if n.Body != nil {
+			t.transformStmtList(n.Body.List, visitor)
+		}
 	case *syntax.VarDecl:
 		if n.Values != nil {
-			if transformed := v.transform.transformExpr(n.Values, v); transformed != n.Values {
-				n.Values = transformed
-				v.changed = true
-			}
-		}
-	case *syntax.AssignStmt:
-		if n.Rhs != nil {
-			if transformed := v.transform.transformExpr(n.Rhs, v); transformed != n.Rhs {
-				n.Rhs = transformed
-				v.changed = true
-			}
-		}
-	case *syntax.CheckStmt:
-		if n.Cond != nil {
-			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
-				n.Cond = transformed
-				v.changed = true
-			}
-		}
-	case *syntax.ExprStmt:
-		if transformed := v.transform.transformExpr(n.X, v); transformed != n.X {
-			n.X = transformed
-			v.changed = true
-		}
-	case *syntax.IfStmt:
-		if n.Cond != nil {
-			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
-				n.Cond = transformed
-				v.changed = true
-			}
-		}
-	case *syntax.ForStmt:
-		if n.Cond != nil {
-			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
-				n.Cond = transformed
-				v.changed = true
-			}
+			n.Values = t.transformExpr(n.Values, visitor)
 		}
 	}
+}
+
+// transformStmtList transforms a list of statements
+func (t *InOperatorTransform) transformStmtList(stmts []syntax.Stmt, visitor *inVisitor) {
+	for _, stmt := range stmts {
+		t.transformStmt(stmt, visitor)
+	}
+}
+
+// transformStmt transforms a single statement
+func (t *InOperatorTransform) transformStmt(stmt syntax.Stmt, visitor *inVisitor) {
+	if stmt == nil {
+		return
+	}
 	
-	// Continue visiting child nodes
-	return v
+	switch s := stmt.(type) {
+	case *syntax.ExprStmt:
+		s.X = t.transformExpr(s.X, visitor)
+	case *syntax.AssignStmt:
+		if s.Rhs != nil {
+			s.Rhs = t.transformExpr(s.Rhs, visitor)
+		}
+	case *syntax.CheckStmt:
+		if s.Cond != nil {
+			s.Cond = t.transformExpr(s.Cond, visitor)
+		}
+	case *syntax.BlockStmt:
+		t.transformStmtList(s.List, visitor)
+	case *syntax.IfStmt:
+		if s.Cond != nil {
+			s.Cond = t.transformExpr(s.Cond, visitor)
+		}
+		t.transformStmt(s.Then, visitor)
+		if s.Else != nil {
+			t.transformStmt(s.Else, visitor)
+		}
+	case *syntax.ForStmt:
+		if s.Cond != nil {
+			s.Cond = t.transformExpr(s.Cond, visitor)
+		}
+		if s.Init != nil {
+			t.transformStmt(s.Init, visitor)
+		}
+		if s.Post != nil {
+			t.transformStmt(s.Post, visitor)
+		}
+		t.transformStmt(s.Body, visitor)
+	}
 }
 
 // transformExpr transforms a single expression
@@ -222,6 +235,14 @@ func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, vis
 	}
 	stringsContains.SetPos(pos)
 	
+	// Ensure arguments have proper position info
+	if op.Y != nil {
+		op.Y.SetPos(pos)
+	}
+	if op.X != nil {
+		op.X.SetPos(pos)
+	}
+	
 	call := &syntax.CallExpr{
 		Fun:     stringsContains,
 		ArgList: []syntax.Expr{op.Y, op.X}, // Y is container, X is item
@@ -246,6 +267,14 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 		Sel: containsName,
 	}
 	slicesContains.SetPos(pos)
+	
+	// Ensure arguments have proper position info
+	if op.Y != nil {
+		op.Y.SetPos(pos)
+	}
+	if op.X != nil {
+		op.X.SetPos(pos)
+	}
 	
 	call := &syntax.CallExpr{
 		Fun:     slicesContains,
