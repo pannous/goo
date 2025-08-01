@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 )
 
 // InOperatorTransform handles the 'in' operator for strings and collections
@@ -26,6 +27,7 @@ func (t *InOperatorTransform) Name() string {
 }
 
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	fmt.Printf("DEBUG: InOperatorTransform running\n")
 	visitor := &inVisitor{transform: t, ctx: ctx}
 	
 	// Walk all declarations and transform them
@@ -33,13 +35,17 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 		t.walkAndTransform(decl, visitor)
 	}
 	
+	fmt.Printf("DEBUG: needsStringsImport: %v\n", visitor.needsStringsImport)
+	fmt.Printf("DEBUG: hasImport: %v\n", t.hasImport(file, "strings"))
+	
 	// Add imports if needed
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
-		t.addImport(file, "strings")
+		fmt.Printf("Adding strings import\n")
+		t.addStringsImport(file)
 		visitor.changed = true
 	}
 	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-		t.addImport(file, "slices")
+		t.addSlicesImport(file)
 		visitor.changed = true
 	}
 	
@@ -116,7 +122,9 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 	
 	// Check for 'in' operations
 	if op, ok := expr.(*syntax.Operation); ok {
+		println("DEBUG: Found operation:", syntax.String(op), "Op:", int(op.Op))
 		if op.Op == syntax.In {
+			println("DEBUG: Found In operation!")
 			if transformed := t.convertInOperation(op, visitor); transformed != nil {
 				visitor.changed = true
 				return transformed
@@ -152,6 +160,9 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *inVisitor) syntax.Expr {
 	pos := op.Pos()
 	
+	println("DEBUG: Converting in operation:", syntax.String(op))
+	println("DEBUG: About to create strings.Contains call")
+	
 	// For now, assume string containment: "substr" in "string" -> strings.Contains("string", "substr")
 	// Later we can add type checking to determine if it's a slice/map/etc.
 	
@@ -176,15 +187,24 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
 	call.SetPos(pos)
 	
 	visitor.needsStringsImport = true
+	// Immediately add the strings import since the transform is working
+	// but the post-processing import logic might not be running correctly
+	if visitor.ctx != nil {
+		// Access the file through the transform's context if possible
+		// For now, just set the flag and hope the Transform method processes it
+	}
+	println("DEBUG: Set needsStringsImport = true")
+	println("DEBUG: Converted to:", syntax.String(call))
 	return call
 }
 
-// hasImport checks if the file already imports the specified package
-func (t *InOperatorTransform) hasImport(file *syntax.File, pkgName string) bool {
-	quotedName := "\"" + pkgName + "\""
+func (t *InOperatorTransform) hasImport(file *syntax.File, name string) bool {
+	if name[0] != '"' {
+		name = "\"" + name + "\""
+	}
 	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if importDecl.Path != nil && importDecl.Path.Value == quotedName {
+			if importDecl.Path != nil && importDecl.Path.Value == name {
 				return true
 			}
 		}
@@ -192,16 +212,19 @@ func (t *InOperatorTransform) hasImport(file *syntax.File, pkgName string) bool 
 	return false
 }
 
-// addImport adds a package import
-func (t *InOperatorTransform) addImport(file *syntax.File, pkgName string) {
-	newImport := &syntax.ImportDecl{
+func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
+	if t.hasImport(file, "strings") {
+		return
+	}
+
+	stringsImport := &syntax.ImportDecl{
 		Path: &syntax.BasicLit{
-			Value: "\"" + pkgName + "\"",
+			Value: "\"strings\"",
 			Kind:  syntax.StringLit,
 		},
 	}
+	stringsImport.SetPos(syntax.Pos{})
 
-	// Find where to insert the import (after existing imports)
 	var insertPos int
 	for i, decl := range file.DeclList {
 		if _, ok := decl.(*syntax.ImportDecl); ok {
@@ -211,10 +234,38 @@ func (t *InOperatorTransform) addImport(file *syntax.File, pkgName string) {
 		}
 	}
 
-	// Insert the import
 	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
 	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
-	newDeclList = append(newDeclList, newImport)
+	newDeclList = append(newDeclList, stringsImport)
+	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
+	file.DeclList = newDeclList
+}
+
+func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
+	if t.hasImport(file, "slices") {
+		return
+	}
+
+	slicesImport := &syntax.ImportDecl{
+		Path: &syntax.BasicLit{
+			Value: "\"slices\"",
+			Kind:  syntax.StringLit,
+		},
+	}
+	slicesImport.SetPos(syntax.Pos{})
+
+	var insertPos int
+	for i, decl := range file.DeclList {
+		if _, ok := decl.(*syntax.ImportDecl); ok {
+			insertPos = i + 1
+		} else {
+			break
+		}
+	}
+
+	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
+	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
+	newDeclList = append(newDeclList, slicesImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
 }
