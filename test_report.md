@@ -13,15 +13,13 @@ Running all tests in ./goo/ directory...
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 ❌ test_as_cast_convert.goo
-❌ test_as_cast.goo
+✅ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
 ❌ test_check_reverse.goo
 ✅ test_check.goo
-❌ test_class_classic.goo
 ❌ test_class_constructors.goo
 ✅ test_class_funcs.goo
-❌ test_class_methods_no_self.goo
 ✅ test_class_methods.goo
 ✅ test_class.goo
 ✅ test_comma_compatibility.goo
@@ -39,16 +37,13 @@ Running all tests in ./goo/ directory...
 ✅ test_for_loop.goo
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
+❌ test_import_file.goo
 ✅ test_import_folder.goo
-❌ test_import.goo
 ❌ test_in_operator_auto_import.goo
+✅ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
-✅ test_interpolation_debug.goo
-✅ test_interpolation_expected.goo
-✅ test_interpolation_paren.goo
-✅ test_interpolation_simple.goo
-✅ test_interpolation_spacing.goo
+✅ test_interpolation.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
@@ -124,7 +119,6 @@ Running all tests in ./goo/ directory...
 ✅ test_map_dot_printf_only.goo
 ✅ test_not_comprehensive.goo
 ✅ test_not_literals.goo
-❌ test_not_simple_types.goo
 ✅ test_not_simple.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_enum.goo
@@ -146,5 +140,5 @@ Running all tests in ./goo/ directory...
 ✅ test_truthiness_basic.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 133/145 passed, 12 failed
+Summary: 131/139 passed, 8 failed
 ⚠️  Some tests failed
