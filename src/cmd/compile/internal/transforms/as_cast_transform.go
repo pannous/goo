@@ -107,12 +107,13 @@ func (v *asCastVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 func (t *AsCastTransform) convertAsCastToAssert(asCast *syntax.AsCastExpr, ctx *TransformContext) syntax.Expr {
 	// Check if this is a no-op cast (same type)
-	// For now, we'll implement a simple optimization for obvious cases
-	// TODO: Add more sophisticated type checking
-	
-	// If casting to the same type name, just return the original expression
 	if t.isSameType(asCast.X, asCast.Type, ctx) {
 		return asCast.X
+	}
+	
+	// Handle special "hard cast" cases that need custom conversion logic
+	if specialConv := t.createSpecialConversion(asCast.X, asCast.Type, asCast.Pos()); specialConv != nil {
+		return specialConv
 	}
 	
 	// Determine if we need type assertion or type conversion
@@ -152,25 +153,66 @@ func (t *AsCastTransform) isSameType(expr syntax.Expr, targetType syntax.Expr, c
 	return false
 }
 
+// createSpecialConversion handles special "hard cast" cases
+func (t *AsCastTransform) createSpecialConversion(expr syntax.Expr, targetType syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Check if target type is a name we can work with
+	typeName, ok := targetType.(*syntax.Name)
+	if !ok {
+		return nil
+	}
+	
+	// Handle "float" as alias for "float64"
+	if typeName.Value == "float" {
+		// Create float64(x) conversion
+		newTypeName := &syntax.Name{Value: "float64"}
+		newTypeName.SetPos(pos)
+		
+		callExpr := &syntax.CallExpr{
+			Fun:     newTypeName,
+			ArgList: []syntax.Expr{expr},
+		}
+		callExpr.SetPos(pos)
+		return callExpr
+	}
+	
+	return nil
+}
+
 // shouldUseTypeConversion determines if we should use type conversion T(x) vs type assertion x.(T)
 // Type conversion is used when converting between concrete types (like float64 to int)
 // Type assertion is used when extracting a concrete type from an interface
 func (t *AsCastTransform) shouldUseTypeConversion(expr syntax.Expr, targetType syntax.Expr, ctx *TransformContext) bool {
+	// Common concrete types that can be converted between
+	concreteTypes := map[string]bool{
+		"int": true, "int8": true, "int16": true, "int32": true, "int64": true,
+		"uint": true, "uint8": true, "uint16": true, "uint32": true, "uint64": true,
+		"float32": true, "float64": true, "float": true,
+		"byte": true, "rune": true,
+		"string": true,
+	}
+	
+	// Check if target type is a concrete type
+	if typeName, ok := targetType.(*syntax.Name); ok {
+		if !concreteTypes[typeName.Value] {
+			return false // Not a concrete type, use assertion
+		}
+	} else {
+		return false // Complex type, use assertion
+	}
+	
+	// For literals, always use type conversion
+	if basic, ok := expr.(*syntax.BasicLit); ok {
+		switch basic.Kind {
+		case syntax.IntLit, syntax.FloatLit, syntax.RuneLit, syntax.StringLit:
+			return true
+		}
+	}
+	
 	// Look up the variable's declared type in the context if available
 	if exprName, ok := expr.(*syntax.Name); ok {
 		if typeName, ok := targetType.(*syntax.Name); ok {
 			// Check if we have type information for this variable
 			if declaredType, exists := ctx.Types[exprName.Value]; exists {
-				// If the declared type is concrete (not interface), use conversion
-				// Common concrete types that can be converted between
-				concreteTypes := map[string]bool{
-					"int": true, "int8": true, "int16": true, "int32": true, "int64": true,
-					"uint": true, "uint8": true, "uint16": true, "uint32": true, "uint64": true,
-					"float32": true, "float64": true,
-					"byte": true, "rune": true,
-					"string": true,
-				}
-				
 				// If both source and target are concrete types, use conversion
 				if concreteTypes[declaredType] && concreteTypes[typeName.Value] {
 					return true
@@ -184,7 +226,11 @@ func (t *AsCastTransform) shouldUseTypeConversion(expr syntax.Expr, targetType s
 		}
 	}
 	
-	// Default to type assertion for safety
+	// Default to type conversion for concrete types
+	if typeName, ok := targetType.(*syntax.Name); ok {
+		return concreteTypes[typeName.Value]
+	}
+	
 	return false
 }
 
