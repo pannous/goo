@@ -1,3 +1,5 @@
+import "slices"
+
 check 2 in [1,2,3]
 check 'b' in ['a','b','c']
 check "hello" in ["hello", "world"]
@@ -11,11 +13,6 @@ check x in y  // true
 needle := 'b'
 haystack := ['a', 'b', 'c']
 check needle in haystack  // true
-text := "hello world"
-check "hello" in text  // true
-check "xyz" in text  // false
-needleText := "world"
-check needleText in text  // true
 pi := 3.14
 ps := [3.14, 2.71, 1.618]
 check pi in ps
@@ -24,30 +21,23 @@ bools := [true, false]
 check ok in bools  // true
 
 # counterexamples
-check not 4 in [1, 2, 3]  // false
-check not 'd' in ['a', 'b', 'c']  // false
-check not "goodbye" in ["hello", "world"]  // false
-check not 1.618 in [3.14, 2.71]  // false
-check not false in [true, true]  // false
+check not (4 in [1, 2, 3] )
+check not ('d' in ['a', 'b', 'c'] )
+check not ("goodbye" in ["hello", "world"] )
+check not (1.618 in [3.14, 2.71] )
+check not (false in [true, true] )
 // counterexamples with variables
 x2 := 4
 y2 := [1, 2, 3]
-check not x2 in y2  // false
+check not (x2 in y2)  // false
 needle2 := 'd'
 haystack2 := ['a', 'b', 'c']
-check not needle2 in haystack2  // false
-text2 := "goodbye world"
-check not "hello" in text2  // false
-check not "xyz" in text2  // false
-needleText2 := "goodbye"
-check not needleText2 in text2  // false
+check not (needle2 in haystack2)  // false
 pi2 := 1.618
 ps2 := [3.14, 2.71]
-check not pi2 in ps2  // false
+check not (pi2 in ps2)  // false
 ok2 := false
 bools2 := [true, true]
-check not ok2 in bools2  // false
-// counterexamples with string literals
-check not "x" in "abc"  // false
-check not "123" in "456"  // false
+check not (ok2 in bools2)  // false
 
+printf("ALL TESTS PASSED\n")

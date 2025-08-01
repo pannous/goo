@@ -1,4 +1,6 @@
-// Test the 'in' operator
+// FAILS:
+#import "strings"  // auto import TOO HARD for in operator! Claude spent 4 hours on this :(
+
 text := "hello world"
 result1 := "hello" in text
 result2 := "xyz" in text

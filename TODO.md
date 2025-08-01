@@ -142,3 +142,21 @@ BLA:
   This would explain why manual imports work (available from the start) but auto-injection fails (too late in the
    process).
 
+branch in_operator_brakes_all << case study of what can go wrong;)
+
+
+
+
+        x.X = p.unaryExpr()  << changing this in the parcel breaks everything!!
+ 
+
+      // For 'not', allow binary expressions with higher precedence (like 'in')
+      if x.Op == Not {
+        x.X = p.binaryExpr(nil, precOrOr) // Allow all binary ops except ||  breaks everything!!
+      } else {
+        x.X = p.unaryExpr()
+      }
+
+
+      Building Go toolchain2 using go_bootstrap and Go toolchain1.
+go tool dist: FAILED: /opt/other/go/pkg/tool/darwin_arm64/go_bootstrap install -pgo=off cmd/asm cmd/cgo cmd/compile cmd/link cmd/preprofile: signal: segmentation fault
