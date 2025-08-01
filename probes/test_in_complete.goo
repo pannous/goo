@@ -1,0 +1,16 @@
+import "strings"
+
+// Complete test of in operator functionality
+text := "hello world"
+substr := "hello"
+
+// Test various combinations
+result1 := substr in text        // variable in variable
+result2 := "world" in text       // literal in variable
+result3 := "hello" in "hello world"  // literal in literal
+result4 := "xyz" in text         // negative case
+
+printf("'%s' in '%s': %t\n", substr, text, result1)
+printf("'world' in '%s': %t\n", text, result2)
+printf("'hello' in 'hello world': %t\n", result3)
+printf("'xyz' in '%s': %t\n", text, result4)
