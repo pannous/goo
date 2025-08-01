@@ -8,7 +8,7 @@ import (
 	"cmd/compile/internal/syntax"
 )
 
-// PrintfTransform converts printf/put calls to fmt.Printf and adds fmt import
+// PrintfTransform converts printf calls to fmt.Printf and put calls to fmt.Println, and adds fmt import
 type PrintfTransform struct{}
 
 type printfVisitor struct {
@@ -66,8 +66,8 @@ func (v *printfVisitor) convertPrintfCall(call *syntax.CallExpr) bool {
 			v.convertToFmtPrintf(call, name)
 			return true
 		case "put":
-			// Convert put() to fmt.Printf()  
-			v.convertToFmtPrintf(call, name)
+			// Convert put() to fmt.Println()  
+			v.convertToFmtPrintln(call, name)
 			return true
 		}
 	}
@@ -96,6 +96,29 @@ func (v *printfVisitor) convertToFmtPrintf(call *syntax.CallExpr, name *syntax.N
 	
 	// Replace the function with fmt.Printf
 	call.Fun = fmtPrintf
+}
+
+// convertToFmtPrintln converts a call to fmt.Println
+func (v *printfVisitor) convertToFmtPrintln(call *syntax.CallExpr, name *syntax.Name) {
+	pos := call.Pos()
+	
+	// Create fmt identifier
+	fmtName := &syntax.Name{Value: "fmt"}
+	fmtName.SetPos(pos)
+	
+	// Create Println identifier
+	printlnName := &syntax.Name{Value: "Println"}
+	printlnName.SetPos(pos)
+	
+	// Create fmt.Println selector
+	fmtPrintln := &syntax.SelectorExpr{
+		X:   fmtName,
+		Sel: printlnName,
+	}
+	fmtPrintln.SetPos(pos)
+	
+	// Replace the function with fmt.Println
+	call.Fun = fmtPrintln
 }
 
 // hasImport checks if the file already imports the specified package
