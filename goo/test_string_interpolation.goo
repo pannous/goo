@@ -8,9 +8,12 @@ check result2 == "value: 42 units"
 
 // Basic string interpolation with variable
 x := "middle"
+y := "right"
 result1 := "left" x "right"
 put("Test 1: " + result1)
 check result1 == "left middle right"
+
+check x+y == "middleright"  // no space with + operator
 
 // String interpolation with expression
 result3 := "result:" (2 + 3) "total"

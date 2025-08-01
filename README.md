@@ -31,15 +31,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
 ✅ test_list_comparison.goo [1,2]==[1,2]  
 ✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)  
-check not "OK" == false # invalid operation: operator ! not defined on "OK" (untyped string constant)  
-check not x == false =>   falsey(x)
-check not "" == true // falsy string
-check not "x" == true // falsy string
-check not ø == true // falsy string
-check not []int{} == true // falsy slice
-check not []int{1,2} == false // truthy slice
-check not "" == ! // falsy string and falsy slice
-
+✅ check not x =>  !truthy(x)
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
 ✅ String methods "abc".contains("a")
 ✅ 3.14 as int … 
@@ -52,14 +44,15 @@ check not "" == ! // falsy string and falsy slice
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 ✅ "你" == '你'
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
+✅ import "helper"  / "helper.goo" // allow local imports (for go run)
+✅ 1 in [1,2,3]
+☐ for keyword in keywords  => for _, keyword := range keywords { __  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
-☐ import "helper.goo" // allow local imports (for go run)
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`  
 ☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?  
 ☐ for loops  :  
-☐  for keyword := keywords  => for _, keyword := range keywords { __  
 ☐ void(!) as synonym for func, e.g. void main(){} BAD  
 ☐ public() -> Public() calls OK // as compiler plugin?  
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  
