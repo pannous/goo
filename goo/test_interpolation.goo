@@ -1,14 +1,13 @@
 // Test what the current implementation actually produces
 result2 := "value:" 42 "units"
 printf("Actual result2: '%s'\n", result2)
+check result2 == "value: 42 units"
 
 x := "middle"
 result1 := "left" x "right"
 printf("Actual result1: '%s'\n", result1)
+check result1 == "left middle right"
 
 result3 := "result:" (2 + 3) "total"
 printf("Actual result3: '%s'\n", result3)
-
-name := "world"
-result4 := "hello" name "!"
-printf("Actual result4: '%s'\n", result4)
+check result3 == "result: 5 total"
