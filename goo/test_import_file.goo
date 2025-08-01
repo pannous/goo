@@ -1,5 +1,4 @@
-import "os"
-import "fmt"
+// NOT YET 1.8.25  or never?   see test_import_folder.goo
 import "helper.goo" // current directory only see test_import_folder.goo
 
 helper() 
