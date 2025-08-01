@@ -1,3 +1,0 @@
-// Test simple string interpolation
-result := "value:" 42 "units"
-printf("Result: %s\n", result)
