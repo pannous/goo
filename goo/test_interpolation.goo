@@ -1,4 +1,3 @@
-// Test what the current implementation actually produces
 result2 := "value:" 42 "units"
 printf("Actual result2: '%s'\n", result2)
 check result2 == "value: 42 units"
