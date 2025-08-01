@@ -1,5 +1,0 @@
-# If GoLang.app says "No GOROOT" … just rebuild:
-# cd /opt/other/go/src; GOROOT_FINAL=/opt/other/go ./make.bash
-printf("OK")
-
-#check [1]+[1] == [1,1]

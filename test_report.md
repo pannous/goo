@@ -12,7 +12,8 @@ Running all tests in ./goo/ directory...
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
-❌ test_as_cast.go.goo
+❌ test_as_cast_convert.goo
+❌ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
 ❌ test_check_reverse.goo
@@ -40,7 +41,9 @@ Running all tests in ./goo/ directory...
 ✅ test_implicit_main.goo
 ✅ test_import_folder.goo
 ❌ test_import.goo
-✅ test_in_operator.goo
+❌ test_in_operator_auto_import.goo
+✅ test_in_operator_slices.goo
+✅ test_in_operator_strings.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
@@ -90,32 +93,18 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
-✅ tests.goo
+❌ tests.goo
 ✅ test_bool_not.goo
 ✅ test_both_auto.goo
 ✅ test_charAt_comprehensive.goo
 ✅ test_charAt_vs_runeAt.goo
 ✅ test_charAt.goo
 ✅ test_cmp_manual.goo
-✅ test_debug_interpolation.goo
 ✅ test_exclamation.goo
 ✅ test_falsey.goo
 ✅ test_filter_clean.goo
-❌ test_in_assignment.goo
 ✅ test_in_complete.goo
-✅ test_in_manual_strings.goo
-❌ test_in_no_manual_import.goo
-❌ test_in_operator.goo
-❌ test_in_parentheses.goo
-❌ test_in_simple.goo
-✅ test_in_with_import.goo
-✅ test_interpolation_debug.goo
-✅ test_interpolation_expected.goo
-✅ test_interpolation_paren.goo
-✅ test_interpolation_simple.goo
-✅ test_interpolation_spacing.goo
 ✅ test_list_visitor.goo
-✅ test_main_line.goo
 ✅ test_manual_slices.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_check_debug.goo
@@ -123,19 +112,12 @@ Running all tests in ./goo/ directory...
 ✅ test_map_dot_printf_only.goo
 ✅ test_not_comprehensive.goo
 ✅ test_not_literals.goo
-❌ test_not_simple_types.goo
 ✅ test_not_simple.goo
-✅ test_printf_enum_complete.goo
-✅ test_printf_enum.goo
 ✅ test_printf_transform.goo
 ✅ test_put_auto.goo
-✅ test_put_concat.goo
-✅ test_put_newline.goo
 ✅ test_put_parser.goo
 ✅ test_runeAt_simple.goo
 ✅ test_runeAt.goo
-✅ test_runtime_truthiness.goo
-✅ test_simple_check.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
 ✅ test_slices_auto.goo
@@ -146,15 +128,9 @@ Running all tests in ./goo/ directory...
 ✅ test_string_char_comparison.goo
 ✅ test_string_char_comprehensive.goo
 ✅ test_string_char_literal.goo
-✅ test_string_format_chain.goo
-✅ test_string_format_original.goo
-✅ test_string_format_simple.goo
-✅ test_string_format.goo
 ✅ test_string_simple.goo
-✅ test_string_var_spacing.goo
-✅ test_strings_import.goo
 ✅ test_truthiness_basic.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 140/155 passed, 15 failed
+Summary: 119/131 passed, 12 failed
 ⚠️  Some tests failed
