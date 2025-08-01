@@ -1,0 +1,17 @@
+# HARD casts ok or only soft casts?
+# NOT YET 1.8. Did it ever work?
+#c5de3c0407 2025-07-30 15:08 refactor: convert as_cast_transform to visitor pattern
+#e6f30e8f36 2025-07-28 21:03 feat(major): add type conversion support to as cast operator
+#1b4dced39f 2025-07-28 19:37 feat(minor): optimize no-op as casts
+#2d6be74eb4 2025-07-28 19:28 feat(major): implement 'as' cast operator with => syntax
+check 1 as string == "1"
+check 1 as rune == '1'
+check '1' as int == 1
+check "1" as int == 1
+
+check 3.1 as int == 3
+check 3 as float == 3
+
+# string_list := any_list as string[]
+# string_list, ok := any_list as string[]
+# string_list, ok := any_list as? string[]

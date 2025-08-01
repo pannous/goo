@@ -1,7 +1,12 @@
+import "slices"
+import "strings"
 #import "fmt"
 #import "reflect"
 #check 'a' in "abcde"  // true
+check 1 in [1,2,3]
 check "a" in "abcde"  // true
+printf("OK")
+
 // Create maps with type inference
 #x := {a: 1, b: 2}  // map[string]int
 #y := {a: 1, b: 2}  // map[string]int

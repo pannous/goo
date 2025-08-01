@@ -576,12 +576,12 @@ func (p *parser) fileOrNil() *File {
 				Kind:  StringLit,
 			}
 			slicesLit.pos = f.pos
-			
+
 			slicesImport := &ImportDecl{
 				Path: slicesLit,
 			}
 			slicesImport.pos = f.pos
-			
+
 			// Insert at the beginning of DeclList (after fmt if it was added)
 			f.DeclList = append([]Decl{slicesImport}, f.DeclList...)
 		}
@@ -1377,13 +1377,13 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 	if x == nil {
 		x = p.unaryExpr()
 	}
-	
+
 	// Handle string interpolation: detect consecutive expressions without operators
 	// Only do this at the top level (prec == 0) to avoid interfering with operator precedence
 	if p.transformsEnabled() && prec == 0 {
 		x = p.handleStringInterpolation(x)
 	}
-	
+
 	for (p.tok == _Operator || p.tok == _Star) && p.prec > prec {
 		t := new(Operation)
 		t.pos = p.pos()
@@ -1414,23 +1414,23 @@ func (p *parser) handleStringInterpolation(x Expr) Expr {
 	if !p.isStringLiteral(x) {
 		return x
 	}
-	
+
 	// Collect all consecutive expressions that form an interpolation pattern
 	parts := []Expr{x}
-	
+
 	// Continue collecting expressions as long as we see them without operators
-	for p.canStartExpr() && p.tok != _Operator && p.tok != _Star && p.tok != _Semi && p.tok != _EOF && 
+	for p.canStartExpr() && p.tok != _Operator && p.tok != _Star && p.tok != _Semi && p.tok != _EOF &&
 		p.tok != _Rbrace && p.tok != _Rparen && p.tok != _Rbrack && p.tok != _Comma {
 		// Parse the next expression
 		nextExpr := p.unaryExpr()
 		parts = append(parts, nextExpr)
 	}
-	
+
 	// If we only have one part, no interpolation occurred
 	if len(parts) == 1 {
 		return x
 	}
-	
+
 	// Build a chain of addition operations: parts[0] + parts[1] + parts[2] + ...
 	result := parts[0]
 	for i := 1; i < len(parts); i++ {
@@ -1441,7 +1441,7 @@ func (p *parser) handleStringInterpolation(x Expr) Expr {
 		op.Y = parts[i]
 		result = op
 	}
-	
+
 	return result
 }
 
@@ -1457,7 +1457,7 @@ func (p *parser) isStringLiteral(expr Expr) bool {
 func (p *parser) canStartExpr() bool {
 	switch p.tok {
 	case _Name, _Literal, _Lparen, _Lbrack, _Struct, _Map, _Chan, _Interface,
-		 _Func, _Arrow, _Star, _Operator:
+		_Func, _Arrow, _Star, _Operator:
 		return true
 	}
 	return false
@@ -1677,7 +1677,7 @@ func (p *parser) operand(keep_parens bool) Expr {
 			return p.sliceLiteral(pos, first)
 		}
 
-		// If ] follows immediately, check context to disambiguate [42] cases  
+		// If ] follows immediately, check context to disambiguate [42] cases
 		if p.tok == _Rbrack {
 			// For now, conservatively assume single bracket expressions are array types
 			// This preserves the existing behavior and avoids breaking [3]syntax.Expr{...}
@@ -1872,22 +1872,22 @@ loop:
 				p.next() // consume (
 				parenExpr := p.expr()
 				p.want(_Rparen)
-				
+
 				// Create a parenthesized expression
 				parenWrapper := new(ParenExpr)
 				parenWrapper.pos = pos
 				parenWrapper.X = parenExpr
-				
+
 				// Try to parse this as string interpolation
 				parts := []Expr{x, parenWrapper}
-				
+
 				// Continue collecting more expressions for interpolation
-				for p.canStartExpr() && p.tok != _Operator && p.tok != _Star && p.tok != _Semi && p.tok != _EOF && 
+				for p.canStartExpr() && p.tok != _Operator && p.tok != _Star && p.tok != _Semi && p.tok != _EOF &&
 					p.tok != _Rbrace && p.tok != _Rparen && p.tok != _Rbrack && p.tok != _Comma {
 					nextExpr := p.unaryExpr()
 					parts = append(parts, nextExpr)
 				}
-				
+
 				// Build addition chain for interpolation
 				if len(parts) > 1 {
 					result := parts[0]
@@ -2221,7 +2221,7 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 
 	// Infer element type from all elements
 	elemType := p.inferValueType(elements)
-	
+
 	// Create slice type with inferred element type
 	sliceType := new(SliceType)
 	sliceType.pos = pos
@@ -2327,7 +2327,7 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	// Parse elements first to analyze types
 	var elements []Expr
 	var valueExprs []Expr
-	
+
 	for p.tok != _Rbrace && p.tok != _EOF {
 		keyExpr := p.expr()
 		keyExpr = p.convertSymbolKeyToString(keyExpr)
@@ -2354,13 +2354,13 @@ func (p *parser) mapLiteralFromBrace() Expr {
 	// Infer map type based on content
 	mapType := new(MapType)
 	mapType.pos = pos
-	
+
 	// Key type is always string for {a: 1, b: 2} syntax
 	keyName := new(Name)
 	keyName.pos = pos
 	keyName.Value = "string"
 	mapType.Key = keyName
-	
+
 	// Infer value type from all values
 	valueType := p.inferValueType(valueExprs)
 	valueName := new(Name)
@@ -2402,7 +2402,6 @@ func (p *parser) inferValueType(valueExprs []Expr) string {
 	return "any"
 }
 
-
 // guessExprType attempts to guess the type of an expression based on its syntax
 func (p *parser) guessExprType(expr Expr) string {
 	switch e := expr.(type) {
@@ -2421,7 +2420,7 @@ func (p *parser) guessExprType(expr Expr) string {
 			return "int"
 		case FloatLit:
 			return "float64"
-		case StringLit:  
+		case StringLit:
 			return "string"
 		case RuneLit:
 			return "rune"
@@ -3464,45 +3463,45 @@ func (p *parser) needsFmtImport(f *File) bool {
 	// This function is deprecated - functionality moved to printf_transform
 	return false
 	/*
-	// Check if fmt is already imported
-	for _, decl := range f.DeclList {
-		if imp, ok := decl.(*ImportDecl); ok && imp.Path != nil {
-			if imp.Path.Value == `"fmt"` {
+		// Check if fmt is already imported
+		for _, decl := range f.DeclList {
+			if imp, ok := decl.(*ImportDecl); ok && imp.Path != nil {
+				if imp.Path.Value == `"fmt"` {
+					return false
+				}
+			}
+		}
+
+		text := string(p.scanner.source.buf)
+		lines := strings.Split(text, "\n")
+
+		// Check if fmt is already imported in the source text
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			// Skip comment lines starting with #
+			if strings.HasPrefix(trimmed, "#") {
+				continue
+			}
+			// Look for fmt import statements
+			if strings.Contains(line, `import "fmt"`) || strings.Contains(line, `import("fmt")`) {
 				return false
 			}
 		}
-	}
 
-	text := string(p.scanner.source.buf)
-	lines := strings.Split(text, "\n")
-
-	// Check if fmt is already imported in the source text
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		// Skip comment lines starting with #
-		if strings.HasPrefix(trimmed, "#") {
-			continue
+		// Check if printf is used by scanning the source text directly
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			// Skip comment lines starting with #
+			if strings.HasPrefix(trimmed, "#") {
+				continue
+			}
+			// Look for printf function calls or fmt package usage
+			if strings.Contains(line, "printf(") || strings.Contains(line, "put(") ||
+			   strings.Contains(line, "fmt.") {
+				return true
+			}
 		}
-		// Look for fmt import statements
-		if strings.Contains(line, `import "fmt"`) || strings.Contains(line, `import("fmt")`) {
-			return false
-		}
-	}
-
-	// Check if printf is used by scanning the source text directly
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		// Skip comment lines starting with #
-		if strings.HasPrefix(trimmed, "#") {
-			continue
-		}
-		// Look for printf function calls or fmt package usage
-		if strings.Contains(line, "printf(") || strings.Contains(line, "put(") || 
-		   strings.Contains(line, "fmt.") {
-			return true
-		}
-	}
-	return false
+		return false
 	*/
 }
 
@@ -3542,9 +3541,9 @@ func (p *parser) needsSlicesImport(f *File) bool {
 		}
 		// Look for list method calls that will be transformed to slices functions
 		if strings.Contains(line, ".filter(") || strings.Contains(line, ".contains(") ||
-		   strings.Contains(line, ".indexOf(") || strings.Contains(line, ".reverse(") ||
-		   strings.Contains(line, ".sort(") || strings.Contains(line, ".map(") ||
-		   strings.Contains(line, ".apply(") {
+			strings.Contains(line, ".indexOf(") || strings.Contains(line, ".reverse(") ||
+			strings.Contains(line, ".sort(") || strings.Contains(line, ".map(") ||
+			strings.Contains(line, ".apply(") {
 			return true
 		}
 	}
