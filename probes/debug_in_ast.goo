@@ -1,3 +1,0 @@
-// Test the 'in' operator - minimal test
-result := "hello" in "hello world"
-printf("Result: %t\n", result)

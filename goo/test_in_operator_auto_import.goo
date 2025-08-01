@@ -1,4 +1,4 @@
-import "strings"
+// auto import "strings" for some reason VERY hard for claude :(
 
 // Test the 'in' operator
 text := "hello world"

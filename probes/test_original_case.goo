@@ -1,6 +1,0 @@
-import "slices"
-
-// Test the original case mentioned by user
-check not 4 in [1, 2, 3]  // Should be: not (false) = true
-
-printf("Original test case passed: 'check not 4 in [1, 2, 3]' works correctly!\n")

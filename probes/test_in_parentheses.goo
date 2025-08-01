@@ -1,4 +1,0 @@
-// Test in operator with parentheses to avoid parsing issues
-text := "hello world"
-result := ("hello" in text)
-printf("Result: %t\n", result)

@@ -158,9 +158,14 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 ## Testing Best Practices
 • Before declaring a bug/task as fixed run the test again.
 
+# Visitor Pattern
+The visitor pattern is used to traverse the AST and apply transformations in a much more concise way than the walker pattern.
 With the visitor pattern, we can only replace nodes in place, so not always applicable? 
 we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
 Or use a hybrid.
+If the visitor pattern creates strange internal compiler error consult AST_Transform_Lessons.md
+
+
 
 # Assume mishearings
 I am using speech recognition which might misunderstand some words:

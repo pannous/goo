@@ -1,3 +1,0 @@
-// Test in operator without manual import to see if automatic resolution works
-result := "a" in "abc"
-printf("Result: %t\n", result)

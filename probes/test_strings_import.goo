@@ -1,4 +1,0 @@
-import "strings"
-
-result := strings.Contains("hello world", "hello")
-printf("Result: %t\n", result)

@@ -1,6 +1,0 @@
-import "slices"
-
-// Test simple slice case with manual import
-numbers := [1, 2, 3]
-result := 2 in numbers
-printf("2 in [1,2,3]: %t\n", result)
