@@ -10,7 +10,7 @@ check result2 == "value: 42 units"
 x := "middle"
 result1 := "left" x "right"
 put("Test 1: " + result1)
-check result1 == "leftmiddleright"
+check result1 == "left middle right"
 
 // String interpolation with expression
 result3 := "result:" (2 + 3) "total"
@@ -21,7 +21,7 @@ check result3 == "result: 5 total"
 name := "world"
 result4 := "hello" name "!"
 put("Test 4: " + result4)
-check result4 == "helloworld!"
+check result4 == "hello world !"
 
 // String interpolation with float literal
 result5 := "pi" 3.14159 "approximately"
