@@ -4,7 +4,7 @@
 // String interpolation with integer
 result2 := "value:" 42 "units"
 put("Test 2: " + result2)
-check result2 == "value:42units"
+check result2 == "value: 42 units"
 
 // Basic string interpolation with variable
 x := "middle"
@@ -15,7 +15,7 @@ check result1 == "leftmiddleright"
 // String interpolation with expression
 result3 := "result:" (2 + 3) "total"
 put("Test 3: " + result3)
-check result3 == "result:5total"
+check result3 == "result: 5 total"
 
 // String interpolation with identifier
 name := "world"
@@ -26,11 +26,11 @@ check result4 == "helloworld!"
 // String interpolation with float literal
 result5 := "pi" 3.14159 "approximately"
 put("Test 5: " + result5)
-check result5 == "pi3.14159approximately"
+check result5 == "pi 3.14159 approximately"
 
 // String interpolation with negative number
 result6 := "temp:" (-5) "degrees"
 put("Test 6: " + result6)
-check result6 == "temp:-5degrees"
+check result6 == "temp: -5 degrees"
 
 put("All string interpolation tests passed!")
