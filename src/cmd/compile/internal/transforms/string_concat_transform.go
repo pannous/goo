@@ -72,11 +72,16 @@ func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
 		}
 	}
 
-	// Check for string concatenation operations
+	// Check for string concatenation operations (but skip if it's already an interpolation pattern)
 	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Add {
-		//println("Found ADD operation:", syntax.String(op))
+		// Don't apply regular concatenation to operations that are part of interpolation patterns
+		parts := v.transform.extractInterpolationParts(op)
+		if len(parts) >= 3 && v.transform.isStringInterpolationPattern(parts, v.ctx) {
+			// This is already handled by string interpolation, skip regular concatenation
+			return v
+		}
+		
 		if transformed := v.transform.transformConcatOperation(op, v.ctx); transformed != nil {
-			//println("TRANSFORMING:", syntax.String(op), "->", syntax.String(transformed))
 			if newOp, ok := transformed.(*syntax.Operation); ok {
 				op.X = newOp.X
 				op.Y = newOp.Y
@@ -255,21 +260,17 @@ func (t *StringConcatTransform) isStringInterpolationPattern(parts []syntax.Expr
 		return false
 	}
 
-	// Check if pattern alternates: string, non-string, string, ...
-	// or starts with string: string, non-string, string
+	// Check if pattern alternates: string literal, any value, string literal, ...
+	// The key is that even positions (0, 2, 4, ...) should be string literals
+	// and odd positions (1, 3, 5, ...) can be any values (including string variables)
 	for i, part := range parts {
-		isString := t.isStringExpression(part, ctx)
 		if i%2 == 0 {
-			// Even positions should be strings (0, 2, 4, ...)
-			if !isString {
-				return false
-			}
-		} else {
-			// Odd positions should be non-strings (1, 3, 5, ...)
-			if isString {
+			// Even positions should be string literals (not just any string expression)
+			if !t.isStringLiteral(part) {
 				return false
 			}
 		}
+		// Odd positions can be anything (numbers, variables, expressions, etc.)
 	}
 
 	return true
@@ -286,10 +287,12 @@ func (t *StringConcatTransform) buildInterpolationChain(parts []syntax.Expr, ctx
 	for i := 1; i < len(parts); i++ {
 		var rightSide syntax.Expr
 
-		// If this is a non-string part, wrap it with fmt.Sprintf with spaces
-		if !t.isStringExpression(parts[i], ctx) {
+		// For interpolated values (not string literals), add spacing
+		if !t.isStringLiteral(parts[i]) {
+			// This includes both non-string values and string variables
 			rightSide = t.createSprintfCallWithSpacing(parts[i])
 		} else {
+			// Only string literals don't get spacing
 			rightSide = parts[i]
 		}
 
