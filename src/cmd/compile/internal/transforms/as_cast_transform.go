@@ -208,6 +208,20 @@ func (t *AsCastTransform) shouldUseTypeConversion(expr syntax.Expr, targetType s
 		}
 	}
 	
+	// Handle IndexExpr (like array[0], slice[i])
+	if indexExpr, ok := expr.(*syntax.IndexExpr); ok {
+		// Check if the indexed variable is a slice/array of interface{}/any
+		if varName, ok := indexExpr.X.(*syntax.Name); ok {
+			if declaredType, exists := ctx.Types[varName.Value]; exists {
+				// If it's a slice of interface{} or any, use assertion
+				if declaredType == "[]interface{}" || declaredType == "[]any" || 
+				   declaredType == "slice" {
+					return false // Use type assertion
+				}
+			}
+		}
+	}
+
 	// Look up the variable's declared type in the context if available
 	if exprName, ok := expr.(*syntax.Name); ok {
 		if typeName, ok := targetType.(*syntax.Name); ok {
