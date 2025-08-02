@@ -99,19 +99,39 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
 ✅ tests.goo
+✅ test_array_vs_slice.goo
+✅ test_as_cast_check.goo
+✅ test_as_cast_comprehensive.goo
+✅ test_as_cast_debug.goo
+✅ test_as_cast_minimal.goo
+✅ test_as_cast_simple.goo
+❌ test_as_cast_working.goo
 ✅ test_bool_not.goo
 ✅ test_both_auto.goo
 ✅ test_charAt_comprehensive.goo
 ✅ test_charAt_vs_runeAt.goo
 ✅ test_charAt.goo
 ✅ test_cmp_manual.goo
+✅ test_debug_comparison.goo
 ✅ test_debug_interpolation.goo
+✅ test_debug_manual.goo
+✅ test_debug_transform.goo
 ✅ test_exclamation.goo
 ✅ test_falsey.goo
 ✅ test_filter_clean.goo
+✅ test_final_verification.goo
+✅ test_final_working.goo
+✅ test_for_in_basic.goo
+✅ test_for_in_debug.goo
+✅ test_for_in_function.goo
+✅ test_for_in_minimal_working.goo
+✅ test_for_in_minimal.goo
+❌ test_for_in_no_var.goo
+✅ test_for_in_working.goo
 ✅ test_in_complete.goo
 ✅ test_list_visitor.goo
 ✅ test_main_line.goo
+✅ test_manual_range_only.goo
 ✅ test_manual_slices.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_check_debug.goo
@@ -120,6 +140,7 @@ Running all tests in ./goo/ directory...
 ✅ test_not_comprehensive.goo
 ✅ test_not_literals.goo
 ✅ test_not_simple.goo
+✅ test_pkg.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_enum.goo
 ✅ test_printf_transform.goo
@@ -127,18 +148,26 @@ Running all tests in ./goo/ directory...
 ✅ test_put_concat.goo
 ✅ test_put_newline.goo
 ✅ test_put_parser.goo
+✅ test_range_equivalent.goo
+✅ test_range_pattern.goo
 ✅ test_runeAt_simple.goo
 ✅ test_runeAt.goo
 ✅ test_runtime_truthiness.goo
 ✅ test_simple_check.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
+✅ test_simple_for_in.goo
+✅ test_simple_for.goo
+✅ test_simple_in.goo
+✅ test_simple.goo
 ✅ test_slices_auto.goo
 ✅ test_slices_direct.goo
 ✅ test_slices_import.goo
 ✅ test_slices_manual.goo
+✅ test_target_index.goo
+✅ test_target_value.goo
 ✅ test_truthiness_basic.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 131/139 passed, 8 failed
+Summary: 158/168 passed, 10 failed
 ⚠️  Some tests failed
