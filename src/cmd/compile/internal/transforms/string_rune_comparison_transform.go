@@ -10,7 +10,7 @@ import (
 
 // StringRuneComparisonTransform handles comparison between strings and runes
 // Transforms "你" == '你' into "你" == string('你')
-type StringRuneComparisonTransform struct{
+type StringRuneComparisonTransform struct {
 	ctx *TransformContext
 }
 
@@ -19,7 +19,7 @@ func (t *StringRuneComparisonTransform) Name() string {
 }
 
 func (t *StringRuneComparisonTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	println("StringRuneComparisonTransform.Transform called")
+	//println("StringRuneComparisonTransform.Transform called")
 	t.ctx = ctx // Store context for use in other methods
 	changed := false
 
@@ -112,17 +112,17 @@ func (t *StringRuneComparisonTransform) transformStmt(stmt syntax.Stmt, ctx *Tra
 		condChanged := false
 		thenChanged := false
 		elseChanged := false
-		
+
 		newCond := t.transformExpr(s.Cond, ctx)
 		if newCond != s.Cond {
 			condChanged = true
 		}
-		
+
 		newThen := t.transformStmt(s.Then, ctx)
 		if newThen != s.Then {
 			thenChanged = true
 		}
-		
+
 		var newElse syntax.Stmt
 		if s.Else != nil {
 			newElse = t.transformStmt(s.Else, ctx)
@@ -130,7 +130,7 @@ func (t *StringRuneComparisonTransform) transformStmt(stmt syntax.Stmt, ctx *Tra
 				elseChanged = true
 			}
 		}
-		
+
 		if condChanged || thenChanged || elseChanged {
 			newStmt := *s
 			newStmt.Cond = newCond
@@ -155,13 +155,13 @@ func (t *StringRuneComparisonTransform) transformExpr(expr syntax.Expr, ctx *Tra
 		if e.Op == syntax.Eql || e.Op == syntax.Neq {
 			newX := t.transformExpr(e.X, ctx)
 			newY := t.transformExpr(e.Y, ctx)
-			
+
 			// Check if we have string vs rune comparison
 			transformed := t.transformStringRuneComparison(newX, newY, e.Op)
 			if transformed != nil {
 				return transformed
 			}
-			
+
 			// If no special transformation, check if operands changed
 			if newX != e.X || newY != e.Y {
 				newOp := *e
@@ -176,7 +176,7 @@ func (t *StringRuneComparisonTransform) transformExpr(expr syntax.Expr, ctx *Tra
 			if e.Y != nil {
 				newY = t.transformExpr(e.Y, ctx)
 			}
-			
+
 			if newX != e.X || (e.Y != nil && newY != e.Y) {
 				newOp := *e
 				newOp.X = newX
@@ -225,9 +225,9 @@ func (t *StringRuneComparisonTransform) transformStringRuneComparison(left, righ
 	rightIsString := t.isStringType(right)
 	leftIsRune := t.isRuneType(left)
 	rightIsRune := t.isRuneType(right)
-	
+
 	var transformedExpr syntax.Expr
-	
+
 	// Transform when we have string vs rune comparison (literals or variables)
 	if leftIsString && rightIsRune {
 		// string_var == rune_var -> string_var == string(rune_var)
@@ -246,13 +246,13 @@ func (t *StringRuneComparisonTransform) transformStringRuneComparison(left, righ
 			Y:  right,
 		}
 	}
-	
+
 	if transformedExpr != nil {
 		transformedExpr.SetPos(left.Pos())
 		println("TRANSFORMING string-rune comparison")
 		return transformedExpr
 	}
-	
+
 	return nil
 }
 
@@ -303,16 +303,16 @@ func (t *StringRuneComparisonTransform) isRuneLiteral(expr syntax.Expr) bool {
 // createStringConversion creates string(rune) conversion
 func (t *StringRuneComparisonTransform) createStringConversion(runeExpr syntax.Expr) syntax.Expr {
 	pos := runeExpr.Pos()
-	
+
 	stringName := &syntax.Name{Value: "string"}
 	stringName.SetPos(pos)
-	
+
 	call := &syntax.CallExpr{
 		Fun:     stringName,
 		ArgList: []syntax.Expr{runeExpr},
 	}
 	call.SetPos(pos)
-	
+
 	return call
 }
 

@@ -23,7 +23,7 @@ func (t *TypeAssertionTransform) Name() string {
 }
 
 func (t *TypeAssertionTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	println("TypeAssertionTransform.Transform called")
+	//println("TypeAssertionTransform.Transform called")
 
 	visitor := &typeAssertionVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
