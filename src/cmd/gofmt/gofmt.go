@@ -97,6 +97,61 @@ func isGooFile(filename string) bool {
 	return strings.HasSuffix(filename, ".goo")
 }
 
+// cleanIndentation fixes basic indentation issues in source code
+// when full parsing fails but we still want basic formatting
+func cleanIndentation(src []byte) []byte {
+	lines := bytes.Split(src, []byte("\n"))
+	var result [][]byte
+	
+	for _, line := range lines {
+		cleaned := cleanLine(line)
+		result = append(result, cleaned)
+	}
+	
+	return bytes.Join(result, []byte("\n"))
+}
+
+// cleanLine normalizes indentation on a single line
+func cleanLine(line []byte) []byte {
+	if len(line) == 0 {
+		return line
+	}
+	
+	// Count leading whitespace
+	leadingSpaces := 0
+	leadingTabs := 0
+	i := 0
+	
+	for i < len(line) {
+		if line[i] == ' ' {
+			leadingSpaces++
+		} else if line[i] == '\t' {
+			leadingTabs++
+		} else {
+			break
+		}
+		i++
+	}
+	
+	if i == len(line) {
+		// Line is all whitespace
+		return []byte{}
+	}
+	
+	// Convert mixed indentation to tabs (standard Go style)
+	// Every 8 spaces = 1 tab, remaining spaces become tabs too for simplicity
+	totalTabs := leadingTabs + (leadingSpaces+7)/8
+	
+	// Build result with clean indentation
+	result := make([]byte, totalTabs+len(line)-i)
+	for j := 0; j < totalTabs; j++ {
+		result[j] = '\t'
+	}
+	copy(result[totalTabs:], line[i:])
+	
+	return result
+}
+
 func containsGooSyntax(src []byte) bool {
 	s := string(src)
 	// Check for common Goo-specific syntax that would break standard Go parser
@@ -250,15 +305,34 @@ func (r *reporter) ExitCode() int {
 // processGooFile formats a .goo file using standard go/parser approach
 // We can use the same parsing pipeline as regular Go files since the 
 // Goo syntax extensions should be handled at the token level
-func processGooFile(filename string, info fs.FileInfo, in io.Reader, r *reporter, src []byte) error {
-	// Try to parse as standard Go first - many .goo files are valid Go with just comments
+func processGooFile(filename string, info fs.FileInfo, in io.Reader, r *reporter, src []byte) (err error) {
+	// Recover from scanner panics (e.g., position calculation bugs with hash comments)
+	defer func() {
+		if panicErr := recover(); panicErr != nil {
+			r.Warnf("warning: %s: scanner panic %v (preserving source as-is)\n", filename, panicErr)
+			if !*list && !*write && !*doDiff {
+				_, writeErr := r.Write(src)
+				err = writeErr
+			} else {
+				err = nil
+			}
+		}
+	}()
+
+	// For .goo files, always allow fragment parsing (implicit main support)
 	fileSet := token.NewFileSet()
-	fragmentOk := info == nil
-	file, sourceAdj, indentAdj, err := parse(fileSet, filename, src, fragmentOk)
-	if err != nil {
-		// If parsing fails, preserve the source as-is for now
-		// This handles cases with Goo-specific syntax that go/parser doesn't understand
-		res := src
+	fragmentOk := true // Always allow fragments for .goo files
+	file, sourceAdj, indentAdj, parseErr := parse(fileSet, filename, src, fragmentOk)
+	if parseErr != nil {
+		// If parsing fails, preserve the source as-is
+		// For .goo files with implicit main, this is expected behavior - no warning needed
+		errMsg := parseErr.Error()
+		if !strings.Contains(errMsg, "expected declaration") && !strings.Contains(errMsg, "expected 'package'") {
+			// Only warn for unexpected errors, not implicit main structure
+			r.Warnf("warning: %s: %v (preserving source as-is)\n", filename, parseErr)
+		}
+		// Apply basic indentation cleanup even when parsing fails
+		res := cleanIndentation(src)
 		if !*list && !*write && !*doDiff {
 			_, writeErr := r.Write(res)
 			return writeErr

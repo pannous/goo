@@ -1,0 +1,6 @@
+# command-line-arguments
+GooImportTransform.Transform called
+ListMethodsTransform.Transform called
+StringMethodsTransform.Transform called
+StringRuneComparisonTransform.Transform called
+TryCatchTransform.Transform called

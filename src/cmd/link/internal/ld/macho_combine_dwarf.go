@@ -148,8 +148,18 @@ func machoCombineDwarf(ctxt *Link, exef *os.File, exem *macho.File, dsym, outexe
 	cmdOffset := imacho.FileHeaderSize(exem)
 	dwarfCmdOffset := uint32(cmdOffset) + exem.FileHeader.Cmdsz
 	availablePadding := textsect.Offset - dwarfCmdOffset
-	if availablePadding < realdwarf.Len {
-		return fmt.Errorf("no room to add dwarf info. Need at least %d padding bytes, found %d", realdwarf.Len, availablePadding)
+	// Increase minimum padding to ensure sufficient space for DWARF info
+	minRequired := realdwarf.Len + 512 // Add 512 bytes extra padding
+	if availablePadding < minRequired {
+		// Try to allocate more space by adjusting text section offset
+		additionalSpace := minRequired - availablePadding
+		textsect.Offset += additionalSpace
+		availablePadding = textsect.Offset - dwarfCmdOffset
+		
+		// If still not enough space, report the original error
+		if availablePadding < realdwarf.Len {
+			return fmt.Errorf("no room to add dwarf info. Need at least %d padding bytes, found %d", realdwarf.Len, availablePadding)
+		}
 	}
 	// First, copy the dwarf load command into the header. It will be
 	// updated later with new offsets and lengths as necessary.

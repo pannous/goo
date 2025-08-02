@@ -23,7 +23,7 @@ func TestSmoke(t *testing.T) {
 	tokens := []token{_If, _Lparen, _Operator, _Name, _AssignOp, _Dot, _Literal, _Literal, _Literal, _Literal, _Literal, _Dot, _Dot, _Name, _Semi, _EOF}
 
 	var got scanner
-	got.init(strings.NewReader(src), errh, 0)
+	got.init(strings.NewReader(src), errh, 0, "")
 	for _, want := range tokens {
 		got.next()
 		if got.tok != want {
@@ -39,7 +39,7 @@ func TestTokens(t *testing.T) {
 	for _, want := range sampleTokens {
 		got.init(strings.NewReader(want.src), func(line, col uint, msg string) {
 			t.Errorf("%s:%d:%d: %s", want.src, line, col, msg)
-		}, 0)
+		}, 0, "")
 		got.next()
 		if got.tok != want.tok {
 			t.Errorf("%s: got %s; want %s", want.src, got.tok, want.tok)
@@ -64,7 +64,7 @@ func TestScanner(t *testing.T) {
 	defer src.Close()
 
 	var s scanner
-	s.init(src, errh, 0)
+	s.init(src, errh, 0, "")
 	for {
 		s.next()
 		if s.tok == _EOF {
@@ -99,7 +99,7 @@ func TestEmbeddedTokens(t *testing.T) {
 	var src string
 	got.init(&buf, func(line, col uint, msg string) {
 		t.Fatalf("%s:%d:%d: %s", src, line, col, msg)
-	}, 0)
+	}, 0, "")
 	got.next()
 	for i, want := range sampleTokens {
 		src = want.src
@@ -540,7 +540,7 @@ func TestNumbers(t *testing.T) {
 			if err == "" {
 				err = msg
 			}
-		}, 0)
+		}, 0, "")
 
 		for i, want := range strings.Split(test.tokens, " ") {
 			err = ""
@@ -665,7 +665,7 @@ func TestScanErrors(t *testing.T) {
 				line, col = l-linebase, c-colbase
 				err = msg
 			}
-		}, 0)
+		}, 0, "")
 
 		for {
 			s.next()
@@ -752,7 +752,7 @@ func TestIssue33961(t *testing.T) {
 		got.init(strings.NewReader(lit), func(_, _ uint, msg string) {
 			// fmt.Printf("%s: %s\n", lit, msg) // uncomment for debugging
 			n++
-		}, 0)
+		}, 0, "")
 		got.next()
 
 		if n != 1 {
