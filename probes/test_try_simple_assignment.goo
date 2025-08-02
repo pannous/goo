@@ -1,6 +1,6 @@
 import "strconv"
 
-func testAssignment() error {
+func testSimpleAssignment() error {
 	try val := strconv.Atoi("42")
 	println("Converted value:", val)
 	
@@ -11,7 +11,7 @@ func testAssignment() error {
 }
 
 func main() {
-	err := testAssignment()
+	err := testSimpleAssignment()
 	if err != nil {
 		println("Error caught:", err.Error())
 	} else {
