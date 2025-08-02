@@ -202,7 +202,8 @@ func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType 
 		return t.createStrconvCall("Itoa", expr, pos)
 		
 	// String to int: "1" as int -> strconv.Atoi("1") 
-	// Temporarily disabled due to multi-value return complexity
+	// Currently disabled due to position handling issues in error wrapper
+	// TODO: Fix createMustAtoi position handling
 	// case (targetType == "int" || targetType == "int32" || targetType == "int64") && 
 	//	 (sourceType == "string" || sourceType == "string_literal"):
 	//	visitor.needsStrconvImport = true
@@ -280,9 +281,9 @@ func (t *AsCastTransform) createStrconvCall(funcName string, arg syntax.Expr, po
 	callExpr.SetPos(pos)
 	
 	// For functions that return (value, error), we need to handle the error
-	// Use the simplified wrapper approach
+	// Use a simplified must pattern for single-value contexts
 	if funcName == "Atoi" {
-		return t.createSimpleWrapper(callExpr, "int", pos)
+		return t.createMustAtoi(callExpr, pos)
 	}
 	
 	return callExpr
@@ -389,6 +390,50 @@ func (t *AsCastTransform) createFloatLiteralToIntConversion(expr syntax.Expr, po
 	// We need to just use the basic int() conversion and let Go handle it
 	// If it fails, it means the code needs to be written differently
 	return t.createBasicTypeConversion(expr, "int", pos)
+}
+
+// createMustAtoi creates a simple wrapper that extracts the value from strconv.Atoi
+func (t *AsCastTransform) createMustAtoi(atoiCall syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Use the simplest possible approach that works with Go's syntax
+	// Generate: (func() int { v, _ := call(); return v })()
+	// But using only the most basic syntax nodes to avoid position issues
+	
+	// Create a minimal function literal that calls strconv.Atoi and returns the value
+	// This is much simpler than the previous complex version
+	
+	// Create result variable: v
+	vVar := &syntax.Name{Value: "v"}
+	
+	// Create blank variable: _
+	blank := &syntax.Name{Value: "_"}
+	
+	// Create list for LHS: v, _
+	lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{vVar, blank}}
+	
+	// Create assignment: v, _ := atoiCall
+	assign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: lhsList,
+		Rhs: atoiCall,
+	}
+	
+	// Create return: return v
+	ret := &syntax.ReturnStmt{Results: vVar}
+	
+	// Create function body: { v, _ := atoiCall; return v }
+	body := &syntax.BlockStmt{List: []syntax.Stmt{assign, ret}}
+	
+	// Create function type: func() int
+	intType := &syntax.Name{Value: "int"}
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{{Type: intType}},
+	}
+	
+	// Create function literal
+	funcLit := &syntax.FuncLit{Type: funcType, Body: body}
+	
+	// Create function call: (func()...)()
+	return &syntax.CallExpr{Fun: funcLit}
 }
 
 // createSimpleWrapper creates a simple wrapper for multi-value returns
