@@ -1,13 +1,18 @@
+#!/usr/bin/env goo
 # Comprehensive Goo test demonstrating all language features
 # This file tests the enhanced IntelliJ plugin capabilities
-
-# Multi-line comment block
-# that should be foldable
-# in the IDE
+// old comment style
+/*
+ Multi-line comment block
+ that should be foldable
+ in the IDE
+*/
+/*
 
 package main
 
 printf("=== Goo Language Comprehensive Test ===")
+*/
 
 # Test basic variable declarations
 x := 42

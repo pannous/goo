@@ -19,7 +19,6 @@ func (t *GooImportTransform) Name() string {
 }
 
 func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	//println("GooImportTransform.Transform called")
 	changed := false
 
 	// Transform import declarations
@@ -44,7 +43,6 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 
 	// Check if this is a .goo file import
 	if strings.HasSuffix(importPath, ".goo") {
-		println("TRANSFORMING .goo import:", importPath)
 
 		// Extract base name for package directory
 		baseName := strings.TrimSuffix(filepath.Base(importPath), ".goo")
@@ -63,7 +61,6 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 
 	// Check if this is a local directory import that should be converted to relative
 	if t.shouldConvertToLocalImport(importPath) {
-		println("TRANSFORMING local directory import:", importPath)
 
 		// Convert bare directory name to relative import
 		newImportPath := "./" + importPath

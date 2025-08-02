@@ -882,7 +882,7 @@ func loadPackageData(ctx context.Context, path, parentPath, parentDir, parentRoo
 		if newPath, dir, ok := fips140.ResolveImport(path); ok {
 			r.path = newPath
 			r.dir = dir
-		} else if cfg.ModulesEnabled {
+		} else if cfg.ModulesEnabled && !strings.HasSuffix(path, ".goo") {
 			r.dir, r.path, r.err = modload.Lookup(parentPath, parentIsStd, path)
 		} else if build.IsLocalImport(path) {
 			if strings.HasSuffix(path, ".goo") {
@@ -1172,7 +1172,7 @@ func ResolveImportPath(parent *Package, path string) (found string) {
 }
 
 func resolveImportPath(path, parentPath, parentDir, parentRoot string, parentIsStd bool) (found string) {
-	if cfg.ModulesEnabled {
+	if cfg.ModulesEnabled && !strings.HasSuffix(path, ".goo") {
 		if _, p, e := modload.Lookup(parentPath, parentIsStd, path); e == nil {
 			return p
 		}

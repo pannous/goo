@@ -1,5 +1,7 @@
+package main
+
 import "fmt"
-import "./helper"
+import "helper.goo"
 
 greeting := helper.Greet("World")
 sum := helper.Add(5, 3)
