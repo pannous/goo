@@ -41,6 +41,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ return void, e.g. return print("ok") HARD  
 ✅ try{x}catch e{y} => func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
+☐ try f()  =>  if err := f(); err != nil { panic(err) }
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 ✅ "你" == '你'
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !

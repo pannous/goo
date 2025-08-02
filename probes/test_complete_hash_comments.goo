@@ -1,0 +1,13 @@
+#!/usr/bin/env goo
+# This is a shebang line
+# Multiple hash comments
+# Should all work
+
+// Regular comment for comparison
+/* Block comment */
+
+# Indented hash comment
+	# Tab-indented hash comment
+    # Space-indented hash comment
+
+put("Hash comments work!")

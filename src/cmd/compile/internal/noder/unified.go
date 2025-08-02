@@ -613,7 +613,6 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 	for importPath := range newImports {
 		if packageFile := resolveStandardLibraryPackage(importPath); packageFile != "" {
 			base.Flag.Cfg.PackageFile[importPath] = packageFile
-			fmt.Printf("DEBUG: Added %s=%s to import config\n", importPath, packageFile)
 		}
 	}
 }
