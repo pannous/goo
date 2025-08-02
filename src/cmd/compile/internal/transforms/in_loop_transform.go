@@ -73,14 +73,17 @@ func (t *InLoopTransform) convertInClauseToRange(inClause *syntax.InClause, ctx 
 	if inClause.Lhs == nil {
 		// "for in collection" -> "for range collection"
 		rangeClause.Lhs = nil
+	} else if list, ok := inClause.Lhs.(*syntax.ListExpr); ok && len(list.ElemList) == 2 {
+		// "for key, value in collection" -> "for key, value := range collection"
+		rangeClause.Lhs = inClause.Lhs // Use key,value as-is
+		rangeClause.Def = true
 	} else {
 		// "for x in collection" -> "for _, x := range collection" (for slices/arrays/strings)
-		// For now, assume slice/array/string pattern: for _, x := range collection
+		// or "for x in collection" -> "for x := range collection" (for maps)
 		rangeLhs := t.createRangeLhs(inClause.Lhs, pos)
 		rangeClause.Lhs = rangeLhs
 		// Ensure we use := for new variable declarations
 		rangeClause.Def = true
-		
 	}
 	
 	return rangeClause
