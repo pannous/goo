@@ -21,7 +21,7 @@ Running all tests in ./goo/ directory...
 ✅ test_check.goo
 ❌ test_class_constructors.goo
 ✅ test_class_funcs.goo
-❌ test_class_methods.goo
+✅ test_class_methods.goo
 ✅ test_class.goo
 ✅ test_comma_compatibility.goo
 ❌ test_comma_optional.goo
@@ -216,5 +216,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 201/215 passed, 14 failed
+Summary: 202/215 passed, 13 failed
 ⚠️  Some tests failed
