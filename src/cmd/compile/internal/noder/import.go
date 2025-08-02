@@ -60,7 +60,8 @@ func islocalname(name string) bool {
 
 func openPackage(path string) (*os.File, error) {
 	if islocalname(path) {
-		if base.Flag.NoLocalImports {
+		// Allow local imports for .goo files (they get transformed from .goo imports)
+		if base.Flag.NoLocalImports && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
 			return nil, errors.New("local imports disallowed")
 		}
 
