@@ -1,0 +1,10 @@
+package main
+
+import "fmt"
+import "helper.goo"
+
+greeting := helper.Greet("World")
+sum := helper.Add(5, 3)
+
+fmt.Printf("Greeting: %s\n", greeting)
+fmt.Printf("Sum: %d\n", sum)

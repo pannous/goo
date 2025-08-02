@@ -7,7 +7,7 @@ text := "Hello World"
 
 put("🎯 LIST METHOD SYNONYMS:")
 
-// OK!
+# OK!
 
 // Element access synonyms
 put("first/head/start/begin:", nums.first(), nums.head(), nums.start(), nums.begin())
