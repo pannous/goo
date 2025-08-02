@@ -1,8 +1,8 @@
 xs := [1,2,3]
-for i := range xs {
-	printf("%v", i)
-}
 
-// for i in [1,2,3] {
-// 	printf(i)
-// }
+sum := 0
+for i in [1,2,3] {
+  	put(i)
+ 	sum += i
+}
+check sum == 6

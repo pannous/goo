@@ -405,10 +405,9 @@ func (s *scanner) ident() {
 	// possibly a keyword
 	lit := s.segment()
 	if len(lit) >= 2 {
-		// Special case for 'in' operator when transforms are enabled
+		// Special case for 'in' keyword when transforms are enabled
 		if string(lit) == "in" && os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
-			s.op, s.prec = In, precCmp
-			s.tok = _Operator
+			s.tok = _In
 			return
 		}
 		
