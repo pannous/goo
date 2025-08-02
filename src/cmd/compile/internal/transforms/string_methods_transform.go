@@ -19,6 +19,7 @@ type methodVisitor struct {
 	needsStringsImport bool
 	needsStrconvImport bool
 	needsUnicodeImport bool
+	needsSlicesImport  bool
 }
 
 func (t *StringMethodsTransform) Name() string {
@@ -31,6 +32,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 	switch methodName {
 	// Basic string info
 	case "reverse", "flip":
+		// Note: This will be handled by the visitor to set needsSlicesImport flag
 		return t.createReverseCall(receiver)
 	case "first", "head", "start":
 		return t.createFirstCall(receiver)
@@ -257,6 +259,10 @@ func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformCont
 		println("Adding unicode import")
 		t.addUnicodeImport(file)
 	}
+	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
+		println("Adding slices import")
+		t.addSlicesImport(file)
+	}
 
 	return visitor.changed
 }
@@ -293,7 +299,6 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 					v.changed = true
 					// Track required imports based on method name
 					stringsMethods := []string{
-						"reverse",
 						"contains", "includes", "indexOf", "find", "lastIndexOf", "rfind",
 						"replace", "replaceAll", "replaceFirst",
 						"toUpper", "upper", "upperCase", "toUpperCase",
@@ -311,6 +316,9 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 					}
 					strconvMethods := []string{
 						"toInt", "parseInt", "toFloat", "parseFloat", "toBool", "parseBool",
+					}
+					slicesMethods := []string{
+						"reverse", "flip",
 					}
 
 					for _, method := range stringsMethods {
@@ -331,6 +339,12 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 							break
 						}
 					}
+					for _, method := range slicesMethods {
+						if method == methodName {
+							v.needsSlicesImport = true
+							break
+						}
+					}
 				}
 			}
 		}
@@ -338,9 +352,413 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// createReverseCall creates a TODO error for string reverse (needs runtime implementation)
+// createReverseCall creates a call to reverse a string using slices.Reverse
 func (t *StringMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Expr {
-	return t.createCompilerError(receiver, "reverse", "string_reversal_not_implemented")
+	pos := receiver.Pos()
+
+	// Use a much simpler approach with slices.Reverse:
+	// func() string { r := []rune(receiver); slices.Reverse(r); return string(r) }()
+	
+	// Create function type: func() string
+	stringType := &syntax.Name{Value: "string"}
+	stringType.SetPos(pos)
+	
+	returnField := &syntax.Field{Type: stringType}
+	returnField.SetPos(pos)
+
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{returnField},
+	}
+	funcType.SetPos(pos)
+
+	// Function body using slices.Reverse
+	body := t.createSlicesReverseBody(pos, receiver)
+
+	// Create function literal
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+
+	// Call the function immediately
+	call := &syntax.CallExpr{Fun: funcLit}
+	call.SetPos(pos)
+
+	return call
+}
+
+// createReverseBody creates the function body for string reversal
+func (t *StringMethodsTransform) createReverseBody(pos syntax.Pos) *syntax.BlockStmt {
+	// runes := []rune(s)
+	runesVar := &syntax.Name{Value: "runes"}
+	runesVar.SetPos(pos)
+
+	sVar := &syntax.Name{Value: "s"}
+	sVar.SetPos(pos)
+
+	runeType := &syntax.Name{Value: "rune"}
+	runeType.SetPos(pos)
+
+	runeSliceType := &syntax.SliceType{Elem: runeType}
+	runeSliceType.SetPos(pos)
+
+	runeConversion := &syntax.CallExpr{
+		Fun:     runeSliceType,
+		ArgList: []syntax.Expr{sVar},
+	}
+	runeConversion.SetPos(pos)
+
+	runesAssign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: runesVar,
+		Rhs: runeConversion,
+	}
+	runesAssign.SetPos(pos)
+
+	// for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+	//     runes[i], runes[j] = runes[j], runes[i]
+	// }
+
+	iVar := &syntax.Name{Value: "i"}
+	iVar.SetPos(pos)
+	jVar := &syntax.Name{Value: "j"}
+	jVar.SetPos(pos)
+
+	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zeroLit.SetPos(pos)
+
+	lenCall := &syntax.CallExpr{
+		Fun:     &syntax.Name{Value: "len"},
+		ArgList: []syntax.Expr{runesVar},
+	}
+	lenCall.SetPos(pos)
+
+	oneLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+	oneLit.SetPos(pos)
+
+	lenMinus1 := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  lenCall,
+		Y:  oneLit,
+	}
+	lenMinus1.SetPos(pos)
+
+	// Initial assignment: i, j := 0, len(runes)-1
+	initLhs := &syntax.ListExpr{ElemList: []syntax.Expr{iVar, jVar}}
+	initLhs.SetPos(pos)
+	initRhs := &syntax.ListExpr{ElemList: []syntax.Expr{zeroLit, lenMinus1}}
+	initRhs.SetPos(pos)
+
+	initStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: initLhs,
+		Rhs: initRhs,
+	}
+	initStmt.SetPos(pos)
+
+	// Condition: i < j
+	cond := &syntax.Operation{
+		Op: syntax.Lss,
+		X:  iVar,
+		Y:  jVar,
+	}
+	cond.SetPos(pos)
+
+	// Post: i, j = i+1, j-1
+	iPlusOne := &syntax.Operation{
+		Op: syntax.Add,
+		X:  iVar,
+		Y:  oneLit,
+	}
+	iPlusOne.SetPos(pos)
+
+	jMinusOne := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  jVar,
+		Y:  oneLit,
+	}
+	jMinusOne.SetPos(pos)
+
+	postLhs := &syntax.ListExpr{ElemList: []syntax.Expr{iVar, jVar}}
+	postLhs.SetPos(pos)
+	postRhs := &syntax.ListExpr{ElemList: []syntax.Expr{iPlusOne, jMinusOne}}
+	postRhs.SetPos(pos)
+
+	postStmt := &syntax.AssignStmt{
+		Op:  0, // simple assignment =
+		Lhs: postLhs,
+		Rhs: postRhs,
+	}
+	postStmt.SetPos(pos)
+
+	// Loop body: runes[i], runes[j] = runes[j], runes[i]
+	runesI := &syntax.IndexExpr{X: runesVar, Index: iVar}
+	runesI.SetPos(pos)
+	runesJ := &syntax.IndexExpr{X: runesVar, Index: jVar}
+	runesJ.SetPos(pos)
+
+	swapLhs := &syntax.ListExpr{ElemList: []syntax.Expr{runesI, runesJ}}
+	swapLhs.SetPos(pos)
+	swapRhs := &syntax.ListExpr{ElemList: []syntax.Expr{runesJ, runesI}}
+	swapRhs.SetPos(pos)
+
+	swapStmt := &syntax.AssignStmt{
+		Op:  0, // simple assignment =
+		Lhs: swapLhs,
+		Rhs: swapRhs,
+	}
+	swapStmt.SetPos(pos)
+
+	forBody := &syntax.BlockStmt{List: []syntax.Stmt{swapStmt}}
+	forBody.SetPos(pos)
+
+	forStmt := &syntax.ForStmt{
+		Init: initStmt,
+		Cond: cond,
+		Post: postStmt,
+		Body: forBody,
+	}
+	forStmt.SetPos(pos)
+
+	// return string(runes)
+	stringType := &syntax.Name{Value: "string"}
+	stringType.SetPos(pos)
+
+	stringConversion := &syntax.CallExpr{
+		Fun:     stringType,
+		ArgList: []syntax.Expr{runesVar},
+	}
+	stringConversion.SetPos(pos)
+
+	returnStmt := &syntax.ReturnStmt{Results: stringConversion}
+	returnStmt.SetPos(pos)
+
+	// Complete function body
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{runesAssign, forStmt, returnStmt},
+	}
+	body.SetPos(pos)
+
+	return body
+}
+
+// createSimpleReverseBody creates a simpler reverse implementation with unique variable names
+func (t *StringMethodsTransform) createSimpleReverseBody(pos syntax.Pos, receiver syntax.Expr) *syntax.BlockStmt {
+	// Create unique variable names to avoid conflicts
+	runesVar := &syntax.Name{Value: "rev_runes"}
+	runesVar.SetPos(pos)
+
+	// Create: rev_runes := []rune(receiver)
+	runeType := &syntax.Name{Value: "rune"}
+	runeType.SetPos(pos)
+	runeSliceType := &syntax.SliceType{Elem: runeType}
+	runeSliceType.SetPos(pos)
+
+	runeConversion := &syntax.CallExpr{
+		Fun:     runeSliceType,
+		ArgList: []syntax.Expr{receiver},
+	}
+	runeConversion.SetPos(pos)
+
+	runesAssign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: runesVar,
+		Rhs: runeConversion,
+	}
+	runesAssign.SetPos(pos)
+
+	// Create simple range-based reversal using standard library approach
+	// We'll use a simpler method: just manually reverse by swapping in a for loop
+
+	iVar := &syntax.Name{Value: "rev_i"}
+	iVar.SetPos(pos)
+	jVar := &syntax.Name{Value: "rev_j"}
+	jVar.SetPos(pos)
+
+	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zeroLit.SetPos(pos)
+
+	lenCall := &syntax.CallExpr{
+		Fun:     &syntax.Name{Value: "len"},
+		ArgList: []syntax.Expr{runesVar},
+	}
+	lenCall.SetPos(pos)
+
+	oneLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+	oneLit.SetPos(pos)
+
+	lenMinus1 := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  lenCall,
+		Y:  oneLit,
+	}
+	lenMinus1.SetPos(pos)
+
+	// for rev_i, rev_j := 0, len(rev_runes)-1; rev_i < rev_j; rev_i, rev_j = rev_i+1, rev_j-1
+	initLhs := &syntax.ListExpr{ElemList: []syntax.Expr{iVar, jVar}}
+	initLhs.SetPos(pos)
+	initRhs := &syntax.ListExpr{ElemList: []syntax.Expr{zeroLit, lenMinus1}}
+	initRhs.SetPos(pos)
+
+	initStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: initLhs,
+		Rhs: initRhs,
+	}
+	initStmt.SetPos(pos)
+
+	// Condition: rev_i < rev_j
+	cond := &syntax.Operation{
+		Op: syntax.Lss,
+		X:  iVar,
+		Y:  jVar,
+	}
+	cond.SetPos(pos)
+
+	// Post: rev_i, rev_j = rev_i+1, rev_j-1
+	iPlusOne := &syntax.Operation{
+		Op: syntax.Add,
+		X:  iVar,
+		Y:  oneLit,
+	}
+	iPlusOne.SetPos(pos)
+
+	jMinusOne := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  jVar,
+		Y:  oneLit,
+	}
+	jMinusOne.SetPos(pos)
+
+	postLhs := &syntax.ListExpr{ElemList: []syntax.Expr{iVar, jVar}}
+	postLhs.SetPos(pos)
+	postRhs := &syntax.ListExpr{ElemList: []syntax.Expr{iPlusOne, jMinusOne}}
+	postRhs.SetPos(pos)
+
+	postStmt := &syntax.AssignStmt{
+		Op:  0, // simple assignment =
+		Lhs: postLhs,
+		Rhs: postRhs,
+	}
+	postStmt.SetPos(pos)
+
+	// Loop body: rev_runes[rev_i], rev_runes[rev_j] = rev_runes[rev_j], rev_runes[rev_i]
+	runesI := &syntax.IndexExpr{X: runesVar, Index: iVar}
+	runesI.SetPos(pos)
+	runesJ := &syntax.IndexExpr{X: runesVar, Index: jVar}
+	runesJ.SetPos(pos)
+
+	swapLhs := &syntax.ListExpr{ElemList: []syntax.Expr{runesI, runesJ}}
+	swapLhs.SetPos(pos)
+	swapRhs := &syntax.ListExpr{ElemList: []syntax.Expr{runesJ, runesI}}
+	swapRhs.SetPos(pos)
+
+	swapStmt := &syntax.AssignStmt{
+		Op:  0, // simple assignment =
+		Lhs: swapLhs,
+		Rhs: swapRhs,
+	}
+	swapStmt.SetPos(pos)
+
+	forBody := &syntax.BlockStmt{List: []syntax.Stmt{swapStmt}}
+	forBody.SetPos(pos)
+
+	forStmt := &syntax.ForStmt{
+		Init: initStmt,
+		Cond: cond,
+		Post: postStmt,
+		Body: forBody,
+	}
+	forStmt.SetPos(pos)
+
+	// return string(rev_runes)
+	stringType := &syntax.Name{Value: "string"}
+	stringType.SetPos(pos)
+
+	stringConversion := &syntax.CallExpr{
+		Fun:     stringType,
+		ArgList: []syntax.Expr{runesVar},
+	}
+	stringConversion.SetPos(pos)
+
+	returnStmt := &syntax.ReturnStmt{Results: stringConversion}
+	returnStmt.SetPos(pos)
+
+	// Complete function body
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{runesAssign, forStmt, returnStmt},
+	}
+	body.SetPos(pos)
+
+	return body
+}
+
+// createSlicesReverseBody creates a simple body using slices.Reverse
+func (t *StringMethodsTransform) createSlicesReverseBody(pos syntax.Pos, receiver syntax.Expr) *syntax.BlockStmt {
+	// r := []rune(receiver)
+	runesVar := &syntax.Name{Value: "r"}
+	runesVar.SetPos(pos)
+
+	runeType := &syntax.Name{Value: "rune"}
+	runeType.SetPos(pos)
+	runeSliceType := &syntax.SliceType{Elem: runeType}
+	runeSliceType.SetPos(pos)
+
+	runeConversion := &syntax.CallExpr{
+		Fun:     runeSliceType,
+		ArgList: []syntax.Expr{receiver},
+	}
+	runeConversion.SetPos(pos)
+
+	runesAssign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: runesVar,
+		Rhs: runeConversion,
+	}
+	runesAssign.SetPos(pos)
+
+	// slices.Reverse(r)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	reverseName := &syntax.Name{Value: "Reverse"}
+	reverseName.SetPos(pos)
+
+	slicesReverse := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: reverseName,
+	}
+	slicesReverse.SetPos(pos)
+
+	reverseCall := &syntax.CallExpr{
+		Fun:     slicesReverse,
+		ArgList: []syntax.Expr{runesVar},
+	}
+	reverseCall.SetPos(pos)
+
+	reverseStmt := &syntax.ExprStmt{X: reverseCall}
+	reverseStmt.SetPos(pos)
+
+	// return string(r)
+	stringType := &syntax.Name{Value: "string"}
+	stringType.SetPos(pos)
+
+	stringConversion := &syntax.CallExpr{
+		Fun:     stringType,
+		ArgList: []syntax.Expr{runesVar},
+	}
+	stringConversion.SetPos(pos)
+
+	returnStmt := &syntax.ReturnStmt{Results: stringConversion}
+	returnStmt.SetPos(pos)
+
+	// Complete function body
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{runesAssign, reverseStmt, returnStmt},
+	}
+	body.SetPos(pos)
+
+	return body
 }
 
 // createFirstCall creates receiver[0:1] for first character
@@ -970,6 +1388,36 @@ func (t *StringMethodsTransform) addUnicodeImport(file *syntax.File) {
 	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
 	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
 	newDeclList = append(newDeclList, unicodeImport)
+	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
+	file.DeclList = newDeclList
+}
+
+// addSlicesImport adds the slices import to the file
+func (t *StringMethodsTransform) addSlicesImport(file *syntax.File) {
+	if t.hasImport(file, "slices") {
+		return
+	}
+
+	slicesImport := &syntax.ImportDecl{
+		Path: &syntax.BasicLit{
+			Value: "\"slices\"",
+			Kind:  syntax.StringLit,
+		},
+	}
+	slicesImport.SetPos(syntax.Pos{})
+
+	var insertPos int
+	for i, decl := range file.DeclList {
+		if _, ok := decl.(*syntax.ImportDecl); ok {
+			insertPos = i + 1
+		} else {
+			break
+		}
+	}
+
+	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
+	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
+	newDeclList = append(newDeclList, slicesImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
 }

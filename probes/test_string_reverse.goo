@@ -1,0 +1,21 @@
+// Test string reverse functionality
+
+printf("Testing string reverse:\n")
+
+result1 := "hi".reverse()
+printf("'hi'.reverse() = '%s'\n", result1)
+check result1 == "ih"
+
+result2 := "hello".reverse()  
+printf("'hello'.reverse() = '%s'\n", result2)
+check result2 == "olleh"
+
+result3 := "a".reverse()
+printf("'a'.reverse() = '%s'\n", result3)
+check result3 == "a"
+
+result4 := "".reverse()
+printf("''.reverse() = '%s'\n", result4)
+check result4 == ""
+
+printf("All reverse tests passed!\n")

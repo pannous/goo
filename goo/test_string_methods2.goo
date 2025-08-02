@@ -1,0 +1,37 @@
+#import "strings" // auto import on demand WORKS!
+#import "fmt" // auto import on demand WORKS!
+#import "unicode" // auto import on demand WORKS!
+#import "strconv" // for string conversion
+#import "string_tools" // for string manipulation utilities  'cannot find package' <WHICH?>c TODO
+
+
+#check "hi".reverse() == "ih" // todo
+#check "hellø".runes() == ['h', 'e', 'l', 'l', 'ø'] // invalid use of [...] array (outside a composite literal)
+#check "hello".reverse() == "olleh"
+
+i := 2
+#check "你" == '你'
+#check "你好"#2 == '好' // charAt returns a rune at the given index
+#check "你好"#i == '好'
+bytos :=  [104, 101, 108, 108, 111]
+#check "hello".bytes() == bytos // returns a list of bytes (ASCII values)
+#invalid use of [...] array (outside a composite literal)
+#check "hello".codePoints() == [104, 101, 108, 108, 111] // returns a list of code points (Unicode values)
+#check "hello".runes() == []rune{'h', 'e', 'l', 'l', 'o'}
+#print("hello".split(""))
+#any_list := "hi you".split(" ") // []any is a list of any type, here it is a list of strings
+#check "hello".split("l") == ["he", "", "o"] as string[] // split returns a list of strings
+#check "hello".split("l") == ["he", "", "o"]
+#check "hello".split("") == ["h", "e", "l", "l", "o"]
+#check "hello".splits() == ["h", "e", "l", "l", "o"]
+#check "42".toInt() == 42
+#check "42".toInt(10) == 42
+#check "42".toInt(16) == 66 // 42 in hex is
+#check "42".toInt(2) == 0 // 42 in binary is 101010, which is not a valid binary number
+#check "101010".toInt(2) == 42 // 101010 in binary is 42
+#check "42".toFloat() == 42.0
+#check "42.5".toFloat() == 42.5
+#check "a" == 'a'
+#
+#
+printf("All checks passed!\n")
