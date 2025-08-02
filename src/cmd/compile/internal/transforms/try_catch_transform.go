@@ -201,7 +201,7 @@ func (v *tryCatchVisitor) transformTryCatch(tryStmt *syntax.TryCatchStmt) syntax
 	return exprStmt
 }
 
-// transformTry transforms try f() to func() { if err := f(); err != nil { panic(err) } }()
+// transformTry transforms try f() to { err := f(); if err != nil { return err } }
 func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	pos := tryStmt.Pos()
 
@@ -212,6 +212,7 @@ func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 		Rhs: tryStmt.Call,
 	}
 	assign.Lhs.SetPos(pos)
+	assign.Rhs.SetPos(pos)
 	assign.SetPos(pos)
 
 	// Create condition: err != nil
@@ -224,62 +225,33 @@ func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	condition.Y.SetPos(pos)
 	condition.SetPos(pos)
 
-	// Create panic(err)
-	panicCall := &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "panic"},
-		ArgList: []syntax.Expr{&syntax.Name{Value: "err"}},
+	// Create return err
+	returnStmt := &syntax.ReturnStmt{
+		Results: &syntax.Name{Value: "err"},
 	}
-	panicCall.Fun.SetPos(pos)
-	panicCall.ArgList[0].SetPos(pos)
-	panicCall.SetPos(pos)
-
-	// Create panic statement
-	panicStmt := &syntax.ExprStmt{
-		X: panicCall,
-	}
-	panicStmt.SetPos(pos)
+	returnStmt.Results.SetPos(pos)
+	returnStmt.SetPos(pos)
 
 	// Create if body
 	ifBody := &syntax.BlockStmt{
-		List: []syntax.Stmt{panicStmt},
+		List: []syntax.Stmt{returnStmt},
 	}
 	ifBody.SetPos(pos)
 
-	// Create if statement: if err := f(); err != nil { panic(err) }
+	// Create if statement: if err != nil { return err }
 	ifStmt := &syntax.IfStmt{
-		Init: assign,
 		Cond: condition,
 		Then: ifBody,
 	}
 	ifStmt.SetPos(pos)
 
-	// Wrap in function literal like the existing try-catch
-	wrapperBody := &syntax.BlockStmt{
-		List: []syntax.Stmt{ifStmt},
+	// Return block with assignment and if statement: { err := f(); if err != nil { return err } }
+	block := &syntax.BlockStmt{
+		List: []syntax.Stmt{assign, ifStmt},
 	}
-	wrapperBody.SetPos(pos)
+	block.SetPos(pos)
 
-	// Create wrapper function: func() { if ... }
-	wrapperFunc := &syntax.FuncLit{
-		Type: &syntax.FuncType{},
-		Body: wrapperBody,
-	}
-	wrapperFunc.SetPos(pos)
-	wrapperFunc.Type.SetPos(pos)
-
-	// Create wrapper function call: func() { ... }()
-	wrapperCall := &syntax.CallExpr{
-		Fun: wrapperFunc,
-	}
-	wrapperCall.SetPos(pos)
-
-	// Return as expression statement
-	exprStmt := &syntax.ExprStmt{
-		X: wrapperCall,
-	}
-	exprStmt.SetPos(pos)
-
-	return exprStmt
+	return block
 }
 
 func init() {
