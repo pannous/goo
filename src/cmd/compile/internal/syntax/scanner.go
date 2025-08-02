@@ -437,6 +437,7 @@ func (s *scanner) ident() {
 			s.tok = _Void
 			return
 		case "in":
+			s.op, s.prec = In, precAdd
 			s.tok = _In
 			return
 		}

@@ -210,13 +210,13 @@ const (
 	Leq // <=
 	Gtr // >
 	Geq // >=
-	In  // in
 
 	// precAdd
 	Add // +
 	Sub // -
 	Or  // |
 	Xor // ^
+	In  // in
 
 	// precMul
 	Mul    // *
