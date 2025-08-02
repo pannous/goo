@@ -19,7 +19,7 @@ func (t *GooImportTransform) Name() string {
 }
 
 func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	println("GooImportTransform.Transform called")
+	//println("GooImportTransform.Transform called")
 	changed := false
 
 	// Transform import declarations
@@ -41,17 +41,17 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 	}
 
 	importPath := strings.Trim(importDecl.Path.Value, "\"")
-	
+
 	// Check if this is a .goo file import
 	if strings.HasSuffix(importPath, ".goo") {
 		println("TRANSFORMING .goo import:", importPath)
 
 		// Extract base name for package directory
 		baseName := strings.TrimSuffix(filepath.Base(importPath), ".goo")
-		
+
 		// Create new relative import path
 		newImportPath := "./" + baseName
-		
+
 		// Create new import declaration
 		newImportDecl := *importDecl
 		newPath := *importDecl.Path
@@ -60,14 +60,14 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 
 		return &newImportDecl
 	}
-	
+
 	// Check if this is a local directory import that should be converted to relative
 	if t.shouldConvertToLocalImport(importPath) {
 		println("TRANSFORMING local directory import:", importPath)
-		
+
 		// Convert bare directory name to relative import
 		newImportPath := "./" + importPath
-		
+
 		// Create new import declaration
 		newImportDecl := *importDecl
 		newPath := *importDecl.Path
@@ -83,7 +83,7 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 // shouldConvertToLocalImport checks if a bare import should be treated as local directory
 func (t *GooImportTransform) shouldConvertToLocalImport(importPath string) bool {
 	// DISABLED: This was interfering with auto-import system
-	// The auto-import system needs to see bare package names like "strings" 
+	// The auto-import system needs to see bare package names like "strings"
 	// to know when to auto-inject imports. Converting them to "./strings"
 	// breaks this detection.
 	return false
@@ -98,13 +98,13 @@ func (t *GooImportTransform) isStandardLibrary(importPath string) bool {
 		"go", "hash", "html", "image", "index", "mime", "reflect", "runtime",
 		"text", "unsafe", "archive", "compress", "container", "embed",
 	}
-	
+
 	for _, pkg := range stdLibPackages {
 		if importPath == pkg {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

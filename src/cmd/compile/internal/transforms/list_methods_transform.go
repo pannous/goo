@@ -139,7 +139,7 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 }
 
 func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	println("ListMethodsTransform.Transform called")
+	//println("ListMethodsTransform.Transform called")
 	changed := false
 
 	// Transform all declarations
