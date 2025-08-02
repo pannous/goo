@@ -260,11 +260,66 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 	return call
 }
 
-// createMapContainsCall creates map key existence check (simplified for now)
+// createMapContainsCall creates map key existence check: _, ok := map[key]; ok
 func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
-	// For now, fall back to treating as slice
-	// TODO: Implement proper map[key] existence check
-	return t.createSliceContainsCall(op, visitor, pos)
+	// Create anonymous function that returns the existence check
+	// Transforms: key in myMap  =>  func() bool { _, ok := myMap[key]; return ok }()
+	
+	// Create map index expression: myMap[key]
+	indexExpr := &syntax.IndexExpr{
+		X:     op.Y, // the map
+		Index: op.X, // the key
+	}
+	indexExpr.SetPos(pos)
+	
+	// Create assignment: _, ok := myMap[key]
+	blankVar := &syntax.Name{Value: "_"}
+	blankVar.SetPos(pos)
+	okVar := &syntax.Name{Value: "ok"}
+	okVar.SetPos(pos)
+	
+	lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{blankVar, okVar}}
+	lhsList.SetPos(pos)
+	
+	assign := &syntax.AssignStmt{
+		Op:  syntax.Def, // :=
+		Lhs: lhsList,
+		Rhs: indexExpr,
+	}
+	assign.SetPos(pos)
+	
+	// Create return statement: return ok
+	returnStmt := &syntax.ReturnStmt{
+		Results: okVar,
+	}
+	returnStmt.SetPos(pos)
+	
+	// Create function body
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{assign, returnStmt},
+	}
+	body.SetPos(pos)
+	
+	// Create anonymous function
+	boolType := &syntax.Name{Value: "bool"}
+	boolType.SetPos(pos)
+	
+	funcLit := &syntax.FuncLit{
+		Type: &syntax.FuncType{
+			ResultList: []*syntax.Field{{Type: boolType}},
+		},
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+	funcLit.Type.SetPos(pos)
+	
+	// Create function call
+	call := &syntax.CallExpr{
+		Fun: funcLit,
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 func (t *InOperatorTransform) hasImport(file *syntax.File, name string) bool {
