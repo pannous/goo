@@ -3168,7 +3168,7 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 		return p.newRangeClause(nil, false)
 	}
 
-	if keyword == _For && p.tok == _In {
+	if (keyword == _For || keyword == _While) && p.tok == _In {
 		// _In expr
 		if debug && lhs != nil {
 			panic("invalid call of simpleStmt")
@@ -3180,8 +3180,8 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 		lhs = p.exprList()
 	}
 
-	// Check for 'in' keyword after parsing LHS (for "for x in collection")
-	if keyword == _For && p.tok == _In {
+	// Check for 'in' keyword after parsing LHS (for "for x in collection" or "while x in collection")
+	if (keyword == _For || keyword == _While) && p.tok == _In {
 		return p.newInClause(lhs, true) // true for := (new variable)
 	}
 
@@ -3234,7 +3234,7 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 			return p.newRangeClause(lhs, op == Def)
 		}
 
-		if keyword == _For && p.tok == _In {
+		if (keyword == _For || keyword == _While) && p.tok == _In {
 			// expr_list op= _In
 			return p.newInClause(lhs, op == Def)
 		}
@@ -3378,7 +3378,12 @@ func (p *parser) forStmt() Stmt {
 	s := new(ForStmt)
 	s.pos = p.pos()
 
-	s.Init, s.Cond, s.Post = p.header(_For)
+	// Support both 'for' and 'while' keywords
+	keyword := p.tok
+	if keyword != _For && keyword != _While {
+		keyword = _For // fallback
+	}
+	s.Init, s.Cond, s.Post = p.header(keyword)
 	s.Body = p.blockStmt("for clause")
 
 	return s
@@ -3405,7 +3410,7 @@ func (p *parser) header(keyword token) (init SimpleStmt, cond Expr, post SimpleS
 			p.syntaxError(fmt.Sprintf("var declaration not allowed in %s initializer", keyword.String()))
 		}
 		init = p.simpleStmt(nil, keyword)
-		// If we have a range clause or in clause, we are done (can only happen for keyword == _For).
+		// If we have a range clause or in clause, we are done (can happen for keyword == _For or _While).
 		if _, ok := init.(*RangeClause); ok {
 			p.xnest = outer
 			return
@@ -3852,6 +3857,9 @@ func (p *parser) stmtOrNil() Stmt {
 		return p.simpleStmt(nil, 0)
 
 	case _For:
+		return p.forStmt()
+
+	case _While:
 		return p.forStmt()
 
 	case _Switch:

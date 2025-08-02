@@ -1,0 +1,22 @@
+// Test basic while loops
+
+printf("Testing basic while loops:\n")
+
+// Basic while loop with condition
+i := 0
+while i < 3 {
+    printf("i = %d\n", i)
+    i++
+}
+
+// While loop with true + break
+j := 0
+while true {
+    printf("j = %d\n", j)
+    j++
+    if j >= 3 {
+        break
+    }
+}
+
+printf("Basic while tests completed!\n")

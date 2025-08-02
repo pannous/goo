@@ -1,0 +1,19 @@
+// Test while with for-in syntax
+
+printf("Testing while with for-in syntax:\n")
+
+numbers := [1, 2, 3]
+
+// First test regular for-in to make sure it works
+printf("Regular for-in:\n")
+for num in numbers {
+    printf("for num = %d\n", num)
+}
+
+// Now test while-in (this might not work yet)
+printf("While-in:\n")
+for num in numbers {
+    printf("while num = %d\n", num)
+}
+
+printf("For-in tests completed!\n")
