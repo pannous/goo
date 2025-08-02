@@ -1,0 +1,5 @@
+import "strconv"
+
+// Test string conversions with manual import
+check 1 as string == "1"
+check "1" as int == 1

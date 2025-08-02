@@ -1,0 +1,15 @@
+// Multi-return context try statement test
+
+import "strconv"
+
+def testMultiReturn() (int, string, error) {
+    try val := strconv.Atoi("invalid")
+    return val, "success", nil
+}
+
+result, msg, err := testMultiReturn()
+if err != nil {
+    printf("Got error: %v", err)
+} else {
+    printf("Result: %d, Message: %s", result, msg)
+}

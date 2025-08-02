@@ -1,0 +1,27 @@
+import "fmt"
+import "errors"
+
+func niceFunction() error{
+	return nil
+}
+
+
+func failingFunction() error {
+	return errors.New("try to catch me;)")
+}
+
+func testFunction() error {
+	try niceFunction()
+	try failingFunction()
+	put("This should not be reached")
+	return nil  
+}
+
+func main() {
+	err := testFunction()
+	if err != nil {
+		println("Success! Error propagated:", err.Error())
+	} else {
+		println("No error returned")
+	}
+}

@@ -12,7 +12,7 @@ Running all tests in ./goo/ directory...
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
-❌ test_as_cast_convert.goo
+✅ test_as_cast_convert.goo
 ✅ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_import_go_get.goo
@@ -42,6 +42,7 @@ Running all tests in ./goo/ directory...
 ❌ test_import_file.goo
 ✅ test_import_folder.goo
 ❌ test_in_operator_auto_import.goo
+❌ test_in_operator_maps.goo
 ✅ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
@@ -133,11 +134,13 @@ Running all tests in ./goo/ directory...
 ✅ test_for_in_basic.goo
 ✅ test_for_in_debug.goo
 ✅ test_for_in_function.goo
+✅ test_for_in_loops.goo
 ✅ test_for_in_minimal_working.goo
 ✅ test_for_in_minimal.goo
 ✅ test_for_in_working.goo
 ❌ test_goo_import.goo
 ✅ test_hash_comment.goo
+❌ test_in_operator_maps.goo
 ✅ test_int_to_string.goo
 ✅ test_line_comment.goo
 ✅ test_list_visitor.goo
@@ -173,7 +176,7 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_for_in.goo
 ✅ test_simple_for.goo
 ✅ test_simple_import.goo
-✅ test_simple_in.goo
+❌ test_simple_in.goo
 ✅ test_simple.goo
 ✅ test_slices_auto.goo
 ✅ test_slices_direct.goo
@@ -187,6 +190,7 @@ Running all tests in ./goo/ directory...
 ✅ test_target_value.goo
 ✅ test_transform_debug.goo
 ✅ test_truthiness_basic.goo
+✅ test_try_assignment.goo
 ❌ test_try_function_call.goo
 ❌ test_try_minimal.goo
 ✅ test_try_propagation.goo
@@ -195,5 +199,5 @@ Running all tests in ./goo/ directory...
 ✅ test_typeof_debug.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 176/194 passed, 18 failed
+Summary: 178/198 passed, 20 failed
 ⚠️  Some tests failed

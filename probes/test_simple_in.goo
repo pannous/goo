@@ -1,2 +1,5 @@
-for x in []int{1} {
-}
+import "slices"
+
+x := 2
+y := [1, 2, 3]
+check x in y
