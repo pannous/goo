@@ -240,7 +240,7 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 }
 
 func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	println("StringMethodsTransform.Transform called")
+	//println("StringMethodsTransform.Transform called")
 
 	visitor := &methodVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
@@ -429,7 +429,7 @@ func (t *StringMethodsTransform) createLenCall(receiver syntax.Expr) syntax.Expr
 func (t *StringMethodsTransform) createCharAtCall(receiver, index syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
-	// Create receiver[index] 
+	// Create receiver[index]
 	indexExpr := &syntax.IndexExpr{
 		X:     receiver,
 		Index: index,

@@ -6,7 +6,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 )
 
 // TryCatchTransform handles transformation of try-catch syntax to defer/recover pattern.
@@ -21,7 +20,7 @@ func (t *TryCatchTransform) Name() string {
 }
 
 func (t *TryCatchTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	fmt.Printf("TryCatchTransform.Transform called\n")
+	//fmt.Printf("TryCatchTransform.Transform called\n")
 	visitor := &tryCatchVisitor{ctx: ctx}
 
 	// Transform function declarations
