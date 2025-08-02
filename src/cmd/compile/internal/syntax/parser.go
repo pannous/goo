@@ -64,8 +64,13 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 		// position, it is safe to use the most recent position
 		// base to compute the corresponding Pos value.
 		func(line, col uint, msg string) {
-			if msg[0] != '/' {
+			if msg[0] != '/' && msg[0] != '#' {
 				p.errorAt(p.posAt(line, col), msg)
+				return
+			}
+			
+			// Hash comments don't support directives, just ignore them
+			if msg[0] == '#' {
 				return
 			}
 
