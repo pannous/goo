@@ -101,7 +101,9 @@ Running all tests in ./goo/ directory...
 ✅ test_synonyms_simple.goo
 ✅ test_transform_synonyms.goo
 ✅ test_truthy.goo
-❌ test_try_assignment.goo
+✅ test_try_assign_context_aware.goo
+✅ test_try_assign.goo
+✅ test_try_assignment.goo
 ✅ test_try_catch.goo
 ✅ test_try_propagation.goo
 ✅ test_typeof.goo
@@ -202,10 +204,9 @@ Running all tests in ./goo/ directory...
 ✅ test_target_value.goo
 ✅ test_transform_debug.goo
 ✅ test_truthiness_basic.goo
-❌ test_try_assign_context_aware.goo
-❌ test_try_assign.goo
 ✅ test_try_function_call.goo
 ✅ test_try_propagation.goo
+✅ test_try_simple_assignment.goo
 ✅ test_type_precedence.goo
 ✅ test_typeof_debug.goo
 ✅ test_while_for_in.goo
@@ -213,5 +214,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 193/212 passed, 19 failed
+Summary: 197/213 passed, 16 failed
 ⚠️  Some tests failed
