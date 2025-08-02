@@ -82,6 +82,7 @@ tokens.so
 lexer.go
 parser.go
 transform.go  custom desugaring stage, best place to start
+our custom transformers are in ./src/cmd/compile/internal/transforms/ folder 
 typecheck.go in types2 should only be touched in the rarest cases, e.g. when adding new builtins that require type checking
 
 1. types2 declarations (universe.go)
@@ -175,3 +176,4 @@ goo/test_list_methods.goo
 
 # Hard extensions
 When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
+
