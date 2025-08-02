@@ -205,36 +205,33 @@ func (v *tryCatchVisitor) transformTryCatch(tryStmt *syntax.TryCatchStmt) syntax
 func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	pos := tryStmt.Pos()
 
-	// Create err variable
-	errVar := &syntax.Name{Value: "err"}
-	errVar.SetPos(pos)
-
 	// Create assignment: err := f()
 	assign := &syntax.AssignStmt{
 		Op:  syntax.Def, // :=
-		Lhs: errVar,
+		Lhs: &syntax.Name{Value: "err"},
 		Rhs: tryStmt.Call,
 	}
+	assign.Lhs.SetPos(pos)
 	assign.SetPos(pos)
 
 	// Create condition: err != nil
-	nilName := &syntax.Name{Value: "nil"}
-	nilName.SetPos(pos)
-
 	condition := &syntax.Operation{
 		Op: syntax.Neq,
-		X:  errVar,
-		Y:  nilName,
+		X:  &syntax.Name{Value: "err"},
+		Y:  &syntax.Name{Value: "nil"},
 	}
+	condition.X.SetPos(pos)
+	condition.Y.SetPos(pos)
 	condition.SetPos(pos)
 
-	// Create panic call: panic(err)
+	// Create panic(err)
 	panicCall := &syntax.CallExpr{
 		Fun:     &syntax.Name{Value: "panic"},
-		ArgList: []syntax.Expr{errVar},
+		ArgList: []syntax.Expr{&syntax.Name{Value: "err"}},
 	}
-	panicCall.SetPos(pos)
 	panicCall.Fun.SetPos(pos)
+	panicCall.ArgList[0].SetPos(pos)
+	panicCall.SetPos(pos)
 
 	// Create panic statement
 	panicStmt := &syntax.ExprStmt{
