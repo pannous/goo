@@ -32,7 +32,6 @@ Running all tests in ./goo/ directory...
 ✅ test_def.goo
 ✅ test_enum.goo
 ✅ test_explicit_main.goo
-❌ test_filter_basic.goo
 ✅ test_filter_simple.goo
 ✅ test_filter_synonyms.goo
 ✅ test_fmt.goo
@@ -91,10 +90,11 @@ Running all tests in ./goo/ directory...
 ✅ test_string_format_simple.goo
 ✅ test_string_interpolation.goo
 ✅ test_string_methods.goo
+✅ test_string_methods2.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
 ✅ test_string_replace.goo
-❌ test_string_reverse.goo
+✅ test_string_reverse.goo
 ✅ test_string_var_spacing.goo
 ✅ test_strings_auto_import.goo
 ✅ test_struct.goo
@@ -199,6 +199,8 @@ Running all tests in ./goo/ directory...
 ❌ test_string_as_convert.goo
 ✅ test_string_conversions_comprehensive.goo
 ✅ test_string_method.goo
+✅ test_string_reverse_simple.goo
+✅ test_string_reverse.goo
 ✅ test_string_to_int_multivalue.goo
 ✅ test_target_index.goo
 ✅ test_target_value.goo
@@ -214,5 +216,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 197/213 passed, 16 failed
+Summary: 201/215 passed, 14 failed
 ⚠️  Some tests failed
