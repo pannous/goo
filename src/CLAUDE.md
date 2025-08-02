@@ -176,4 +176,3 @@ goo/test_list_methods.goo
 
 # Hard extensions
 When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
-

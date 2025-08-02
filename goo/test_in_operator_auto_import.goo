@@ -1,6 +1,5 @@
-// FAILS: DON't TRY TO FIX Claude spent 4 hours on this :(
+// FAILS:
 #import "strings"  // auto import TOO HARD for in operator! Claude spent 4 hours on this :(
-// don't just fix it by un-commenting the import stupid!
 
 text := "hello world"
 result1 := "hello" in text

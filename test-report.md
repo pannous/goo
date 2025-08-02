@@ -42,9 +42,9 @@ Running all tests in ./goo/ directory...
 ❌ test_import_file.goo
 ✅ test_import_folder.goo
 ❌ test_in_operator_auto_import.goo
-✅ test_in_operator_rune_strings.goo
-✅ test_in_operator_slices.goo
-✅ test_in_operator_strings.goo
+❌ test_in_operator_rune_strings.goo
+❌ test_in_operator_slices.goo
+❌ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
@@ -101,7 +101,7 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
-✅ tests.goo
+❌ tests.goo
 ✅ test_array_vs_slice.goo
 ✅ test_as_cast_check.goo
 ✅ test_as_cast_comprehensive.goo
@@ -134,7 +134,9 @@ Running all tests in ./goo/ directory...
 ✅ test_for_in_minimal_working.goo
 ✅ test_for_in_minimal.goo
 ✅ test_for_in_working.goo
+❌ test_goo_import.goo
 ✅ test_hash_comment.goo
+❌ test_in_complete.goo
 ✅ test_line_comment.goo
 ✅ test_list_visitor.goo
 ✅ test_main_line.goo
@@ -177,5 +179,5 @@ Running all tests in ./goo/ directory...
 ✅ test_truthiness_basic.goo
 ✅ test_typeof_debug.goo
 ========================================
-Summary: 163/176 passed, 13 failed
+Summary: 159/178 passed, 19 failed
 ⚠️  Some tests failed
