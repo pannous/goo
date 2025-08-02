@@ -1,0 +1,9 @@
+// Equivalent range syntax that should work
+numbers := []int{1, 2, 3}
+
+printf("Testing equivalent range syntax:\n")
+for _, x := range numbers {
+    printf("  %d\n", x)
+}
+
+printf("Done!\n")

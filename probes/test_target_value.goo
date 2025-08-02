@@ -1,0 +1,9 @@
+// What for x in numbers should become: for _, x := range numbers (value version)
+numbers := []int{1, 2, 3, 4, 5}
+
+printf("Testing for _, x := range slice (value):\n")
+for _, x := range numbers {
+    printf("  Value: %d\n", x)
+}
+
+printf("Done!\n")

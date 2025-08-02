@@ -1,0 +1,6 @@
+sum := 0
+for i in [1,2,3] {
+    printf("%d\n", i)
+    sum += i
+}
+printf("sum = %d\n", sum)

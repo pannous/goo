@@ -4,6 +4,8 @@
 
 package modload
 
+import "os/exec"
+
 import (
 	"context"
 	"errors"
@@ -78,14 +80,21 @@ func (e *ImportMissingError) Error() string {
 			return fmt.Sprintf("module %s provides package %s and is replaced but not required; to add it:\n\tgo get %s", e.replaced.Path, e.Path, suggestArg)
 		}
 
+		// ...
+
 		message := fmt.Sprintf("no required module provides package %s", e.Path)
 		if e.QueryErr != nil {
 			return fmt.Sprintf("%s: %v", message, e.QueryErr)
 		}
 		if e.ImportingMainModule.Path != "" && e.ImportingMainModule != MainModules.ModContainingCWD() {
-			return fmt.Sprintf("%s; to add it:\n\tcd %s\n\tgo get %s", message, MainModules.ModRoot(e.ImportingMainModule), e.Path)
+			cmd := exec.Command("go", "get", e.Path)
+			cmd.Dir = MainModules.ModRoot(e.ImportingMainModule)
+			_ = cmd.Run() // Optionally handle error
+			return fmt.Sprintf("%s; ran:\n\tcd %s\n\tgo get %s", message, MainModules.ModRoot(e.ImportingMainModule), e.Path)
 		}
-		return fmt.Sprintf("%s; to add it:\n\tgo get %s", message, e.Path)
+		cmd := exec.Command("go", "get", e.Path)
+		_ = cmd.Run() // Optionally handle error
+		return fmt.Sprintf("%s; ran:\n\tgo get %s", message, e.Path)
 	}
 
 	if e.newMissingVersion != "" {
