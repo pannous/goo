@@ -192,7 +192,7 @@ func (t *AsCastTransform) createSpecialConversion(expr syntax.Expr, targetType s
 // createSemanticConversion handles high-level value conversions
 func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType string, pos syntax.Pos, visitor *asCastVisitor) syntax.Expr {
 	// Determine source type
-	sourceType := t.inferExprType(expr)
+	sourceType := t.inferExprType(expr, visitor.ctx)
 	
 	// Handle specific conversion patterns
 	switch {
@@ -200,6 +200,10 @@ func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType 
 	case targetType == "string" && (sourceType == "int" || sourceType == "int_literal"):
 		visitor.needsStrconvImport = true
 		return t.createStrconvCall("Itoa", expr, pos)
+		
+	// Non-base types to string: obj as string -> obj.String()
+	case targetType == "string" && !t.isBaseType(sourceType):
+		return t.createStringMethodCall(expr, pos)
 		
 	// String to int: "1" as int -> strconv.Atoi("1") 
 	// Currently disabled due to position handling issues in error wrapper
@@ -239,7 +243,7 @@ func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType 
 }
 
 // inferExprType tries to determine the type of an expression
-func (t *AsCastTransform) inferExprType(expr syntax.Expr) string {
+func (t *AsCastTransform) inferExprType(expr syntax.Expr, ctx *TransformContext) string {
 	switch e := expr.(type) {
 	case *syntax.BasicLit:
 		switch e.Kind {
@@ -253,10 +257,20 @@ func (t *AsCastTransform) inferExprType(expr syntax.Expr) string {
 			return "rune_literal"
 		}
 	case *syntax.Name:
-		// Could look up in context, but for now assume based on common patterns
-		return "unknown"
+		// Look up the variable's declared type in the context if available
+		if ctx != nil && ctx.Types != nil {
+			if declaredType, exists := ctx.Types[e.Value]; exists {
+				return declaredType
+			}
+		}
+		// For named variables without context, assume they are custom types
+		// This allows String() method conversion to trigger
+		return "custom_type"
+	case *syntax.Operation:
+		// For operations, try to infer from operands
+		return "custom_type"
 	}
-	return "unknown"
+	return "custom_type" // Default to custom type to enable String() method calls
 }
 
 // createStrconvCall creates a call to strconv function, handling error returns
@@ -620,6 +634,42 @@ func (t *AsCastTransform) addStrconvImport(file *syntax.File) {
 	newDeclList = append(newDeclList, strconvImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
+}
+
+// isBaseType checks if a type is a Go base type that has built-in string conversion
+func (t *AsCastTransform) isBaseType(sourceType string) bool {
+	baseTypes := map[string]bool{
+		"int": true, "int8": true, "int16": true, "int32": true, "int64": true,
+		"uint": true, "uint8": true, "uint16": true, "uint32": true, "uint64": true,
+		"float32": true, "float64": true, "float": true,
+		"byte": true, "rune": true, "bool": true,
+		"string": true,
+		// Literal types
+		"int_literal": true, "float_literal": true, "string_literal": true, "rune_literal": true,
+	}
+	return baseTypes[sourceType]
+}
+
+// createStringMethodCall creates obj.String() method call
+func (t *AsCastTransform) createStringMethodCall(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create method name: String
+	methodName := &syntax.Name{Value: "String"}
+	methodName.SetPos(pos)
+	
+	// Create selector: expr.String
+	selectorExpr := &syntax.SelectorExpr{
+		X:   expr,
+		Sel: methodName,
+	}
+	selectorExpr.SetPos(pos)
+	
+	// Create method call: expr.String()
+	callExpr := &syntax.CallExpr{
+		Fun: selectorExpr,
+	}
+	callExpr.SetPos(pos)
+	
+	return callExpr
 }
 
 func init() {
