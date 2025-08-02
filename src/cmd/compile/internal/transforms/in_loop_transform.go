@@ -27,65 +27,10 @@ func (t *InLoopTransform) Name() string {
 func (t *InLoopTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &inLoopVisitor{transform: t, ctx: ctx, file: file}
 	
-	// Walk the file manually to ensure proper order
-	visitor.walkFile(file)
+	// Use syntax.Walk but with a better visitor implementation
+	syntax.Walk(file, visitor)
 	
 	return visitor.changed
-}
-
-// walkFile manually walks the file to handle InClause transformation
-func (v *inLoopVisitor) walkFile(file *syntax.File) {
-	for _, decl := range file.DeclList {
-		v.walkDecl(decl)
-	}
-}
-
-// walkDecl walks declarations
-func (v *inLoopVisitor) walkDecl(decl syntax.Decl) {
-	switch d := decl.(type) {
-	case *syntax.FuncDecl:
-		if d.Body != nil {
-			v.walkBlockStmt(d.Body)
-		}
-	// Note: BlockStmt is not a Decl, so we don't need this case
-	}
-}
-
-// walkBlockStmt walks statements in a block
-func (v *inLoopVisitor) walkBlockStmt(block *syntax.BlockStmt) {
-	for _, stmt := range block.List {
-		v.walkStmt(stmt)
-	}
-}
-
-// walkStmt walks individual statements
-func (v *inLoopVisitor) walkStmt(stmt syntax.Stmt) {
-	switch s := stmt.(type) {
-	case *syntax.ForStmt:
-		// Handle InClause transformation
-		if s.Init != nil {
-			if inClause, ok := s.Init.(*syntax.InClause); ok {
-				rangeClause := v.transform.convertInClauseToRange(inClause, v.ctx)
-				if rangeClause != nil {
-					s.Init = rangeClause
-					v.changed = true
-				}
-			}
-		}
-		// Walk the body
-		if s.Body != nil {
-			v.walkBlockStmt(s.Body)
-		}
-	case *syntax.BlockStmt:
-		v.walkBlockStmt(s)
-	case *syntax.IfStmt:
-		if s.Then != nil {
-			v.walkBlockStmt(s.Then)
-		}
-		if s.Else != nil {
-			v.walkStmt(s.Else)
-		}
-	}
 }
 
 // Visit implements syntax.Visitor interface
@@ -108,16 +53,6 @@ func (v *inLoopVisitor) Visit(node syntax.Node) syntax.Visitor {
 		}
 	}
 	
-	// Also check for InClause nodes directly (in case they appear elsewhere)
-	if inClause, ok := node.(*syntax.InClause); ok {
-		// This shouldn't happen if ForStmt handling works, but adding as fallback
-		rangeClause := v.transform.convertInClauseToRange(inClause, v.ctx)
-		if rangeClause != nil {
-			// Note: we can't replace the node directly here since Visit doesn't allow that
-			// The ForStmt case above should handle this
-		}
-	}
-	
 	// Continue visiting child nodes  
 	return v
 }
@@ -131,7 +66,7 @@ func (t *InLoopTransform) convertInClauseToRange(inClause *syntax.InClause, ctx 
 	rangeClause := &syntax.RangeClause{}
 	rangeClause.SetPos(pos)
 	rangeClause.X = inClause.X // Same collection expression
-	rangeClause.Def = true     // Always use := for new variables
+	rangeClause.Def = inClause.Def // Use the same definition flag from InClause
 	
 	// Handle different LHS patterns based on collection type
 	if inClause.Lhs == nil {
@@ -141,6 +76,8 @@ func (t *InLoopTransform) convertInClauseToRange(inClause *syntax.InClause, ctx 
 		// "for x in collection" -> "for _, x := range collection" (for slices/arrays/strings)
 		// For now, assume slice/array/string pattern: for _, x := range collection
 		rangeClause.Lhs = t.createRangeLhs(inClause.Lhs, pos)
+		// Ensure we use := for new variable declarations
+		rangeClause.Def = true
 	}
 	
 	return rangeClause
@@ -150,10 +87,10 @@ func (t *InLoopTransform) convertInClauseToRange(inClause *syntax.InClause, ctx 
 // For slices/arrays/strings: "x" becomes "_, x"
 // For maps: "x" stays "x" (keys only)
 func (t *InLoopTransform) createRangeLhs(originalLhs syntax.Expr, pos syntax.Pos) syntax.Expr {
-	// For now, implement the slice/array/string pattern: _, x
-	// This assumes we want the values, not the indices
+	// Create "_, x" pattern for Python-like behavior (values, not indices)
+	// "for x in collection" -> "for _, x := range collection"
 	
-	// Create "_, originalLhs"
+	// Create underscore for index
 	underscore := &syntax.Name{Value: "_"}
 	underscore.SetPos(pos)
 	
@@ -162,7 +99,7 @@ func (t *InLoopTransform) createRangeLhs(originalLhs syntax.Expr, pos syntax.Pos
 		originalLhs.SetPos(pos)
 	}
 	
-	// Create a list expression with _, originalLhs
+	// Create list expression with _, originalLhs
 	listExpr := &syntax.ListExpr{}
 	listExpr.SetPos(pos)
 	listExpr.ElemList = []syntax.Expr{underscore, originalLhs}
