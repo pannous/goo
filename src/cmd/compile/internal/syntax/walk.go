@@ -334,6 +334,9 @@ func (w walker) node(n Node) {
 		}
 
 	case *TryStmt:
+		if n.Var != nil {
+			w.node(n.Var)
+		}
 		if n.Call != nil {
 			w.node(n.Call)
 		}

@@ -452,7 +452,8 @@ type (
 	}
 
 	TryStmt struct {
-		Call Expr // function call expression
+		Var  *Name // optional variable for assignment (nil for try f())
+		Call Expr  // function call expression
 		stmt
 	}
 
