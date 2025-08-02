@@ -1396,7 +1396,7 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 		x = p.handleStringInterpolation(x)
 	}
 
-	for (p.tok == _Operator || p.tok == _Star) && p.prec > prec {
+	for (p.tok == _Operator || p.tok == _Star || p.tok == _In) && p.prec > prec {
 		t := new(Operation)
 		t.pos = p.pos()
 		t.Op = p.op
