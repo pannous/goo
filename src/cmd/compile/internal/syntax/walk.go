@@ -304,6 +304,12 @@ func (w walker) node(n Node) {
 		}
 		w.node(n.X)
 
+	case *InClause:
+		if n.Lhs != nil {
+			w.node(n.Lhs)
+		}
+		w.node(n.X)
+
 	case *CaseClause:
 		if n.Cases != nil {
 			w.node(n.Cases)
