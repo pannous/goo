@@ -46,8 +46,7 @@ func ApplyTransformations(files []*syntax.File) {
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
 		for _, transformer := range TransformRegistry {
-			transformer.Transform(file, ctx)
-			{
+			if transformer.Transform(file, ctx) {
 				fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			}
 		}
