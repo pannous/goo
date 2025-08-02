@@ -1,11 +1,22 @@
+import "fmt"
 import "errors"
 
 func riskyFunction() error {
-	return errors.New("something went wrong")
+	return errors.New("risky function threw an error")
 }
 
 func testTryFunctionCall() {
 	// Test the new try f() syntax
 	try riskyFunction()
 	println("This should not be reached if try works")
+}
+
+func main() {
+	// Run the test
+	try{
+		testTryFunctionCall()
+	} catch err {
+		put(err)
+	}
+	println("Test completed successfully")
 }
