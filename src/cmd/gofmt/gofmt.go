@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"cmd/internal/telemetry/counter"
+	"cmd/compile/internal/syntax"
 
 	"golang.org/x/sync/semaphore"
 )
@@ -88,9 +89,28 @@ func initParserMode() {
 }
 
 func isGoFile(f fs.DirEntry) bool {
-	// ignore non-Go files
+	// ignore non-Go/Goo files
 	name := f.Name()
-	return !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".go") && !f.IsDir()
+	return !strings.HasPrefix(name, ".") && (strings.HasSuffix(name, ".go") || strings.HasSuffix(name, ".goo")) && !f.IsDir()
+}
+
+func isGooFile(filename string) bool {
+	return strings.HasSuffix(filename, ".goo")
+}
+
+func containsGooSyntax(src []byte) bool {
+	s := string(src)
+	// Check for common Goo-specific syntax that would break standard Go parser
+	return strings.Contains(s, " as ") ||
+		strings.Contains(s, " and ") ||
+		strings.Contains(s, " or ") ||
+		strings.Contains(s, " not ") ||
+		strings.Contains(s, "check ") ||
+		strings.Contains(s, "def ") ||
+		strings.Contains(s, " in ") ||
+		strings.Contains(s, "printf(") ||
+		strings.Contains(s, "typeof(") ||
+		strings.Contains(s, "#") && !strings.Contains(s, "/*") // hash comments but not in multiline comments
 }
 
 // A sequencer performs concurrent tasks that may write output, but emits that
@@ -228,14 +248,74 @@ func (r *reporter) ExitCode() int {
 	return r.getState().exitCode
 }
 
+// processGooFile formats a .goo file using the internal syntax parser
+func processGooFile(filename string, info fs.FileInfo, in io.Reader, r *reporter, src []byte) error {
+	// Parse using internal syntax parser for .goo files
+	var syntaxFile *syntax.File
+	var err error
+	syntaxFile, err = syntax.Parse(syntax.NewFileBase(filename), bytes.NewReader(src), nil, nil, syntax.CheckBranches)
+	if err != nil {
+		return err
+	}
+
+	// Format using internal syntax printer
+	var buf bytes.Buffer
+	_, err = syntax.Fprint(&buf, syntaxFile, 0)
+	if err != nil {
+		return err
+	}
+	res := buf.Bytes()
+
+	if !bytes.Equal(src, res) {
+		// formatting has changed
+		if *list {
+			fmt.Fprintln(r, filename)
+		}
+		if *write {
+			if info == nil {
+				panic("-w should not have been allowed with stdin")
+			}
+
+			perm := info.Mode().Perm()
+			if err := writeFile(filename, src, res, perm, info.Size()); err != nil {
+				return err
+			}
+		}
+		if *doDiff {
+			newName := filepath.ToSlash(filename)
+			oldName := newName + ".orig"
+			r.Write(diff.Diff(oldName, src, newName, res))
+		}
+	}
+
+	if !*list && !*write && !*doDiff {
+		_, err = r.Write(res)
+	}
+
+	return err
+}
+
 // If info == nil, we are formatting stdin instead of a file.
 // If in == nil, the source is the contents of the file with the given filename.
 func processFile(filename string, info fs.FileInfo, in io.Reader, r *reporter) error {
+	// Read file first to check content
 	src, err := readFile(filename, info, in)
 	if err != nil {
 		return err
 	}
 
+	// Handle .goo files with internal syntax parser
+	if isGooFile(filename) {
+		return processGooFile(filename, info, in, r, src)
+	}
+
+	// Check if source contains Goo-specific syntax that would break standard parser
+	if containsGooSyntax(src) {
+		r.Warnf("warning: file contains Goo syntax but has .go extension, treating as .goo file\n")
+		return processGooFile(filename, info, in, r, src)
+	}
+
+	// Handle .go files with standard parser
 	fileSet := token.NewFileSet()
 	// If we are formatting stdin, we accept a program fragment in lieu of a
 	// complete source file.
