@@ -49,15 +49,26 @@ type tryCatchVisitor struct {
 
 // walkBlockStmt walks through all statements in a block
 func (v *tryCatchVisitor) walkBlockStmt(block *syntax.BlockStmt) {
-	for i, stmt := range block.List {
-		if newStmt := v.transformStmt(stmt); newStmt != nil {
-			block.List[i] = newStmt
+	newList := make([]syntax.Stmt, 0, len(block.List))
+	
+	for _, stmt := range block.List {
+		if tryStmt, ok := stmt.(*syntax.TryStmt); ok && tryStmt.Var != nil {
+			// Special handling for try val := f() - need to expand to multiple statements
+			assign, ifStmt := v.transformTryToStatements(tryStmt)
+			newList = append(newList, assign, ifStmt)
 			v.changed = true
+		} else if newStmt := v.transformStmt(stmt); newStmt != nil {
+			newList = append(newList, newStmt)
+			v.changed = true
+		} else {
+			newList = append(newList, stmt)
 		}
 
 		// Recursively walk nested blocks
 		v.walkNestedStmt(stmt)
 	}
+	
+	block.List = newList
 }
 
 // walkNestedStmt recursively walks nested statements
@@ -202,17 +213,33 @@ func (v *tryCatchVisitor) transformTryCatch(tryStmt *syntax.TryCatchStmt) syntax
 }
 
 // transformTry transforms try f() to { err := f(); if err != nil { return err } }
+// or try val := f() to { val, err := f(); if err != nil { return err } }
 func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	pos := tryStmt.Pos()
 
-	// Create assignment: err := f()
-	assign := &syntax.AssignStmt{
-		Op:  syntax.Def, // :=
-		Lhs: &syntax.Name{Value: "err"},
-		Rhs: tryStmt.Call,
+	var assign *syntax.AssignStmt
+	if tryStmt.Var != nil {
+		// try val := f() case - multi-assignment: val, err := f()
+		errVar := &syntax.Name{Value: "err"}
+		errVar.SetPos(pos)
+		
+		lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{tryStmt.Var, errVar}}
+		lhsList.SetPos(pos)
+		
+		assign = &syntax.AssignStmt{
+			Op:  syntax.Def, // :=
+			Lhs: lhsList,
+			Rhs: tryStmt.Call,
+		}
+	} else {
+		// try f() case - single assignment: err := f()
+		assign = &syntax.AssignStmt{
+			Op:  syntax.Def, // :=
+			Lhs: &syntax.Name{Value: "err"},
+			Rhs: tryStmt.Call,
+		}
+		assign.Lhs.SetPos(pos)
 	}
-	assign.Lhs.SetPos(pos)
-	assign.Rhs.SetPos(pos)
 	assign.SetPos(pos)
 
 	// Create condition: err != nil
@@ -245,13 +272,67 @@ func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	}
 	ifStmt.SetPos(pos)
 
-	// Return block with assignment and if statement: { err := f(); if err != nil { return err } }
+	// We need to return multiple statements but can only return one
+	// So create a sequence using a technique that works with the visitor pattern
+	// For now, let's use a wrapper block but mark it specially
 	block := &syntax.BlockStmt{
 		List: []syntax.Stmt{assign, ifStmt},
 	}
 	block.SetPos(pos)
 
 	return block
+}
+
+// transformTryToStatements transforms try val := f() to separate statements:
+// val, err := f(); if err != nil { return err }
+func (v *tryCatchVisitor) transformTryToStatements(tryStmt *syntax.TryStmt) (syntax.Stmt, syntax.Stmt) {
+	pos := tryStmt.Pos()
+
+	// Create assignment: val, err := f()
+	errVar := &syntax.Name{Value: "err"}
+	errVar.SetPos(pos)
+	
+	lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{tryStmt.Var, errVar}}
+	lhsList.SetPos(pos)
+	
+	assign := &syntax.AssignStmt{
+		Op:  syntax.Def, // :=
+		Lhs: lhsList,
+		Rhs: tryStmt.Call,
+	}
+	assign.SetPos(pos)
+
+	// Create condition: err != nil
+	condition := &syntax.Operation{
+		Op: syntax.Neq,
+		X:  &syntax.Name{Value: "err"},
+		Y:  &syntax.Name{Value: "nil"},
+	}
+	condition.X.SetPos(pos)
+	condition.Y.SetPos(pos)
+	condition.SetPos(pos)
+
+	// Create return err
+	returnStmt := &syntax.ReturnStmt{
+		Results: &syntax.Name{Value: "err"},
+	}
+	returnStmt.Results.SetPos(pos)
+	returnStmt.SetPos(pos)
+
+	// Create if body
+	ifBody := &syntax.BlockStmt{
+		List: []syntax.Stmt{returnStmt},
+	}
+	ifBody.SetPos(pos)
+
+	// Create if statement: if err != nil { return err }
+	ifStmt := &syntax.IfStmt{
+		Cond: condition,
+		Then: ifBody,
+	}
+	ifStmt.SetPos(pos)
+
+	return assign, ifStmt
 }
 
 func init() {

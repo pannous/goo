@@ -3656,12 +3656,28 @@ func (p *parser) tryStmt() Stmt {
 
 		return s
 	} else {
-		// try f() pattern
+		// try f() or try val := f() pattern
 		s := new(TryStmt)
 		s.pos = pos
 
-		// parse function call expression
-		s.Call = p.expr()
+		// Parse first element to see if it's var := call or just call
+		if p.tok == _Name {
+			// Save current position to potentially backtrack
+			name := p.name()
+			if p.tok == _Define { // :=
+				// try val := f() pattern
+				s.Var = name
+				p.next() // consume :=
+				s.Call = p.expr()
+			} else {
+				// try f() pattern - name was actually start of function call
+				// Continue parsing from the name as primary expression
+				s.Call = p.pexpr(name, false)
+			}
+		} else {
+			// try f() pattern starting with non-name
+			s.Call = p.expr()
+		}
 
 		return s
 	}
