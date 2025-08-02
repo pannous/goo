@@ -1,4 +1,0 @@
-// Simple in operator test to debug the issue
-text := "hello world"
-result := "hello" in text
-printf("Result: %t\n", result)
