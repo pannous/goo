@@ -47,5 +47,8 @@ if [[ $failed -eq 0 ]]; then
     exit 0
 else
     echo "⚠️  Some tests failed"
+    if [[ $failed -gt 50 ]]; then
+        echo "Consider ./build-compiler.sh or do rollback!"
+    fi
     exit 1
 fi
