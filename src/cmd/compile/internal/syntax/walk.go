@@ -333,6 +333,11 @@ func (w walker) node(n Node) {
 			w.node(n.CatchBlock)
 		}
 
+	case *TryStmt:
+		if n.Call != nil {
+			w.node(n.Call)
+		}
+
 	default:
 		panic(fmt.Sprintf("internal error: walk.go:331 unregistered node type %T", n))
 	}

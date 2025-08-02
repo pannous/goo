@@ -91,10 +91,13 @@ func (v *tryCatchVisitor) walkNestedStmt(stmt syntax.Stmt) {
 	}
 }
 
-// transformStmt transforms a single statement if it's a try-catch
+// transformStmt transforms a single statement if it's a try-catch or try
 func (v *tryCatchVisitor) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 	if tryCatchStmt, ok := stmt.(*syntax.TryCatchStmt); ok {
 		return v.transformTryCatch(tryCatchStmt)
+	}
+	if tryStmt, ok := stmt.(*syntax.TryStmt); ok {
+		return v.transformTry(tryStmt)
 	}
 	return nil
 }
@@ -176,6 +179,90 @@ func (v *tryCatchVisitor) transformTryCatch(tryStmt *syntax.TryCatchStmt) syntax
 	}
 
 	// Create wrapper function: func() { defer ...; tryBlock }
+	wrapperFunc := &syntax.FuncLit{
+		Type: &syntax.FuncType{},
+		Body: wrapperBody,
+	}
+	wrapperFunc.SetPos(pos)
+	wrapperFunc.Type.SetPos(pos)
+
+	// Create wrapper function call: func() { ... }()
+	wrapperCall := &syntax.CallExpr{
+		Fun: wrapperFunc,
+	}
+	wrapperCall.SetPos(pos)
+
+	// Return as expression statement
+	exprStmt := &syntax.ExprStmt{
+		X: wrapperCall,
+	}
+	exprStmt.SetPos(pos)
+
+	return exprStmt
+}
+
+// transformTry transforms try f() to func() { if err := f(); err != nil { panic(err) } }()
+func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
+	pos := tryStmt.Pos()
+
+	// Create err variable
+	errVar := &syntax.Name{Value: "err"}
+	errVar.SetPos(pos)
+
+	// Create assignment: err := f()
+	assign := &syntax.AssignStmt{
+		Op:  syntax.Def, // :=
+		Lhs: errVar,
+		Rhs: tryStmt.Call,
+	}
+	assign.SetPos(pos)
+
+	// Create condition: err != nil
+	nilName := &syntax.Name{Value: "nil"}
+	nilName.SetPos(pos)
+
+	condition := &syntax.Operation{
+		Op: syntax.Neq,
+		X:  errVar,
+		Y:  nilName,
+	}
+	condition.SetPos(pos)
+
+	// Create panic call: panic(err)
+	panicCall := &syntax.CallExpr{
+		Fun:     &syntax.Name{Value: "panic"},
+		ArgList: []syntax.Expr{errVar},
+	}
+	panicCall.SetPos(pos)
+	panicCall.Fun.SetPos(pos)
+
+	// Create panic statement
+	panicStmt := &syntax.ExprStmt{
+		X: panicCall,
+	}
+	panicStmt.SetPos(pos)
+
+	// Create if body
+	ifBody := &syntax.BlockStmt{
+		List: []syntax.Stmt{panicStmt},
+	}
+	ifBody.SetPos(pos)
+
+	// Create if statement: if err := f(); err != nil { panic(err) }
+	ifStmt := &syntax.IfStmt{
+		Init: assign,
+		Cond: condition,
+		Then: ifBody,
+	}
+	ifStmt.SetPos(pos)
+
+	// Wrap in function literal like the existing try-catch
+	wrapperBody := &syntax.BlockStmt{
+		List: []syntax.Stmt{ifStmt},
+	}
+	wrapperBody.SetPos(pos)
+
+	// Create wrapper function: func() { if ... }
 	wrapperFunc := &syntax.FuncLit{
 		Type: &syntax.FuncType{},
 		Body: wrapperBody,

@@ -451,6 +451,11 @@ type (
 		stmt
 	}
 
+	TryStmt struct {
+		Call Expr // function call expression
+		stmt
+	}
+
 	SwitchStmt struct {
 		Init   SimpleStmt
 		Tag    Expr // incl. *TypeSwitchGuard
