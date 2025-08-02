@@ -366,7 +366,7 @@ redo:
 			s.nextch()
 		} else {
 			s.nextch()
-			s.lineComment()
+			s.hashComment()
 			goto redo
 		}
 
@@ -960,6 +960,21 @@ func (s *scanner) fullComment() {
 	if s.skipComment() {
 		s.comment(string(s.segment()))
 	}
+}
+
+func (s *scanner) hashComment() {
+	// # opening has already been consumed
+	
+	if s.mode&comments != 0 {
+		s.skipLine()
+		s.comment(string(s.segment()))
+		return
+	}
+
+	// are we saving directives? Hash comments don't support directives
+	// so just skip the line regardless of directive mode
+	s.stop()
+	s.skipLine()
 }
 
 func (s *scanner) escape(quote rune) bool {
