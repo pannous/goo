@@ -172,3 +172,6 @@ If you ever encounter automatic import problems again just look at:
 goo/test_strings_auto_import.goo                                                                   │
 goo/test_list_methods.goo
 (together with their implementation and maybe their commits)
+
+# Hard extensions
+When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes

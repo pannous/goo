@@ -437,7 +437,7 @@ type (
 	}
 
 	ForStmt struct {
-		Init SimpleStmt // incl. *RangeClause
+		Init SimpleStmt // incl. *RangeClause, *InClause
 		Cond Expr
 		Post SimpleStmt
 		Body *BlockStmt
@@ -471,6 +471,13 @@ type (
 		Lhs Expr // nil means no Lhs = or Lhs :=
 		Def bool // means :=
 		X   Expr // range X
+		simpleStmt
+	}
+
+	InClause struct {
+		Lhs Expr // nil means no Lhs = or Lhs :=
+		Def bool // means :=
+		X   Expr // in X
 		simpleStmt
 	}
 
