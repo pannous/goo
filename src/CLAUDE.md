@@ -125,6 +125,8 @@ Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` 
 # Test Writing
 Usually when you create one test there's no more need to modify it unless you really missed something
 USE existing tests instead of writing new ones
+Before declaring a bug/task as fixed run the test again. If it fails report it with ❌
+
 ## Editing Guidelines
 never edit token_string.go
 always use ../bin/go 
@@ -145,6 +147,7 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 
 ## Transformers
 • Add Position information SetPos(pos) In Transformers (pos := old.Pos())
+• Inline nodes often need explicit SetPos(pos) too
 • Never modify tests in the goo folder only in probes.
 
 ## System Health
@@ -155,13 +158,12 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 
 ## Debugging
 • don't Temporarily disable To test functionality that worked before instead push forward to resolve the issue
-
-## Testing Best Practices
-• Before declaring a bug/task as fixed run the test again.
+ 
 
 With the visitor pattern, we can only replace nodes in place, so not always applicable? 
 we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
 Or use a hybrid.
+
 
 # Assume mishearings
 I am using speech recognition which might misunderstand some words:
