@@ -3620,37 +3620,51 @@ func (p *parser) ifStmt() *IfStmt {
 	return s
 }
 
-func (p *parser) tryCatchStmt() *TryCatchStmt {
+func (p *parser) tryStmt() Stmt {
 	if trace {
-		defer p.trace("tryCatchStmt")()
+		defer p.trace("tryStmt")()
 	}
 
-	s := new(TryCatchStmt)
-	s.pos = p.pos()
-
+	pos := p.pos()
 	// consume 'try'
 	p.next()
 
-	// parse try block
-	s.TryBlock = p.blockStmt("try clause")
+	// Check if this is try{...} or try f()
+	if p.tok == _Lbrace {
+		// try{...}catch pattern
+		s := new(TryCatchStmt)
+		s.pos = pos
 
-	// expect 'catch'
-	if !p.got(_Catch) {
-		p.syntaxError("expected 'catch' after try block")
+		// parse try block
+		s.TryBlock = p.blockStmt("try clause")
+
+		// expect 'catch'
+		if !p.got(_Catch) {
+			p.syntaxError("expected 'catch' after try block")
+			return s
+		}
+
+		// parse catch variable
+		if p.tok != _Name {
+			p.syntaxError("expected variable name after 'catch'")
+			p.advance(_Name, _Lbrace)
+		}
+		s.CatchVar = p.name()
+
+		// parse catch block
+		s.CatchBlock = p.blockStmt("catch clause")
+
+		return s
+	} else {
+		// try f() pattern
+		s := new(TryStmt)
+		s.pos = pos
+
+		// parse function call expression
+		s.Call = p.expr()
+
 		return s
 	}
-
-	// parse catch variable
-	if p.tok != _Name {
-		p.syntaxError("expected variable name after 'catch'")
-		p.advance(_Name, _Lbrace)
-	}
-	s.CatchVar = p.name()
-
-	// parse catch block
-	s.CatchBlock = p.blockStmt("catch clause")
-
-	return s
 }
 
 func (p *parser) switchStmt() *SwitchStmt {
@@ -3875,7 +3889,7 @@ func (p *parser) stmtOrNil() Stmt {
 		return s
 
 	case _Try: // try-catch statement should only be active with transformers tag
-		return p.tryCatchStmt()
+		return p.tryStmt()
 	case _Check:
 		s := new(CheckStmt)
 		s.pos = p.pos()
