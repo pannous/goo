@@ -282,7 +282,7 @@ func importFromModules(ctx context.Context, path string, rs *Requirements, mg *M
 	if strings.Contains(path, "@") {
 		return invalidf("import path %q should not have @version", path)
 	}
-	if build.IsLocalImport(path) {
+	if build.IsLocalImport(path) && !strings.HasSuffix(path, ".goo") {
 		return invalidf("%q is relative, but relative import paths are not supported in module mode", path)
 	}
 	if filepath.IsAbs(path) {

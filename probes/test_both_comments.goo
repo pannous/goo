@@ -1,0 +1,3 @@
+// Regular comment
+# Hash comment
+put("hello")

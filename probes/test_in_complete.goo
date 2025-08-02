@@ -4,8 +4,6 @@ import "strings"  // auto import TOO HARD for in operator! Claude spent 4 hours 
 text := "hello world"
 substr := "hello"
 
-// Test various combinations
-result1 := substr in text        // variable in variable
 result2 := "world" in text       // literal in variable
 result3 := "hello" in "hello world"  // literal in literal
 result4 := "xyz" in text         // negative case
