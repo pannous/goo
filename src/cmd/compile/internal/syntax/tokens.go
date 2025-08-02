@@ -81,6 +81,7 @@ const (
 	_Try            // try
 	_Void           // void
 	_In             // in
+	_While          // while
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -168,6 +169,7 @@ var TokenNames = [...]string{
 	_Void:           "void",
 	_Hash:           "#",
 	_In:             "in",
+	_While:          "while",
 	_CUSTOM_TOKENS_: "avoid_hash_collision",
 }
 

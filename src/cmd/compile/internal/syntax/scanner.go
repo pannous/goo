@@ -439,6 +439,9 @@ func (s *scanner) ident() {
 		case "in":
 			s.tok = _In
 			return
+		case "while":
+			s.tok = _While
+			return
 		}
 	}
 	

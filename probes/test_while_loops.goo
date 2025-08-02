@@ -1,0 +1,29 @@
+// Test while loops as synonym for for loops
+
+printf("Testing while loops:\n")
+
+// Basic while loop (infinite loop with break)
+i := 0
+while true {
+    printf("i = %d\n", i)
+    i++
+    if i >= 3 {
+        break
+    }
+}
+
+// While loop with condition
+j := 0
+while j < 3 {
+    printf("j = %d\n", j)
+    j++
+}
+
+// While loop with for-in syntax
+numbers := [1, 2, 3]
+printf("While with for-in:\n")
+while num in numbers {
+    printf("num = %d\n", num)
+}
+
+printf("All while tests completed!\n")
