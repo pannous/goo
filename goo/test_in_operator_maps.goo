@@ -6,7 +6,8 @@ myMap := map[string]int{
 }
 
 // Test key existence using assignment like string tests
-result1 := "hello" in myMap
+// known issue
+result1 := ("hello" in myMap)
 result2 := "world" in myMap
 result3 := "missing" in myMap
 

@@ -3,7 +3,11 @@
 import "strconv"
 
 def testBasicTry() {
-    try strconv.Atoi("invalid")
+// todo allow both syntaxes
+    try i := "a" as int
+    val := try "a" as int
+// todo allow throwing away value (hard?)
+    try "a" as int
     printf("This should not be reached")
 }
 

@@ -61,7 +61,7 @@ Universal for-in syntax:
 ✅ for i, v in slice { ... }      // Index-value pairs
 ✅ for k, v in iterator() { ... } // Iterator pairs
 
-☐ while keyword as plain synonym for 'for'
+✅ while keyword as plain synonym for 'for'
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
