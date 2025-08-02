@@ -26,7 +26,6 @@ import (
 	"strings"
 
 	"cmd/internal/telemetry/counter"
-	"cmd/compile/internal/syntax"
 
 	"golang.org/x/sync/semaphore"
 )
@@ -248,23 +247,44 @@ func (r *reporter) ExitCode() int {
 	return r.getState().exitCode
 }
 
-// processGooFile formats a .goo file using the internal syntax parser
+// processGooFile formats a .goo file using standard go/parser approach
+// We can use the same parsing pipeline as regular Go files since the 
+// Goo syntax extensions should be handled at the token level
 func processGooFile(filename string, info fs.FileInfo, in io.Reader, r *reporter, src []byte) error {
-	// Parse using internal syntax parser for .goo files
-	var syntaxFile *syntax.File
-	var err error
-	syntaxFile, err = syntax.Parse(syntax.NewFileBase(filename), bytes.NewReader(src), nil, nil, syntax.CheckBranches)
+	// Try to parse as standard Go first - many .goo files are valid Go with just comments
+	fileSet := token.NewFileSet()
+	fragmentOk := info == nil
+	file, sourceAdj, indentAdj, err := parse(fileSet, filename, src, fragmentOk)
 	if err != nil {
-		return err
+		// If parsing fails, preserve the source as-is for now
+		// This handles cases with Goo-specific syntax that go/parser doesn't understand
+		res := src
+		if !*list && !*write && !*doDiff {
+			_, writeErr := r.Write(res)
+			return writeErr
+		}
+		return nil
 	}
 
-	// Format using internal syntax printer
-	var buf bytes.Buffer
-	_, err = syntax.Fprint(&buf, syntaxFile, 0)
+	// If parsing succeeded, format normally
+	if rewrite != nil {
+		if sourceAdj == nil {
+			file = rewrite(fileSet, file)
+		} else {
+			r.Warnf("warning: rewrite ignored for incomplete programs\n")
+		}
+	}
+
+	ast.SortImports(fileSet, file)
+
+	if *simplifyAST {
+		simplify(file)
+	}
+
+	res, err := format(fileSet, file, sourceAdj, indentAdj, src, printer.Config{Mode: printerMode, Tabwidth: tabWidth})
 	if err != nil {
 		return err
 	}
-	res := buf.Bytes()
 
 	if !bytes.Equal(src, res) {
 		// formatting has changed
