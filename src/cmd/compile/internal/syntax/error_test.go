@@ -92,7 +92,7 @@ func declaredErrors(t *testing.T, filename string) map[position]string {
 			// we may have more comments before the next token - collect them
 			pattern = strings.TrimSpace(msg[9 : len(msg)-2])
 		}
-	}, comments)
+	}, comments, "")
 
 	// consume file
 	for {

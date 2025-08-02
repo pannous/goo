@@ -1,0 +1,8 @@
+// Final working test - this will work after the fix
+numbers := []int{10, 20, 30}
+
+printf("Testing working for-in:\n")
+for i := range numbers {
+    printf("  Index %d: Value %d\n", i, numbers[i])
+}
+printf("Success!\n")

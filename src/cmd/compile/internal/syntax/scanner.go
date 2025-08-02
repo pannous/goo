@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -30,8 +31,9 @@ const (
 
 type scanner struct {
 	source
-	mode   uint
-	nlsemi bool // if set '\n' and EOF translate to ';'
+	mode     uint
+	nlsemi   bool   // if set '\n' and EOF translate to ';'
+	filename string // filename being scanned, used for .goo file detection
 
 	// current token, valid after calling next()
 	line, col uint
@@ -44,9 +46,10 @@ type scanner struct {
 	prec      int      // valid if tok is _Operator, _Star, _AssignOp, or _IncOp
 }
 
-func (s *scanner) init(src io.Reader, errh func(line, col uint, msg string), mode uint) {
+func (s *scanner) init(src io.Reader, errh func(line, col uint, msg string), mode uint, filename string) {
 	s.source.init(src, errh)
 	s.mode = mode
+	s.filename = filename
 	s.nlsemi = false
 }
 
@@ -404,23 +407,45 @@ func (s *scanner) ident() {
 
 	// possibly a keyword
 	lit := s.segment()
-	if len(lit) >= 2 {
-		// Special case for 'in' keyword when transforms are enabled
-		if string(lit) == "in" && os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
+	litStr := string(lit)
+	
+	// Check for .goo-specific keywords when transforms are enabled
+	if s.transformsEnabled() {
+		switch litStr {
+		case "as":
+			s.tok = _As
+			return
+		case "enum":
+			s.tok = _Enum
+			return
+		case "catch":
+			s.tok = _Catch
+			return
+		case "class":
+			s.tok = _Class
+			return
+		case "check":
+			s.tok = _Check
+			return
+		case "def":
+			s.tok = _Def
+			return
+		case "try":
+			s.tok = _Try
+			return
+		case "void":
+			s.tok = _Void
+			return
+		case "in":
 			s.tok = _In
 			return
 		}
-		
+	}
+	
+	if len(lit) >= 2 {
 		h := hash(lit)
 		for keywordMap[h] != 0 {
-			if tok := keywordMap[h]; tokStrFast(tok) == string(lit) {
-				// Check if this is a transform-only token
-				if (tok == _Class || tok == _Check || tok == _Def) && os.Getenv("GOO_USE_TRANSFORMERS") != "1" {
-					// Treat as regular identifier when transforms disabled
-					s.tok = _Name
-					s.lit = string(lit)
-					return
-				}
+			if tok := keywordMap[h]; tokStrFast(tok) == litStr {
 				s.nlsemi = contains(1<<_Break|1<<_Continue|1<<_Fallthrough|1<<_Return, tok)
 				s.tok = tok
 				return
@@ -510,20 +535,23 @@ func (s *scanner) atIdentChar(first bool) bool {
 }
 
 // hash is a perfect hash function for keywords.
-// It assumes that s has at least length 2.
+// It handles strings of any length.
 func hash(s []byte) uint {
+	if len(s) == 0 {
+		return 0
+	}
+	if len(s) == 1 {
+		return (uint(s[0])<<4 + uint(len(s))) & uint(len(keywordMap)-1)
+	}
 	return (uint(s[0])<<4 ^ uint(s[1]) + uint(len(s))) & uint(len(keywordMap)-1)
 }
 
 var keywordMap [1 << 12]token // size must be power of two
 
 func init() {
-	// populate keywordMap
-	last_keyword := _CUSTOM_TOKENS_
-	if useTransforms() {
-		last_keyword = tokenCount // include all tokens if transformers are enabled
-	}
-	for tok := _keywords_start + 1; tok < last_keyword; tok++ {
+	// populate keywordMap with standard Go keywords only
+	// Custom .goo tokens are handled separately in ident()
+	for tok := _keywords_start + 1; tok < _CUSTOM_TOKENS_; tok++ {
 		h := hash([]byte(tok.String()))
 		// Handle hash collisions with linear probing
 		for keywordMap[h] != 0 {
@@ -531,11 +559,21 @@ func init() {
 		}
 		keywordMap[h] = tok
 	}
-
 }
 
 func useTransforms() bool {
 	return os.Getenv("GOO_USE_TRANSFORMERS") == "1"
+}
+
+// transformsEnabled returns true if .goo syntax should be enabled for this scanner
+func (s *scanner) transformsEnabled() bool {
+	// Check environment variable first
+	if os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
+		// Only enable if we're scanning a .goo file or if no filename is provided
+		return s.filename == "" || strings.HasSuffix(s.filename, ".goo")
+	}
+	// Also check file extension directly (for cases where env var isn't set)
+	return strings.HasSuffix(s.filename, ".goo")
 }
 
 func lower(ch rune) rune     { return ('a' - 'A') | ch } // returns lower-case ch iff ch is ASCII letter

@@ -978,7 +978,12 @@ scanAgain:
 				goto scanAgain
 			}
 			tok = token.COMMENT
-			lit = string(s.src[offs:s.offset])
+			// Ensure offset doesn't exceed source bounds
+			end := s.offset
+			if end > len(s.src) {
+				end = len(s.src)
+			}
+			lit = string(s.src[offs:end])
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {

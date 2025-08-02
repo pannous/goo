@@ -1,0 +1,11 @@
+// Test automatic dependency installation with multiple dependencies
+// go get github.com/google/uuid
+
+package main
+
+import "github.com/google/uuid"
+
+func main() {
+    id := uuid.New()
+    println("Generated UUID:", id.String())
+}

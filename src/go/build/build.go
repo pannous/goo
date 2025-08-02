@@ -806,7 +806,11 @@ func (ctxt *Context) Import(path string, srcDir string, mode ImportMode) (*Packa
 		if len(tried.gopath) == 0 {
 			paths = append(paths, "\t($GOPATH not set. For more details see: 'go help gopath')")
 		}
-		return p, fmt.Errorf("cannot find package %q in any of:\n%s", path, strings.Join(paths, "\n"))
+		cmd := exec.Command("go", "get", path)
+		cmd.Dir = srcDir // or set as needed
+		err := cmd.Run()
+		return p, err
+		//return p, fmt.Errorf("cannot find package %q in any of:\n%s", path, strings.Join(paths, "\n"))
 	}
 
 Found:

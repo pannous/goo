@@ -1,0 +1,5 @@
+// Test for-in without variable
+numbers := []int{1, 2, 3}
+for in [1,2,3] {
+    printf("iteration\n",i)
+}

@@ -6,7 +6,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 )
 
 // InLoopTransform handles the 'for x in collection' syntax

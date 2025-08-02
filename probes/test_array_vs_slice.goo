@@ -1,0 +1,9 @@
+// Array literal
+for i in [3]int{10,20,30} {
+    printf("array: %d\n", i)
+}
+
+// Slice literal
+for j in []int{1,2,3} {
+    printf("slice: %d\n", j)
+}

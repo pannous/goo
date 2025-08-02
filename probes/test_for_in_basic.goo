@@ -1,0 +1,10 @@
+// Test basic for-in syntax with slices
+numbers := []int{1, 2, 3, 4, 5}
+
+printf("Testing for x in slice:\n")
+x:=0
+for x in numbers {
+    printf("  %d\n", x)
+}
+
+printf("Done!\n")

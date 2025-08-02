@@ -1,0 +1,3 @@
+// Minimal for-in test
+for x in []int{1} {
+}
