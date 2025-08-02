@@ -22,7 +22,8 @@
       "Bash(find:*)",
       "Bash(bin/go run:*)",
       "Bash(go build:*)",
-      "Bash(../bin/go run /opt/other/go/probes/test_simple_for_in.goo)"
+      "Bash(../bin/go run /opt/other/go/probes/test_simple_for_in.goo)",
+      "Bash(../bin/go run test_as_cast_convert.goo)"
     ],
     "deny": []
   }
