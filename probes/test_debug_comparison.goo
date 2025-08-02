@@ -1,0 +1,13 @@
+// Compare what works vs what doesn't
+
+// This should work (manual range)
+printf("Manual range:\n")
+for i := range [3]int{1,2,3} {
+    printf("  i=%d\n", i)
+}
+
+// This doesn't work (for-in transform)
+printf("For-in transform:\n")
+for i in [3]int{1,2,3} {
+    printf("  i=%d\n", i)
+}

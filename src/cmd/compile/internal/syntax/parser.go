@@ -101,7 +101,13 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 				}
 			}
 		},
-		directives,
+		func() uint {
+			if strings.HasSuffix(file.Filename(), ".goo") {
+				return comments | directives // Process all comments for .goo files
+			}
+			return directives // Only directives for regular .go files
+		}(),
+		file.Filename(),
 	)
 
 	p.base = file
@@ -143,6 +149,7 @@ func (p *parser) transformsEnabled() bool {
 	filename := p.file.Filename()
 	return strings.HasSuffix(filename, ".goo")
 }
+
 
 // updateBase sets the current position base to a new line base at pos.
 // The base's filename, line, and column values are extracted from text
@@ -3147,10 +3154,6 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 	if trace {
 		defer p.trace("simpleStmt")()
 	}
-	
-	if debug && keyword == _For {
-		fmt.Printf("DEBUG: simpleStmt for keyword=%v, tok=%v, op=%v, lhs=%v\n", keyword, p.tok, p.op, lhs)
-	}
 
 	if keyword == _For && p.tok == _Range {
 		// _Range expr
@@ -3172,15 +3175,8 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 		lhs = p.exprList()
 	}
 
-	if debug && keyword == _For {
-		fmt.Printf("DEBUG: After parsing LHS: lhs=%v, tok=%v, op=%v\n", lhs, p.tok, p.op)
-	}
-
 	// Check for 'in' keyword after parsing LHS (for "for x in collection")
 	if keyword == _For && p.tok == _In {
-		if debug {
-			fmt.Printf("DEBUG: Creating InClause with lhs=%v\n", lhs)
-		}
 		return p.newInClause(lhs, true) // true for := (new variable)
 	}
 

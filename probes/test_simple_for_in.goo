@@ -1,0 +1,4 @@
+// Simplest possible test
+for i in []int{1,2,3} {
+    printf("%d\n", i)
+}

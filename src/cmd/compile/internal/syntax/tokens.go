@@ -166,6 +166,8 @@ var TokenNames = [...]string{
 	_Try:            "try",
 	_Catch:          "catch",
 	_Void:           "void",
+	_Hash:           "#",
+	_In:             "in",
 	_CUSTOM_TOKENS_: "avoid_hash_collision",
 }
 

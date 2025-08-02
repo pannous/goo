@@ -16,7 +16,7 @@ import (
 // the comment text; otherwise it is the error message.
 func CommentsDo(src io.Reader, handler func(line, col uint, text string)) {
 	var s scanner
-	s.init(src, handler, comments)
+	s.init(src, handler, comments, "")
 	for s.tok != _EOF {
 		s.next()
 	}
@@ -55,7 +55,7 @@ func CommentMap(src io.Reader, rx *regexp.Regexp) (res map[uint][]Error) {
 			}
 			res[prev.line] = append(res[prev.line], err)
 		}
-	}, comments)
+	}, comments, "")
 
 	for s.tok != _EOF {
 		s.next()

@@ -7,12 +7,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"internal/buildcfg"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	rtrace "runtime/trace"
 	"slices"
@@ -308,6 +310,9 @@ func invoke(cmd *base.Command, args []string) {
 	if strings.HasSuffix(args[len(args)-1], ".goo") {
 		println("GOO_USE_TRANSFORMERS")
 		os.Setenv("GOO_USE_TRANSFORMERS", "1") // Enable transformers by default for .goo files
+		
+		// Scan for and install dependencies from // go get comments
+		installGooGetDependencies(args[len(args)-1])
 	}
 
 	// 'go env' handles checking the build config
@@ -361,6 +366,47 @@ func invoke(cmd *base.Command, args []string) {
 	ctx, span := trace.StartSpan(ctx, fmt.Sprint("Running ", cmd.Name(), " command"))
 	cmd.Run(ctx, cmd, args)
 	span.Done()
+}
+
+// installGooGetDependencies scans a .goo file for // go get comments and installs dependencies
+func installGooGetDependencies(filename string) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return // Silently ignore file open errors
+	}
+	defer file.Close()
+	
+	scanner := bufio.NewScanner(file)
+	var packagesToInstall []string
+	
+	// Scan file line by line looking for // go get comments
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "// go get ") {
+			packageName := strings.TrimSpace(line[10:]) // Remove "// go get " prefix
+			if packageName != "" {
+				packagesToInstall = append(packagesToInstall, packageName)
+			}
+		}
+	}
+	
+	// Install each dependency
+	for _, packageName := range packagesToInstall {
+		fmt.Printf("Auto-installing dependency: %s\n", packageName)
+		
+		cmd := exec.Command("go", "get", packageName)
+		cmd.Env = os.Environ() // Inherit current environment
+		
+		if output, err := cmd.CombinedOutput(); err != nil {
+			// Only show error if it's not already installed
+			if !strings.Contains(string(output), "no changes") {
+				fmt.Printf("Warning: Failed to install dependency %s: %v\n", packageName, err)
+				if len(output) > 0 {
+					fmt.Printf("Output: %s\n", string(output))
+				}
+			}
+		}
+	}
 }
 
 func init() {
