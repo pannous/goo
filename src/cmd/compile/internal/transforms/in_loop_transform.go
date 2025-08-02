@@ -79,9 +79,15 @@ func (t *InLoopTransform) convertInClauseToRange(inClause *syntax.InClause, ctx 
 		rangeClause.Def = true
 	} else {
 		// "for x in collection" -> "for _, x := range collection" (for slices/arrays/strings)
-		// or "for x in collection" -> "for x := range collection" (for maps)
-		rangeLhs := t.createRangeLhs(inClause.Lhs, pos)
-		rangeClause.Lhs = rangeLhs
+		// or "for x in collection" -> "for x := range collection" (for maps/iterators)
+		if t.isIteratorType(inClause.X) {
+			// Iterator functions only allow single variable: for x := range iterator()
+			rangeClause.Lhs = inClause.Lhs
+		} else {
+			// Non-iterators use blank identifier for value access
+			rangeLhs := t.createRangeLhs(inClause.Lhs, pos)
+			rangeClause.Lhs = rangeLhs
+		}
 		// Ensure we use := for new variable declarations
 		rangeClause.Def = true
 	}
@@ -112,6 +118,47 @@ func (t *InLoopTransform) createRangeLhs(originalLhs syntax.Expr, pos syntax.Pos
 	listExpr.SetPos(pos)
 	
 	return listExpr
+}
+
+// isIteratorType attempts to detect if the expression is likely an iterator
+// This is a heuristic since we don't have full type information at AST level
+func (t *InLoopTransform) isIteratorType(expr syntax.Expr) bool {
+	// Check if it's a function call that might return an iterator
+	if call, ok := expr.(*syntax.CallExpr); ok {
+		// Check if the function name suggests it returns an iterator
+		if name, ok := call.Fun.(*syntax.Name); ok {
+			// Common iterator function naming patterns
+			funcName := name.Value
+			// Look for iterator-like function names or functions that end with common patterns
+			return t.looksLikeIteratorFunction(funcName)
+		}
+		
+		// Check for selector expressions like somePackage.Iterator()
+		if sel, ok := call.Fun.(*syntax.SelectorExpr); ok {
+			return t.looksLikeIteratorFunction(sel.Sel.Value)
+		}
+	}
+	
+	return false
+}
+
+// looksLikeIteratorFunction checks if a function name suggests it returns an iterator
+func (t *InLoopTransform) looksLikeIteratorFunction(name string) bool {
+	// Common patterns for iterator function names
+	iteratorPatterns := []string{
+		"Iter", "Iterator", "Items", "Values", "Keys", "Entries", 
+		"Numbers", "Range", "Sequence", "Stream", "Generate",
+	}
+	
+	for _, pattern := range iteratorPatterns {
+		if name == pattern || 
+		   len(name) > len(pattern) && name[len(name)-len(pattern):] == pattern ||
+		   len(name) > len(pattern) && name[:len(pattern)] == pattern {
+			return true
+		}
+	}
+	
+	return false
 }
 
 func init() {

@@ -152,6 +152,8 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
 		return t.createSliceContainsCall(op, visitor, pos)
 	case "map":
 		return t.createMapContainsCall(op, visitor, pos)
+	case "iterator":
+		return t.createIteratorContainsCall(op, visitor, pos)
 	default:
 		// Try to determine at runtime or fall back to string
 		return t.createStringContainsCall(op, visitor, pos)
@@ -184,6 +186,11 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 		}
 		// If no explicit type, infer from usage - composite literals are usually slices
 		return "slice"
+	}
+	
+	// Check for iterator function calls
+	if t.isIteratorType(container) {
+		return "iterator"
 	}
 	
 	// Check context for variable types
@@ -320,6 +327,135 @@ func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, visito
 	call.SetPos(pos)
 	
 	return call
+}
+
+// createIteratorContainsCall creates iterator membership check using range loop
+// item in iterator() => func() bool { for v := range iterator() { if v == item { return true } } return false }()
+func (t *InOperatorTransform) createIteratorContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
+	// Create loop variable
+	loopVar := &syntax.Name{Value: "v"}
+	loopVar.SetPos(pos)
+	
+	// Create range clause: for v := range iterator()
+	rangeClause := &syntax.RangeClause{
+		Lhs: loopVar,
+		Def: true,
+		X:   op.Y, // the iterator call
+	}
+	rangeClause.SetPos(pos)
+	
+	// Create comparison: v == item
+	comparison := &syntax.Operation{
+		Op: syntax.Eql,
+		X:  loopVar,
+		Y:  op.X, // the item to find
+	}
+	comparison.SetPos(pos)
+	
+	// Create return true statement
+	trueReturn := &syntax.ReturnStmt{
+		Results: &syntax.Name{Value: "true"},
+	}
+	trueReturn.SetPos(pos)
+	trueReturn.Results.SetPos(pos)
+	
+	// Create if body
+	ifBody := &syntax.BlockStmt{
+		List: []syntax.Stmt{trueReturn},
+	}
+	ifBody.SetPos(pos)
+	
+	// Create if statement: if v == item { return true }
+	ifStmt := &syntax.IfStmt{
+		Cond: comparison,
+		Then: ifBody,
+	}
+	ifStmt.SetPos(pos)
+	
+	// Create for loop body
+	forBody := &syntax.BlockStmt{
+		List: []syntax.Stmt{ifStmt},
+	}
+	forBody.SetPos(pos)
+	
+	// Create for loop: for v := range iterator() { if v == item { return true } }
+	forStmt := &syntax.ForStmt{
+		Init: rangeClause,
+		Body: forBody,
+	}
+	forStmt.SetPos(pos)
+	
+	// Create return false statement
+	falseReturn := &syntax.ReturnStmt{
+		Results: &syntax.Name{Value: "false"},
+	}
+	falseReturn.SetPos(pos)
+	falseReturn.Results.SetPos(pos)
+	
+	// Create function body: { for ... ; return false }
+	funcBody := &syntax.BlockStmt{
+		List: []syntax.Stmt{forStmt, falseReturn},
+	}
+	funcBody.SetPos(pos)
+	
+	// Create anonymous function
+	boolType := &syntax.Name{Value: "bool"}
+	boolType.SetPos(pos)
+	
+	funcLit := &syntax.FuncLit{
+		Type: &syntax.FuncType{
+			ResultList: []*syntax.Field{{Type: boolType}},
+		},
+		Body: funcBody,
+	}
+	funcLit.SetPos(pos)
+	funcLit.Type.SetPos(pos)
+	
+	// Create function call
+	call := &syntax.CallExpr{
+		Fun: funcLit,
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+// isIteratorType attempts to detect if the expression is likely an iterator (reused from in_loop_transform)
+func (t *InOperatorTransform) isIteratorType(expr syntax.Expr) bool {
+	// Check if it's a function call that might return an iterator
+	if call, ok := expr.(*syntax.CallExpr); ok {
+		// Check if the function name suggests it returns an iterator
+		if name, ok := call.Fun.(*syntax.Name); ok {
+			funcName := name.Value
+			return t.looksLikeIteratorFunction(funcName)
+		}
+		
+		// Check for selector expressions like somePackage.Iterator()
+		if sel, ok := call.Fun.(*syntax.SelectorExpr); ok {
+			return t.looksLikeIteratorFunction(sel.Sel.Value)
+		}
+	}
+	
+	return false
+}
+
+// looksLikeIteratorFunction checks if a function name suggests it returns an iterator
+func (t *InOperatorTransform) looksLikeIteratorFunction(name string) bool {
+	// Common patterns for iterator function names
+	iteratorPatterns := []string{
+		"Iter", "Iterator", "Items", "Values", "Keys", "Entries", 
+		"Numbers", "Range", "Sequence", "Stream", "Generate",
+	}
+	
+	for _, pattern := range iteratorPatterns {
+		if name == pattern || 
+		   len(name) > len(pattern) && name[len(name)-len(pattern):] == pattern ||
+		   len(name) > len(pattern) && name[:len(pattern)] == pattern {
+			return true
+		}
+	}
+	
+	return false
 }
 
 func (t *InOperatorTransform) hasImport(file *syntax.File, name string) bool {
