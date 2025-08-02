@@ -3147,6 +3147,10 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 	if trace {
 		defer p.trace("simpleStmt")()
 	}
+	
+	if debug && keyword == _For {
+		fmt.Printf("DEBUG: simpleStmt for keyword=%v, tok=%v, op=%v, lhs=%v\n", keyword, p.tok, p.op, lhs)
+	}
 
 	if keyword == _For && p.tok == _Range {
 		// _Range expr
@@ -3156,8 +3160,8 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 		return p.newRangeClause(nil, false)
 	}
 
-	if keyword == _For && (p.tok == _In || (p.tok == _Operator && p.op == In)) {
-		// _In expr or 'in' operator
+	if keyword == _For && p.tok == _In {
+		// _In expr
 		if debug && lhs != nil {
 			panic("invalid call of simpleStmt")
 		}
@@ -3166,6 +3170,18 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 
 	if lhs == nil {
 		lhs = p.exprList()
+	}
+
+	if debug && keyword == _For {
+		fmt.Printf("DEBUG: After parsing LHS: lhs=%v, tok=%v, op=%v\n", lhs, p.tok, p.op)
+	}
+
+	// Check for 'in' keyword after parsing LHS (for "for x in collection")
+	if keyword == _For && p.tok == _In {
+		if debug {
+			fmt.Printf("DEBUG: Creating InClause with lhs=%v\n", lhs)
+		}
+		return p.newInClause(lhs, true) // true for := (new variable)
 	}
 
 	if _, ok := lhs.(*ListExpr); !ok && p.tok != _Assign && p.tok != _Define {
@@ -3217,8 +3233,8 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 			return p.newRangeClause(lhs, op == Def)
 		}
 
-		if keyword == _For && (p.tok == _In || (p.tok == _Operator && p.op == In)) {
-			// expr_list op= _In expr or 'in' operator
+		if keyword == _For && p.tok == _In {
+			// expr_list op= _In
 			return p.newInClause(lhs, op == Def)
 		}
 
@@ -3265,7 +3281,7 @@ func (p *parser) newRangeClause(lhs Expr, defi bool) *RangeClause {
 func (p *parser) newInClause(lhs Expr, defi bool) *InClause {
 	i := new(InClause)
 	i.pos = p.pos()
-	p.next() // consume _In or 'in' operator
+	p.next() // consume _In
 	i.Lhs = lhs
 	i.Def = defi
 	i.X = p.expr()
