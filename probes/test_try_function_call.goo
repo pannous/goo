@@ -1,0 +1,11 @@
+import "errors"
+
+func riskyFunction() error {
+	return errors.New("something went wrong")
+}
+
+func testTryFunctionCall() {
+	// Test the new try f() syntax
+	try riskyFunction()
+	println("This should not be reached if try works")
+}

@@ -7,23 +7,23 @@ Goo is an up-to-date fork of Go with the following modifications:
 just like most ugliness in the world appears when you add a five to json(5)  
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
-✅ truthy/falsey if  
+✅ truthy/falsey if   
 ✅ try f()  ->   if err := f(); err != nil { return err }
-✅ try{x}catch e{y} => func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
-✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
-
+✅ try f()  ->   if err := f(); err != nil { panic(err) }
+✅ try val := f()  =>  { val, err := f(); if err != nil { return err } }    
+✅ try { x } catch e { y } =>  func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
+✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?
 ✅ # comment and shebang support  
 ✅ goo file extension  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
 ✅ no Main needed   ☐  implicit package main  
-✅ printf as synonym for fmt.Println  with fmt as auto-import (similar to OPRINTLN|OPRINT?)  
+✅ printf as synonym for fmt.Println  with fmt as auto-import   
 ✅ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?  
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }  
-✅ z := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
-✅ z := ['a', 'b', 'c'] ; z#1 == 'a'  // 1-indexed array access using # operator  
-✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]
-✅ Get rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
+✅ simple_list := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
+✅ xs := ['a', 'b', 'c'] ; xs#1 == 'a'  // 1-indexed array access using # operator  
+✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]   // 🙌 lambdas!
 ✅ go command default to run => `go test.go` OK  
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
@@ -49,14 +49,23 @@ Do you think the following one liner syntax (without any {} blocks) would be com
 ✅ "你" == '你'
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
 ✅ import "helper"  / "helper.goo" // allow local imports (for go run)
-✅ 1 in [1,2,3]
-☐ for keyword in keywords  => for _, keyword := range keywords { __  
+✅ 1 in [1,2,3] 'e' in "hello"  // in operator for lists and strings and maps and iterators
+✅ Got rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
+
+Universal for-in syntax:
+✅ for item in slice { ... }      // Values
+✅ for char in "hello" { ... }    // Characters  
+✅ for key in myMap { ... }       // Keys
+✅ for item in iterator() { ... } // Iterator values
+✅ for k, v in myMap { ... }      // Key-value pairs
+✅ for i, v in slice { ... }      // Index-value pairs
+✅ for k, v in iterator() { ... } // Iterator pairs
+
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
 ☐ runtime disable gc for extreme (resume?) performance, e.g. via `go run -gc=off test.go`  
-☐ optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?  
-☐ for loops  :  
+☐ try x vs optional chaining via ?. operator, e.g. x?.y?.z => if not err{y.z}?  
 ☐ void(!) as synonym for func, e.g. void main(){} BAD  
 ☐ public() -> Public() calls OK // as compiler plugin?  
     Rust allows snake_case to call CamelCase methods via compiler desugaring, but warns.  

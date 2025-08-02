@@ -1,0 +1,16 @@
+import "strconv"
+
+// Test type precedence - base types should use strconv, custom types should use String()
+
+// Test that base type variables still use strconv.Itoa, not String() method
+var num int = 42
+result1 := num as string
+printf("Variable int as string: %s\n", result1)
+check result1 == "42"
+
+// Test that literals still work
+result2 := 42 as string  
+printf("Literal int as string: %s\n", result2)
+check result2 == "42"
+
+printf("Type precedence working correctly!\n")

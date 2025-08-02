@@ -1,0 +1,4 @@
+// Debug what's happening with as conversion
+x := 3.1
+result := x as int
+printf("Result: %d\n", result)

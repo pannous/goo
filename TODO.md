@@ -160,3 +160,16 @@ branch in_operator_brakes_all << case study of what can go wrong;)
 
       Building Go toolchain2 using go_bootstrap and Go toolchain1.
 go tool dist: FAILED: /opt/other/go/pkg/tool/darwin_arm64/go_bootstrap install -pgo=off cmd/asm cmd/cgo cmd/compile cmd/link cmd/preprofile: signal: segmentation fault
+
+
+Write(../probes/test_iterator_for_in.goo)
+  ⎿  Wrote 40 lines to ../probes/test_iterator_for_in.goo
+     import "iter"
+     // Custom iterator that yields numbers 1-5
+     func Numbers() iter.Seq[int] {
+       return func(yield func(int) bool) {
+         for i := 1; i <= 5; i++ {
+           if !yield(i) {
+             return
+           }
+         }

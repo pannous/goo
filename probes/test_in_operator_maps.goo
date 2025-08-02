@@ -1,0 +1,19 @@
+myMap := map[string]int{
+	"hello": 1,
+	"world": 2,
+	"test":  3,
+}
+
+// Test key existence  
+result1 := "hello" in myMap
+result2 := "world" in myMap  
+result3 := "missing" in myMap
+
+printf("'hello' in myMap: %t\n", result1)
+printf("'world' in myMap: %t\n", result2)
+printf("'missing' in myMap: %t\n", result3)
+
+// Test with variables
+key := "test"
+result4 := key in myMap
+printf("'%s' in myMap: %t\n", key, result4)

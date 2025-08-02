@@ -1,0 +1,20 @@
+import "strconv"
+
+func testAssignment() error {
+	try val := strconv.Atoi("42")
+	println("Converted value:", val)
+	
+	try val2 := strconv.Atoi("invalid")
+	println("This should not print:", val2)
+	
+	return nil
+}
+
+func main() {
+	err := testAssignment()
+	if err != nil {
+		println("Error caught:", err.Error())
+	} else {
+		println("No error")
+	}
+}

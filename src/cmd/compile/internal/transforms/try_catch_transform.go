@@ -26,7 +26,10 @@ func (t *TryCatchTransform) Transform(file *syntax.File, ctx *TransformContext) 
 	// Transform function declarations
 	for _, decl := range file.DeclList {
 		if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
+			// Set current function context
+			visitor.currentFunc = funcDecl
 			visitor.walkBlockStmt(funcDecl.Body)
+			visitor.currentFunc = nil
 		}
 	}
 
@@ -43,8 +46,9 @@ func (t *TryCatchTransform) Transform(file *syntax.File, ctx *TransformContext) 
 
 // tryCatchVisitor implements the visitor pattern for try-catch transformation
 type tryCatchVisitor struct {
-	ctx     *TransformContext
-	changed bool
+	ctx         *TransformContext
+	changed     bool
+	currentFunc *syntax.FuncDecl // Track current function context
 }
 
 // walkBlockStmt walks through all statements in a block
@@ -252,12 +256,8 @@ func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	condition.Y.SetPos(pos)
 	condition.SetPos(pos)
 
-	// Create return err
-	returnStmt := &syntax.ReturnStmt{
-		Results: &syntax.Name{Value: "err"},
-	}
-	returnStmt.Results.SetPos(pos)
-	returnStmt.SetPos(pos)
+	// Create context-aware return statement
+	returnStmt := v.createContextAwareReturn(pos, v.ctx)
 
 	// Create if body
 	ifBody := &syntax.BlockStmt{
@@ -265,7 +265,7 @@ func (v *tryCatchVisitor) transformTry(tryStmt *syntax.TryStmt) syntax.Stmt {
 	}
 	ifBody.SetPos(pos)
 
-	// Create if statement: if err != nil { return err }
+	// Create if statement: if err != nil { return ... }
 	ifStmt := &syntax.IfStmt{
 		Cond: condition,
 		Then: ifBody,
@@ -312,12 +312,8 @@ func (v *tryCatchVisitor) transformTryToStatements(tryStmt *syntax.TryStmt) (syn
 	condition.Y.SetPos(pos)
 	condition.SetPos(pos)
 
-	// Create return err
-	returnStmt := &syntax.ReturnStmt{
-		Results: &syntax.Name{Value: "err"},
-	}
-	returnStmt.Results.SetPos(pos)
-	returnStmt.SetPos(pos)
+	// Create context-aware return statement
+	returnStmt := v.createContextAwareReturn(pos, v.ctx)
 
 	// Create if body
 	ifBody := &syntax.BlockStmt{
@@ -333,6 +329,115 @@ func (v *tryCatchVisitor) transformTryToStatements(tryStmt *syntax.TryStmt) (syn
 	ifStmt.SetPos(pos)
 
 	return assign, ifStmt
+}
+
+// createContextAwareReturn creates an appropriate return statement based on function context
+func (v *tryCatchVisitor) createContextAwareReturn(pos syntax.Pos, ctx *TransformContext) syntax.Stmt {
+	// Analyze the current function's return type
+	returnValues := v.analyzeReturnSignature()
+	
+	switch len(returnValues) {
+	case 0:
+		// No return values: panic(err)
+		errVar := &syntax.Name{Value: "err"}
+		errVar.SetPos(pos)
+		
+		panicCall := &syntax.CallExpr{
+			Fun:     &syntax.Name{Value: "panic"},
+			ArgList: []syntax.Expr{errVar},
+		}
+		panicCall.SetPos(pos)
+		panicCall.Fun.SetPos(pos)
+		
+		// Return panic as expression statement
+		panicStmt := &syntax.ExprStmt{X: panicCall}
+		panicStmt.SetPos(pos)
+		return panicStmt
+		
+	case 1:
+		// Single return value (error): return err
+		errVar := &syntax.Name{Value: "err"}
+		errVar.SetPos(pos)
+		
+		returnStmt := &syntax.ReturnStmt{Results: errVar}
+		returnStmt.SetPos(pos)
+		return returnStmt
+		
+	default:
+		// Multiple return values: return zero values..., err
+		zeroValues := v.createZeroValues(returnValues[:len(returnValues)-1], pos)
+		errVar := &syntax.Name{Value: "err"}
+		errVar.SetPos(pos)
+		
+		// Create list of return values: zero1, zero2, ..., err
+		allValues := append(zeroValues, errVar)
+		var results syntax.Expr
+		if len(allValues) == 1 {
+			results = allValues[0]
+		} else {
+			listExpr := &syntax.ListExpr{ElemList: allValues}
+			listExpr.SetPos(pos)
+			results = listExpr
+		}
+		
+		returnStmt := &syntax.ReturnStmt{Results: results}
+		returnStmt.SetPos(pos)
+		return returnStmt
+	}
+}
+
+// analyzeReturnSignature analyzes the current function's return signature
+func (v *tryCatchVisitor) analyzeReturnSignature() []syntax.Expr {
+	if v.currentFunc == nil || v.currentFunc.Type == nil {
+		return []syntax.Expr{} // No context, assume void function
+	}
+	
+	funcType := v.currentFunc.Type
+	if funcType.ResultList == nil {
+		return []syntax.Expr{} // No return values
+	}
+	
+	// Convert ResultList to expressions (simplified)
+	var results []syntax.Expr
+	for _, field := range funcType.ResultList {
+		results = append(results, field.Type)
+	}
+	
+	return results
+}
+
+// createZeroValues creates zero values for the given types
+func (v *tryCatchVisitor) createZeroValues(types []syntax.Expr, pos syntax.Pos) []syntax.Expr {
+	var zeros []syntax.Expr
+	
+	for _, typ := range types {
+		var zeroValue syntax.Expr
+		
+		// Determine zero value based on type
+		if name, ok := typ.(*syntax.Name); ok {
+			switch name.Value {
+			case "int", "int8", "int16", "int32", "int64",
+				 "uint", "uint8", "uint16", "uint32", "uint64",
+				 "float32", "float64", "byte", "rune":
+				zeroValue = &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+			case "string":
+				zeroValue = &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
+			case "bool":
+				zeroValue = &syntax.Name{Value: "false"}
+			default:
+				// For other types, use nil
+				zeroValue = &syntax.Name{Value: "nil"}
+			}
+		} else {
+			// For complex types, use nil
+			zeroValue = &syntax.Name{Value: "nil"}
+		}
+		
+		zeroValue.SetPos(pos)
+		zeros = append(zeros, zeroValue)
+	}
+	
+	return zeros
 }
 
 func init() {

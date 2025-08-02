@@ -1,0 +1,31 @@
+// Test for-in with both single and double variable patterns
+myMap := map[string]int{
+	"apple":  1,
+	"banana": 2,
+	"cherry": 3,
+}
+
+println("Single variable (keys only):")
+for key in myMap {
+	printf("Key: %s\n", key)
+}
+
+println("\nDouble variable (key-value pairs):")
+for key, value in myMap {
+	printf("Key: %s, Value: %d\n", key, value)
+}
+
+println("\nTesting with slice:")
+numbers := [10, 20, 30]
+
+println("Single variable (values):")
+for num in numbers {
+	printf("Value: %d\n", num)
+}
+
+println("\nDouble variable (index-value pairs):")
+for i, num in numbers {
+	printf("Index: %d, Value: %d\n", i, num)
+}
+
+println("All key-value tests completed!")

@@ -1,0 +1,5 @@
+import "fmt"
+
+func test() {
+	try fmt.Println("test")
+}

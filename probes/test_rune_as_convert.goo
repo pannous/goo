@@ -1,0 +1,3 @@
+// Test rune conversions
+check 1 as rune == '1'
+check '1' as int == 1

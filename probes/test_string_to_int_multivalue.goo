@@ -1,0 +1,9 @@
+import "strconv"
+
+// Test string to int with multi-value assignment
+value, err := "1" as int
+if err != nil {
+    printf("Error: %v\n", err)
+} else {
+    printf("\"1\" as int: %d\n", value)
+}

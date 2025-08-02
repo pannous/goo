@@ -1,0 +1,13 @@
+// Simple try statement test
+
+import "strconv"
+
+def testSimpleTry() {
+    _, err := strconv.Atoi("invalid")
+    if err != nil {
+        printf("Got error: %v", err)
+    }
+}
+
+testSimpleTry()
+printf("Simple try test done")

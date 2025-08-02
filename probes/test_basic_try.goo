@@ -1,0 +1,11 @@
+// Basic try statement test
+
+import "strconv"
+
+def testBasicTry() {
+    try strconv.Atoi("invalid")
+    printf("This should not be reached")
+}
+
+testBasicTry()
+printf("Basic try test done")
