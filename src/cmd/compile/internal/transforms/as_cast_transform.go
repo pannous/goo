@@ -202,10 +202,11 @@ func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType 
 		return t.createStrconvCall("Itoa", expr, pos)
 		
 	// String to int: "1" as int -> strconv.Atoi("1") 
-	case (targetType == "int" || targetType == "int32" || targetType == "int64") && 
-		 (sourceType == "string" || sourceType == "string_literal"):
-		visitor.needsStrconvImport = true
-		return t.createStrconvCall("Atoi", expr, pos)
+	// Temporarily disabled due to multi-value return complexity
+	// case (targetType == "int" || targetType == "int32" || targetType == "int64") && 
+	//	 (sourceType == "string" || sourceType == "string_literal"):
+	//	visitor.needsStrconvImport = true
+	//	return t.createStrconvCall("Atoi", expr, pos)
 		
 	// Float to int: 3.1 as int -> int(3.1)
 	case targetType == "int" && (sourceType == "float64" || sourceType == "float_literal"):
@@ -279,9 +280,9 @@ func (t *AsCastTransform) createStrconvCall(funcName string, arg syntax.Expr, po
 	callExpr.SetPos(pos)
 	
 	// For functions that return (value, error), we need to handle the error
-	// Use panic-on-error approach: func() T { v, err := call(); if err != nil { panic(err) }; return v }()
+	// Use the simplified wrapper approach
 	if funcName == "Atoi" {
-		return t.createMustWrapper(callExpr, "int", pos)
+		return t.createSimpleWrapper(callExpr, "int", pos)
 	}
 	
 	return callExpr
@@ -390,68 +391,75 @@ func (t *AsCastTransform) createFloatLiteralToIntConversion(expr syntax.Expr, po
 	return t.createBasicTypeConversion(expr, "int", pos)
 }
 
-// createMustWrapper creates a wrapper that panics on error
-// Generates: func() T { v, err := call(); if err != nil { panic(err) }; return v }()
-func (t *AsCastTransform) createMustWrapper(call syntax.Expr, returnType string, pos syntax.Pos) syntax.Expr {
-	// For simplicity, let's use a different approach
-	// Generate: func() T { v, _ := call(); return v }()
-	// This ignores the error but doesn't panic
+// createSimpleWrapper creates a simple wrapper for multi-value returns
+func (t *AsCastTransform) createSimpleWrapper(call syntax.Expr, returnType string, pos syntax.Pos) syntax.Expr {
+	// Use a very simple pattern that Go can handle:
+	// Create an immediately invoked function expression (IIFE) with minimal complexity
+	// Pattern: (func() int { v, _ := strconv.Atoi(s); return v })()
 	
-	// Create variable names
-	vName := &syntax.Name{Value: "v"}
-	vName.SetPos(pos)
+	// Create: func() returnType { v, _ := call; return v }
 	
-	blankName := &syntax.Name{Value: "_"}
-	blankName.SetPos(pos)
+	// Use the position from the call expression instead
+	callPos := call.Pos()
 	
-	// Create assignment: v, _ := call()
-	lhs := &syntax.ListExpr{
-		ElemList: []syntax.Expr{vName, blankName},
+	// Variable for result
+	resultVar := &syntax.Name{Value: "v"}
+	resultVar.SetPos(callPos)
+	
+	// Blank identifier for error
+	blankVar := &syntax.Name{Value: "_"}
+	blankVar.SetPos(callPos)
+	
+	// Assignment LHS: v, _
+	assignLHS := &syntax.ListExpr{
+		ElemList: []syntax.Expr{resultVar, blankVar},
 	}
-	lhs.SetPos(pos)
+	assignLHS.SetPos(callPos)
 	
-	assignStmt := &syntax.AssignStmt{
-		Op:  syntax.Def, // :=
-		Lhs: lhs,
+	// Assignment statement: v, _ := call
+	assignment := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: assignLHS,
 		Rhs: call,
 	}
-	assignStmt.SetPos(pos)
+	assignment.SetPos(callPos)
 	
-	// Create return statement: return v
+	// Return statement: return v
 	returnStmt := &syntax.ReturnStmt{
-		Results: vName,
+		Results: resultVar,
 	}
-	returnStmt.SetPos(pos)
+	returnStmt.SetPos(callPos)
 	
-	// Create function body
+	// Function body: { v, _ := call; return v }
 	body := &syntax.BlockStmt{
-		List: []syntax.Stmt{assignStmt, returnStmt},
+		List: []syntax.Stmt{assignment, returnStmt},
 	}
-	body.SetPos(pos)
+	body.SetPos(callPos)
 	
-	// Create function type: func() returnType
-	returnTypeName := &syntax.Name{Value: returnType}
-	returnTypeName.SetPos(pos)
+	// Return type for function
+	retType := &syntax.Name{Value: returnType}
+	retType.SetPos(callPos)
 	
-	fnType := &syntax.FuncType{
-		ResultList: []*syntax.Field{{Type: returnTypeName}},
+	// Function type: func() returnType
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{{Type: retType}},
 	}
-	fnType.SetPos(pos)
+	funcType.SetPos(callPos)
 	
-	// Create function literal
-	fnLit := &syntax.FuncLit{
-		Type: fnType,
+	// Function literal: func() returnType { ... }
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
 		Body: body,
 	}
-	fnLit.SetPos(pos)
+	funcLit.SetPos(callPos)
 	
-	// Create function call: (func()...)()
-	callExpr := &syntax.CallExpr{
-		Fun: fnLit,
+	// Function call: (func() returnType { ... })()
+	funcCall := &syntax.CallExpr{
+		Fun: funcLit,
 	}
-	callExpr.SetPos(pos)
+	funcCall.SetPos(callPos)
 	
-	return callExpr
+	return funcCall
 }
 
 // shouldUseTypeConversion determines if we should use type conversion T(x) vs type assertion x.(T)
