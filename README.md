@@ -8,6 +8,7 @@ just like most ugliness in the world appears when you add a five to json(5)
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
 ✅ truthy/falsey if  
+✅ try f()  ->   if err := f(); err != nil { panic(err) }
 ✅ # comment and shebang support  
 ✅ goo file extension  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
@@ -38,10 +39,12 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ x => x * 2   lambda syntax
 ✅ class via type struct  
 ✅ imported and not used only warning  
-✅ return void, e.g. return print("ok") HARD  
+✅ return void, e.g. return print("ok") HARD
+Do you think the following one liner syntax (without any {} blocks) would be compatible with the existing syntax?
+☐ try f()  =>  if err := f(); err != nil { panic(err) }
 ✅ try{x}catch e{y} => func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }
-☐ try f()  =>  if err := f(); err != nil { panic(err) }
+
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return
 ✅ "你" == '你'
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !
