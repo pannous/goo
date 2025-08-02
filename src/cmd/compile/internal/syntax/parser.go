@@ -3156,6 +3156,14 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 		return p.newRangeClause(nil, false)
 	}
 
+	if keyword == _For && (p.tok == _In || (p.tok == _Operator && p.op == In)) {
+		// _In expr or 'in' operator
+		if debug && lhs != nil {
+			panic("invalid call of simpleStmt")
+		}
+		return p.newInClause(nil, false)
+	}
+
 	if lhs == nil {
 		lhs = p.exprList()
 	}
@@ -3209,6 +3217,11 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 			return p.newRangeClause(lhs, op == Def)
 		}
 
+		if keyword == _For && (p.tok == _In || (p.tok == _Operator && p.op == In)) {
+			// expr_list op= _In expr or 'in' operator
+			return p.newInClause(lhs, op == Def)
+		}
+
 		// expr_list op= expr_list
 		rhs := p.exprList()
 
@@ -3247,6 +3260,16 @@ func (p *parser) newRangeClause(lhs Expr, defi bool) *RangeClause {
 	r.Def = defi
 	r.X = p.expr()
 	return r
+}
+
+func (p *parser) newInClause(lhs Expr, defi bool) *InClause {
+	i := new(InClause)
+	i.pos = p.pos()
+	p.next() // consume _In or 'in' operator
+	i.Lhs = lhs
+	i.Def = defi
+	i.X = p.expr()
+	return i
 }
 
 func (p *parser) newAssignStmt(pos Pos, op Operator, lhs, rhs Expr) *AssignStmt {
@@ -3365,8 +3388,12 @@ func (p *parser) header(keyword token) (init SimpleStmt, cond Expr, post SimpleS
 			p.syntaxError(fmt.Sprintf("var declaration not allowed in %s initializer", keyword.String()))
 		}
 		init = p.simpleStmt(nil, keyword)
-		// If we have a range clause, we are done (can only happen for keyword == _For).
+		// If we have a range clause or in clause, we are done (can only happen for keyword == _For).
 		if _, ok := init.(*RangeClause); ok {
+			p.xnest = outer
+			return
+		}
+		if _, ok := init.(*InClause); ok {
 			p.xnest = outer
 			return
 		}
