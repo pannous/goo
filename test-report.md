@@ -13,7 +13,7 @@ Running all tests in ./goo/ directory...
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 ❌ test_as_cast_convert.goo
-❌ test_as_cast.goo
+✅ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_import_go_get.goo
 ✅ test_auto_return.goo
@@ -97,6 +97,7 @@ Running all tests in ./goo/ directory...
 ✅ test_transform_synonyms.goo
 ✅ test_truthy.goo
 ✅ test_try_catch.goo
+✅ test_try_propagation.goo
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
@@ -119,6 +120,7 @@ Running all tests in ./goo/ directory...
 ✅ test_charAt.goo
 ✅ test_cmp_manual.goo
 ✅ test_complete_hash_comments.goo
+✅ test_debug_as.goo
 ✅ test_debug_comparison.goo
 ✅ test_debug_interpolation.goo
 ✅ test_debug_manual.goo
@@ -136,6 +138,7 @@ Running all tests in ./goo/ directory...
 ✅ test_for_in_working.goo
 ❌ test_goo_import.goo
 ✅ test_hash_comment.goo
+✅ test_int_to_string.goo
 ✅ test_line_comment.goo
 ✅ test_list_visitor.goo
 ✅ test_main_line.goo
@@ -147,6 +150,7 @@ Running all tests in ./goo/ directory...
 ✅ test_not_comprehensive.goo
 ✅ test_not_literals.goo
 ✅ test_not_simple.goo
+✅ test_numeric_as_convert.goo
 ✅ test_pkg.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_enum.goo
@@ -157,9 +161,12 @@ Running all tests in ./goo/ directory...
 ✅ test_put_parser.goo
 ✅ test_range_equivalent.goo
 ✅ test_range_pattern.goo
+✅ test_rune_as_convert.goo
+✅ test_rune_debug.goo
 ✅ test_runeAt_simple.goo
 ✅ test_runeAt.goo
 ✅ test_runtime_truthiness.goo
+❌ test_simple_as_convert.goo
 ✅ test_simple_check.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
@@ -172,11 +179,21 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_direct.goo
 ✅ test_slices_import.goo
 ✅ test_slices_manual.goo
+❌ test_string_as_convert.goo
+✅ test_string_conversions_comprehensive.goo
+✅ test_string_method.goo
+✅ test_string_to_int_multivalue.goo
 ✅ test_target_index.goo
 ✅ test_target_value.goo
 ✅ test_transform_debug.goo
 ✅ test_truthiness_basic.goo
+❌ test_try_function_call.goo
+❌ test_try_minimal.goo
+✅ test_try_propagation.goo
+❌ test_try_simple.goo
+✅ test_type_precedence.goo
 ✅ test_typeof_debug.goo
+✅ test_working_conversions.goo
 ========================================
-Summary: 163/177 passed, 14 failed
+Summary: 176/194 passed, 18 failed
 ⚠️  Some tests failed

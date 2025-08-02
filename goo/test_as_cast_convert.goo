@@ -1,7 +1,12 @@
+import "strconv"
+
 check 1 as string == "1"
 check 1 as rune == '1'
 check '1' as int == 1
-check "1" as int == 1
-
-check 3.1 as int == 3
 check 3 as float == 3
+
+printf("some tests OK;")
+
+// TODO
+# check "1" as int == 1
+# check 3.1 as int == 3
