@@ -1,0 +1,39 @@
+import "strconv"
+
+func main() {
+	// Test string methods
+	printf("String methods test:\n")
+	
+	// Test runes
+	runes := "hello".runes()
+	printf("runes: %v\n", runes)
+	
+	// Test bytes  
+	bytes := "hello".bytes()
+	printf("bytes: %v\n", bytes)
+	
+	// Test codePoints
+	codes := "hello".codePoints()
+	printf("codePoints: %v\n", codes)
+	
+	// Test toInt
+	num := "42".toInt()
+	printf("toInt: %d\n", num)
+	
+	// Test toFloat
+	fnum := "42.5".toFloat()
+	printf("toFloat: %f\n", fnum)
+	
+	// Test whitespace-separated lists
+	printf("\nWhitespace lists test:\n")
+	nums := [1 2 3 4 5]
+	printf("nums: %v\n", nums)
+	
+	chars := ['a' 'b' 'c']
+	printf("chars: %v\n", chars)
+	
+	// Test string vs rune comparison
+	printf("\nString vs rune test:\n")
+	same := "a" == 'a'
+	printf("\"a\" == 'a': %v\n", same)
+}

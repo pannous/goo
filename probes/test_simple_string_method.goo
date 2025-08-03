@@ -1,0 +1,4 @@
+func main() {
+	runes := "hello".runes()
+	printf("runes: %v\n", runes)
+}

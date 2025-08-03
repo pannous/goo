@@ -1,0 +1,4 @@
+func main() {
+	result := stringToInt("42")
+	printf("result: %d\n", result)
+}

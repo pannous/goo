@@ -1,0 +1,7 @@
+// Test the specific syntax from the TODO file
+
+chars := ['h', 'e', 'l', 'l', 'ø']
+
+func main() {
+	printf("chars: %v\n", chars)
+}

@@ -1,0 +1,12 @@
+// Test empty string reverse
+
+func main() {
+	result := "".reverse()
+	printf("Empty string reverse: '%s'\n", result)
+	printf("Length: %d\n", len(result))
+	
+	// Test with other empty cases
+	empty := ""
+	reversed := empty.reverse()
+	printf("Variable empty reverse: '%s'\n", reversed)
+}
