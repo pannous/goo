@@ -24,7 +24,10 @@
       "Bash(go build:*)",
       "Bash(../bin/go run /opt/other/go/probes/test_simple_for_in.goo)",
       "Bash(../bin/go run test_as_cast_convert.goo)",
-      "Bash(GOROOT=/opt/other/go go build -tags=transforms -o ../bin/compile ./cmd/compile)"
+      "Bash(GOROOT=/opt/other/go go build -tags=transforms -o ../bin/compile ./cmd/compile)",
+      "Bash(git checkout:*)",
+      "Bash(rm:*)",
+      "Bash(../bin/go run test_import_folder.goo)"
     ],
     "deny": []
   }

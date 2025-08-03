@@ -121,6 +121,7 @@ Running all tests in ./goo/ directory...
 ❌ test_as_cast_debug.goo
 ❌ test_as_cast_minimal.goo
 ✅ test_as_cast_simple.goo
+❌ test_as_cast_string_int.goo
 ✅ test_as_cast_working.goo
 ❌ test_as_int_cast.goo
 ✅ test_assignment_lists.goo
@@ -132,6 +133,7 @@ Running all tests in ./goo/ directory...
 ✅ test_both_auto.goo
 ✅ test_both_comments.goo
 ✅ test_both_imports.goo
+✅ test_builtin_len.goo
 ✅ test_char_literals.goo
 ✅ test_charAt_comprehensive.goo
 ✅ test_charAt_vs_runeAt.goo
@@ -139,7 +141,8 @@ Running all tests in ./goo/ directory...
 ✅ test_check_string_rune.goo
 ✅ test_cmp_manual.goo
 ✅ test_codepoints.goo
-❌ test_complete_hash_comments.goo
+✅ test_comma_strings.goo
+✅ test_complete_hash_comments.goo
 ✅ test_debug_as_cast.goo
 ✅ test_debug_as.goo
 ✅ test_debug_comparison.goo
@@ -162,6 +165,7 @@ Running all tests in ./goo/ directory...
 ✅ test_for_in_working.goo
 ❌ test_goo_file_import.goo
 ✅ test_hash_comment.goo
+✅ test_hash_index_vs_comment.goo
 ❌ test_in_operator_maps.goo
 ✅ test_int_to_string.goo
 ✅ test_line_comment.goo
@@ -181,6 +185,7 @@ Running all tests in ./goo/ directory...
 ✅ test_not_literals.goo
 ✅ test_not_simple.goo
 ✅ test_numeric_as_convert.goo
+❌ test_one_string.goo
 ✅ test_original_examples.goo
 ✅ test_panic_context_try.goo
 ✅ test_pkg.goo
@@ -194,6 +199,7 @@ Running all tests in ./goo/ directory...
 ✅ test_range_equivalent.goo
 ✅ test_range_pattern.goo
 ✅ test_return_context_try.goo
+✅ test_reverse.goo
 ✅ test_rune_as_convert.goo
 ✅ test_rune_debug.goo
 ✅ test_runeAt_simple.goo
@@ -211,8 +217,11 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_printf.goo
 ✅ test_simple_string_method.goo
 ✅ test_simple_string_rune.goo
+✅ test_simple_toint_with_import.goo
+❌ test_simple_toint.goo
 ✅ test_simple_try.goo
 ✅ test_simple_while.goo
+✅ test_simple_with_import.goo
 ✅ test_simple.goo
 ✅ test_slices_auto.goo
 ✅ test_slices_direct.goo
@@ -225,6 +234,7 @@ Running all tests in ./goo/ directory...
 ✅ test_string_reverse.goo
 ❌ test_string_to_int_multivalue.goo
 ❌ test_string_to_int.goo
+❌ test_string_toint_simple.goo
 ❌ test_string_toint.goo
 ✅ test_strings_method.goo
 ✅ test_target_index.goo
@@ -237,13 +247,16 @@ Running all tests in ./goo/ directory...
 ✅ test_try_propagation.goo
 ✅ test_try_simple_assignment.goo
 ✅ test_two_elements.goo
+❌ test_two_strings.goo
 ✅ test_type_precedence.goo
 ✅ test_typeof_debug.goo
 ✅ test_while_for_in.goo
 ✅ test_while_in_simple.goo
 ✅ test_while_loops.goo
+✅ test_whitespace_debug.goo
 ❌ test_whitespace_lists_simple.goo
+❌ test_whitespace_strings.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 216/244 passed, 28 failed
+Summary: 224/257 passed, 33 failed
 ⚠️  Some tests failed
