@@ -16,7 +16,6 @@ Running all tests in ./goo/ directory...
 ✅ test_as_cast_convert.goo
 ✅ test_as_cast.goo
 ✅ test_assert.goo
-✅ test_auto_import_go_get.goo
 ✅ test_auto_return.goo
 ❌ test_check_reverse.goo
 ✅ test_check.goo
@@ -271,5 +270,5 @@ Running all tests in ./goo/ directory...
 ❌ test_whitespace_strings.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 232/270 passed, 38 failed
+Summary: 231/269 passed, 38 failed
 ⚠️  Some tests failed
