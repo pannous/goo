@@ -1,0 +1,4 @@
+func main() {
+	result := "42" as int
+	printf("result: %d\n", result)
+}

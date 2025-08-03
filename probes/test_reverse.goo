@@ -1,0 +1,2 @@
+result := "hello".reverse()
+printf("Result: %s\n", result)

@@ -1,0 +1,3 @@
+func main() {
+	strings := ["hello" "world"]
+}
