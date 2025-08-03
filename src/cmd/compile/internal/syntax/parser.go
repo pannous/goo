@@ -144,6 +144,12 @@ func (p *parser) clearPragma() {
 	}
 }
 
+// isInOperator checks if the current token is the 'in' operator
+// It handles both the legacy _In token and the current _Operator with In operation
+func (p *parser) isInOperator() bool {
+	return p.tok == _In || (p.tok == _Operator && p.op == In)
+}
+
 // transformsEnabled checks if transforms should be enabled for this file
 func (p *parser) transformsEnabled() bool {
 	// Check environment variable
@@ -3189,7 +3195,7 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 		return p.newRangeClause(nil, false)
 	}
 
-	if (keyword == _For || keyword == _While) && p.tok == _In {
+	if (keyword == _For || keyword == _While) && p.isInOperator() {
 		// _In expr
 		if debug && lhs != nil {
 			panic("invalid call of simpleStmt")
@@ -3202,7 +3208,7 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 	}
 
 	// Check for 'in' keyword after parsing LHS (for "for x in collection" or "while x in collection")
-	if (keyword == _For || keyword == _While) && p.tok == _In {
+	if (keyword == _For || keyword == _While) && p.isInOperator() {
 		return p.newInClause(lhs, true) // true for := (new variable)
 	}
 
@@ -3255,7 +3261,7 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 			return p.newRangeClause(lhs, op == Def)
 		}
 
-		if (keyword == _For || keyword == _While) && p.tok == _In {
+		if (keyword == _For || keyword == _While) && p.isInOperator() {
 			// expr_list op= _In
 			return p.newInClause(lhs, op == Def)
 		}
@@ -3303,7 +3309,7 @@ func (p *parser) newRangeClause(lhs Expr, defi bool) *RangeClause {
 func (p *parser) newInClause(lhs Expr, defi bool) *InClause {
 	i := new(InClause)
 	i.pos = p.pos()
-	p.next() // consume _In
+	p.next() // consume in operator
 	i.Lhs = lhs
 	i.Def = defi
 	i.X = p.expr()
