@@ -1,4 +1,5 @@
-// Simplest possible test
-for i in []int{1,2,3} {
-    printf("%d\n", i)
+// Test simple for loop with in operator
+numbers := [1, 2, 3]
+for num in numbers {
+    printf("num = %d\n", num)
 }

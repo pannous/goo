@@ -1,0 +1,5 @@
+// Test simple while loop with in operator
+numbers := [1, 2, 3]
+while num in numbers {
+    printf("num = %d\n", num)
+}
