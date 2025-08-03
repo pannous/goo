@@ -1,0 +1,9 @@
+#!/usr/bin/env goo
+// Test that hash indexing still works (1-based)
+
+arr := [100, 200, 300]
+first := arr#1   // Should work: 100 (1-based indexing)
+second := arr#2  // Should work: 200 (1-based indexing) 
+
+printf("First: %d\n", first)
+printf("Second: %d\n", second)

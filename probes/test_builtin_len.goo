@@ -1,0 +1,4 @@
+func main() {
+	result := len("hello")
+	printf("result: %d\n", result)
+}

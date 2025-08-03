@@ -1043,10 +1043,23 @@ func (s *scanner) escape(quote rune) bool {
 
 func (s *scanner) canBeIndexOperator() bool {
 	// Check if # should be treated as a comment or index operator
-	// If line is blank up to this point (only whitespace), treat as comment
-	// Otherwise, treat as index operator (e.g., xs#1, array#index)
+	// Logic: if immediately preceded by whitespace -> comment
+	//        if immediately preceded by non-whitespace -> index operator
+	
+	// If line is blank up to this point (only whitespace), definitely a comment
 	if s.blank {
-		return false // Only whitespace before # - treat as comment
+		return false
 	}
-	return true // Non-whitespace content before # - treat as index operator
+	
+	// Look back one character in the buffer to see what precedes the #
+	// We need to go back from current position (which is at #)
+	if s.r > 1 {
+		prevChar := s.buf[s.r-2] // Go back 2 positions: current '#' and one before
+		// If previous character is space or tab, treat as comment
+		if prevChar == ' ' || prevChar == '\t' {
+			return false
+		}
+	}
+	
+	return true // Default to index operator
 }

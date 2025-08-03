@@ -1,0 +1,4 @@
+func main() {
+	result := "42".toInt()
+	printf("result: %d\n", result)
+}
