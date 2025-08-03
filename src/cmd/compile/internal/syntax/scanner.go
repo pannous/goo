@@ -437,7 +437,8 @@ func (s *scanner) ident() {
 			s.tok = _Void
 			return
 		case "in":
-			s.tok = _In
+			s.op, s.prec = In, precAdd
+			s.tok = _Operator
 			return
 		case "while":
 			s.tok = _While
