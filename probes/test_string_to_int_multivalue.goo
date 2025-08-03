@@ -1,3 +1,4 @@
+import "fmt"
 import "strconv"
 
 // Test string to int with multi-value assignment
