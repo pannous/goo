@@ -173,3 +173,17 @@ Write(../probes/test_iterator_for_in.goo)
              return
            }
          }
+
+
+ca1bc19 HEAD@{0}: reset: moving to ca1bc19
+d08079a HEAD@{1}: reset: moving to HEAD
+d08079a HEAD@{2}: commit: fix: create minimal plugin version to resolve hanging issues
+722611b HEAD@{3}: commit: fix: disable bundled binary service to prevent IDE hangs
+b1ceb3c HEAD@{4}: commit: fix: resolve IDE crash during file indexing by converting service to object
+c4a9647 HEAD@{5}: commit: go to declaration
+ca1bc19 HEAD@{6}: reset: moving to ca1bc19
+d1e56d2 HEAD@{7}: reset: moving to HEAD
+d1e56d2 HEAD@{8}: commit: feat(minor): add string/rune comparison transform
+ca1bc19 HEAD@{9}: commit: fix: resolve PSI consistency error in comment handling
+674f98b HEAD@{10}: commit: intentions!
+8d68230 HEAD@{11}: commit: refactor: clean up debug code from Goo formatter
