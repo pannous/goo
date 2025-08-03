@@ -44,5 +44,10 @@ check "hello".startsWith("lo") == false
 check "hello".endsWith("lo") == true
 check "hello".endsWith("he") == false
 
+put("hello".split("")) // [h e l l o]  without quotes ?!
+check "hello".split("l") == ["he", "", "o"] // as string[] // split returns a list of strings
+check "hello".split("") == ["h", "e", "l", "l", "o"]
+check "hello".splits() == ["h", "e", "l", "l", "o"]
+
 
 printf("All checks passed!\n")
