@@ -1,6 +1,6 @@
 package helper
 
-const MaxValue = 100
+const MaxValue = 1000
 const MinValue = 0
 
-var DefaultGreeting = "Hi there"
+var DefaultGreeting = "Hello, World!"

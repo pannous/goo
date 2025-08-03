@@ -7,7 +7,7 @@
 /* Block comment */
 
 # Indented hash comment
-	# Tab-indented hash comment
+	# Tab-indented hash comment ⚠️ distinguished from xs#i xs#1 slice index without spaces!
     # Space-indented hash comment
 
 put("Hash comments work!")
