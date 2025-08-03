@@ -44,9 +44,9 @@ Running all tests in ./goo/ directory...
 ❌ test_import_folder.goo
 ❌ test_in_operator_auto_import.goo
 ❌ test_in_operator_maps.goo
-❌ test_in_operator_rune_strings.goo
-❌ test_in_operator_slices.goo
-❌ test_in_operator_strings.goo
+✅ test_in_operator_rune_strings.goo
+✅ test_in_operator_slices.goo
+✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_iterator_for_in.goo
 ✅ test_iterator_membership.goo
@@ -207,7 +207,7 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_for_in.goo
 ✅ test_simple_for.goo
 ✅ test_simple_import.goo
-❌ test_simple_in.goo
+✅ test_simple_in.goo
 ✅ test_simple_printf.goo
 ✅ test_simple_string_method.goo
 ✅ test_simple_string_rune.goo
@@ -245,5 +245,5 @@ Running all tests in ./goo/ directory...
 ❌ test_whitespace_lists_simple.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 212/244 passed, 32 failed
+Summary: 216/244 passed, 28 failed
 ⚠️  Some tests failed
