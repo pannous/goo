@@ -1,0 +1,15 @@
+// Test list syntax without commas
+
+func main() {
+	// This should work (already works)
+	chars1 := ['h', 'e', 'l', 'l', 'o']
+	printf("With commas: %v\n", chars1)
+	
+	// This should also work (new feature)
+	chars2 := ['h' 'e' 'l' 'l' 'o']
+	printf("Without commas: %v\n", chars2)
+	
+	// Numbers without commas
+	nums := [104 101 108 108 111]
+	printf("Numbers: %v\n", nums)
+}

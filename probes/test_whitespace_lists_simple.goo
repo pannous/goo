@@ -1,0 +1,19 @@
+// Test simple whitespace-separated lists
+
+func main() {
+	// Basic whitespace syntax
+	chars := ['h' 'e' 'l' 'l' 'o']
+	printf("Chars: %v\n", chars)
+	
+	// Numbers  
+	nums := [1 2 3 4 5]
+	printf("Numbers: %v\n", nums)
+	
+	// Mixed literals
+	strings := ["hello" "world" "test"]
+	printf("Strings: %v\n", strings)
+	
+	// Verify they work like normal slices
+	printf("Length: %d\n", len(chars))
+	printf("First char: %v\n", chars[0])
+}

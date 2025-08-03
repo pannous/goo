@@ -1,0 +1,14 @@
+// Test the exact examples from the request
+
+func main() {
+	// Original examples
+	hello_chars := ['h' 'e' 'l' 'l' 'o']
+	hello_nums := [104 101 108 108 111]
+	
+	printf("['h' 'e' 'l' 'l' 'o']: %v\n", hello_chars)
+	printf("[104 101 108 108 111]: %v\n", hello_nums)
+	
+	// Already working example
+	chars_with_commas := ['h', 'e', 'l', 'l', 'ø']
+	printf("With commas: %v\n", chars_with_commas)
+}

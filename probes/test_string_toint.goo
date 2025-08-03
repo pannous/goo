@@ -1,0 +1,6 @@
+// Test string toInt method
+
+func main() {
+	result := "42".toInt()
+	printf("Result: %d\n", result)
+}

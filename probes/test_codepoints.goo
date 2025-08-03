@@ -1,0 +1,4 @@
+func main() {
+	result := "hello".codePoints()
+	printf("result: %v\n", result)
+}

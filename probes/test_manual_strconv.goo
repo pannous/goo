@@ -1,0 +1,6 @@
+import "strconv"
+
+func main() {
+	result := func() int { n, _ := strconv.Atoi("42"); return n }()
+	printf("result: %d\n", result)
+}
