@@ -1042,10 +1042,11 @@ func (s *scanner) escape(quote rune) bool {
 }
 
 func (s *scanner) canBeIndexOperator() bool {
-	// For now, be permissive with # as operator except at start of line
-	// Comments at start of line are preserved, others are treated as operators
-	if s.col == 1 {
-		return false // Start of line - definitely a comment
+	// Check if # should be treated as a comment or index operator
+	// If line is blank up to this point (only whitespace), treat as comment
+	// Otherwise, treat as index operator (e.g., xs#1, array#index)
+	if s.blank {
+		return false // Only whitespace before # - treat as comment
 	}
-	return true // Assume it's an operator in all other contexts
+	return true // Non-whitespace content before # - treat as index operator
 }
