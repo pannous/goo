@@ -1,0 +1,5 @@
+// Test multi-variable for loop with in operator
+myMap := map[string]int{"a": 1, "b": 2}
+for key, value in myMap {
+    printf("key = %s, value = %d\n", key, value)
+}

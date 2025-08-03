@@ -1,0 +1,5 @@
+// Debug test to see token parsing
+a := "hello"
+b := "hello world"
+result := a in b
+printf("result = %v\n", result)

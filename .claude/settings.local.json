@@ -27,7 +27,8 @@
       "Bash(GOROOT=/opt/other/go go build -tags=transforms -o ../bin/compile ./cmd/compile)",
       "Bash(git checkout:*)",
       "Bash(rm:*)",
-      "Bash(../bin/go run test_import_folder.goo)"
+      "Bash(../bin/go run test_import_folder.goo)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }

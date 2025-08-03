@@ -43,7 +43,7 @@ func (v *inLoopVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if forStmt, ok := node.(*syntax.ForStmt); ok {
 		if forStmt.Init != nil {
 			if inClause, ok := forStmt.Init.(*syntax.InClause); ok {
-						// Transform the InClause to a RangeClause
+				// Transform the InClause to a RangeClause
 				rangeClause := v.transform.convertInClauseToRange(inClause, v.ctx)
 				if rangeClause != nil {
 					forStmt.Init = rangeClause

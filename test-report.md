@@ -36,21 +36,21 @@ Running all tests in ./goo/ directory...
 ✅ test_filter_simple.goo
 ✅ test_filter_synonyms.goo
 ✅ test_fmt.goo
-✅ test_for_in_key_value.goo
-✅ test_for_loop.goo
+❌ test_for_in_key_value.goo
+❌ test_for_loop.goo
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
 ❌ test_import_file.goo
-❌ test_import_folder.goo
+✅ test_import_folder.goo
 ❌ test_in_operator_auto_import.goo
 ❌ test_in_operator_maps.goo
 ✅ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
-✅ test_iterator_for_in.goo
-✅ test_iterator_membership.goo
-✅ test_iterator_simple.goo
+❌ test_iterator_for_in.goo
+❌ test_iterator_membership.goo
+❌ test_iterator_simple.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
@@ -86,7 +86,7 @@ Running all tests in ./goo/ directory...
 ✅ test_slice_inference_final.goo
 ✅ test_string_char_comparison.goo
 ✅ test_string_char_literal.goo
-❌ test_string_comparison.goo
+✅ test_string_comparison.goo
 ✅ test_string_concat.goo
 ✅ test_string_format_chain.goo
 ✅ test_string_format_simple.goo
@@ -112,10 +112,10 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
-✅ test_while_loops.goo
+❌ test_while_loops.goo
 ✅ tests.goo
 ❌ test_all_features.goo
-✅ test_array_vs_slice.goo
+❌ test_array_vs_slice.goo
 ✅ test_as_cast_check.goo
 ❌ test_as_cast_comprehensive.goo
 ❌ test_as_cast_debug.goo
@@ -130,7 +130,7 @@ Running all tests in ./goo/ directory...
 ✅ test_auto_install2.goo
 ✅ test_basic_strconv.goo
 ✅ test_bool_not.goo
-✅ test_both_auto.goo
+❌ test_both_auto.goo
 ✅ test_both_comments.goo
 ✅ test_both_imports.goo
 ✅ test_builtin_len.goo
@@ -145,26 +145,28 @@ Running all tests in ./goo/ directory...
 ✅ test_complete_hash_comments.goo
 ✅ test_debug_as_cast.goo
 ✅ test_debug_as.goo
-✅ test_debug_comparison.goo
+❌ test_debug_comparison.goo
 ✅ test_debug_interpolation.goo
 ✅ test_debug_manual.goo
-✅ test_debug_transform.goo
+❌ test_debug_transform.goo
 ❌ test_direct_call.goo
 ✅ test_empty_string_reverse.goo
 ✅ test_exclamation.goo
 ✅ test_falsey.goo
-✅ test_filter_clean.goo
-✅ test_final_verification.goo
+❌ test_filter_clean.goo
+❌ test_final_verification.goo
 ✅ test_final_working.goo
-✅ test_for_in_basic.goo
-✅ test_for_in_debug.goo
-✅ test_for_in_function.goo
-✅ test_for_in_loops.goo
+❌ test_for_in_basic.goo
+❌ test_for_in_debug.goo
+❌ test_for_in_function.goo
+❌ test_for_in_loops.goo
 ✅ test_for_in_minimal_working.goo
-✅ test_for_in_minimal.goo
-✅ test_for_in_working.goo
-❌ test_goo_file_import.goo
+❌ test_for_in_minimal.goo
+❌ test_for_in_working.goo
+✅ test_goo_file_import.goo
 ✅ test_hash_comment.goo
+❌ test_hash_edge_cases_fixed.goo
+✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
 ❌ test_in_operator_maps.goo
 ✅ test_int_to_string.goo
@@ -210,7 +212,7 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_check.goo
 ✅ test_simple_concat.goo
 ✅ test_simple_fmt.goo
-✅ test_simple_for_in.goo
+❌ test_simple_for_in.goo
 ✅ test_simple_for.goo
 ✅ test_simple_import.goo
 ✅ test_simple_in.goo
@@ -250,13 +252,14 @@ Running all tests in ./goo/ directory...
 ❌ test_two_strings.goo
 ✅ test_type_precedence.goo
 ✅ test_typeof_debug.goo
-✅ test_while_for_in.goo
-✅ test_while_in_simple.goo
-✅ test_while_loops.goo
+❌ test_while_for_in.goo
+❌ test_while_in_simple.goo
+❌ test_while_loops.goo
 ✅ test_whitespace_debug.goo
 ❌ test_whitespace_lists_simple.goo
 ❌ test_whitespace_strings.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 224/257 passed, 33 failed
+Summary: 206/259 passed, 53 failed
 ⚠️  Some tests failed
+Consider ./build-compiler.sh or do rollback!

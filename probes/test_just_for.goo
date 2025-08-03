@@ -1,0 +1,4 @@
+myMap := map[string]int{"a": 1, "b": 2}
+for key, value in myMap {
+    printf("  %s = %d\n", key, value)
+}

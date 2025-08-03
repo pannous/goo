@@ -47,6 +47,7 @@ type parser struct {
 	top    bool   // in top of file (before package clause)
 	fnest  int    // function nesting level (for error handling)
 	xnest  int    // expression nesting level (for complit ambiguity resolution)
+	inForLoop bool // parsing expressions in for-loop context (stop at 'in' operator)
 	indent []byte // tracing support
 }
 
@@ -1403,6 +1404,11 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 	}
 
 	for (p.tok == _Operator || p.tok == _Star) && p.prec > prec {
+		// Stop parsing if we encounter 'in' operator in for-loop context
+		if p.inForLoop && p.tok == _Operator && p.op == In {
+			break
+		}
+		
 		t := new(Operation)
 		t.pos = p.pos()
 		t.Op = p.op
@@ -3204,7 +3210,15 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 	}
 
 	if lhs == nil {
-		lhs = p.exprList()
+		// Set flag to stop at 'in' operator when parsing for-loop expressions
+		if keyword == _For || keyword == _While {
+			oldInForLoop := p.inForLoop
+			p.inForLoop = true
+			lhs = p.exprList()
+			p.inForLoop = oldInForLoop
+		} else {
+			lhs = p.exprList()
+		}
 	}
 
 	// Check for 'in' keyword after parsing LHS (for "for x in collection" or "while x in collection")
@@ -4086,6 +4100,7 @@ func (p *parser) exprList() Expr {
 	}
 	return x
 }
+
 
 // typeList parses a non-empty, comma-separated list of types,
 // optionally followed by a comma. If strict is set to false,
