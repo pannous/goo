@@ -48,6 +48,13 @@ func (v *asCastVisitor) Visit(node syntax.Node) syntax.Visitor {
 		return nil
 	}
 	
+	// First, handle AsCastExpr directly if this node is one
+	if asCast, ok := node.(*syntax.AsCastExpr); ok {
+		// Replace the AsCastExpr directly - this approach requires modifying the parent
+		// Since we can't modify the parent from here, we'll handle specific parent types below
+		_ = asCast // Just to note we found one
+	}
+	
 	// Look for nodes that contain as-cast expressions we can replace
 	switch n := node.(type) {
 	case *syntax.ExprStmt:
@@ -58,10 +65,22 @@ func (v *asCastVisitor) Visit(node syntax.Node) syntax.Visitor {
 			}
 		}
 	case *syntax.AssignStmt:
+		// Handle both simple assignments and list assignments
 		if asCast, ok := n.Rhs.(*syntax.AsCastExpr); ok {
 			if newExpr := v.transform.convertAsCastToAssert(asCast, v); newExpr != asCast {
 				n.Rhs = newExpr
 				v.changed = true
+			}
+		}
+		// Check if RHS is a list expression containing AsCastExpr
+		if listExpr, ok := n.Rhs.(*syntax.ListExpr); ok {
+			for i, elem := range listExpr.ElemList {
+				if asCast, ok := elem.(*syntax.AsCastExpr); ok {
+					if newExpr := v.transform.convertAsCastToAssert(asCast, v); newExpr != asCast {
+						listExpr.ElemList[i] = newExpr
+						v.changed = true
+					}
+				}
 			}
 		}
 	case *syntax.VarDecl:
@@ -205,13 +224,10 @@ func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType 
 	case targetType == "string" && !t.isBaseType(sourceType):
 		return t.createStringMethodCall(expr, pos)
 		
-	// String to int: "1" as int -> strconv.Atoi("1") 
-	// Currently disabled due to position handling issues in error wrapper
-	// TODO: Fix createMustAtoi position handling
-	// case (targetType == "int" || targetType == "int32" || targetType == "int64") && 
-	//	 (sourceType == "string" || sourceType == "string_literal"):
-	//	visitor.needsStrconvImport = true
-	//	return t.createStrconvCall("Atoi", expr, pos)
+	// String to int: "1" as int -> runtime stringtoint function
+	case (targetType == "int" || targetType == "int32" || targetType == "int64") && 
+		 (sourceType == "string" || sourceType == "string_literal"):
+		return t.createStringToIntCall(expr, pos)
 		
 	// Float to int: 3.1 as int -> int(3.1)
 	case targetType == "int" && (sourceType == "float64" || sourceType == "float_literal"):
@@ -406,6 +422,92 @@ func (t *AsCastTransform) createFloatLiteralToIntConversion(expr syntax.Expr, po
 	return t.createBasicTypeConversion(expr, "int", pos)
 }
 
+// createSimpleAtoi creates a very simple pattern to call strconv.Atoi and get just the value
+func (t *AsCastTransform) createSimpleAtoi(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create strconv.Atoi(expr) call first
+	strconvName := &syntax.Name{Value: "strconv"}
+	strconvName.SetPos(pos)
+	
+	atoiName := &syntax.Name{Value: "Atoi"}
+	atoiName.SetPos(pos)
+	
+	selectorExpr := &syntax.SelectorExpr{
+		X:   strconvName,
+		Sel: atoiName,
+	}
+	selectorExpr.SetPos(pos)
+	
+	atoiCall := &syntax.CallExpr{
+		Fun:     selectorExpr,
+		ArgList: []syntax.Expr{expr},
+	}
+	atoiCall.SetPos(pos)
+	
+	// Create simple wrapper that ignores error and just returns value
+	// Pattern: (func() int { v, _ := strconv.Atoi(expr); return v })()
+	return t.createValueOnlyWrapper(atoiCall, pos)
+}
+
+// createValueOnlyWrapper creates a minimal wrapper to extract just the value from a multi-return function
+func (t *AsCastTransform) createValueOnlyWrapper(call syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create: (func() int { v, _ := call; return v })()
+	// But use extremely simple approach to avoid position issues
+	
+	// Use the call position instead of the passed position to avoid issues
+	callPos := call.Pos()
+	
+	// v variable
+	vVar := &syntax.Name{Value: "v"}
+	vVar.SetPos(callPos)
+	
+	// _ variable  
+	blankVar := &syntax.Name{Value: "_"}
+	blankVar.SetPos(callPos)
+	
+	// v, _ list
+	lhs := &syntax.ListExpr{ElemList: []syntax.Expr{vVar, blankVar}}
+	lhs.SetPos(callPos)
+	
+	// v, _ := call
+	assign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: lhs,
+		Rhs: call,
+	}
+	assign.SetPos(callPos)
+	
+	// return v
+	ret := &syntax.ReturnStmt{Results: vVar}
+	ret.SetPos(callPos)
+	
+	// function body
+	body := &syntax.BlockStmt{List: []syntax.Stmt{assign, ret}}
+	body.SetPos(callPos)
+	
+	// int type
+	intType := &syntax.Name{Value: "int"}
+	intType.SetPos(callPos)
+	
+	// func() int
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{{Type: intType}},
+	}
+	funcType.SetPos(callPos)
+	
+	// func() int { ... }
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
+		Body: body,
+	}
+	funcLit.SetPos(callPos)
+	
+	// (func() int { ... })()
+	result := &syntax.CallExpr{Fun: funcLit}
+	result.SetPos(callPos)
+	
+	return result
+}
+
 // createMustAtoi creates a simple wrapper that extracts the value from strconv.Atoi
 func (t *AsCastTransform) createMustAtoi(atoiCall syntax.Expr, pos syntax.Pos) syntax.Expr {
 	// Use the simplest possible approach that works with Go's syntax
@@ -417,12 +519,15 @@ func (t *AsCastTransform) createMustAtoi(atoiCall syntax.Expr, pos syntax.Pos) s
 	
 	// Create result variable: v
 	vVar := &syntax.Name{Value: "v"}
+	vVar.SetPos(pos)
 	
 	// Create blank variable: _
 	blank := &syntax.Name{Value: "_"}
+	blank.SetPos(pos)
 	
 	// Create list for LHS: v, _
 	lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{vVar, blank}}
+	lhsList.SetPos(pos)
 	
 	// Create assignment: v, _ := atoiCall
 	assign := &syntax.AssignStmt{
@@ -430,24 +535,32 @@ func (t *AsCastTransform) createMustAtoi(atoiCall syntax.Expr, pos syntax.Pos) s
 		Lhs: lhsList,
 		Rhs: atoiCall,
 	}
+	assign.SetPos(pos)
 	
 	// Create return: return v
 	ret := &syntax.ReturnStmt{Results: vVar}
+	ret.SetPos(pos)
 	
 	// Create function body: { v, _ := atoiCall; return v }
 	body := &syntax.BlockStmt{List: []syntax.Stmt{assign, ret}}
+	body.SetPos(pos)
 	
 	// Create function type: func() int
 	intType := &syntax.Name{Value: "int"}
+	intType.SetPos(pos)
 	funcType := &syntax.FuncType{
 		ResultList: []*syntax.Field{{Type: intType}},
 	}
+	funcType.SetPos(pos)
 	
 	// Create function literal
 	funcLit := &syntax.FuncLit{Type: funcType, Body: body}
+	funcLit.SetPos(pos)
 	
 	// Create function call: (func()...)()
-	return &syntax.CallExpr{Fun: funcLit}
+	callExpr := &syntax.CallExpr{Fun: funcLit}
+	callExpr.SetPos(pos)
+	return callExpr
 }
 
 // createSimpleWrapper creates a simple wrapper for multi-value returns
@@ -648,6 +761,24 @@ func (t *AsCastTransform) isBaseType(sourceType string) bool {
 		"int_literal": true, "float_literal": true, "string_literal": true, "rune_literal": true,
 	}
 	return baseTypes[sourceType]
+}
+
+// createStringToIntCall creates a function literal that converts string to int inline
+func (t *AsCastTransform) createStringToIntCall(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Follow the pattern of string_methods_transform: create a complete function literal
+	// Pattern: func() int { /* inline conversion */ }()
+	
+	// Use the same naming pattern as string methods transform: stringToInt
+	funcName := &syntax.Name{Value: "stringToInt"}
+	funcName.SetPos(pos)
+	
+	callExpr := &syntax.CallExpr{
+		Fun:     funcName,
+		ArgList: []syntax.Expr{expr},
+	}
+	callExpr.SetPos(pos)
+	
+	return callExpr
 }
 
 // createStringMethodCall creates obj.String() method call

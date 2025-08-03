@@ -5,25 +5,28 @@
 #import "string_tools" // for string manipulation utilities  'cannot find package' <WHICH?>c TODO
 
 
-#check "hi".reverse() == "ih" // todo
+chars := ['h', 'e', 'l', 'l', 'ø'] // invalid use of [...] array (outside a composite literal)
 #check "hellø".runes() == ['h', 'e', 'l', 'l', 'ø'] // invalid use of [...] array (outside a composite literal)
-#check "hello".reverse() == "olleh"
+runes := []rune("hello")
+put(typeof(runes)) // prints "[]rune"
+printf("%q\n", runes)
+put(runes) // [104 101 108 108 111]
+#put("hello".runes())
+#check "hellø".runes() == chars
 
 i := 2
 #check "你" == '你'
 #check "你好"#2 == '好' // charAt returns a rune at the given index
 #check "你好"#i == '好'
 bytos :=  [104, 101, 108, 108, 111]
+byts := []byte("你好") // [228 189 160 229 165 189] OK
+#byts := []int("你好")
+put(byts) // prints [104 101 108 108 111]
 #check "hello".bytes() == bytos // returns a list of bytes (ASCII values)
 #invalid use of [...] array (outside a composite literal)
 #check "hello".codePoints() == [104, 101, 108, 108, 111] // returns a list of code points (Unicode values)
 #check "hello".runes() == []rune{'h', 'e', 'l', 'l', 'o'}
-#print("hello".split(""))
 #any_list := "hi you".split(" ") // []any is a list of any type, here it is a list of strings
-#check "hello".split("l") == ["he", "", "o"] as string[] // split returns a list of strings
-#check "hello".split("l") == ["he", "", "o"]
-#check "hello".split("") == ["h", "e", "l", "l", "o"]
-#check "hello".splits() == ["h", "e", "l", "l", "o"]
 #check "42".toInt() == 42
 #check "42".toInt(10) == 42
 #check "42".toInt(16) == 66 // 42 in hex is

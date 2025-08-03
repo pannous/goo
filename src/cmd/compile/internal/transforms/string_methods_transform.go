@@ -127,6 +127,10 @@ func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, met
 		return t.createWordsCall(receiver)
 	case "runes":
 		return t.createRunesCall(receiver)
+	case "bytes":
+		return t.createBytesCall(receiver)
+	case "codePoints":
+		return t.createCodePointsCall(receiver)
 	case "join":
 		if len(args) == 1 {
 			return t.createJoinCall(receiver, args[0])
@@ -420,9 +424,9 @@ func (t *StringMethodsTransform) createReverseBody(pos syntax.Pos) *syntax.Block
 	//     runes[i], runes[j] = runes[j], runes[i]
 	// }
 
-	iVar := &syntax.Name{Value: "i"}
+	iVar := &syntax.Name{Value: "rev1_i"}
 	iVar.SetPos(pos)
-	jVar := &syntax.Name{Value: "j"}
+	jVar := &syntax.Name{Value: "rev1_j"}
 	jVar.SetPos(pos)
 
 	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
@@ -1208,21 +1212,236 @@ func (t *StringMethodsTransform) createSplitsCall(receiver syntax.Expr) syntax.E
 func (t *StringMethodsTransform) createRunesCall(receiver syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
+	// Create []rune type
 	runeName := &syntax.Name{Value: "rune"}
 	runeName.SetPos(pos)
 
-	arrayType := &syntax.ArrayType{
+	sliceType := &syntax.SliceType{
 		Elem: runeName,
 	}
-	arrayType.SetPos(pos)
+	sliceType.SetPos(pos)
 
+	// Create []rune(receiver) call
 	call := &syntax.CallExpr{
-		Fun:     arrayType,
+		Fun:     sliceType,
 		ArgList: []syntax.Expr{receiver},
 	}
 	call.SetPos(pos)
 
 	return call
+}
+
+// createBytesCall creates []byte(receiver)
+func (t *StringMethodsTransform) createBytesCall(receiver syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
+	// Create []byte type
+	byteName := &syntax.Name{Value: "byte"}
+	byteName.SetPos(pos)
+
+	sliceType := &syntax.SliceType{
+		Elem: byteName,
+	}
+	sliceType.SetPos(pos)
+
+	// Create []byte(receiver) call
+	call := &syntax.CallExpr{
+		Fun:     sliceType,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+
+	return call
+}
+
+// createCodePointsCall creates []int32([]rune(receiver)) - convert to code points
+func (t *StringMethodsTransform) createCodePointsCall(receiver syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+
+	// Create a function literal that properly converts string to []int
+	// func() []int { 
+	//   runes := []rune(receiver)
+	//   result := make([]int, len(runes))
+	//   for i, r := range runes {
+	//     result[i] = int(r)
+	//   }
+	//   return result
+	// }()
+
+	// Create []int return type
+	intName := &syntax.Name{Value: "int"}
+	intName.SetPos(pos)
+	intSliceType := &syntax.SliceType{Elem: intName}
+	intSliceType.SetPos(pos)
+
+	// Create function type: func() []int
+	returnField := &syntax.Field{Type: intSliceType}
+	returnField.SetPos(pos)
+
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{returnField},
+	}
+	funcType.SetPos(pos)
+
+	// Create function body
+	body := t.createCodePointsBody(pos, receiver)
+
+	// Create function literal
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+
+	// Create call to the function literal
+	call := &syntax.CallExpr{
+		Fun: funcLit,
+	}
+	call.SetPos(pos)
+
+	return call
+}
+
+// createCodePointsBody creates the function body for converting string to []int code points
+func (t *StringMethodsTransform) createCodePointsBody(pos syntax.Pos, receiver syntax.Expr) *syntax.BlockStmt {
+	// runes := []rune(receiver)
+	runesVar := &syntax.Name{Value: "runes"}
+	runesVar.SetPos(pos)
+
+	runeName := &syntax.Name{Value: "rune"}
+	runeName.SetPos(pos)
+	runeSliceType := &syntax.SliceType{Elem: runeName}
+	runeSliceType.SetPos(pos)
+
+	runeConversion := &syntax.CallExpr{
+		Fun:     runeSliceType,
+		ArgList: []syntax.Expr{receiver},
+	}
+	runeConversion.SetPos(pos)
+
+	runesAssign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: runesVar,
+		Rhs: runeConversion,
+	}
+	runesAssign.SetPos(pos)
+
+	// result := make([]int, len(runes))
+	resultVar := &syntax.Name{Value: "result"}
+	resultVar.SetPos(pos)
+
+	makeName := &syntax.Name{Value: "make"}
+	makeName.SetPos(pos)
+
+	intName := &syntax.Name{Value: "int"}
+	intName.SetPos(pos)
+	intSliceType := &syntax.SliceType{Elem: intName}
+	intSliceType.SetPos(pos)
+
+	lenName := &syntax.Name{Value: "len"}
+	lenName.SetPos(pos)
+	lenCall := &syntax.CallExpr{
+		Fun:     lenName,
+		ArgList: []syntax.Expr{runesVar},
+	}
+	lenCall.SetPos(pos)
+
+	makeCall := &syntax.CallExpr{
+		Fun:     makeName,
+		ArgList: []syntax.Expr{intSliceType, lenCall},
+	}
+	makeCall.SetPos(pos)
+
+	resultAssign := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: resultVar,
+		Rhs: makeCall,
+	}
+	resultAssign.SetPos(pos)
+
+
+	// for cp_i := 0; cp_i < len(runes); cp_i++ { result[cp_i] = int(runes[cp_i]) }
+	// Use unique variable names to avoid conflicts
+	cpIVar := &syntax.Name{Value: "cp_i"}
+	cpIVar.SetPos(pos)
+	
+	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zeroLit.SetPos(pos)
+
+	initStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: cpIVar,
+		Rhs: zeroLit,
+	}
+	initStmt.SetPos(pos)
+
+	// cp_i < len(runes)
+	cond := &syntax.Operation{
+		Op: syntax.Lss,
+		X:  cpIVar,
+		Y:  lenCall, // reuse the lenCall from above
+	}
+	cond.SetPos(pos)
+
+	// cp_i++
+	oneLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+	oneLit.SetPos(pos)
+	postStmt := &syntax.AssignStmt{
+		Op:  syntax.Add,
+		Lhs: cpIVar,
+		Rhs: oneLit,
+	}
+	postStmt.SetPos(pos)
+
+	// Update the assignment to use runes[cp_i] instead of range
+	runesIndex := &syntax.IndexExpr{
+		X:     runesVar,
+		Index: cpIVar,
+	}
+	runesIndex.SetPos(pos)
+
+	intConversionFromIndex := &syntax.CallExpr{
+		Fun:     intName,
+		ArgList: []syntax.Expr{runesIndex},
+	}
+	intConversionFromIndex.SetPos(pos)
+
+	// result[cp_i] = int(runes[cp_i])
+	resultIndexFixed := &syntax.IndexExpr{
+		X:     resultVar,
+		Index: cpIVar,
+	}
+	resultIndexFixed.SetPos(pos)
+
+	assignStmtFixed := &syntax.AssignStmt{
+		Op:  0, // Regular assignment
+		Lhs: resultIndexFixed,
+		Rhs: intConversionFromIndex,
+	}
+	assignStmtFixed.SetPos(pos)
+
+	forBodyFixed := &syntax.BlockStmt{
+		List: []syntax.Stmt{assignStmtFixed},
+	}
+	forBodyFixed.SetPos(pos)
+
+	forStmt := &syntax.ForStmt{
+		Init: initStmt,
+		Cond: cond,
+		Post: postStmt,
+		Body: forBodyFixed,
+	}
+	forStmt.SetPos(pos)
+
+	// return result
+	returnStmt := &syntax.ReturnStmt{
+		Results: resultVar,
+	}
+	returnStmt.SetPos(pos)
+
+	return &syntax.BlockStmt{
+		List: []syntax.Stmt{runesAssign, resultAssign, forStmt, returnStmt},
+	}
 }
 
 // createJoinCall creates strings.Join(receiver.splits(), sep)
@@ -1294,40 +1513,256 @@ func (t *StringMethodsTransform) createToIntCall(receiver syntax.Expr, base synt
 	pos := receiver.Pos()
 
 	if base == nil {
-		// Call runtime helper: stringToInt(receiver)
-		funcName := &syntax.Name{Value: "stringToInt"}
+		// Use strconv.Atoi(receiver)
+		strconvName := &syntax.Name{Value: "strconv"}
+		strconvName.SetPos(pos)
+
+		funcName := &syntax.Name{Value: "Atoi"}
 		funcName.SetPos(pos)
 
+		selector := &syntax.SelectorExpr{
+			X:   strconvName,
+			Sel: funcName,
+		}
+		selector.SetPos(pos)
+
 		call := &syntax.CallExpr{
-			Fun:     funcName,
+			Fun:     selector,
 			ArgList: []syntax.Expr{receiver},
 		}
 		call.SetPos(pos)
-		return call
+
+		// strconv.Atoi returns (int, error), we need just the int
+		// Create a function literal that handles the error: func() int { n, _ := strconv.Atoi(receiver); return n }()
+		return t.createAtoiWrapper(pos, call)
 	} else {
-		// Call runtime helper: stringToIntBase(receiver, base)
-		funcName := &syntax.Name{Value: "stringToIntBase"}
+		// Use strconv.ParseInt(receiver, base, 0) for custom base
+		strconvName := &syntax.Name{Value: "strconv"}
+		strconvName.SetPos(pos)
+
+		funcName := &syntax.Name{Value: "ParseInt"}
 		funcName.SetPos(pos)
 
+		selector := &syntax.SelectorExpr{
+			X:   strconvName,
+			Sel: funcName,
+		}
+		selector.SetPos(pos)
+
+		// ParseInt(s string, base int, bitSize int) (int64, error)
+		zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+		zeroLit.SetPos(pos)
+
 		call := &syntax.CallExpr{
-			Fun:     funcName,
-			ArgList: []syntax.Expr{receiver, base},
+			Fun:     selector,
+			ArgList: []syntax.Expr{receiver, base, zeroLit},
 		}
 		call.SetPos(pos)
-		return call
+
+		// ParseInt returns (int64, error), convert to int and ignore error
+		return t.createParseIntWrapper(pos, call)
 	}
+}
+
+// createAtoiWrapper creates a function literal that calls strconv.Atoi and ignores the error
+func (t *StringMethodsTransform) createAtoiWrapper(pos syntax.Pos, atoiCall syntax.Expr) syntax.Expr {
+	// func() int { n, _ := strconv.Atoi(receiver); return n }()
+	
+	// Create return type
+	intName := &syntax.Name{Value: "int"}
+	intName.SetPos(pos)
+	
+	returnField := &syntax.Field{Type: intName}
+	returnField.SetPos(pos)
+
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{returnField},
+	}
+	funcType.SetPos(pos)
+
+	// Create variables
+	nVar := &syntax.Name{Value: "n"}
+	nVar.SetPos(pos)
+	underscoreVar := &syntax.Name{Value: "_"}
+	underscoreVar.SetPos(pos)
+
+	// n, _ := strconv.Atoi(receiver)
+	assignStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: &syntax.ListExpr{ElemList: []syntax.Expr{nVar, underscoreVar}},
+		Rhs: atoiCall,
+	}
+	assignStmt.SetPos(pos)
+
+	// return n
+	returnStmt := &syntax.ReturnStmt{
+		Results: nVar,
+	}
+	returnStmt.SetPos(pos)
+
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{assignStmt, returnStmt},
+	}
+	body.SetPos(pos)
+
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+
+	// Call the function literal
+	call := &syntax.CallExpr{
+		Fun: funcLit,
+	}
+	call.SetPos(pos)
+
+	return call
+}
+
+// createParseIntWrapper creates a function literal that calls strconv.ParseInt and converts to int
+func (t *StringMethodsTransform) createParseIntWrapper(pos syntax.Pos, parseIntCall syntax.Expr) syntax.Expr {
+	// func() int { n, _ := strconv.ParseInt(receiver, base, 0); return int(n) }()
+	
+	// Create return type
+	intName := &syntax.Name{Value: "int"}
+	intName.SetPos(pos)
+	
+	returnField := &syntax.Field{Type: intName}
+	returnField.SetPos(pos)
+
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{returnField},
+	}
+	funcType.SetPos(pos)
+
+	// Create variables
+	nVar := &syntax.Name{Value: "n"}
+	nVar.SetPos(pos)
+	underscoreVar := &syntax.Name{Value: "_"}
+	underscoreVar.SetPos(pos)
+
+	// n, _ := strconv.ParseInt(receiver, base, 0)
+	assignStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: &syntax.ListExpr{ElemList: []syntax.Expr{nVar, underscoreVar}},
+		Rhs: parseIntCall,
+	}
+	assignStmt.SetPos(pos)
+
+	// return int(n)
+	intConversion := &syntax.CallExpr{
+		Fun:     intName,
+		ArgList: []syntax.Expr{nVar},
+	}
+	intConversion.SetPos(pos)
+
+	returnStmt := &syntax.ReturnStmt{
+		Results: intConversion,
+	}
+	returnStmt.SetPos(pos)
+
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{assignStmt, returnStmt},
+	}
+	body.SetPos(pos)
+
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+
+	// Call the function literal
+	call := &syntax.CallExpr{
+		Fun: funcLit,
+	}
+	call.SetPos(pos)
+
+	return call
 }
 
 // createToFloatCall creates helper function call for string to float conversion
 func (t *StringMethodsTransform) createToFloatCall(receiver syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
-	funcName := &syntax.Name{Value: "stringToFloat"}
+	// Use strconv.ParseFloat(receiver, 64)
+	strconvName := &syntax.Name{Value: "strconv"}
+	strconvName.SetPos(pos)
+
+	funcName := &syntax.Name{Value: "ParseFloat"}
 	funcName.SetPos(pos)
 
+	selector := &syntax.SelectorExpr{
+		X:   strconvName,
+		Sel: funcName,
+	}
+	selector.SetPos(pos)
+
+	// ParseFloat(s string, bitSize int) (float64, error)
+	sixtyFourLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "64"}
+	sixtyFourLit.SetPos(pos)
+
 	call := &syntax.CallExpr{
-		Fun:     funcName,
-		ArgList: []syntax.Expr{receiver},
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, sixtyFourLit},
+	}
+	call.SetPos(pos)
+
+	// ParseFloat returns (float64, error), ignore error
+	return t.createParseFloatWrapper(pos, call)
+}
+
+// createParseFloatWrapper creates a function literal that calls strconv.ParseFloat and ignores the error
+func (t *StringMethodsTransform) createParseFloatWrapper(pos syntax.Pos, parseFloatCall syntax.Expr) syntax.Expr {
+	// func() float64 { f, _ := strconv.ParseFloat(receiver, 64); return f }()
+	
+	// Create return type
+	floatName := &syntax.Name{Value: "float64"}
+	floatName.SetPos(pos)
+	
+	returnField := &syntax.Field{Type: floatName}
+	returnField.SetPos(pos)
+
+	funcType := &syntax.FuncType{
+		ResultList: []*syntax.Field{returnField},
+	}
+	funcType.SetPos(pos)
+
+	// Create variables
+	fVar := &syntax.Name{Value: "f"}
+	fVar.SetPos(pos)
+	underscoreVar := &syntax.Name{Value: "_"}
+	underscoreVar.SetPos(pos)
+
+	// f, _ := strconv.ParseFloat(receiver, 64)
+	assignStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: &syntax.ListExpr{ElemList: []syntax.Expr{fVar, underscoreVar}},
+		Rhs: parseFloatCall,
+	}
+	assignStmt.SetPos(pos)
+
+	// return f
+	returnStmt := &syntax.ReturnStmt{
+		Results: fVar,
+	}
+	returnStmt.SetPos(pos)
+
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{assignStmt, returnStmt},
+	}
+	body.SetPos(pos)
+
+	funcLit := &syntax.FuncLit{
+		Type: funcType,
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+
+	// Call the function literal
+	call := &syntax.CallExpr{
+		Fun: funcLit,
 	}
 	call.SetPos(pos)
 
