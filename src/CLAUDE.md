@@ -120,7 +120,10 @@ Create exactly one new file <git_root>/goo/test_{feature}.goo to test cases for 
 Only create ONE new test per feature and reuse existing tests for very similar features.
 Before committing quickly run these new tests with the freshly built ../bin/go 
 
+# Test Reporting and Regression 
 Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` increases, commit to git!
+Check for regressions with:
+git diff HEAD~3 test-report.md | grep "\-✅"
 
 # Test Writing
 Usually when you create one test there's no more need to modify it unless you really missed something
