@@ -1,0 +1,13 @@
+#!/usr/bin/env goo
+# This is a comment at start
+	# This is a tab-indented comment  
+    # This is a space-indented comment
+
+// Test that hash indexing still works
+xs := [10, 20, 30]
+value := xs#1  // Should be index operator (20)
+second := xs#2 // Should be index operator (30)
+
+printf("First: %d\n", value)   // Should print 20
+printf("Second: %d\n", second) // Should print 30
+printf("Hash comments and indexing both work!")
