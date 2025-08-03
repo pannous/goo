@@ -282,6 +282,30 @@ func (t *AsCastTransform) inferExprType(expr syntax.Expr, ctx *TransformContext)
 		// For named variables without context, assume they are custom types
 		// This allows String() method conversion to trigger
 		return "custom_type"
+	case *syntax.IndexExpr:
+		// For slice/array indexing like arr[i], try to infer the element type
+		// If we can't determine the specific element type, assume it could be any interface value
+		// For any_list[1], the element type should be 'any'
+		if baseName, ok := e.X.(*syntax.Name); ok {
+			if ctx != nil && ctx.Types != nil {
+				if declaredType, exists := ctx.Types[baseName.Value]; exists {
+					// Handle specific known slice types
+					switch declaredType {
+					case "[]any":
+						return "any"
+					case "[]int":
+						return "int"
+					case "[]string":
+						return "string"
+					case "[]float64":
+						return "float64"
+					// Add more specific cases as needed
+					}
+				}
+			}
+		}
+		// Default for unknown slice indexing - assume interface value
+		return "any"
 	case *syntax.Operation:
 		// For operations, try to infer from operands
 		return "custom_type"
@@ -757,6 +781,8 @@ func (t *AsCastTransform) isBaseType(sourceType string) bool {
 		"float32": true, "float64": true, "float": true,
 		"byte": true, "rune": true, "bool": true,
 		"string": true,
+		// Interface types should use type assertions, not method calls
+		"any": true, "interface{}": true,
 		// Literal types
 		"int_literal": true, "float_literal": true, "string_literal": true, "rune_literal": true,
 	}

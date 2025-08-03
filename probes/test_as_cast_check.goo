@@ -1,4 +1,6 @@
 // Test as cast with check statements
-check 1 as string == string(1)
+import "strconv"
+
+check 1 as string == "1"
 check 3 as float == float64(3)
 printf("Check tests passed\n")
