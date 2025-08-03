@@ -260,6 +260,40 @@ func stringRuneAt(s string, i int) string {
 	return string(runes[i])
 }
 
+// stringToInt converts a string to an integer using strconv.Atoi
+// This function panics if the conversion fails, providing a simple
+// runtime helper for string-to-int casting
+func stringToInt(s string) int {
+	n, ok := strconv.Atoi(s)
+	if !ok {
+		panic("stringToInt: invalid syntax")
+	}
+	return n
+}
+
+// stringToIntBase converts a string to an integer with the specified base
+// For now, only base 10 is supported - ignore the base parameter
+func stringToIntBase(s string, base int) int {
+	// TODO: Implement proper base parsing
+	// For now, just use regular Atoi regardless of base
+	n, ok := strconv.Atoi(s)
+	if !ok {
+		panic("stringToIntBase: invalid syntax")
+	}
+	return n
+}
+
+// stringToFloat converts a string to a float64
+// This is a simplified implementation
+func stringToFloat(s string) float64 {
+	// TODO: Implement proper float parsing
+	// For now, try to convert via Atoi and cast to float
+	if n, ok := strconv.Atoi(s); ok {
+		return float64(n)
+	}
+	panic("stringToFloat: invalid syntax")
+}
+
 func slicerunetostring(buf *tmpBuf, a []rune) string {
 	if raceenabled && len(a) > 0 {
 		racereadrangepc(unsafe.Pointer(&a[0]),

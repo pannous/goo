@@ -103,6 +103,9 @@ func slicebytetostringtmp(ptr *byte, n int) string
 func slicerunetostring(*[32]byte, []rune) string
 func stringtoslicebyte(*[32]byte, string) []byte
 func stringtoslicerune(*[32]rune, string) []rune
+func stringToInt(string) int
+func stringToIntBase(string, int) int
+func stringToFloat(string) float64
 func slicecopy(toPtr *any, toLen int, fromPtr *any, fromLen int, wid uintptr) int
 
 func decoderune(string, int) (retv rune, retk int)

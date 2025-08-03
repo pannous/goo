@@ -1685,7 +1685,8 @@ func (p *parser) operand(keep_parens bool) Expr {
 		first := p.expr()
 
 		// Disambiguate: if comma follows, it's slice literal [1,2,3]
-		if p.tok == _Comma {
+		// Or if another expression starts, it's whitespace-separated [1 2 3]
+		if p.tok == _Comma || (p.isExprStart() && p.tok != _Rbrack) {
 			return p.sliceLiteral(pos, first)
 		}
 
@@ -2208,7 +2209,18 @@ func (p *parser) mapTypeOrLiteral() Expr {
 	}
 }
 
-// sliceLiteral parses [1,2,3] style slice literals with type inference
+// isExprStart returns true if the current token can start an expression
+func (p *parser) isExprStart() bool {
+	switch p.tok {
+	case _Name, _Literal, _Lparen, _Func, _Map, _Lbrack, _Lbrace,
+		_Chan, _Struct, _Interface:
+		return true
+	default:
+		return false
+	}
+}
+
+// sliceLiteral parses slice literals with both comma-separated [1,2,3] and whitespace-separated [1 2 3] syntax
 func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	if trace {
 		defer p.trace("sliceLiteral")()
@@ -2217,15 +2229,24 @@ func (p *parser) sliceLiteral(pos Pos, first Expr) Expr {
 	// Collect all elements first to analyze types
 	elements := []Expr{first}
 
-	// Parse remaining elements
-	for p.tok == _Comma {
-		p.next()
-		if p.tok == _Rbrack {
-			break // trailing comma
+	// Parse remaining elements (support both comma-separated and whitespace-separated)
+	for {
+		if p.tok == _Comma {
+			// Traditional comma-separated syntax
+			p.next()
+			if p.tok == _Rbrack {
+				break // trailing comma
+			}
+			expr := p.expr()
+			elements = append(elements, expr)
+		} else if p.isExprStart() && p.tok != _Rbrack {
+			// Whitespace-separated syntax (new feature)
+			expr := p.expr()
+			elements = append(elements, expr)
+		} else {
+			// No more elements
+			break
 		}
-
-		expr := p.expr()
-		elements = append(elements, expr)
 	}
 
 	rbrace := p.pos()
