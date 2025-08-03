@@ -1513,54 +1513,11 @@ func (t *StringMethodsTransform) createToIntCall(receiver syntax.Expr, base synt
 	pos := receiver.Pos()
 
 	if base == nil {
-		// Use strconv.Atoi(receiver)
-		strconvName := &syntax.Name{Value: "strconv"}
-		strconvName.SetPos(pos)
-
-		funcName := &syntax.Name{Value: "Atoi"}
-		funcName.SetPos(pos)
-
-		selector := &syntax.SelectorExpr{
-			X:   strconvName,
-			Sel: funcName,
-		}
-		selector.SetPos(pos)
-
-		call := &syntax.CallExpr{
-			Fun:     selector,
-			ArgList: []syntax.Expr{receiver},
-		}
-		call.SetPos(pos)
-
-		// strconv.Atoi returns (int, error), we need just the int
-		// Create a function literal that handles the error: func() int { n, _ := strconv.Atoi(receiver); return n }()
-		return t.createAtoiWrapper(pos, call)
+		// Use the must pattern: func() int { n, _ := strconv.Atoi(receiver); return n }()
+		return t.createMustAtoi(pos, receiver)
 	} else {
-		// Use strconv.ParseInt(receiver, base, 0) for custom base
-		strconvName := &syntax.Name{Value: "strconv"}
-		strconvName.SetPos(pos)
-
-		funcName := &syntax.Name{Value: "ParseInt"}
-		funcName.SetPos(pos)
-
-		selector := &syntax.SelectorExpr{
-			X:   strconvName,
-			Sel: funcName,
-		}
-		selector.SetPos(pos)
-
-		// ParseInt(s string, base int, bitSize int) (int64, error)
-		zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
-		zeroLit.SetPos(pos)
-
-		call := &syntax.CallExpr{
-			Fun:     selector,
-			ArgList: []syntax.Expr{receiver, base, zeroLit},
-		}
-		call.SetPos(pos)
-
-		// ParseInt returns (int64, error), convert to int and ignore error
-		return t.createParseIntWrapper(pos, call)
+		// Use the must pattern: func() int { n, _ := strconv.ParseInt(receiver, base, 0); return int(n) }()
+		return t.createMustParseInt(pos, receiver, base)
 	}
 }
 
@@ -1686,31 +1643,8 @@ func (t *StringMethodsTransform) createParseIntWrapper(pos syntax.Pos, parseIntC
 func (t *StringMethodsTransform) createToFloatCall(receiver syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
-	// Use strconv.ParseFloat(receiver, 64)
-	strconvName := &syntax.Name{Value: "strconv"}
-	strconvName.SetPos(pos)
-
-	funcName := &syntax.Name{Value: "ParseFloat"}
-	funcName.SetPos(pos)
-
-	selector := &syntax.SelectorExpr{
-		X:   strconvName,
-		Sel: funcName,
-	}
-	selector.SetPos(pos)
-
-	// ParseFloat(s string, bitSize int) (float64, error)
-	sixtyFourLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "64"}
-	sixtyFourLit.SetPos(pos)
-
-	call := &syntax.CallExpr{
-		Fun:     selector,
-		ArgList: []syntax.Expr{receiver, sixtyFourLit},
-	}
-	call.SetPos(pos)
-
-	// ParseFloat returns (float64, error), ignore error
-	return t.createParseFloatWrapper(pos, call)
+	// Use the must pattern: func() float64 { f, _ := strconv.ParseFloat(receiver, 64); return f }()
+	return t.createMustParseFloat(pos, receiver)
 }
 
 // createParseFloatWrapper creates a function literal that calls strconv.ParseFloat and ignores the error
@@ -2223,6 +2157,118 @@ func (t *StringMethodsTransform) createToBoolCall(receiver syntax.Expr) syntax.E
 	call.SetPos(pos)
 
 	return call
+}
+
+// createMustAtoi creates a simple call that panics on error: func() int { n, _ := strconv.Atoi(s); return n }()
+func (t *StringMethodsTransform) createMustAtoi(pos syntax.Pos, receiver syntax.Expr) syntax.Expr {
+	// Build: func() int { n, _ := strconv.Atoi(receiver); return n }()
+	
+	// Create strconv.Atoi call
+	strconvName := &syntax.Name{Value: "strconv"}
+	strconvName.SetPos(pos)
+	
+	atoiName := &syntax.Name{Value: "Atoi"}
+	atoiName.SetPos(pos)
+	
+	selector := &syntax.SelectorExpr{X: strconvName, Sel: atoiName}
+	selector.SetPos(pos)
+	
+	atoiCall := &syntax.CallExpr{Fun: selector, ArgList: []syntax.Expr{receiver}}
+	atoiCall.SetPos(pos)
+	
+	// Create func() int { n, _ := strconv.Atoi(receiver); return n }()
+	return t.createMustWrapper(pos, atoiCall, "int", "n")
+}
+
+// createMustParseInt creates a ParseInt wrapper
+func (t *StringMethodsTransform) createMustParseInt(pos syntax.Pos, receiver syntax.Expr, base syntax.Expr) syntax.Expr {
+	strconvName := &syntax.Name{Value: "strconv"}
+	strconvName.SetPos(pos)
+	
+	parseIntName := &syntax.Name{Value: "ParseInt"}
+	parseIntName.SetPos(pos)
+	
+	selector := &syntax.SelectorExpr{X: strconvName, Sel: parseIntName}
+	selector.SetPos(pos)
+	
+	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zeroLit.SetPos(pos)
+	
+	parseIntCall := &syntax.CallExpr{Fun: selector, ArgList: []syntax.Expr{receiver, base, zeroLit}}
+	parseIntCall.SetPos(pos)
+	
+	return t.createMustWrapper(pos, parseIntCall, "int", "n")
+}
+
+// createMustParseFloat creates a ParseFloat wrapper  
+func (t *StringMethodsTransform) createMustParseFloat(pos syntax.Pos, receiver syntax.Expr) syntax.Expr {
+	strconvName := &syntax.Name{Value: "strconv"}
+	strconvName.SetPos(pos)
+	
+	parseFloatName := &syntax.Name{Value: "ParseFloat"}
+	parseFloatName.SetPos(pos)
+	
+	selector := &syntax.SelectorExpr{X: strconvName, Sel: parseFloatName}
+	selector.SetPos(pos)
+	
+	sixtyFourLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "64"}
+	sixtyFourLit.SetPos(pos)
+	
+	parseFloatCall := &syntax.CallExpr{Fun: selector, ArgList: []syntax.Expr{receiver, sixtyFourLit}}
+	parseFloatCall.SetPos(pos)
+	
+	return t.createMustWrapper(pos, parseFloatCall, "float64", "f")
+}
+
+// createMustWrapper creates func() RetType { varName, _ := call; return RetType(varName) }()
+func (t *StringMethodsTransform) createMustWrapper(pos syntax.Pos, call syntax.Expr, retType string, varName string) syntax.Expr {
+	// Create return type
+	retTypeName := &syntax.Name{Value: retType}
+	retTypeName.SetPos(pos)
+	
+	retField := &syntax.Field{Type: retTypeName}
+	retField.SetPos(pos)
+	
+	funcType := &syntax.FuncType{ResultList: []*syntax.Field{retField}}
+	funcType.SetPos(pos)
+	
+	// Create variables  
+	varNameNode := &syntax.Name{Value: varName}
+	varNameNode.SetPos(pos)
+	underscoreVar := &syntax.Name{Value: "_"}
+	underscoreVar.SetPos(pos)
+	
+	// Create assignment: varName, _ := call
+	assignStmt := &syntax.AssignStmt{
+		Op:  syntax.Def,
+		Lhs: &syntax.ListExpr{ElemList: []syntax.Expr{varNameNode, underscoreVar}},
+		Rhs: call,
+	}
+	assignStmt.SetPos(pos)
+	
+	// Create return: return RetType(varName)
+	castExpr := &syntax.CallExpr{
+		Fun:     retTypeName,
+		ArgList: []syntax.Expr{varNameNode},
+	}
+	castExpr.SetPos(pos)
+	
+	returnStmt := &syntax.ReturnStmt{Results: castExpr}
+	returnStmt.SetPos(pos)
+	
+	// Create function body
+	body := &syntax.BlockStmt{List: []syntax.Stmt{assignStmt, returnStmt}}
+	body.SetPos(pos)
+	
+	// Create function literal
+	funcLit := &syntax.FuncLit{Type: funcType, Body: body}
+	funcLit.SetPos(pos)
+	
+	// Create function call
+	funcCall := &syntax.CallExpr{Fun: funcLit}
+	funcCall.SetPos(pos)
+	
+	return funcCall
 }
 
 func init() {

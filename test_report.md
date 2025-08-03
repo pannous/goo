@@ -113,10 +113,10 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
-❌ tests.goo
+✅ tests.goo
 ❌ test_all_features.goo
 ✅ test_array_vs_slice.goo
-❌ test_as_cast_check.goo
+✅ test_as_cast_check.goo
 ❌ test_as_cast_comprehensive.goo
 ❌ test_as_cast_debug.goo
 ❌ test_as_cast_minimal.goo
@@ -140,6 +140,7 @@ Running all tests in ./goo/ directory...
 ✅ test_cmp_manual.goo
 ✅ test_codepoints.goo
 ❌ test_complete_hash_comments.goo
+✅ test_debug_as_cast.goo
 ✅ test_debug_as.goo
 ✅ test_debug_comparison.goo
 ✅ test_debug_interpolation.goo
@@ -244,5 +245,5 @@ Running all tests in ./goo/ directory...
 ❌ test_whitespace_lists_simple.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 209/243 passed, 34 failed
+Summary: 212/244 passed, 32 failed
 ⚠️  Some tests failed
