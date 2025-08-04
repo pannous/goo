@@ -2,7 +2,7 @@
 
 func main() {
 	// Single element (should not break existing array type syntax)
-	single := ['x']
+	single := ['x',]
 	printf("Single: %v\n", single)
 	
 	// Empty list
