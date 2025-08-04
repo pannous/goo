@@ -86,7 +86,7 @@ If types are known ([]int, etc.), generate func(int) int instead of func(any) an
 ☐ [1, 2, 3] is []int  
 ☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
 ☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... } 
-  
+☐ while event := sdl.PollEvent(){} =>  for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 
 ☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)  
 ☐ optional braces for function calls put 42 => put(42)      ambiguity resolution (e.g. put 42 + 3 vs put(42) + 3)  

@@ -1,3 +1,2 @@
-func main() {
-	strings := ["hello"]
-}
+strings := ["hello",]
+check strings#1 == "hello" // Access the first element of the array
