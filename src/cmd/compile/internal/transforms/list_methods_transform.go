@@ -142,7 +142,12 @@ func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContex
 	//println("ListMethodsTransform.Transform called")
 	changed := false
 
-	// Transform all declarations
+	// NOTE: We use manual traversal instead of pure syntax.Walk() visitor pattern
+	// because list method transforms often change expression types (CallExpr -> IndexExpr, etc.)
+	// and the visitor pattern can't handle in-place replacement of different node types.
+	// Manual traversal allows us to properly replace nodes with different types.
+
+	// Transform all declarations with enhanced traversal
 	for i, decl := range file.DeclList {
 		if newDecl := t.transformDecl(decl, ctx); newDecl != decl {
 			file.DeclList[i] = newDecl
@@ -237,6 +242,39 @@ func (t *ListMethodsTransform) transformStmt(stmt syntax.Stmt, ctx *TransformCon
 		if newCond := t.transformExpr(s.Cond, ctx); newCond != s.Cond {
 			newStmt := *s
 			newStmt.Cond = newCond
+			return &newStmt
+		}
+	case *syntax.IfStmt:
+		// Added IfStmt support for better coverage
+		condChanged := false
+		thenChanged := false
+		elseChanged := false
+		
+		newCond := t.transformExpr(s.Cond, ctx)
+		if newCond != s.Cond {
+			condChanged = true
+		}
+		
+		newThen := t.transformStmt(s.Then, ctx)
+		if newThen != s.Then {
+			thenChanged = true
+		}
+		
+		var newElse syntax.Stmt
+		if s.Else != nil {
+			newElse = t.transformStmt(s.Else, ctx)
+			if newElse != s.Else {
+				elseChanged = true
+			}
+		}
+		
+		if condChanged || thenChanged || elseChanged {
+			newStmt := *s
+			newStmt.Cond = newCond
+			if blockStmt, ok := newThen.(*syntax.BlockStmt); ok {
+				newStmt.Then = blockStmt
+			}
+			newStmt.Else = newElse
 			return &newStmt
 		}
 	}

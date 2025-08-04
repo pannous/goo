@@ -13,7 +13,7 @@ Running all tests in ./goo/ directory...
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 ✅ test_array_like_slice.goo
-❌ test_as_cast_convert.goo
+✅ test_as_cast_convert.goo
 ✅ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
@@ -55,6 +55,7 @@ Running all tests in ./goo/ directory...
 ✅ test_list_comparison2.goo
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
+❌ test_list_methods_broken.goo
 ✅ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
 ✅ test_list_typed.goo
@@ -114,6 +115,11 @@ Running all tests in ./goo/ directory...
 ✅ tests.goo
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
+✅ test_adjacent_broken_exact.goo
+✅ test_adjacent_lines_broken.goo
+✅ test_adjacent_lines_working.goo
+✅ test_adjacent_method_calls.goo
+✅ test_adjacent_working_exact.goo
 ❌ test_all_features.goo
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
@@ -121,9 +127,11 @@ Running all tests in ./goo/ directory...
 ✅ test_charAt_comprehensive.goo
 ❌ test_comments_consolidated.goo
 ❌ test_conversions_consolidated.goo
+✅ test_exact_adjacent_issue.goo
+✅ test_exact_user_issue.goo
 ✅ test_falsey.goo
 ❌ test_filter_clean.goo
-❌ test_for_in_consolidated.goo
+✅ test_for_in_consolidated.goo
 ❌ test_goo_file_import.goo
 ✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
@@ -132,6 +140,7 @@ Running all tests in ./goo/ directory...
 ✅ test_manual_strconv.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_printf_only.goo
+✅ test_minimal_adjacent.goo
 ✅ test_multi_return_try.goo
 ✅ test_multi_var_while_in.goo
 ✅ test_not_comprehensive.goo
@@ -144,9 +153,10 @@ Running all tests in ./goo/ directory...
 ✅ test_truthiness_basic.goo
 ✅ test_try_propagation.goo
 ✅ test_try_simple_assignment.goo
+✅ test_user_exact_syntax.goo
 ✅ test_while_for_in.goo
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ========================================
-Summary: 127/147 passed, 20 failed
+Summary: 138/157 passed, 19 failed
 ⚠️  Some tests failed
