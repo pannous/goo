@@ -34,7 +34,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ map[active:true age:30 name:Alice]  // read back print("%v") format  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
 ✅ test_list_comparison.goo [1,2]==[1,2]  
-✅ check "a"+1 == "a1" // invalid operation: "a" + 1 (mismatched types untyped string and untyped int)  
+✅ check "a"+1 == "a1"  
+✅ check "a" == 'a'  
 ✅ check not x =>  !truthy(x)  
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
 ✅ String methods "abc".contains("a")  
