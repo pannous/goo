@@ -10,6 +10,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"strings"
 )
 
 // AsCastTransform converts as cast expressions to type assertions
@@ -124,6 +125,14 @@ func (v *asCastVisitor) Visit(node syntax.Node) syntax.Visitor {
 				v.changed = true
 			}
 		}
+	case *syntax.ParenExpr:
+		// Handle AsCastExpr inside parentheses: (expr as T)
+		if asCast, ok := n.X.(*syntax.AsCastExpr); ok {
+			if newExpr := v.transform.convertAsCastToAssert(asCast, v); newExpr != asCast {
+				n.X = newExpr
+				v.changed = true
+			}
+		}
 	}
 	
 	// Continue visiting child nodes
@@ -219,6 +228,11 @@ func (t *AsCastTransform) createSemanticConversion(expr syntax.Expr, targetType 
 	case targetType == "string" && (sourceType == "int" || sourceType == "int_literal"):
 		visitor.needsStrconvImport = true
 		return t.createStrconvCall("Itoa", expr, pos)
+		
+	// Float to string: 3.14 as string -> strconv.FormatFloat(3.14, 'g', -1, 64)
+	case targetType == "string" && (sourceType == "float64" || sourceType == "float_literal"):
+		visitor.needsStrconvImport = true
+		return t.createFloatToStringCall(expr, pos)
 		
 	// Non-base types to string: obj as string -> obj.String()
 	case targetType == "string" && !t.isBaseType(sourceType):
@@ -343,6 +357,56 @@ func (t *AsCastTransform) createStrconvCall(funcName string, arg syntax.Expr, po
 	return callExpr
 }
 
+// createFloatToStringCall creates strconv.FormatFloat call for float to string conversion
+func (t *AsCastTransform) createFloatToStringCall(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create: strconv.FormatFloat(expr, 'g', -1, 64)
+	// 'g' format, -1 precision (shortest), 64-bit size
+	
+	// Create strconv.FormatFloat
+	strconvName := &syntax.Name{Value: "strconv"}
+	strconvName.SetPos(pos)
+	
+	formatFloatName := &syntax.Name{Value: "FormatFloat"}
+	formatFloatName.SetPos(pos)
+	
+	selectorExpr := &syntax.SelectorExpr{
+		X:   strconvName,
+		Sel: formatFloatName,
+	}
+	selectorExpr.SetPos(pos)
+	
+	// Create 'g' argument (format)
+	formatArg := &syntax.BasicLit{
+		Value: "'g'",
+		Kind:  syntax.RuneLit,
+	}
+	formatArg.SetPos(pos)
+	
+	// Create -1 argument (precision)
+	precisionArg := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  &syntax.BasicLit{Value: "0", Kind: syntax.IntLit},
+		Y:  &syntax.BasicLit{Value: "1", Kind: syntax.IntLit},
+	}
+	precisionArg.SetPos(pos)
+	
+	// Create 64 argument (bitsize)
+	bitsizeArg := &syntax.BasicLit{
+		Value: "64",
+		Kind:  syntax.IntLit,
+	}
+	bitsizeArg.SetPos(pos)
+	
+	// Create the function call
+	callExpr := &syntax.CallExpr{
+		Fun:     selectorExpr,
+		ArgList: []syntax.Expr{expr, formatArg, precisionArg, bitsizeArg},
+	}
+	callExpr.SetPos(pos)
+	
+	return callExpr
+}
+
 // createBasicTypeConversion creates T(x) conversion
 func (t *AsCastTransform) createBasicTypeConversion(expr syntax.Expr, targetType string, pos syntax.Pos) syntax.Expr {
 	typeName := &syntax.Name{Value: targetType}
@@ -438,11 +502,30 @@ func (t *AsCastTransform) createIntToRuneConversion(expr syntax.Expr, pos syntax
 	return callExpr
 }
 
-// createFloatLiteralToIntConversion converts untyped float literals to int
+// createFloatLiteralToIntConversion converts untyped float literals to int with truncation
 func (t *AsCastTransform) createFloatLiteralToIntConversion(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
-	// For untyped float literals like 3.1, Go's type system is strict
-	// We need to just use the basic int() conversion and let Go handle it
-	// If it fails, it means the code needs to be written differently
+	// For semantic casting like 3.14 as int == 3, we want truncation behavior
+	// Transform: 3.14 as int -> int(3.14) using truncation
+	// Since Go doesn't allow int(3.14) directly, we'll extract the integer part
+	
+	// For simple cases like 3.14, we can evaluate at compile time
+	if basicLit, ok := expr.(*syntax.BasicLit); ok && basicLit.Kind == syntax.FloatLit {
+		// Extract the integer part from the float literal
+		val := basicLit.Value
+		// Find the decimal point and take everything before it
+		if dotIndex := strings.Index(val, "."); dotIndex != -1 {
+			intPart := val[:dotIndex]
+			// Create new integer literal with the truncated value
+			truncatedLit := &syntax.BasicLit{
+				Value: intPart,
+				Kind:  syntax.IntLit,
+			}
+			truncatedLit.SetPos(pos)
+			return truncatedLit
+		}
+	}
+	
+	// For complex expressions, fall back to regular conversion (may fail)
 	return t.createBasicTypeConversion(expr, "int", pos)
 }
 
