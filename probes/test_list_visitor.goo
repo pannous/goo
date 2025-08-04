@@ -1,5 +1,0 @@
-nums := [1, 2, 3, 4, 5]
-print("Length:", nums.len())
-print("First:", nums.first())
-print("Last:", nums.last())
-print("Contains 3:", nums.contains(3))

@@ -1,4 +1,0 @@
-// Test to confirm the pattern we want
-for _, i := range [3]int{1,2,3} {
-    printf("%d\n", i)
-}

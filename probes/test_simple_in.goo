@@ -1,6 +1,0 @@
-import "slices"
-
-x := 2
-y := [1, 2, 3]
-check (x in y)
-check x in y

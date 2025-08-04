@@ -1,7 +1,0 @@
-// Debug for-in transform
-numbers := []int{1, 2, 3}
-
-// Test if this gets parsed and transformed correctly
-for x in numbers {
-    printf("x: %d\n", x)
-}

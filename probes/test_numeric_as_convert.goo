@@ -1,6 +1,0 @@
-// Test basic numeric conversions 
-result1 := 3 as float64
-result2 := 3 as float
-
-printf("3 as float64: %.1f\n", result1)
-printf("3 as float: %.1f\n", result2)

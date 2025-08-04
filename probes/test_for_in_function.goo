@@ -1,9 +1,0 @@
-// Test for-in inside a function
-func testForIn() {
-    numbers := []int{1, 2, 3}
-    for in numbers {
-        printf("iteration\n")
-    }
-}
-
-testForIn()

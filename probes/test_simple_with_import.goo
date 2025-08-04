@@ -1,6 +1,0 @@
-import "strconv"
-
-func main() {
-	result, _ := strconv.Atoi("42")
-	printf("result: %d\n", result)
-}

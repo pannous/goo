@@ -1,5 +1,0 @@
-// Test just manual range
-printf("Manual range only:\n")
-for i := range [3]int{1,2,3} {
-    printf("  i=%d\n", i)
-}

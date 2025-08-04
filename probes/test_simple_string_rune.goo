@@ -1,4 +1,0 @@
-func main() {
-	result := "a" == 'a'
-	printf("result: %v\n", result)
-}

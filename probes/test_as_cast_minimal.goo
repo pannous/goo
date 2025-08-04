@@ -1,6 +1,0 @@
-check 1 as string == string(1)
-check 1 as rune == rune(1)
-check '1' as int == int('1')
-check 3 as float == float64(3)
-
-printf("All as cast tests PASSED\n")

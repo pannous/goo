@@ -1,6 +1,0 @@
-// While with for-in syntax for slices
-numbers := [1, 2, 3]
-printf("While with slice:\n")
-while num in numbers {
-    printf("  num = %d\n", num)
-}

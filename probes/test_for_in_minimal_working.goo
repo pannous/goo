@@ -1,4 +1,0 @@
-// Minimal working for-in test
-for range []int{1, 2, 3} {
-    printf("iteration\n")
-}

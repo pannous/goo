@@ -1,5 +1,0 @@
-// Copy exact line from main test
-result2 := "value:" 42 "units"
-printf("result2: '%s'\n", result2)
-check result2 == "value: 42 units"
-printf("Test passed!\n")

@@ -1,6 +1,0 @@
-import "strconv"
-
-// Test int to string conversion (should work since Itoa doesn't return error)
-result := 1 as string
-printf("1 as string: '%s'\n", result)
-check 1 as string == "1"

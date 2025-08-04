@@ -1,8 +1,0 @@
-// Simple test for string reverse
-
-printf("Testing string reverse:\n")
-
-result := "hello".reverse()
-printf("'hello'.reverse() = '%s'\n", result)
-
-printf("Done!\n")

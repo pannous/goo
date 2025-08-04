@@ -1,2 +1,0 @@
-import "fmt"
-fmt.Println("hello")
