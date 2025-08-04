@@ -1,0 +1,16 @@
+// Comprehensive comment syntax tests
+
+// Different comment types
+# Hash comment
+// Double slash comment  
+#
+# Hash comment with content
+#Another hash comment without space
+
+// Comment vs hash index distinction
+arr := [1, 2, 3]
+value := arr#0  // This should work as array indexing
+# value := arr#0  // This should be a comment
+
+println("Comment parsing works!")
+println("Array access:", value)

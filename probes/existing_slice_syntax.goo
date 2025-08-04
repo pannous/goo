@@ -1,0 +1,6 @@
+// Test that existing slice syntax still works
+typed := []string{}
+println("Typed empty slice length:", len(typed))
+
+typedWithType := []int{1, 2, 3}
+println("Typed slice with elements length:", len(typedWithType))

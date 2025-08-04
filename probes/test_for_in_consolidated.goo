@@ -1,0 +1,29 @@
+// Comprehensive for-in loop tests
+
+// Basic for-in with slice
+numbers := [1, 2, 3]
+println("=== Basic for-in ===")
+for n in numbers {
+    println("Number:", n)
+}
+
+// Multi-variable for-in (index, value)
+println("=== Multi-variable for-in ===")
+for i, n in numbers {
+    println("Index:", i, "Value:", n)
+}
+
+// For-in with string
+println("=== String for-in ===")
+for char in "abc" {
+    println("Char:", char)
+}
+
+// For-in with map
+data := {name: "Alice", age: 30}
+println("=== Map for-in ===")  
+for key, value in data {
+    println("Key:", key, "Value:", value)
+}
+
+println("All for-in tests completed!")
