@@ -111,26 +111,38 @@ func (g *CommentGroup) Text() string {
 	for _, c := range comments {
 		// Remove comment markers.
 		// The parser has given us exactly the comment text.
-		switch c[1] {
+		if len(c) < 1 {
+			continue // Skip empty comments
+		}
+		switch c[0] {
 		case '/':
-			//-style comment (no newline at the end)
-			c = c[2:]
-			if len(c) == 0 {
-				// empty line
-				break
+			if len(c) > 1 && c[1] == '/' {
+				//-style comment (no newline at the end)
+				c = c[2:]
+				if len(c) == 0 {
+					// empty line
+					break
+				}
+				if c[0] == ' ' {
+					// strip first space - required for Example tests
+					c = c[1:]
+					break
+				}
+				if isDirective(c) {
+					// Ignore //go:noinline, //line, and so on.
+					continue
+				}
+			} else if len(c) > 1 && c[1] == '*' {
+				/*-style comment */
+				c = c[2 : len(c)-2]
 			}
-			if c[0] == ' ' {
-				// strip first space - required for Example tests
+		case '#':
+			// #-style comment (line comment starting with #)
+			c = c[1:] // Remove the #
+			if len(c) > 0 && c[0] == ' ' {
+				// strip first space
 				c = c[1:]
-				break
 			}
-			if isDirective(c) {
-				// Ignore //go:noinline, //line, and so on.
-				continue
-			}
-		case '*':
-			/*-style comment */
-			c = c[2 : len(c)-2]
 		}
 
 		// Split on newlines.
