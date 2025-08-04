@@ -112,6 +112,9 @@ Running all tests in ./goo/ directory...
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
+✅ empty_list_comprehensive.goo
+✅ empty_list_test.goo
+✅ existing_slice_syntax.goo
 ❌ test_all_features.goo
 ✅ test_array_vs_slice.goo
 ✅ test_as_cast_check.goo
@@ -185,7 +188,7 @@ Running all tests in ./goo/ directory...
 ✅ test_map_dot_check_debug.goo
 ✅ test_map_dot_printf_only.goo
 ✅ test_minimal_for_in.goo
-❌ test_mixed_list_syntax.goo
+✅ test_mixed_list_syntax.goo
 ✅ test_multi_return_try.goo
 ✅ test_multi_var_for_in.goo
 ✅ test_multi_var_while_in.goo
@@ -193,7 +196,7 @@ Running all tests in ./goo/ directory...
 ✅ test_not_literals.goo
 ✅ test_not_simple.goo
 ✅ test_numeric_as_convert.goo
-❌ test_one_string.goo
+✅ test_one_string.goo
 ✅ test_original_examples.goo
 ✅ test_panic_context_try.goo
 ✅ test_pkg.goo
@@ -269,5 +272,5 @@ Running all tests in ./goo/ directory...
 ❌ test_whitespace_strings.goo
 ✅ test_working_conversions.goo
 ========================================
-Summary: 230/268 passed, 38 failed
+Summary: 235/271 passed, 36 failed
 ⚠️  Some tests failed

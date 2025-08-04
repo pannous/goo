@@ -1,5 +1,5 @@
-check "a" == 'a'  // invalid operation: "a" == 'a' (mismatched types untyped string and rune)
-check "a" == 'a' // todo allow string/rune comparison!
+check ("a" == 'a')  // ✅ Now works! Transformed to "a" == string('a')
+check ("a" == 'a') // ✅ String/rune comparison now supported!
 
 // Test only basic methods that don't need imports
 check "a"+"1" == "a1"
