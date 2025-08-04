@@ -73,3 +73,4 @@ printf("len(nil1): %d, len(nil2): %d\n", len(nil1), len(nil2))
 
 // Test mixed nil and empty
 printf("nil1 == empty1: %v\n", nil1 == empty1)
+printf("All tests completed successfully.\n")

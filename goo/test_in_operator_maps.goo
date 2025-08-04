@@ -1,9 +1,4 @@
-// Test the in operator with maps  
-myMap := map[string]int{
-	"hello": 1,
-	"world": 2,
-	"test":  3,
-}
+myMap := { "hello": 1, "world": 2, "test":  3 }
 
 // Test key existence using assignment like string tests
 // known issue
