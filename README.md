@@ -38,7 +38,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check "a" == 'a'  
 ✅ check not x =>  !truthy(x)  
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
-✅ String methods "abc".contains("a")  
+✅ String methods "abc".contains("a")
+✅ 3.14 as string == "3.14"
 ✅ 3.14 as int … semantic cast conversions  
 ✅ x => x * 2   lambda syntax  
 ✅ class via type struct  
