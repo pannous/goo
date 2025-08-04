@@ -1,0 +1,28 @@
+// Comprehensive string method tests
+
+// String reverse tests
+str1 := "hello"
+reversed := str1.reverse()
+println("Reverse of 'hello':", reversed)
+check str1.reverse() == "olleh"
+
+// String charAt tests  
+char := "abc".charAt(1)
+println("charAt(1) of 'abc':", char)
+check "abc".charAt(1) == "b"
+
+// String runeAt tests
+rune_char := "abc".runeAt(0)
+println("runeAt(0) of 'abc':", rune_char)
+check "abc".runeAt(0) == 'a'
+
+// String/rune comparisons
+check ("a" == 'a')
+check ("hello"[0] == 'h')
+
+// String to int conversion
+num := "123".toInt()
+println("toInt of '123':", num)
+check "123".toInt() == 123
+
+println("All string method tests passed!")

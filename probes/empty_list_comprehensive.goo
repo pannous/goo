@@ -1,0 +1,14 @@
+// Comprehensive test for empty list literal support
+empty := []
+println("Empty list length:", len(empty))
+
+// Test that we can append to empty list
+result := append(empty, "hello", "world")
+println("After append:", len(result))
+
+// Test using empty list in function call
+func takeSlice(s []any) {
+    println("Function received slice of length:", len(s))
+}
+
+takeSlice([])

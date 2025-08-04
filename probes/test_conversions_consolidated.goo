@@ -1,0 +1,36 @@
+import "strconv"
+
+// Comprehensive test for type conversions and casting
+println("=== Type Conversion Tests ===")
+
+// Float to string conversions
+result1 := (3.14 as string)
+println("3.14 as string:", result1)
+check (3.14 as string) == "3.14"
+
+// Float to int conversions (truncation)
+result2 := (3.14 as int)
+println("3.14 as int:", result2)
+check (3.14 as int) == 3
+
+// String to int conversions
+result3 := ("1" as int)
+println("\"1\" as int:", result3)
+check ("1" as int) == 1
+
+// Int to string conversions
+result4 := (42 as string)
+println("42 as string:", result4)
+check (42 as string) == "42"
+
+// Int to rune conversions
+result5 := (1 as rune)
+println("1 as rune:", result5)
+check (1 as rune) == '1'
+
+// Rune to int conversions
+result6 := ('1' as int)
+println("'1' as int:", result6)
+check ('1' as int) == 1
+
+println("All conversion tests passed!")
