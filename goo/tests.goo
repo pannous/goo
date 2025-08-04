@@ -1,5 +1,6 @@
 import "slices"
 import "strings"
+#check 3.14 as string == "3.14"
 #import "fmt"
 #import "reflect"
 #check 'a' in "abcde"  // true
