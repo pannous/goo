@@ -1,0 +1,3 @@
+aList:=[1, 2, 3]
+check aList[1] == 2
+check aList.first() == 1
