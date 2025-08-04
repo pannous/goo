@@ -30,6 +30,7 @@ import (
 	"go/build/constraint"
 	"go/scanner"
 	"go/token"
+	"strconv"
 	"strings"
 )
 
@@ -2533,8 +2534,17 @@ func (p *parser) parseImportSpec(doc *ast.CommentGroup, _ token.Token, _ int) as
 	pos := p.pos
 	var path string
 	if p.tok == token.STRING {
+		// Normal case: import "path" or import alias "path"
 		path = p.lit
 		p.next()
+	} else if p.tok == token.IDENT {
+		// Case: import alias identifier (second identifier is the path)
+		path = strconv.Quote(p.lit)
+		p.next()
+	} else if ident != nil && ident.Name != "." {
+		// Case: import identifier (bare import, identifier was consumed as ident)
+		path = strconv.Quote(ident.Name)
+		ident = nil // Clear the ident since it's actually the path, not an alias
 	} else if p.tok.IsLiteral() {
 		p.error(pos, "import path must be a string")
 		p.next()
