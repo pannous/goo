@@ -1674,13 +1674,26 @@ func (p *parser) operand(keep_parens bool) Expr {
 		pos := p.pos()
 		p.want(_Lbrack)
 
-		// Empty brackets [] - this should be followed by type for slice type
+		// Empty brackets [] - could be empty list literal or slice type
 		if p.tok == _Rbrack {
 			p.next()
-			t := new(SliceType)
-			t.pos = pos
-			t.Elem = p.type_()
-			return t
+			
+			// Check if this looks like a slice type []T or empty list literal []
+			// If next token is a type starter, treat as slice type
+			// Otherwise, treat as empty list literal
+			if p.isTypeStart() {
+				t := new(SliceType)
+				t.pos = pos
+				t.Elem = p.type_()
+				return t
+			} else {
+				// Empty list literal []
+				lit := new(CompositeLit)
+				lit.pos = pos
+				lit.Type = nil // Will be inferred later
+				lit.ElemList = nil
+				return lit
+			}
 		}
 
 		// Check for ellipsis [...] arrays first
@@ -2226,6 +2239,16 @@ func (p *parser) isExprStart() bool {
 	switch p.tok {
 	case _Name, _Literal, _Lparen, _Func, _Map, _Lbrack, _Lbrace,
 		_Chan, _Struct, _Interface:
+		return true
+	default:
+		return false
+	}
+}
+
+func (p *parser) isTypeStart() bool {
+	switch p.tok {
+	case _Name, _Lparen, _Func, _Map, _Lbrack, 
+		_Chan, _Struct, _Interface, _Star, _Arrow:
 		return true
 	default:
 		return false
