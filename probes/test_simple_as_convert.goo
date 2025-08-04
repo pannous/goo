@@ -1,3 +1,0 @@
-// Test simple conversions without strconv first
-check 3.1 as int == 3
-check 3 as float == 3.0

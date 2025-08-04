@@ -1,6 +1,0 @@
-Debug approach: Look at what exactly gets parsed as lhs when we do `key, value in myMap`
-
-Expected: lhs should be a ListExpr with two Name nodes: "key" and "value"
-Actual: lhs might be a binary expression like `key in myMap` with value as an unexpected continuation
-
-The issue is likely in binaryExpr parsing treating 'in' as an operator before the parser checks for for-in syntax.

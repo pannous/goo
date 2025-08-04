@@ -1,6 +1,0 @@
-// Test character literals without commas
-
-func main() {
-	chars := ['a' 'b' 'c']
-	printf("Chars: %v\n", chars)
-}

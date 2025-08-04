@@ -1,9 +1,0 @@
-// What for x in numbers should become: for x := range numbers (index version)
-numbers := []int{1, 2, 3, 4, 5}
-
-printf("Testing for x := range slice (index):\n")
-for x := range numbers {
-    printf("  Index: %d, Value: %d\n", x, numbers[x])
-}
-
-printf("Done!\n")

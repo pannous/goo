@@ -1,6 +1,0 @@
-// Test three elements
-
-func main() {
-	nums := [1 2 3]
-	printf("Result: %v\n", nums)
-}

@@ -1,7 +1,0 @@
-import "slices"
-
-func main() {
-    list := []int{1, 2, 3}
-    result := slices.Contains(list, 2)
-    printf("Contains: %v\n", result)
-}

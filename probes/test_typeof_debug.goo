@@ -1,3 +1,0 @@
-x := 42
-result := typeof(x)
-print("Result:", result)

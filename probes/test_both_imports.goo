@@ -1,8 +1,0 @@
-import "strings"
-import "strconv"
-
-func main() {
-	result1 := strings.Contains("hello world", "world")
-	result2, _ := strconv.Atoi("42")
-	printf("strings result: %v, strconv result: %d\n", result1, result2)
-}

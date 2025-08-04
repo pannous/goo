@@ -1,3 +1,0 @@
-numbers := [1, 2, 3]
-evens := numbers.filter(x => x % 2 == 0)
-put("Result:", evens)

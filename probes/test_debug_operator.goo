@@ -1,5 +1,0 @@
-// Test binary in operator
-a := "hello"
-b := "hello world"
-c := a in b
-printf("result = %v\n", c)

@@ -1,4 +1,0 @@
-x := 0
-result := not x
-check result
-printf("not 0 = %v\n", result)

@@ -1,9 +1,0 @@
-// Debug manual equivalent
-numbers := []int{1, 2, 3, 4, 5}
-
-printf("Testing manual equivalent:\n")
-for _, x := range numbers {
-    printf("  %d\n", x)
-}
-
-printf("Done!\n")

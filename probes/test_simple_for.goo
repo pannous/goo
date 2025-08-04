@@ -1,4 +1,0 @@
-// Test if basic for loops work
-for i := 0; i < 3; i++ {
-    printf("i: %d\n", i)
-}

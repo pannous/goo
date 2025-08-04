@@ -1,5 +1,0 @@
-import "fmt"
-
-s := "hello"
-c := s.runeAt(1)
-fmt.Printf("runeAt(1) = %s\n", c)

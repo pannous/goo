@@ -1,4 +1,0 @@
-func main() {
-	result := "hello world".contains("world")
-	printf("result: %v\n", result)
-}

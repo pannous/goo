@@ -1,9 +1,0 @@
-import "strconv"
-
-func main() {
-	a := 1 as string
-	b := string(1)
-	printf("1 as string: %q\n", a)
-	printf("string(1): %q\n", b)
-	printf("Equal: %v\n", a == b)
-}

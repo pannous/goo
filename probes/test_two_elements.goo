@@ -1,6 +1,0 @@
-// Test just two elements
-
-func main() {
-	nums := [1 2]
-	printf("Result: %v\n", nums)
-}

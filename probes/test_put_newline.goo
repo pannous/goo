@@ -1,6 +1,0 @@
-// Test put() function with automatic newline
-put("First line")
-put("Second line")
-printf("Third line without newline")
-put("Fourth line")
-printf("Done\n")

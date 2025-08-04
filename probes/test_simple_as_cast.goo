@@ -1,6 +1,0 @@
-// Simple test for as int casting
-
-func main() {
-	val := "42" as int
-	printf("Result: %d\n", val)
-}

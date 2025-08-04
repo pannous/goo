@@ -1,9 +1,0 @@
-// Working for-in test (should work after fix)
-numbers := []int{1, 2, 3, 4, 5}
-
-printf("Testing for x in slice:\n")
-for x in numbers {
-    printf("  Value: %d\n", x)
-}
-
-printf("Done!\n")

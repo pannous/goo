@@ -1,9 +1,0 @@
-func mycheck(condition bool) {
-	if !condition {
-		panic("check failed")
-	}
-}
-
-func main() {
-	mycheck("a" == 'a')
-}
