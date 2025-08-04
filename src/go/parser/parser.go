@@ -180,7 +180,7 @@ func (p *parser) consumeComment() (comment *ast.Comment, endline int) {
 	// /*-style comments may end on a different line than where they start.
 	// Scan the comment for '\n' chars and adjust endline accordingly.
 	endline = p.lineFor(p.pos)
-	if p.lit[1] == '*' {
+	if len(p.lit) > 1 && p.lit[1] == '*' {
 		// don't use range here - no need to decode Unicode code points
 		for i := 0; i < len(p.lit); i++ {
 			if p.lit[i] == '\n' {

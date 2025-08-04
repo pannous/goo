@@ -983,6 +983,16 @@ scanAgain:
 			if end > len(s.src) {
 				end = len(s.src)
 			}
+			// Additional bounds check for offs to prevent panic
+			if offs < 0 || offs >= len(s.src) {
+				offs = 0
+			}
+			if end <= offs {
+				end = offs + 1
+				if end > len(s.src) {
+					end = len(s.src)
+				}
+			}
 			lit = string(s.src[offs:end])
 		default:
 			// next reports unexpected BOMs - don't repeat
