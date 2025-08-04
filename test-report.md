@@ -38,6 +38,7 @@ Running all tests in ./goo/ directory...
 ✅ test_for_loop.goo
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
+✅ test_import_bare_syntax.goo
 ❌ test_import_file.goo
 ✅ test_import_folder.goo
 ❌ test_in_operator_auto_import.goo
@@ -51,9 +52,10 @@ Running all tests in ./goo/ directory...
 ✅ test_iterator_simple.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
+❌ test_list_auto_import_broken.goo
 ✅ test_list_comparison.goo
 ✅ test_list_comparison2.goo
-✅ test_list_lambda.goo
+❌ test_list_lambda.goo
 ✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
 ✅ test_list_methods.goo
@@ -113,6 +115,8 @@ Running all tests in ./goo/ directory...
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
+❌ debug_import_parse.goo
+❌ debug_regular_import.goo
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
 ✅ test_adjacent_broken_exact.goo
@@ -123,6 +127,9 @@ Running all tests in ./goo/ directory...
 ❌ test_all_features.goo
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
+✅ test_bare_import_multiple.goo
+✅ test_bare_import_no_external.goo
+✅ test_bare_import_simple.goo
 ✅ test_bool_not.goo
 ✅ test_charAt_comprehensive.goo
 ❌ test_comments_consolidated.goo
@@ -135,6 +142,8 @@ Running all tests in ./goo/ directory...
 ❌ test_goo_file_import.goo
 ✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
+✅ test_import_alias.goo
+❌ test_import_bare_name.goo
 ❌ test_in_operator_maps.goo
 ❌ test_lists_consolidated.goo
 ✅ test_manual_strconv.goo
@@ -158,5 +167,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ========================================
-Summary: 138/157 passed, 19 failed
+Summary: 142/166 passed, 24 failed
 ⚠️  Some tests failed

@@ -21,3 +21,5 @@ printf("Empty slices: %v\n", e == f)
 var g []int
 var h []int
 printf("Nil slices: %v\n", g == h)
+
+printf("All tests completed successfully.\n")
