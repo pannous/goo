@@ -691,9 +691,29 @@ func (p *parser) importDecl(group *Group) Decl {
 	}
 	d.Path = p.oliteral()
 	if d.Path == nil {
-		p.syntaxError("missing import Path")
-		p.advance(_Semi, _Rparen)
-		return d
+		// Check for bare import syntax: if we have LocalPkgName but no Path, use LocalPkgName as Path
+		if d.LocalPkgName != nil && d.LocalPkgName.Value != "." {
+			b := new(BasicLit)
+			b.pos = d.LocalPkgName.Pos()
+			b.Value = strconv.Quote(d.LocalPkgName.Value) // Quote the identifier like standard parser
+			b.Kind = StringLit
+			b.Bad = false
+			d.Path = b
+			d.LocalPkgName = nil // Clear since it's now the path
+		} else if p.tok == _Name {
+			// Fallback: handle additional _Name tokens
+			b := new(BasicLit)
+			b.pos = p.pos()
+			b.Value = strconv.Quote(p.lit) // Quote the identifier like standard parser
+			b.Kind = StringLit
+			b.Bad = false
+			d.Path = b
+			p.next()
+		} else {
+			p.syntaxError("missing import Path (DEBUG: no LocalPkgName and no _Name token)")
+			p.advance(_Semi, _Rparen)
+			return d
+		}
 	}
 	if !d.Path.Bad && d.Path.Kind != StringLit {
 		p.syntaxErrorAt(d.Path.Pos(), "import Path must be a string")
