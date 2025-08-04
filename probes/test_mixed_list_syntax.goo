@@ -14,7 +14,8 @@ func main() {
 	printf("Mixed: %v\n", mixed)
 	
 	// Nested lists with whitespace
-	nested := [[1 2] [3 4]]
+	nested := [[1,2],[3,4]]
+#	nested := [[1 2] [3 4]]
 	printf("Nested: %v\n", nested)
 	
 	// Complex expressions

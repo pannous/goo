@@ -19,19 +19,10 @@ func (t *StringRuneComparisonTransform) Name() string {
 }
 
 func (t *StringRuneComparisonTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	//println("StringRuneComparisonTransform.Transform called")
 	t.ctx = ctx // Store context for use in other methods
-	changed := false
-
-	// Transform all declarations
-	for i, decl := range file.DeclList {
-		if newDecl := t.transformDecl(decl, ctx); newDecl != decl {
-			file.DeclList[i] = newDecl
-			changed = true
-		}
-	}
-
-	return changed
+	visitor := &stringRuneVisitor{transform: t, ctx: ctx}
+	syntax.Walk(file, visitor)
+	return visitor.changed
 }
 
 func (t *StringRuneComparisonTransform) transformDecl(decl syntax.Decl, ctx *TransformContext) syntax.Decl {
@@ -249,7 +240,6 @@ func (t *StringRuneComparisonTransform) transformStringRuneComparison(left, righ
 
 	if transformedExpr != nil {
 		transformedExpr.SetPos(left.Pos())
-		println("TRANSFORMING string-rune comparison")
 		return transformedExpr
 	}
 
@@ -314,6 +304,29 @@ func (t *StringRuneComparisonTransform) createStringConversion(runeExpr syntax.E
 	call.SetPos(pos)
 
 	return call
+}
+
+type stringRuneVisitor struct {
+	transform *StringRuneComparisonTransform
+	ctx       *TransformContext
+	changed   bool
+}
+
+func (v *stringRuneVisitor) Visit(node syntax.Node) syntax.Visitor {
+	switch n := node.(type) {
+	case *syntax.Operation:
+		// Check for equality/inequality operations
+		if n.Op == syntax.Eql || n.Op == syntax.Neq {
+			// Check if we have string vs rune comparison
+			transformed := v.transform.transformStringRuneComparison(n.X, n.Y, n.Op)
+			if transformed != nil {
+				// Replace the operation in place
+				*n = *transformed.(*syntax.Operation)
+				v.changed = true
+			}
+		}
+	}
+	return v
 }
 
 func init() {
