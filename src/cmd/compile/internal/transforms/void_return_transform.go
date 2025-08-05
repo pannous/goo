@@ -24,6 +24,10 @@ func (t *VoidReturnTransform) Name() string {
 	return "void_return_transform"
 }
 
+func (t *VoidReturnTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *VoidReturnTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &voidReturnVisitor{transform: t, ctx: ctx}
 	

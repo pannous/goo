@@ -7,6 +7,7 @@ import (
 	"cmd/compile/internal/syntax"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -23,6 +24,9 @@ type Transformer interface {
 
 	// Name returns a human-readable name for this transformer.
 	Name() string
+
+	// Priority returns the execution priority (lower numbers run first).
+	Priority() int
 }
 
 // ApplyTransformations runs all registered transformers on the syntax tree.
@@ -45,6 +49,10 @@ func ApplyTransformations(files []*syntax.File) {
 
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
+		fmt.Printf("Transform execution order:\n")
+		for i, transformer := range TransformRegistry {
+			fmt.Printf("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
+		}
 		for _, transformer := range TransformRegistry {
 			if transformer.Transform(file, ctx) {
 				fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
@@ -222,6 +230,11 @@ func RegisterTransformer(t Transformer) {
 		}
 	}
 	TransformRegistry = append(TransformRegistry, t)
+	
+	// Sort by priority (lower numbers run first)
+	sort.Slice(TransformRegistry, func(i, j int) bool {
+		return TransformRegistry[i].Priority() < TransformRegistry[j].Priority()
+	})
 }
 
 // collectTypes walks the syntax tree and populates ctx.Types with variable names and their inferred types.

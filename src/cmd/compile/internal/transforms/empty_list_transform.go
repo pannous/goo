@@ -15,6 +15,10 @@ func (t *EmptyListTransform) Name() string {
 	return "empty_list_transform"
 }
 
+func (t *EmptyListTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *EmptyListTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &emptyListVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)

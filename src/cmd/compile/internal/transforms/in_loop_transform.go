@@ -24,6 +24,10 @@ func (t *InLoopTransform) Name() string {
 	return "in_loop_transform"
 }
 
+func (t *InLoopTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *InLoopTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &inLoopVisitor{transform: t, ctx: ctx, file: file}
 	

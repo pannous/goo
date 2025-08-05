@@ -23,6 +23,10 @@ func (t *LambdaTransform) Name() string {
 	return "lambda_transform"
 }
 
+func (t *LambdaTransform) Priority() int {
+	return 200 // Low priority - run after list methods and other transforms
+}
+
 func (t *LambdaTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &lambdaVisitor{transform: t, ctx: ctx}
 	

@@ -27,6 +27,10 @@ func (t *InOperatorTransform) Name() string {
 	return "in_operator_transform"
 }
 
+func (t *InOperatorTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &inVisitor{transform: t, ctx: ctx, file: file}
 	
