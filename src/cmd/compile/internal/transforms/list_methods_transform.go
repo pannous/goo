@@ -16,8 +16,12 @@ func (t *ListMethodsTransform) Name() string {
 	return "list_methods_transform"
 }
 
+func (t *ListMethodsTransform) Priority() int {
+	return 50 // High priority - run before lambda transform (200)
+}
+
 // transformListMethod transforms list method calls to standard library calls
-func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodName string, args []syntax.Expr) syntax.Expr {
+func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodName string, args []syntax.Expr, ctx *TransformContext) syntax.Expr {
 	println("transformListMethod:", methodName)
 	switch methodName {
 	// Basic list info
@@ -104,11 +108,11 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		return t.createUniqueCall(receiver)
 	case "filter", "where", "chose", "that", "which":
 		if len(args) == 1 {
-			return t.createFilterCall(receiver, args[0])
+			return t.createFilterCall(receiver, args[0], ctx)
 		}
 	case "apply", "transform", "convert":
 		if len(args) == 1 {
-			return t.createMapCall(receiver, args[0])
+			return t.createMapCall(receiver, args[0], ctx)
 		}
 
 	// Aggregation methods
@@ -292,7 +296,7 @@ func (t *ListMethodsTransform) transformExpr(expr syntax.Expr, ctx *TransformCon
 		if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
 			if t.isListExpression(selector.X, ctx) {
 				methodName := selector.Sel.Value
-				if transformed := t.transformListMethod(selector.X, methodName, e.ArgList); transformed != nil {
+				if transformed := t.transformListMethod(selector.X, methodName, e.ArgList, ctx); transformed != nil {
 					println("TRANSFORMING list method:", methodName)
 					return transformed
 				}
@@ -659,8 +663,11 @@ func (t *ListMethodsTransform) createUniqueCall(receiver syntax.Expr) syntax.Exp
 	return t.createCompilerError(receiver, "unique", "remove_duplicates")
 }
 
-func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr) syntax.Expr {
+func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr, ctx *TransformContext) syntax.Expr {
 	pos := receiver.Pos()
+
+	// Fix lambda parameter type if needed
+	correctedPredicate := t.correctLambdaParameterType(receiver, predicate, ctx)
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
@@ -676,15 +683,18 @@ func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr)
 
 	call := &syntax.CallExpr{
 		Fun:     selector,
-		ArgList: []syntax.Expr{receiver, predicate},
+		ArgList: []syntax.Expr{receiver, correctedPredicate},
 	}
 	call.SetPos(pos)
 
 	return call
 }
 
-func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr) syntax.Expr {
+func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ctx *TransformContext) syntax.Expr {
 	pos := receiver.Pos()
+
+	// Fix lambda parameter type if needed
+	correctedTransform := t.correctLambdaParameterType(receiver, transform, ctx)
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
@@ -700,7 +710,7 @@ func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr) sy
 
 	call := &syntax.CallExpr{
 		Fun:     selector,
-		ArgList: []syntax.Expr{receiver, transform},
+		ArgList: []syntax.Expr{receiver, correctedTransform},
 	}
 	call.SetPos(pos)
 
@@ -887,6 +897,77 @@ func (t *ListMethodsTransform) hasImport(file *syntax.File, name string) bool {
 		}
 	}
 	return false
+}
+
+// correctLambdaParameterType fixes lambda parameter types based on slice element type
+func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate syntax.Expr, ctx *TransformContext) syntax.Expr {
+	// Check if predicate is a lambda expression
+	lambda, ok := predicate.(*syntax.LambdaExpr)
+	if !ok {
+		return predicate // Not a lambda, return as-is
+	}
+
+	// Extract element type from receiver
+	receiverName, ok := receiver.(*syntax.Name)
+	if !ok {
+		return predicate // Can't determine receiver type
+	}
+
+	// Extract element type from slice type (e.g., []User -> User)
+	elementType := t.extractElementType(receiverName.Value, ctx)
+	if elementType == "" {
+		return predicate // Can't determine element type
+	}
+	
+	// Create a corrected lambda with proper parameter type
+	correctedLambda := *lambda
+	
+	// If lambda has parameters, fix their types
+	if lambda.ParamList != nil && len(lambda.ParamList) > 0 {
+		// Create new parameter list with corrected types
+		newParamList := make([]*syntax.Field, len(lambda.ParamList))
+		for i, param := range lambda.ParamList {
+			newParam := *param
+			
+			// Set the correct element type
+			elementTypeName := &syntax.Name{Value: elementType}
+			elementTypeName.SetPos(param.Pos())
+			newParam.Type = elementTypeName
+			
+			newParamList[i] = &newParam
+		}
+		correctedLambda.ParamList = newParamList
+	}
+
+	return &correctedLambda
+}
+
+// extractElementType extracts element type from slice type string
+// e.g., "[]User" -> "User", "[]int" -> "int"
+func (t *ListMethodsTransform) extractElementType(varName string, ctx *TransformContext) string {
+	// First try to get the actual type from context
+	if ctx != nil && ctx.Types != nil {
+		if varType, exists := ctx.Types[varName]; exists {
+			// Parse slice type: "[]User" -> "User"
+			if len(varType) > 2 && varType[:2] == "[]" {
+				return varType[2:] // Remove "[]" prefix
+			}
+		}
+	}
+	
+	// Fallback to simple heuristics based on common patterns
+	// Pattern: users -> User, items -> Item, etc.
+	if varName == "users" {
+		return "User"
+	}
+	if varName == "items" {
+		return "Item"
+	}
+	if varName == "numbers" {
+		return "int"
+	}
+	
+	return ""
 }
 
 func init() {

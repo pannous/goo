@@ -29,6 +29,10 @@ func (t *AsCastTransform) Name() string {
 	return "as_cast_transform"
 }
 
+func (t *AsCastTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *AsCastTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &asCastVisitor{transform: t, ctx: ctx}
 	

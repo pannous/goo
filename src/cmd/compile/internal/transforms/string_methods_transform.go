@@ -26,6 +26,10 @@ func (t *StringMethodsTransform) Name() string {
 	return "string_methods_transform"
 }
 
+func (t *StringMethodsTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 // transformStringMethod transforms string method calls to standard library calls
 func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, methodName string, args []syntax.Expr) syntax.Expr {
 	println("transformStringMethod:", methodName)

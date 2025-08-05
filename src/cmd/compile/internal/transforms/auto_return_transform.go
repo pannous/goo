@@ -24,6 +24,10 @@ func (t *AutoReturnTransform) Name() string {
 	return "auto_return"
 }
 
+func (t *AutoReturnTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *AutoReturnTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &autoReturnVisitor{transform: t, ctx: ctx}
 	

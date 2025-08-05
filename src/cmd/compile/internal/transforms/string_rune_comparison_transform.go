@@ -18,6 +18,10 @@ func (t *StringRuneComparisonTransform) Name() string {
 	return "string_rune_comparison_transform"
 }
 
+func (t *StringRuneComparisonTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *StringRuneComparisonTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	t.ctx = ctx // Store context for use in other methods
 	visitor := &stringRuneVisitor{transform: t, ctx: ctx}

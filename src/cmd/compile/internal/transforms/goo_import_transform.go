@@ -18,6 +18,10 @@ func (t *GooImportTransform) Name() string {
 	return "goo_import_transform"
 }
 
+func (t *GooImportTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	changed := false
 

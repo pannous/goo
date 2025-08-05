@@ -22,6 +22,10 @@ func (t *TypeAssertionTransform) Name() string {
 	return "type_assertion_transform"
 }
 
+func (t *TypeAssertionTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *TypeAssertionTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	//println("TypeAssertionTransform.Transform called")
 

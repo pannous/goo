@@ -30,6 +30,10 @@ func (t *StringConcatTransform) Name() string {
 	return "string_concat_transform"
 }
 
+func (t *StringConcatTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	//println("*** CUSTOM_COMPILER_BUILD_VERIFICATION_2025_07_27 ***")
 

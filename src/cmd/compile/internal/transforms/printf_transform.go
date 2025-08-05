@@ -22,6 +22,10 @@ func (t *PrintfTransform) Name() string {
 	return "printf_transform"
 }
 
+func (t *PrintfTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *PrintfTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &printfVisitor{transform: t, ctx: ctx}
 	

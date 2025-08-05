@@ -19,6 +19,10 @@ func (t *TryCatchTransform) Name() string {
 	return "try_catch_transform"
 }
 
+func (t *TryCatchTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *TryCatchTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	//fmt.Printf("TryCatchTransform.Transform called\n")
 	visitor := &tryCatchVisitor{ctx: ctx}

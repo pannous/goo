@@ -24,6 +24,10 @@ func (t *FalseyTransform) Name() string {
 	return "falsey_transform"
 }
 
+func (t *FalseyTransform) Priority() int {
+	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
 func (t *FalseyTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &falseyVisitor{transform: t, ctx: ctx}
 	
