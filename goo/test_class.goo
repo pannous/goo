@@ -1,3 +1,4 @@
+#type Person struct {
 class Person {
 	name string
 	age  int
