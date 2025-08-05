@@ -52,10 +52,9 @@ Running all tests in ./goo/ directory...
 ✅ test_iterator_simple.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
-❌ test_list_auto_import_broken.goo
 ✅ test_list_comparison.goo
 ✅ test_list_comparison2.goo
-❌ test_list_lambda.goo
+✅ test_list_lambda.goo
 ✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
 ✅ test_list_methods.goo
@@ -75,6 +74,7 @@ Running all tests in ./goo/ directory...
 ✅ test_nil.goo
 ✅ test_not_truthiness.goo
 ✅ test_not.goo
+✅ test_pipe.goo
 ✅ test_print_comparison.goo
 ✅ test_printf.goo
 ✅ test_put_no_import.goo
@@ -115,45 +115,35 @@ Running all tests in ./goo/ directory...
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
-❌ debug_import_parse.goo
-❌ debug_regular_import.goo
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
-✅ test_adjacent_broken_exact.goo
-✅ test_adjacent_lines_broken.goo
-✅ test_adjacent_lines_working.goo
-✅ test_adjacent_method_calls.goo
-✅ test_adjacent_working_exact.goo
 ❌ test_all_features.goo
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
-✅ test_bare_import_multiple.goo
-✅ test_bare_import_no_external.goo
-✅ test_bare_import_simple.goo
 ✅ test_bool_not.goo
 ✅ test_charAt_comprehensive.goo
 ❌ test_comments_consolidated.goo
 ❌ test_conversions_consolidated.goo
-✅ test_exact_adjacent_issue.goo
-✅ test_exact_user_issue.goo
 ✅ test_falsey.goo
 ❌ test_filter_clean.goo
 ✅ test_for_in_consolidated.goo
 ❌ test_goo_file_import.goo
 ✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
-✅ test_import_alias.goo
-❌ test_import_bare_name.goo
 ❌ test_in_operator_maps.goo
 ❌ test_lists_consolidated.goo
 ✅ test_manual_strconv.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_printf_only.goo
-✅ test_minimal_adjacent.goo
 ✅ test_multi_return_try.goo
 ✅ test_multi_var_while_in.goo
 ✅ test_not_comprehensive.goo
 ✅ test_original_examples.goo
+✅ test_pipe_comprehensive.goo
+✅ test_pipe_edge_cases.goo
+✅ test_pipe_function.goo
+✅ test_pipe_parentheses.goo
+✅ test_pipe_vs_bitwise.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_transform.goo
 ✅ test_put_concat.goo
@@ -162,10 +152,9 @@ Running all tests in ./goo/ directory...
 ✅ test_truthiness_basic.goo
 ✅ test_try_propagation.goo
 ✅ test_try_simple_assignment.goo
-✅ test_user_exact_syntax.goo
 ✅ test_while_for_in.goo
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ========================================
-Summary: 142/166 passed, 24 failed
+Summary: 136/155 passed, 19 failed
 ⚠️  Some tests failed
