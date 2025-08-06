@@ -200,7 +200,8 @@ const (
 	Tilde // ~
 
 	// precOrOr
-	OrOr // ||
+	OrOr       // ||
+	NullCoalesce // ??
 
 	// precAndAnd
 	AndAnd // &&
@@ -237,9 +238,10 @@ var OperatorNames = [...]string{
 	Def:    ":",
 	Not:    "!",
 	Recv:   "<-",
-	Tilde:  "~",
-	OrOr:   "||",
-	AndAnd: "&&",
+	Tilde:       "~",
+	OrOr:        "||",
+	NullCoalesce: "??",
+	AndAnd:      "&&",
 	Eql:    "==",
 	Neq:    "!=",
 	Lss:    "<",
