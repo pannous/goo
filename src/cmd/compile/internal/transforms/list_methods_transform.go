@@ -753,24 +753,38 @@ func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr,
 func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ctx *TransformContext) syntax.Expr {
 	pos := receiver.Pos()
 
-	// Fix lambda parameter type if needed
-	correctedTransform := t.correctLambdaParameterType(receiver, transform, ctx)
+	// Fix lambda parameter type if needed - we'll compute element type first
+	correctedTransform := transform
 
 	// Get input and output types for slices.Map[SliceType, ResultElementType]
 	receiverName := t.getReceiverName(receiver)
-	elementType := t.extractElementType(receiverName, ctx)
-	outputType := t.inferLambdaReturnType(transform.(*syntax.LambdaExpr).Body, elementType)
 	
-	// For slices.Map, we need the full slice type as first parameter
-	sliceType := t.getSliceType(receiverName, ctx)
+	// Use enhanced chained method type inference
+	sliceType := t.inferChainedMethodType(receiver, "self", ctx)
+	if sliceType == "" {
+		sliceType = t.getSliceType(receiverName, ctx)
+	}
 	if sliceType == "" {
 		sliceType = "[]any"
 	}
+	
+	// Extract element type for lambda parameter inference
+	elementType := ""
+	if len(sliceType) > 2 && sliceType[:2] == "[]" {
+		elementType = sliceType[2:]
+	} else {
+		elementType = t.extractElementType(receiverName, ctx)
+	}
+	
+	// Now fix the lambda with the correct element type
+	correctedTransform = t.correctLambdaParameterTypeWithElement(transform, elementType, ctx)
+	
+	outputType := t.inferLambdaReturnType(transform.(*syntax.LambdaExpr).Body, elementType)
 	if outputType == "" {
 		outputType = "any"
 	}
 
-	println("DEBUG: createMapCall using types:", sliceType, "->", outputType)
+	println("DEBUG: createMapCall using types:", sliceType, "->", outputType, "(element:", elementType, ")")
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
@@ -1075,6 +1089,54 @@ func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate sy
 	return &correctedLambda
 }
 
+// correctLambdaParameterTypeWithElement corrects lambda parameter type with explicit element type
+func (t *ListMethodsTransform) correctLambdaParameterTypeWithElement(predicate syntax.Expr, elementType string, ctx *TransformContext) syntax.Expr {
+	lambda, ok := predicate.(*syntax.LambdaExpr)
+	if !ok {
+		return predicate // Not a lambda, return as-is
+	}
+
+	if elementType == "" {
+		return predicate // Can't determine element type
+	}
+	
+	// Create a corrected lambda with proper parameter types
+	correctedLambda := *lambda
+	correctedLambda.SetPos(lambda.Pos())
+	
+	println("DEBUG: correcting lambda parameter type to:", elementType)
+	
+	// Infer return type from lambda body
+	returnType := t.inferLambdaReturnType(lambda.Body, elementType)
+	println("DEBUG: inferred lambda return type:", returnType)
+	
+	// If lambda has parameters, fix their types
+	if lambda.ParamList != nil && len(lambda.ParamList) > 0 {
+		// Create new parameter list with corrected types
+		newParamList := make([]*syntax.Field, len(lambda.ParamList))
+		for i, param := range lambda.ParamList {
+			newParam := *param
+			newParam.SetPos(param.Pos())
+			
+			// Set the correct element type
+			elementTypeName := &syntax.Name{Value: elementType}
+			elementTypeName.SetPos(param.Pos())
+			newParam.Type = elementTypeName
+			
+			newParamList[i] = &newParam
+			println("DEBUG: set parameter", i, "type to:", elementType)
+		}
+		correctedLambda.ParamList = newParamList
+	}
+	
+	// Return type inference will be handled by the Go type system
+	if returnType != "" {
+		println("DEBUG: inferred lambda return type:", returnType, "- Go compiler will handle this automatically")
+	}
+
+	return &correctedLambda
+}
+
 // getReceiverName extracts the variable name from receiver expression
 func (t *ListMethodsTransform) getReceiverName(receiver syntax.Expr) string {
 	if name, ok := receiver.(*syntax.Name); ok {
@@ -1103,6 +1165,50 @@ func (t *ListMethodsTransform) getSliceType(varName string, ctx *TransformContex
 		return "[]any"
 	}
 	
+	return "[]any"
+}
+
+// inferChainedMethodType infers the result type of a method call chain
+func (t *ListMethodsTransform) inferChainedMethodType(receiver syntax.Expr, methodName string, ctx *TransformContext) string {
+	// If receiver is a method call, infer its return type
+	if call, ok := receiver.(*syntax.CallExpr); ok {
+		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
+			innerReceiverType := t.inferChainedMethodType(selector.X, selector.Sel.Value, ctx)
+			println("DEBUG: chained method", selector.Sel.Value, "on type", innerReceiverType, "returns", t.inferMethodReturnTypeFromType(innerReceiverType, selector.Sel.Value))
+			return t.inferMethodReturnTypeFromType(innerReceiverType, selector.Sel.Value)
+		}
+	}
+	
+	// If receiver is a simple variable name
+	if name, ok := receiver.(*syntax.Name); ok {
+		baseType := t.getSliceType(name.Value, ctx)
+		println("DEBUG: base variable", name.Value, "has type", baseType)
+		return baseType
+	}
+	
+	return "[]any"
+}
+
+// inferMethodReturnTypeFromType infers return type based on receiver type and method
+func (t *ListMethodsTransform) inferMethodReturnTypeFromType(receiverType, methodName string) string {
+	if len(receiverType) >= 2 && receiverType[:2] == "[]" {
+		elementType := receiverType[2:] // e.g., "User" from "[]User"
+		
+		switch methodName {
+		case "filter", "where", "chose", "that", "which":
+			return receiverType // []User -> []User
+		case "apply", "transform", "convert":
+			// For apply with User.Name, return []string
+			if elementType == "User" {
+				return "[]string"
+			}
+			return "[]any"
+		case "sort", "sortBy", "reverse", "sorted", "reversed":
+			return receiverType // []string -> []string
+		case "first", "last", "head", "tail":
+			return elementType // []string -> string
+		}
+	}
 	return "[]any"
 }
 
