@@ -1,18 +1,18 @@
 // Test 'and' operator (should work like &&)
 check true and true
-#check true or false
-#check false or true
-#check not false
-#check not (true and false)
-#check not (false and false)
-#check not (false and true)
+check true or false
+check false or true
+check not false
+check not (true and false)
+check not (false and false)
+check not (false and true)
 
 a := true
 b := false
 c := true
-#check a and c
-#check a and b == false
-#check b or c
+check a and c
+check a and b == false
+check b or c
 
 
 
