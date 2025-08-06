@@ -1,0 +1,28 @@
+// Test the newly implemented runtime functions using the and operator
+x := 42
+result := x and "hello"
+println("42 and \"hello\":", result)
+
+y := 0
+result2 := y and "world"
+println("0 and \"world\":", result2)
+
+// Test with strings
+s1 := "test"
+result3 := s1 and "success"
+println("\"test\" and \"success\":", result3)
+
+s2 := ""
+result4 := s2 and "fail"
+println("\"\" and \"fail\":", result4)
+
+// Test in if statement
+if x and 1 {
+    println("x and 1 is truthy")
+}
+
+if y and 1 {
+    println("y and 1 is truthy")
+} else {
+    println("y and 1 is falsy")
+}

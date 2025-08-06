@@ -17,4 +17,5 @@ if user and user.Name {
 
 // Clean:
 result := user?.Name ?? "Anonymous"
+result := user.?Name ?? "Anonymous"
 put("First user over 18: ", result)

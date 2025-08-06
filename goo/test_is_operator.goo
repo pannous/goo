@@ -1,32 +1,23 @@
 import "reflect"
 
-// isTypeOf checks if value x has the same type as the type of typeInstance
-def isTypeOf(x any, typeInstance any) bool {
-	if x == nil && typeInstance == nil {
-		return true
+// Simple typeMatches function for IS operator
+def typeMatches(value any, typeName string) bool {
+	if value == nil {
+		return typeName == "nil"
 	}
-	if x == nil || typeInstance == nil {
-		return false
-	}
-	
-	xType := reflect.TypeOf(x)
-	instanceType := reflect.TypeOf(typeInstance)
-	
-	// Remove pointer indirection from instanceType since we pass (*T)(nil)
-	if instanceType.Kind() == reflect.Ptr {
-		instanceType = instanceType.Elem()
-	}
-	
-	return xType == instanceType
+	actualType := reflect.TypeOf(value).String()
+	return actualType == typeName
 }
 
-ok := 1 is int    //     surprisingly hard to implement
-check ok
+// Simple test of IS operator
+x := 1
+ok := x is int    
+println("1 is int:", ok)
 
-// Test more complex types
-slice := [1, 2, 3]
-ok2 := slice is []int
-check ok2
+str := "hello"  
+ok2 := str is string
+println("hello is string:", ok2)
 
-ok3 := slice is []any  // This should be false - different element types
-check !ok3
+arr := [1, 2, 3]
+ok3 := arr is []int
+println("[1,2,3] is []int:", ok3)

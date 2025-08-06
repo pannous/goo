@@ -158,21 +158,76 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	return expr
 }
 
-// createTruthyAndCall creates a truthy and operation using a type-safe dummy operation
-// Transforms: x and y --> truthyAndOp(x, y)  where truthyAndOp is a simple function call
+// createTruthyAndCall creates a truthy and operation using a simpler approach
+// For now, let's just convert "x and y" to a regular conditional with explicit truthiness checks
 func (t *TruthyAndTransform) createTruthyAndCall(left, right syntax.Expr, pos syntax.Pos) syntax.Expr {
-	println("DEBUG: Creating truthyAndOp function call")
-	// Create truthyAndOp function call: truthyAndOp(x, y)
-	truthyAndOpName := &syntax.Name{Value: "truthyAndOp"}
-	truthyAndOpName.SetPos(pos)
+	println("DEBUG: Creating simple truthy and implementation")
 	
-	call := &syntax.CallExpr{
-		Fun:     truthyAndOpName,
-		ArgList: []syntax.Expr{left, right},
+	// For now, let's implement a much simpler approach:
+	// Convert "x and y" to "x != 0 && y" (for integers) or appropriate truthiness check
+	// This is a simplified version that should work reliably
+	
+	truthyCheck := t.createTruthyCheck(left, pos)
+	
+	// Create && operation: truthyCheck && right  
+	andOp := &syntax.Operation{
+		Op: syntax.AndAnd,
+		X:  truthyCheck,
+		Y:  right,
 	}
-	call.SetPos(pos)
+	andOp.SetPos(pos)
 	
-	return call
+	return andOp
+}
+
+// createTruthyCheck creates a truthiness check for different types
+// Returns appropriate condition based on the expression type
+func (t *TruthyAndTransform) createTruthyCheck(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// For complex expressions that we can't easily determine the type for,
+	// we'll just use a conservative approach: check if it's "truthy" by assuming it's non-zero
+	
+	switch e := expr.(type) {
+	case *syntax.BasicLit:
+		switch e.Kind {
+		case syntax.IntLit:
+			// Check if int != 0
+			zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+			zero.SetPos(pos)
+			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+			neq.SetPos(pos)
+			return neq
+		case syntax.StringLit:
+			// Check if string != ""
+			empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
+			empty.SetPos(pos)
+			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: empty}
+			neq.SetPos(pos)
+			return neq
+		case syntax.FloatLit:
+			// Check if float != 0.0
+			zero := &syntax.BasicLit{Kind: syntax.FloatLit, Value: "0.0"}
+			zero.SetPos(pos)
+			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+			neq.SetPos(pos)
+			return neq
+		}
+	case *syntax.Name:
+		// For variables, we need to make assumptions about their types
+		// Let's just assume they're integers for now (this is a limitation)
+		zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+		zero.SetPos(pos)
+		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+		neq.SetPos(pos)
+		return neq
+	}
+	
+	// For everything else, let's try the simple comparison 
+	// This might fail for some types, but it's better than nil comparison
+	zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zero.SetPos(pos)
+	neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+	neq.SetPos(pos)
+	return neq
 }
 
 func init() {

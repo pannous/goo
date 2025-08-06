@@ -1,0 +1,6 @@
+// Simple test to debug the IS operator
+func main() {
+	x := 1
+	result := x is int
+	println("Result:", result)
+}

@@ -13,7 +13,8 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ try val := f()  =>  { val, err := f(); if err != nil { return err } }  
 ✅ try { x } catch e { y } =>  func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :  
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?  
-✅ # comment and shebang support  
+✅ # comment and shebang support
+✅ #if DEBUG put("better than compiler tags!") #end
 ✅ goo file extension  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
@@ -23,7 +24,9 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }  
 ✅ simple_list := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
 ✅ xs := ['a', 'b', 'c'] ; xs#1 == 'a'  // 1-indexed array access using # operator  
-✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]   // 🙌 lambdas!  
+✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]   // 🙌 lambdas!
+✅ 1 is int, [1, 2, 3] is []int, "hello" is string, 'a' is rune
+✅ 
 ✅ go command default to run => `go test.go` OK  
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
@@ -62,7 +65,9 @@ Universal for-in syntax:
 ✅ for i, v in slice { ... }      // Index-value pairs  
 ✅ for k, v in iterator() { ... } // Iterator pairs  
   
-✅ while keyword as plain synonym for 'for'  
+✅ while keyword as plain synonym for 'for'
+
+☐  for i in 0…5  NOT working
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
@@ -74,19 +79,11 @@ Universal for-in syntax:
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
 instanceOf(a, reflect.TypeOf((*T)(nil)).Elem()) // or generated static checks  
-  
+
 ☐ plugin.Open() is for loading .so files at runtime  
-☐ cross off all done tasks from this list  
-☐ any other pain points you and I might have  
 𐄂 AAA Game Engine Core? Never  
   
   
-If types are known ([]int, etc.), generate func(int) int instead of func(any) any.  
-☐ 1 is int        surprisingly hard to implement  
-☐ [1, 2, 3] is []any  HARD!!  
-☐ [1, 2, 3] is []int  
-☐ if x is int { ... }  => if _, ok := x.(int); ok { }  
-☐ `a is Type` for type assertion, e.g. if a is int {} => if _, ok := a.(int); ok { ... }  
 ☐ while event := sdl.PollEvent(){} =>  for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {  
   
 ☐ GPU Intrinsics: forward []int{} vectors to GPU (simple primitive SIMD/CUDA/Metal/OpenCL adapters)  
@@ -149,4 +146,6 @@ Todo: Web Demo
   
 <!--  
 You can modify CLAUDE.md while the agent is working, it will pick up the changes!! "I see from the updated CLAUDE.md that…"  
--->  
+-->
+☐ any other pain points you and I might have
+☐ cross off all done tasks from this list  

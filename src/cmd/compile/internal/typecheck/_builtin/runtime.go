@@ -158,6 +158,8 @@ func rand32() uint32
 // truthiness conversion for if statements
 func truthy(interface{}) bool
 func falsey(interface{}) bool
+func truthyAndOp(interface{}, interface{}) interface{}
+func isTypeOf(interface{}, string) bool
 
 // *byte is really *runtime.Type
 func makemap64(mapType *byte, hint int64, mapbuf *any) (hmap map[any]any)

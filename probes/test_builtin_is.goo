@@ -1,0 +1,11 @@
+// Test IS operator with builtin isTypeOf function
+x := 1
+y := x is int
+println("1 is int:", y)
+
+str := "hello"
+z := str is string
+println("hello is string:", z)
+
+w := x is string
+println("1 is string:", w)

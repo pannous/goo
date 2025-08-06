@@ -1,0 +1,5 @@
+// Test very simple and operations
+x := 1
+y := 2
+result := x and y
+println("result:", result)

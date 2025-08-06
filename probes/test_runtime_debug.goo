@@ -1,0 +1,20 @@
+import "reflect"
+
+// Test the runtime isTypeOf function directly
+func main() {
+	x := 1
+	println("Testing runtime isTypeOf...")
+	
+	// What does reflect.TypeOf return?
+	xType := reflect.TypeOf(x)
+	println("reflect.TypeOf(1).String() =", xType.String())
+	
+	// Test the runtime call directly - this should work if the runtime function is correct
+	result := isTypeOf(x, "int")
+	println("isTypeOf(1, \"int\") =", result)
+	
+	// Test with the exact type string
+	exactType := xType.String()
+	result2 := isTypeOf(x, exactType)
+	println("isTypeOf(1, \"" + exactType + "\") =", result2)
+}
