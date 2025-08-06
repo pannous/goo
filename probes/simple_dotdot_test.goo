@@ -1,0 +1,8 @@
+package main
+
+// Just test that .. parses without immediate syntax error
+// We expect this to fail at a later stage, but scanner should work
+func main() {
+    // This will fail in parser/semantics, but scanner should handle ..
+    // x := 1..5
+}

@@ -1,0 +1,7 @@
+import "errors"
+
+func returnsError() error {
+	return errors.New("test error")
+}
+
+try returnsError()  // OK, panics as expected

@@ -1,0 +1,3 @@
+x := 5
+// Test just the and keyword
+y := x and 7

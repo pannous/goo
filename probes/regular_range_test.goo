@@ -1,0 +1,8 @@
+import "fmt"
+
+func main() {
+	// Test regular Go 1.22+ range syntax directly
+	for i := range 5 {
+		fmt.Println("Regular range:", i)
+	}
+}

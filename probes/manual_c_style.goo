@@ -1,0 +1,8 @@
+import "fmt"
+
+func main() {
+	// Manual C-style for loop that should work
+	for i := 0; i < 5; i++ {
+		fmt.Println("Manual C-style:", i)
+	}
+}

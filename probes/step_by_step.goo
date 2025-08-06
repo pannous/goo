@@ -1,0 +1,11 @@
+func main() {
+	// Test just integers  
+	a := 0
+	b := 5
+	
+	// Test spaced range (works)
+	c := a .. b
+	
+	// Test what fails
+	d := 0..5
+}

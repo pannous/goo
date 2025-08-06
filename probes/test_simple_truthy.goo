@@ -1,0 +1,33 @@
+// Helper function to evaluate truthiness like Python
+func isTruthy(value any) bool {
+	if value == nil {
+		return false
+	}
+	
+	switch v := value.(type) {
+	case bool:
+		return v
+	case string:
+		return len(v) > 0
+	case int:
+		return v != 0
+	default:
+		return true
+	}
+}
+
+// Truthy and operator implementation
+func truthyAndOp(x, y any) any {
+	if isTruthy(x) {
+		return y
+	}
+	return x
+}
+
+// Simple test with basic types
+x := 5
+y := "hello"
+
+// This should work: if x is truthy (5 != 0), return y ("hello")
+result := x and y
+println("Result:", result)

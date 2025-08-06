@@ -1,0 +1,21 @@
+// Manual version of what the transformation should produce
+
+func truthyAndOp(x, y any) any {
+	// Simplified without logical OR to avoid transformation conflicts
+	if x == 0 {
+		return x
+	}
+	return y
+}
+
+x := 5
+y := "hello"
+
+// This is what "x and y" should become
+result := truthyAndOp(x, y)
+println("Manual result:", result)  // Should print "hello"
+
+// Test with falsy first argument
+x2 := 0
+result2 := truthyAndOp(x2, "world")
+println("Manual result2:", result2)  // Should print 0

@@ -1,0 +1,9 @@
+package main
+
+func variadic(args ...int) {
+    println(len(args))
+}
+
+func main() {
+    variadic(1, 2, 3)
+}

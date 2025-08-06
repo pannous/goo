@@ -1,0 +1,6 @@
+import "strings"
+
+func main() {
+	s := " hello "
+	check s.strip() == "hello"
+}

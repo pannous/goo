@@ -1,0 +1,13 @@
+import "strings"
+
+func main() {
+	s := "hello"
+	
+	// These work - map to existing Go stdlib functions
+	println(s.toUpper())        // -> strings.ToUpper
+	println(s.strip())          // -> strings.TrimSpace (synonym for trim)
+	println(s.find("l"))        // -> strings.Index (synonym for indexOf)
+	println(s.includes("he"))   // -> strings.Contains (synonym for contains)
+	println(s.count("l"))       // -> strings.Count
+//	# println(s.replaceFirst("l", "x")) // -> strings.Replace(..., 1)
+}

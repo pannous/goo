@@ -1,0 +1,6 @@
+import "fmt"
+
+func main() {
+	x := 1 .. 5
+	fmt.Println(x)
+}

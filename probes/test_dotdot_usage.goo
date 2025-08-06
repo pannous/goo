@@ -1,0 +1,8 @@
+package main
+
+func main() {
+    // Test that .. is recognized as a token (not two separate . tokens)
+    // This should give a parser error, not a scanner error
+    a := 1 .. 5
+    println(a)
+}

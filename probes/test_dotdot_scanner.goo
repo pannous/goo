@@ -1,0 +1,5 @@
+// Test for .. token recognition
+x := 1..5  // Should recognize .. as a token
+y := 1...  // Should recognize ... as existing token
+z := 1.5   // Should recognize . as part of number
+w := obj.field // Should recognize . as dot operator
