@@ -97,6 +97,13 @@ func (t *TruthyAndTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 			newStmt.X = newExpr
 			return &newStmt
 		}
+	case *syntax.CheckStmt:
+		newCond := t.transformExpr(s.Cond)
+		if newCond != s.Cond {
+			newCheck := *s
+			newCheck.Cond = newCond
+			return &newCheck
+		}
 	}
 	
 	return stmt
