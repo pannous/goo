@@ -1,0 +1,12 @@
+type User struct {
+    Name string
+    Age int
+}
+
+user := User{Name: "", Age: 25}  // Empty name
+
+if user and user.Name {
+    put("User has name: ", user.Name)
+} else {
+    put("User has no name")
+}

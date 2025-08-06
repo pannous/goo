@@ -1,0 +1,13 @@
+type User struct {
+    Name string
+    Age int
+}
+
+var user *User
+user = &User{Name: "Alice", Age: 25}
+
+if user and user.Name {
+    put("User exists and has name: ", user.Name)
+} else {
+    put("User is nil or has no name")
+}
