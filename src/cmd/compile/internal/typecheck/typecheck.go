@@ -449,6 +449,10 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return tcTypeof(n)
 
+	case ir.OTYPEMATCHES:
+		n := n.(*ir.BinaryExpr)
+		return tcTypeMatches(n)
+
 	case ir.ORECOVER:
 		n := n.(*ir.CallExpr)
 		return tcRecover(n)

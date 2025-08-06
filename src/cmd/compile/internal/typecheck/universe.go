@@ -48,6 +48,7 @@ var builtinFuncs = [...]struct {
 	{"println", ir.OPRINTLN},
 	{"real", ir.OREAL},
 	{"recover", ir.ORECOVER},
+	{"typeMatches", ir.OTYPEMATCHES},
 	{"typeof", ir.OTYPEOF},
 }
 

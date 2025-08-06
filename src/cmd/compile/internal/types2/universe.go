@@ -190,6 +190,7 @@ const (
 	_Real
 	_Recover
 	_Typeof
+	_TypeMatches
 
 	// package unsafe
 	_Add
@@ -229,9 +230,10 @@ var predeclaredFuncs = [...]struct {
 	_Panic:   {"panic", 1, false, statement},
 	_Print:   {"print", 0, true, statement},
 	_Println: {"println", 0, true, statement},
-	_Real:    {"real", 1, false, expression},
-	_Recover: {"recover", 0, false, statement},
-	_Typeof:  {"typeof", 1, false, expression},
+	_Real:       {"real", 1, false, expression},
+	_Recover:    {"recover", 0, false, statement},
+	_Typeof:     {"typeof", 1, false, expression},
+	_TypeMatches: {"typeMatches", 2, false, expression},
 
 	_Add:        {"Add", 2, false, expression},
 	_Alignof:    {"Alignof", 1, false, expression},

@@ -1,3 +1,14 @@
+import "reflect"
+
+// Define typeMatches function for IS operator
+def typeMatches(value any, typeName string) bool {
+	if value == nil {
+		return typeName == "nil"
+	}
+	actualType := reflect.TypeOf(value).String()
+	return actualType == typeName
+}
+
 // Simple test to debug the IS operator
 func main() {
 	x := 1

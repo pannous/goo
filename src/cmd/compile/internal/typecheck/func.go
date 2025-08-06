@@ -180,7 +180,7 @@ func tcCall(n *ir.CallExpr, top int) ir.Node {
 			u := ir.NewUnaryExpr(n.Pos(), l.BuiltinOp, arg)
 			return typecheck(ir.InitExpr(n.Init(), u), top) // typecheckargs can add to old.Init
 
-		case ir.OCOMPLEX, ir.OCOPY, ir.OUNSAFEADD, ir.OUNSAFESLICE, ir.OUNSAFESTRING:
+		case ir.OCOMPLEX, ir.OCOPY, ir.OTYPEMATCHES, ir.OUNSAFEADD, ir.OUNSAFESLICE, ir.OUNSAFESTRING:
 			typecheckargs(n)
 			arg1, arg2, ok := needTwoArgs(n)
 			if !ok {
@@ -720,6 +720,34 @@ func tcTypeof(n *ir.UnaryExpr) ir.Node {
 	typeStr := n.X.Type().String()
 	lit := ir.NewBasicLit(n.Pos(), types.Types[types.TSTRING], constant.MakeString(typeStr))
 	return lit
+}
+
+// tcTypeMatches typechecks a OTYPEMATCHES node.
+func tcTypeMatches(n *ir.BinaryExpr) ir.Node {
+	n.X = Expr(n.X)
+	n.Y = Expr(n.Y)
+	
+	if n.X.Type() == nil || n.Y.Type() == nil {
+		n.SetType(nil)
+		return n
+	}
+	
+	// Second argument must be a string
+	if !n.Y.Type().IsString() {
+		base.Errorf("second argument to typeMatches must be string, not %v", n.Y.Type())
+		n.SetType(nil)
+		return n
+	}
+	
+	// Create runtime call: runtime.typeMatches(value, typeName)
+	// Convert first argument to interface{} 
+	arg1 := Conv(n.X, types.Types[types.TINTER])
+	arg2 := n.Y
+	
+	// Create call to runtime.typeMatches
+	fn := LookupRuntime("typeMatches")
+	call := Call(n.Pos(), fn, []ir.Node{arg1, arg2}, false)
+	return call
 }
 
 // tcPrint typechecks an OPRINT, OPRINTLN, or OPRINTF node.
