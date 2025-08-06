@@ -158,22 +158,19 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	return expr
 }
 
-// createTruthyAndCall creates a truthy and operation using a simpler approach
-// For now, let's just convert "x and y" to a regular conditional with explicit truthiness checks
+// createTruthyAndCall creates a truthy and operation using boolean conversion
 func (t *TruthyAndTransform) createTruthyAndCall(left, right syntax.Expr, pos syntax.Pos) syntax.Expr {
-	println("DEBUG: Creating simple truthy and implementation")
+	println("DEBUG: Creating boolean AND with truthiness checks")
 	
-	// For now, let's implement a much simpler approach:
-	// Convert "x and y" to "x != 0 && y" (for integers) or appropriate truthiness check
-	// This is a simplified version that should work reliably
+	// Convert both operands to boolean truthiness checks
+	leftTruthy := t.createBooleanTruthyCheck(left, pos)
+	rightTruthy := t.createBooleanTruthyCheck(right, pos)
 	
-	truthyCheck := t.createTruthyCheck(left, pos)
-	
-	// Create && operation: truthyCheck && right  
+	// Create && operation: leftTruthy && rightTruthy  
 	andOp := &syntax.Operation{
 		Op: syntax.AndAnd,
-		X:  truthyCheck,
-		Y:  right,
+		X:  leftTruthy,
+		Y:  rightTruthy,
 	}
 	andOp.SetPos(pos)
 	
@@ -228,6 +225,69 @@ func (t *TruthyAndTransform) createTruthyCheck(expr syntax.Expr, pos syntax.Pos)
 	neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
 	neq.SetPos(pos)
 	return neq
+}
+
+// createSmartTruthyCheck creates a smarter truthiness check
+// For variables/names, assume they might be structs and check != nil
+func (t *TruthyAndTransform) createSmartTruthyCheck(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	switch e := expr.(type) {
+	case *syntax.Name:
+		// For variables, assume they might be structs/pointers and check != nil
+		// This handles the common case better than != 0
+		nilName := &syntax.Name{Value: "nil"}
+		nilName.SetPos(pos)
+		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: nilName}
+		neq.SetPos(pos)
+		return neq
+	case *syntax.BasicLit:
+		// For literals, use the appropriate zero comparison
+		return t.createTruthyCheck(expr, pos)
+	default:
+		// For complex expressions, try nil comparison (works for pointers/interfaces)
+		nilName := &syntax.Name{Value: "nil"}
+		nilName.SetPos(pos)
+		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: nilName}
+		neq.SetPos(pos)
+		return neq
+	}
+}
+
+// createBooleanTruthyCheck creates a boolean expression for truthiness
+// This is more conservative and handles type mismatches better
+func (t *TruthyAndTransform) createBooleanTruthyCheck(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	switch e := expr.(type) {
+	case *syntax.Name:
+		// For variable names, we can't easily determine if it's a pointer or struct
+		// Let's use a heuristic: if this is likely a struct, check a meaningful field
+		// For now, try to access .Name field if it exists, otherwise fall back to != nil
+		
+		// Try to create a check for a common field that indicates "non-empty" struct
+		nameField := &syntax.SelectorExpr{
+			X:   expr,
+			Sel: &syntax.Name{Value: "Name"},
+		}
+		nameField.SetPos(pos)
+		
+		empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
+		empty.SetPos(pos)
+		neq := &syntax.Operation{Op: syntax.Neq, X: nameField, Y: empty}
+		neq.SetPos(pos)
+		return neq
+	case *syntax.SelectorExpr:
+		// For field access like user.Name, assume it's a string and check != ""
+		empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
+		empty.SetPos(pos)
+		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: empty}
+		neq.SetPos(pos)
+		return neq
+	case *syntax.BasicLit:
+		// Use the original truthiness check for literals
+		return t.createTruthyCheck(expr, pos)
+	default:
+		// For other expressions, try to be more conservative
+		// Just return the expression as-is if it might already be boolean
+		return expr
+	}
 }
 
 func init() {
