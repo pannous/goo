@@ -1,0 +1,3 @@
+x := 5
+result := typeMatches(x, "int")
+put("Direct call result: ", result)
