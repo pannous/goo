@@ -88,7 +88,7 @@ func (v *isOperatorVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// convertIsToFunctionCall transforms "x is Type" to "isTypeOf(x, (*Type)(nil))"
+// convertIsToFunctionCall transforms "x is Type" to simple function call
 func (t *IsOperatorTransform) convertIsToFunctionCall(isOp *syntax.Operation) syntax.Expr {
 	if isOp.Op != syntax.IS {
 		return isOp
@@ -96,19 +96,20 @@ func (t *IsOperatorTransform) convertIsToFunctionCall(isOp *syntax.Operation) sy
 
 	pos := isOp.Pos()
 	
-	// Create isTypeOf function name
+	// Generate a simple function call that we know works: isTypeOf(x, "Type")
+	// But use a different function name to avoid the builtin issues
 	funcName := &syntax.Name{
-		Value: "isTypeOf",
+		Value: "typeMatches",
 	}
 	funcName.SetPos(pos)
 	
 	// Create function call arguments
 	args := []syntax.Expr{
-		isOp.X,                         // Original left operand (the value)
+		isOp.X,                           // Original left operand (the value)
 		t.createTypeString(isOp.Y, pos), // Type name as string from right operand
 	}
 	
-	// Create function call: isTypeOf(x, (*Type)(nil))
+	// Create function call: typeMatches(x, "Type")
 	funcCall := &syntax.CallExpr{
 		Fun:     funcName,
 		ArgList: args,
@@ -136,28 +137,33 @@ func (t *IsOperatorTransform) createTypeString(typeExpr syntax.Expr, pos syntax.
 
 // extractTypeName extracts the type name from a type expression
 func (t *IsOperatorTransform) extractTypeName(typeExpr syntax.Expr) string {
+	typeName := ""
 	switch expr := typeExpr.(type) {
 	case *syntax.Name:
-		return expr.Value
+		typeName = expr.Value
 	case *syntax.ArrayType:
 		if expr.Len == nil {
 			// Slice type: []T
-			return "[]" + t.extractTypeName(expr.Elem)
+			typeName = "[]" + t.extractTypeName(expr.Elem)
 		} else {
 			// Array type: [N]T - for simplicity, treat as array type
-			return "array"
+			typeName = "array"
 		}
 	case *syntax.Operation:
 		if expr.Op == syntax.Mul {
 			// Pointer type: *T
-			return "*" + t.extractTypeName(expr.X)
+			typeName = "*" + t.extractTypeName(expr.X)
 		}
 	case *syntax.SliceType:
-		return "[]" + t.extractTypeName(expr.Elem)
+		typeName = "[]" + t.extractTypeName(expr.Elem)
 	case *syntax.MapType:
-		return "map[" + t.extractTypeName(expr.Key) + "]" + t.extractTypeName(expr.Value)
+		typeName = "map[" + t.extractTypeName(expr.Key) + "]" + t.extractTypeName(expr.Value)
+	default:
+		typeName = "unknown"
 	}
-	return "unknown"
+	// Debug: print what type names we're extracting
+	// fmt.Printf("DEBUG: extractTypeName extracted '%s'\n", typeName)
+	return typeName
 }
 
 func init() {

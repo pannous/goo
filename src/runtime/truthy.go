@@ -111,3 +111,44 @@ func truthy(i interface{}) bool {
 func falsey(i interface{}) bool {
 	return !truthy(i)
 }
+
+// truthyAndOp implements the truthy AND operator (&&)
+// Returns the first falsy value, or the last value if all are truthy
+func truthyAndOp(left interface{}, right interface{}) interface{} {
+	if !truthy(left) {
+		return left
+	}
+	return right
+}
+
+// isTypeOf checks if the value has the specified type name
+// This is used by the compiler for type checking operations
+func isTypeOf(value interface{}, typeName string) bool {
+	if value == nil {
+		return typeName == "nil" || typeName == "<nil>"
+	}
+
+	// For now, let's use a simplified approach based on known types
+	switch v := value.(type) {
+	case int:
+		return typeName == "int"
+	case string:
+		return typeName == "string"
+	case bool:
+		return typeName == "bool"
+	case float64:
+		return typeName == "float64"
+	case float32:
+		return typeName == "float32"
+	case []int:
+		return typeName == "[]int"
+	case []string:
+		return typeName == "[]string"
+	case []interface{}:
+		return typeName == "[]interface{}" || typeName == "[]any"
+	default:
+		// For other types, try to match based on type assertion patterns
+		_ = v
+		return false
+	}
+}
