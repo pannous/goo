@@ -124,7 +124,7 @@ Running all tests in ./goo/ directory...
 ✅ conditional_test.goo
 ✅ debug_ast.goo
 ❌ debug_dots.goo
-❌ debug_is_parsing.goo
+✅ debug_is_parsing.goo
 ❌ debug_simple.goo
 ❌ debug_spaces.goo
 ❌ debug_tokenize.goo
@@ -144,7 +144,7 @@ Running all tests in ./goo/ directory...
 ✅ simple_conditional_test.goo
 ✅ simple_dotdot_test.goo
 ❌ simple_filter_test.goo
-❌ simple_is_test.goo
+✅ simple_is_test.goo
 ❌ simple_map_test.goo
 ✅ simple_nil_test.goo
 ❌ simple_range_test.goo
@@ -154,7 +154,7 @@ Running all tests in ./goo/ directory...
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
 ✅ test_bool_not.goo
-❌ test_builtin_is.goo
+✅ test_builtin_is.goo
 ✅ test_charAt_comprehensive.goo
 ✅ test_class_methods_advanced.goo
 ❌ test_coalescing_elvis.goo
@@ -176,7 +176,7 @@ Running all tests in ./goo/ directory...
 ✅ test_hash_index_vs_comment.goo
 ❌ test_in_complete.goo
 ❌ test_in_operator_maps.goo
-❌ test_is_simple.goo
+✅ test_is_simple.goo
 ✅ test_just_truthyAndOp.goo
 ❌ test_list_working.goo
 ❌ test_lists_consolidated.goo
@@ -229,12 +229,14 @@ Running all tests in ./goo/ directory...
 ✅ test_try_propagation.goo
 ✅ test_try_simple_assignment.goo
 ❌ test_try_simple.goo
+✅ test_typematches_direct.goo
+✅ test_typematches_simple.goo
 ✅ test_while_for_in.goo
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ✅ test_working_transforms.goo
 ❌ token_debug.goo
 ========================================
-Summary: 169/234 passed, 65 failed
+Summary: 175/236 passed, 61 failed
 ⚠️  Some tests failed
 Consider ./build-compiler.sh or do rollback!
