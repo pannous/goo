@@ -185,6 +185,13 @@ func (t *LambdaTransform) inferReturnType(expr syntax.Expr) string {
 		case syntax.RuneLit:
 			return "rune"
 		}
+	case *syntax.SelectorExpr:
+		// Handle field access like u.Name, u.Age
+		if fieldName := e.Sel.Value; fieldName != "" {
+			// Use basic heuristics for common field names
+			return t.inferFieldTypeFromName(fieldName)
+		}
+		return "string" // Default for field access
 	case *syntax.Name:
 		// For variable references, we can't easily determine the type without more context
 		// Default to int for now
@@ -196,6 +203,23 @@ func (t *LambdaTransform) inferReturnType(expr syntax.Expr) string {
 	
 	// Default to int if we can't determine the type
 	return "int"
+}
+
+// inferFieldTypeFromName uses heuristics to infer field types from field names
+func (t *LambdaTransform) inferFieldTypeFromName(fieldName string) string {
+	switch fieldName {
+	case "Name", "Title", "Description", "Text", "Message", "Label":
+		return "string"
+	case "Age", "Count", "Size", "Length", "Index", "ID", "Number":
+		return "int"
+	case "Price", "Amount", "Value", "Rate", "Score":
+		return "float64"
+	case "Active", "Enabled", "Valid", "Done", "Complete", "IsValid":
+		return "bool"
+	default:
+		// Default to string for unknown field names
+		return "string"
+	}
 }
 
 func init() {

@@ -28,7 +28,10 @@
       "Bash(git checkout:*)",
       "Bash(rm:*)",
       "Bash(../bin/go run test_import_folder.goo)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:docs.anthropic.com)"
     ],
     "deny": []
   }

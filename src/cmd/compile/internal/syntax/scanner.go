@@ -357,6 +357,17 @@ redo:
 		s.op, s.prec = Tilde, 0
 		s.tok = _Operator
 
+	case '?':
+		s.nextch()
+		if s.ch == '?' {
+			s.nextch()
+			s.op, s.prec = NullCoalesce, precOrOr
+			s.tok = _Operator
+			break
+		}
+		s.errorf("invalid character '?'")
+		goto redo
+
 	case '#':
 		// Check if this is a 1-indexed array access operator or a comment
 		// Comments start at beginning of line or after whitespace

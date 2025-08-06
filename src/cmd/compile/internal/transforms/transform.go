@@ -259,7 +259,75 @@ func collectFromVarDecl(varDecl *syntax.VarDecl, ctx *TransformContext) {
 				ctx.Types[name.Value] = typeName.Value
 			}
 		}
+		// Handle slice type declarations like: var xs []User
+		if arrayType, ok := varDecl.Type.(*syntax.ArrayType); ok {
+			if elementType, ok := arrayType.Elem.(*syntax.Name); ok {
+				sliceType := "[]" + elementType.Value
+				for _, name := range varDecl.NameList {
+					ctx.Types[name.Value] = sliceType
+				}
+			}
+		}
+	} else if varDecl.Values != nil {
+		// Handle implicit type inference from values
+		// Like: users := []User{{...}} or filtered := users.filter(...)
+		if len(varDecl.NameList) == 1 {
+			varName := varDecl.NameList[0].Value
+			inferredType := inferTypeFromExpression(varDecl.Values, ctx)
+			if inferredType != "" {
+				ctx.Types[varName] = inferredType
+			}
+		}
 	}
+}
+
+// inferTypeFromExpression attempts to infer the type of an expression
+func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
+	switch e := expr.(type) {
+	case *syntax.CompositeLit:
+		// Handle []User{{...}} literals
+		if arrayType, ok := e.Type.(*syntax.ArrayType); ok {
+			if elementType, ok := arrayType.Elem.(*syntax.Name); ok {
+				return "[]" + elementType.Value
+			}
+		}
+	case *syntax.CallExpr:
+		// Handle method calls like users.filter(...)
+		if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
+			if receiverName, ok := selector.X.(*syntax.Name); ok {
+				receiverType := ctx.Types[receiverName.Value]
+				methodName := selector.Sel.Value
+				
+				// Infer return type based on method and receiver type
+				return inferMethodReturnType(receiverType, methodName)
+			}
+		}
+	}
+	return ""
+}
+
+// inferMethodReturnType infers what type a method call returns
+func inferMethodReturnType(receiverType, methodName string) string {
+	if len(receiverType) >= 2 && receiverType[:2] == "[]" {
+		elementType := receiverType[2:] // e.g., "User" from "[]User"
+		
+		switch methodName {
+		case "filter", "where", "chose", "that", "which":
+			// filter returns same type as input: []User -> []User
+			return receiverType
+		case "apply", "transform", "convert":
+			// apply transforms elements, but we'd need to analyze the lambda
+			// For now, assume it returns []any
+			return "[]any"
+		case "sort", "sortBy", "reverse":
+			// sort returns same type as input: []User -> []User
+			return receiverType
+		case "first", "last", "head", "tail":
+			// first returns element type: []User -> User
+			return elementType
+		}
+	}
+	return ""
 }
 
 func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
@@ -362,6 +430,12 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 					}
 					ctx.Types[lhs.Value] = "map[" + keyType + "]" + valueType
 				}
+			}
+			
+			// Handle method call assignments like: filtered := users.filter(...)
+			inferredType := inferTypeFromExpression(rhsElems[i], ctx)
+			if inferredType != "" {
+				ctx.Types[lhs.Value] = inferredType
 			}
 		}
 	}

@@ -54,7 +54,7 @@ Running all tests in ./goo/ directory...
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
 ✅ test_list_comparison2.goo
-✅ test_list_lambda.goo
+❌ test_list_lambda.goo
 ✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
 ✅ test_list_methods.goo
@@ -139,11 +139,6 @@ Running all tests in ./goo/ directory...
 ✅ test_multi_var_while_in.goo
 ✅ test_not_comprehensive.goo
 ✅ test_original_examples.goo
-✅ test_pipe_comprehensive.goo
-✅ test_pipe_edge_cases.goo
-✅ test_pipe_function.goo
-✅ test_pipe_parentheses.goo
-✅ test_pipe_vs_bitwise.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_transform.goo
 ✅ test_put_concat.goo
@@ -156,5 +151,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ========================================
-Summary: 136/155 passed, 19 failed
+Summary: 130/150 passed, 20 failed
 ⚠️  Some tests failed
