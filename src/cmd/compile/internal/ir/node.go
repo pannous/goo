@@ -307,6 +307,8 @@ const (
 
 	// New operations - always add at end to maintain bootstrap compatibility
 	OCHECK       // check Cond
+	OTRUTHY      // truthy(value) (truthiness check)
+	OTRUTHYANDOP // truthyAndOp(left, right) (truthy and operation)
 	OLISTSORTDESC // listSortDesc(list) (sort list descending)
 	OLISTPOP     // listPop(list) (remove and return last element)
 	OLISTSHIFT   // listShift(list) (remove and return first element)

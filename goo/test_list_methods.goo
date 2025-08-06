@@ -1,4 +1,4 @@
-
+import "strings" // for reverse
 // Test list methods in Goo
 // DON'T REMOVE TESTS even if they fail
 aList:=[1, 2, 3]
@@ -33,6 +33,19 @@ check aList.slice(1,2) == [2,]
 check aList.copy() == aList
 
 check aList.append(4) == [1,2,3,4]
+
+
+#aList:=[1, 2, 3]
+check aList[1] == 2
+check aList.first() == 1
+## ^^ works in principle
+
+
+
+stringList := ["3", "2", "1"]
+check stringList.join("-") == "3-2-1" // join
+check stringList.join("") == "321" // join
+#check strings.Join(stringList, "-") == "3-2-1" // join
 
 printf("All list method tests passed!\n")
 
