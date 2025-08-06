@@ -45,8 +45,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ class via type struct  
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
-Do you think the following one liner syntax (without any {} blocks) would be compatible with the existing syntax?  
-  
+✅ for i in 0…5 {put(i)}  // range syntax
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ✅ "你" == '你'  
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !  

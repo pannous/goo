@@ -28,6 +28,7 @@ GOROOT=/opt/other/go ./make.bash 2>&1 | head -10
 ### Style Guidelines
 
 Always replace interface{} with any
+Omit Caveat: in Summaries.
 
 # Compile
 To compile go, use the following command:
@@ -103,12 +104,13 @@ NEVER modify existing tests!
 INSTEAD of touching tests in goo, create new tests in the probes folder
 Do not remove tests that are not passing instead leave them there for later fixing.
 
-
 Do not re-create tests for what is already working, if this is already tested elsewhere.
 
 after performing changes recompile bin/go before testing!
 
-• Never modify my tests in goo. Only add one new test after I've approved the fully functional major feature otherwise leave your tests in probes
+Only report victories if the original complaining test is passing, check again after the changes!
+
+NEVER modify my tests in goo folder! Only add one new test after I've approved the fully functional major feature otherwise leave your tests in probes
 
 # Consolidation
 When failing to make progress don't celebrate (prior progress), 
@@ -181,3 +183,4 @@ goo/test_list_methods.goo
 
 # Hard extensions
 When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
+

@@ -793,8 +793,9 @@ func init() {
 		syntax.Xor:    allInteger,
 		syntax.AndNot: allInteger,
 
-		syntax.AndAnd: allBoolean,
-		syntax.OrOr:   allBoolean,
+		syntax.AndAnd:   allBoolean,
+		syntax.OrOr:     allBoolean,
+		syntax.TruthyAnd: func(Type) bool { return true }, // Allow any type for truthy and
 	}
 }
 

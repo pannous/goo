@@ -105,7 +105,7 @@ redo:
 	s.line, s.col = s.pos()
 	s.blank = s.line > startLine || startCol == colbase
 	s.start()
-	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.atIdentChar(true) {
+	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.atIdentChar(true) {
 		s.nextch()
 		s.ident()
 		return
@@ -184,10 +184,6 @@ redo:
 
 	case '.':
 		s.nextch()
-		if isDecimal(s.ch) {
-			s.number(true)
-			break
-		}
 		if s.ch == '.' {
 			s.nextch()
 			if s.ch == '.' {
@@ -195,10 +191,20 @@ redo:
 				s.tok = _DotDotDot
 				break
 			}
+			// Rewind for two separate dots
 			s.rewind() // now s.ch holds 1st '.'
 			s.nextch() // consume 1st '.' again
 		}
+		if isDecimal(s.ch) {
+			s.number(true)
+			break
+		}
 		s.tok = _Dot
+
+	case '…': // ellipsis as range operator
+		s.nextch()
+		s.op, s.prec = Range, precAdd
+		s.tok = _Operator
 
 	case '+':
 		s.nextch()
@@ -428,6 +434,10 @@ func (s *scanner) ident() {
 			return
 		case "enum":
 			s.tok = _Enum
+			return
+		case "and":
+			s.op, s.prec = TruthyAnd, precAndAnd
+			s.tok = _Operator
 			return
 		case "catch":
 			s.tok = _Catch
