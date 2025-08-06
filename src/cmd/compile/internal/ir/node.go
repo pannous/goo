@@ -306,7 +306,10 @@ const (
 	OTYPEMATCHES // typeMatches(value, typeName) (runtime type checking)
 
 	// New operations - always add at end to maintain bootstrap compatibility
-	OCHECK // check Cond
+	OCHECK       // check Cond
+	OLISTSORTDESC // listSortDesc(list) (sort list descending)
+	OLISTPOP     // listPop(list) (remove and return last element)
+	OLISTSHIFT   // listShift(list) (remove and return first element)
 
 	OEND
 )

@@ -191,6 +191,9 @@ const (
 	_Recover
 	_Typeof
 	_TypeMatches
+	_ListSortDesc
+	_ListPop  
+	_ListShift
 
 	// package unsafe
 	_Add
@@ -234,6 +237,9 @@ var predeclaredFuncs = [...]struct {
 	_Recover:    {"recover", 0, false, statement},
 	_Typeof:     {"typeof", 1, false, expression},
 	_TypeMatches: {"typeMatches", 2, false, expression},
+	_ListSortDesc: {"listSortDesc", 1, false, expression},
+	_ListPop:     {"listPop", 1, false, expression},
+	_ListShift:   {"listShift", 1, false, expression},
 
 	_Add:        {"Add", 2, false, expression},
 	_Alignof:    {"Alignof", 1, false, expression},

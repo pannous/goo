@@ -1,0 +1,12 @@
+aList := [1, 2, 3]
+
+printf("Original: %v\n", aList)
+
+sorted := aList.sortDesc()
+printf("sortDesc: %v\n", sorted)
+
+popped := aList.pop()  
+printf("pop: %v\n", popped)
+
+shifted := aList.shift()
+printf("shift: %v\n", shifted)

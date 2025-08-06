@@ -67,6 +67,10 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		if len(args) == 1 {
 			return t.createPrependCall(receiver, args[0])
 		}
+	case "pop":
+		return t.createPopCall(receiver)
+	case "shift":
+		return t.createShiftCall(receiver)
 	case "insert":
 		if len(args) == 2 {
 			return t.createInsertCall(receiver, args[0], args[1])
@@ -109,6 +113,8 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		return t.createReverseCall(receiver)
 	case "sort", "sorted":
 		return t.createSortCall(receiver)
+	case "sortDesc", "sortDescending":
+		return t.createSortDescCall(receiver)
 	case "sortBy", "sortedBy":
 		if len(args) == 1 {
 			return t.createSortByCall(receiver, args[0])
@@ -163,11 +169,12 @@ func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContex
 		}
 	}
 
-	// Add required imports if needed and transformations were made
-	if changed && !t.hasImport(file, "slices") {
-		println("Adding slices import")
-		t.addSlicesImport(file)
-	}
+	// For now, skip adding slices import to avoid import errors
+	// TODO: Add smart import detection based on which methods are used
+	// if changed && !t.hasImport(file, "slices") {
+	// 	println("Adding slices import")
+	// 	t.addSlicesImport(file)
+	// }
 
 	return changed
 }
@@ -1299,6 +1306,56 @@ func (t *ListMethodsTransform) extractElementType(varName string, ctx *Transform
 	}
 	
 	return ""
+}
+
+// Create methods for the new list operations
+
+func (t *ListMethodsTransform) createSortDescCall(receiver syntax.Expr) syntax.Expr {
+	// Create call to listSortDesc builtin function
+	pos := receiver.Pos()
+	
+	sortDescName := &syntax.Name{Value: "listSortDesc"}
+	sortDescName.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     sortDescName,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+func (t *ListMethodsTransform) createPopCall(receiver syntax.Expr) syntax.Expr {
+	// Create call to listPop builtin function
+	pos := receiver.Pos()
+	
+	popName := &syntax.Name{Value: "listPop"}
+	popName.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     popName,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+func (t *ListMethodsTransform) createShiftCall(receiver syntax.Expr) syntax.Expr {
+	// Create call to listShift builtin function
+	pos := receiver.Pos()
+	
+	shiftName := &syntax.Name{Value: "listShift"}
+	shiftName.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     shiftName,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 func init() {

@@ -56,7 +56,7 @@ if x < y and y > 0 {
 if x > y or y == 10 {
 	put("x > y or y == 10 works!")
 }
-# check x < y and y > 0 == true
-# check x > y or y == 10 == true
+check x < y and y > 0 == true
+check x > y or y == 10 == true
 
 printf("All checks passed!\n")
