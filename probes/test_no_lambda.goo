@@ -1,0 +1,10 @@
+import "slices"
+
+// Test without lambda - use a regular function
+func double(x int) int {
+    return x * 2
+}
+
+nums := []int{1, 2, 3}
+result := slices.Map(nums, double)
+println("Result:", result)

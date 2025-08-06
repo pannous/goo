@@ -54,7 +54,8 @@ Running all tests in ./goo/ directory...
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
 ✅ test_list_comparison2.goo
-❌ test_list_lambda.goo
+❌ test_list_filter.goo
+✅ test_list_lambda.goo
 ✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
 ✅ test_list_methods.goo
@@ -115,8 +116,13 @@ Running all tests in ./goo/ directory...
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
+✅ debug_ast.goo
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
+✅ nil_coalesce_final_test.goo
+❌ simple_filter_test.goo
+❌ simple_map_test.goo
+✅ simple_nil_test.goo
 ❌ test_all_features.goo
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
@@ -124,6 +130,7 @@ Running all tests in ./goo/ directory...
 ✅ test_charAt_comprehensive.goo
 ❌ test_comments_consolidated.goo
 ❌ test_conversions_consolidated.goo
+❌ test_exclamation_syntax.goo
 ✅ test_falsey.goo
 ❌ test_filter_clean.goo
 ✅ test_for_in_consolidated.goo
@@ -132,17 +139,24 @@ Running all tests in ./goo/ directory...
 ✅ test_hash_index_vs_comment.goo
 ❌ test_in_operator_maps.goo
 ❌ test_lists_consolidated.goo
+❌ test_lists_methods.goo
 ✅ test_manual_strconv.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_printf_only.goo
+✅ test_map_string.goo
 ✅ test_multi_return_try.goo
 ✅ test_multi_var_while_in.goo
+✅ test_nil_coalescing.goo
+✅ test_no_lambda.goo
+❌ test_non_modifying.goo
 ✅ test_not_comprehensive.goo
 ✅ test_original_examples.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_transform.goo
 ✅ test_put_concat.goo
 ✅ test_slices_manual.goo
+✅ test_sort_clear.goo
+✅ test_sort_simple.goo
 ❌ test_string_methods_consolidated.goo
 ✅ test_truthiness_basic.goo
 ✅ test_try_propagation.goo
@@ -151,5 +165,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ========================================
-Summary: 130/150 passed, 20 failed
+Summary: 139/164 passed, 25 failed
 ⚠️  Some tests failed
