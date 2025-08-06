@@ -361,7 +361,7 @@ func TestComments(t *testing.T) {
 				return
 			}
 			got = comment{line - linebase, col - colbase, msg} // keep last one
-		}, comments)
+		}, comments, "")
 
 		for {
 			s.next()
@@ -715,7 +715,7 @@ func TestDirectives(t *testing.T) {
 				t.Errorf("%s: handler called with empty msg", src)
 			}
 			got = msg
-		}, directives)
+		}, directives, "")
 
 		s.next()
 		if strings.HasPrefix(src, "//line ") || strings.HasPrefix(src, "//go:") {
@@ -736,7 +736,7 @@ func TestIssue21938(t *testing.T) {
 	s := "/*" + strings.Repeat(" ", 4089) + "*/ .5"
 
 	var got scanner
-	got.init(strings.NewReader(s), errh, 0)
+	got.init(strings.NewReader(s), errh, 0, "")
 	got.next()
 
 	if got.tok != _Literal || got.lit != ".5" {

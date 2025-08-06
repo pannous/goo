@@ -990,16 +990,74 @@ func (s *scanner) fullComment() {
 func (s *scanner) hashComment() {
 	// # opening has already been consumed
 	
+	// Check for conditional compilation directives and handle them as special comments
+	if s.checkHashDirective() {
+		return
+	}
+	
 	if s.mode&comments != 0 {
 		s.skipLine()
 		s.comment(string(s.segment()))
 		return
 	}
 
-	// are we saving directives? Hash comments don't support directives
-	// so just skip the line regardless of directive mode
+	// are we saving directives? Now hash comments can support conditional directives
+	if s.mode&directives != 0 {
+		s.skipLine()
+		s.comment(string(s.segment()))
+		return
+	}
+	
 	s.stop()
 	s.skipLine()
+}
+
+// checkHashDirective checks for conditional compilation directives like #if and #end
+// Instead of creating new tokens, we handle these as special directive comments
+func (s *scanner) checkHashDirective() bool {
+	// Look ahead to see if this is "if" or "end" 
+	if s.ch == 'i' && s.peekAhead("if") {
+		s.skipLine()
+		s.comment(string(s.segment()))
+		return true
+	} else if s.ch == 'e' && s.peekAhead("end") {
+		s.skipLine()
+		s.comment(string(s.segment()))
+		return true
+	}
+	
+	return false
+}
+
+// peekAhead checks if the next characters match the given string
+func (s *scanner) peekAhead(target string) bool {
+	// Save current position
+	savedR := s.r
+	savedCh := s.ch
+	
+	// Try to match each character
+	for _, expectedCh := range target {
+		if s.ch != expectedCh {
+			// Restore position and return false
+			s.r = savedR
+			s.ch = savedCh
+			return false
+		}
+		s.nextch()
+	}
+	
+	// Check that it's followed by whitespace or end of line
+	if s.ch == ' ' || s.ch == '\t' || s.ch == '\n' || s.ch < 0 {
+		// Restore position to start of matched text
+		s.r = savedR
+		s.ch = savedCh
+		return true
+	}
+	
+	// Restore position and return false
+	s.r = savedR
+	s.ch = savedCh
+	return false
 }
 
 func (s *scanner) escape(quote rune) bool {
