@@ -1,0 +1,23 @@
+import "fmt"
+
+func main() {
+	fmt.Println("Starting conditional compilation test")
+	
+	#if DEBUG
+		fmt.Println("DEBUG: This should only appear in debug mode")
+		debugVar := 42
+		fmt.Printf("DEBUG: Debug variable = %d\n", debugVar)
+	#end
+	
+	fmt.Println("This line always appears")
+	
+	#if RELEASE
+		fmt.Println("RELEASE: This should only appear in release mode")
+	#end
+	
+	#if TESTING
+		fmt.Println("TESTING: This is for testing only")
+	#end
+	
+	fmt.Println("End of test")
+}

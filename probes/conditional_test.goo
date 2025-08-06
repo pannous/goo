@@ -1,0 +1,22 @@
+package main
+
+import "fmt"
+
+#if DEBUG
+	const debugMode = true
+	fmt.Println("Debug mode is on")
+#end
+
+#if FEATURE_ADVANCED
+	func advancedFeature() {
+		fmt.Println("Advanced feature available")
+	}
+#end
+
+func main() {
+	fmt.Println("Hello, conditional compilation!")
+	
+	#if DEBUG
+		fmt.Println("This is debug output")
+	#end
+}
