@@ -1,0 +1,8 @@
+a := true
+b := false  
+c := true
+
+// Test complex expressions
+if (a and c) or (b and false) {
+    put("Complex expression works!")
+}

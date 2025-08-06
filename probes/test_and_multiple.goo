@@ -1,0 +1,19 @@
+a := true
+b := false
+c := true
+
+if a and c {
+    put("First and works!")
+}
+
+if a and b {
+    put("This should not print")
+} else {
+    put("Second and correctly false") 
+}
+
+if b and false {
+    put("This should not print")
+} else {
+    put("Third and correctly false")
+}

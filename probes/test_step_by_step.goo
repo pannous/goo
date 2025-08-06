@@ -1,0 +1,9 @@
+a := true
+b := false  
+c := true
+
+if a and b {
+    put("This should not print")
+} else {
+    put("a and b correctly false")
+}

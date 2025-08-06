@@ -1,0 +1,19 @@
+a := true
+b := false
+c := true
+
+// Test and operations
+if a and c {
+    put("a and c works!")
+}
+
+// Test or operations  
+if b or c {
+    put("b or c works!")
+}
+
+if b or false {
+    put("This should not print")
+} else {
+    put("b or false correctly false")
+}

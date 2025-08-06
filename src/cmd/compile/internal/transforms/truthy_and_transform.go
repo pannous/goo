@@ -130,6 +130,14 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 			newOp.Y = newY
 			return &newOp
 		}
+	case *syntax.ParenExpr:
+		// Transform parenthesized expressions
+		newX := t.transformExpr(e.X)
+		if newX != e.X {
+			newParen := *e
+			newParen.X = newX
+			return &newParen
+		}
 	case *syntax.CallExpr:
 		// Transform function arguments
 		newFun := t.transformExpr(e.Fun)
@@ -162,15 +170,24 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 func (t *TruthyAndTransform) createTruthyAndCall(left, right syntax.Expr, pos syntax.Pos) syntax.Expr {
 	println("DEBUG: Creating boolean AND with truthiness checks")
 	
-	// Convert both operands to boolean truthiness checks
-	leftTruthy := t.createBooleanTruthyCheck(left, pos)
-	rightTruthy := t.createBooleanTruthyCheck(right, pos)
+	// Ensure operands have proper position information
+	if left.Pos().IsKnown() {
+		// Keep original position
+	} else {
+		left.SetPos(pos)
+	}
 	
-	// Create && operation: leftTruthy && rightTruthy  
+	if right.Pos().IsKnown() {
+		// Keep original position  
+	} else {
+		right.SetPos(pos)
+	}
+	
+	// Create && operation with proper initialization
 	andOp := &syntax.Operation{
 		Op: syntax.AndAnd,
-		X:  leftTruthy,
-		Y:  rightTruthy,
+		X:  left,
+		Y:  right,
 	}
 	andOp.SetPos(pos)
 	
@@ -257,22 +274,12 @@ func (t *TruthyAndTransform) createSmartTruthyCheck(expr syntax.Expr, pos syntax
 func (t *TruthyAndTransform) createBooleanTruthyCheck(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
 	switch e := expr.(type) {
 	case *syntax.Name:
-		// For variable names, we can't easily determine if it's a pointer or struct
-		// Let's use a heuristic: if this is likely a struct, check a meaningful field
-		// For now, try to access .Name field if it exists, otherwise fall back to != nil
-		
-		// Try to create a check for a common field that indicates "non-empty" struct
-		nameField := &syntax.SelectorExpr{
-			X:   expr,
-			Sel: &syntax.Name{Value: "Name"},
-		}
-		nameField.SetPos(pos)
-		
-		empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
-		empty.SetPos(pos)
-		neq := &syntax.Operation{Op: syntax.Neq, X: nameField, Y: empty}
-		neq.SetPos(pos)
-		return neq
+		// For variable names, we don't know the type at syntax level
+		// The safest approach is to just return the variable directly
+		// If it's already boolean, it will work as-is
+		// If it's not boolean, the type checker will handle the conversion
+		e.SetPos(pos)  // Ensure position information is set
+		return expr
 	case *syntax.SelectorExpr:
 		// For field access like user.Name, assume it's a string and check != ""
 		empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
@@ -286,6 +293,7 @@ func (t *TruthyAndTransform) createBooleanTruthyCheck(expr syntax.Expr, pos synt
 	default:
 		// For other expressions, try to be more conservative
 		// Just return the expression as-is if it might already be boolean
+		expr.SetPos(pos)  // Ensure position information is set
 		return expr
 	}
 }

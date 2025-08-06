@@ -1,0 +1,13 @@
+a := true
+b := false
+c := true
+
+// Test 1: literals
+if true and true {
+    put("true and true works!")
+}
+
+// Test 2: variables  
+if a and c {
+    put("a and c works!")
+}
