@@ -54,7 +54,7 @@ Running all tests in ./goo/ directory...
 ✅ test_lambda.goo
 ✅ test_list_comparison.goo
 ✅ test_list_comparison2.goo
-❌ test_list_filter.goo
+✅ test_list_filter.goo
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
@@ -165,5 +165,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
 ========================================
-Summary: 139/164 passed, 25 failed
+Summary: 140/164 passed, 24 failed
 ⚠️  Some tests failed

@@ -1,4 +1,18 @@
-# BAD ADVICE:  
+ 🔧 Chained Method Call Challenge:
+
+  The complex chained call users.filter(...).apply(...).sort().first() is a sophisticated challenge that
+  requires:
+  1. Inter-method type propagation through the AST transformation pipeline
+  2. Type context preservation across multiple transforms
+  3. Complex AST analysis to track intermediate result types
+
+  This is definitely solvable but would require substantial additional work on the type inference system. For
+  now, users can achieve the same functionality by breaking the chain into steps (as shown in the working
+  examples).
+
+
+
+# BAD ADVICE:
 Put stuff here which might negatively affect claudes capabilities  
 Never randomly disable code  
   

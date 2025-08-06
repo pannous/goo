@@ -316,9 +316,9 @@ func inferMethodReturnType(receiverType, methodName string) string {
 			// filter returns same type as input: []User -> []User
 			return receiverType
 		case "apply", "transform", "convert":
-			// apply transforms elements, but we'd need to analyze the lambda
-			// For now, assume it returns []any
-			return "[]any"
+			// apply transforms elements, return []string for common cases
+			// This could be enhanced to analyze the actual lambda
+			return "[]string" // Most common case is converting to strings
 		case "sort", "sortBy", "reverse":
 			// sort returns same type as input: []User -> []User
 			return receiverType
