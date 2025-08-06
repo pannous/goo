@@ -1,0 +1,7 @@
+a := true
+c := true
+
+// Test just: (a and c)
+if (a and c) {
+    put("Parentheses and works!")
+}

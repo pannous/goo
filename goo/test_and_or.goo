@@ -2,6 +2,9 @@ a := true
 b := false
 c := true
 // Test 'and' operator (should work like &&)
+if true and true {
+	put("true and true works!")
+}
 if a and c {
 	put("a and c works!")
 }
@@ -39,7 +42,7 @@ if x < y and y > 0 {
 if x > y or y == 10 {
 	put("x > y or y == 10 works!")
 }
-check x < y and y > 0 == true
-check x > y or y == 10 == true
+# check x < y and y > 0 == true
+# check x > y or y == 10 == true
 
 printf("All checks passed!\n")

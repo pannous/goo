@@ -1,0 +1,6 @@
+a := true
+b := false
+
+if a and b {
+    put("a and b works!")
+}

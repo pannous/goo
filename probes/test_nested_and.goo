@@ -1,0 +1,9 @@
+a := true
+b := false
+
+// Test just: b and false  
+if b and false {
+    put("This should not print")
+} else {
+    put("b and false correctly false")
+}

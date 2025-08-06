@@ -1,0 +1,14 @@
+a := true
+b := false  
+c := true
+
+if a and b {
+    put("This should not print")
+} else {
+    put("a and b correctly false")
+}
+
+// Test 'or' operator (should work like ||)
+if b or c {
+    put("b or c works!")
+}
