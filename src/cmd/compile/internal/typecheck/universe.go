@@ -50,6 +50,9 @@ var builtinFuncs = [...]struct {
 	{"recover", ir.ORECOVER},
 	{"typeMatches", ir.OTYPEMATCHES},
 	{"typeof", ir.OTYPEOF},
+	{"listSortDesc", ir.OLISTSORTDESC},
+	{"listPop", ir.OLISTPOP},
+	{"listShift", ir.OLISTSHIFT},
 }
 
 var unsafeFuncs = [...]struct {

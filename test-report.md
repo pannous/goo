@@ -10,7 +10,7 @@ Running all tests in ./goo/ directory...
 ✅ helper.goo
 ❌ kitchensink.goo
 ✅ test_all_synonyms.goo
-❌ test_and_or.goo
+✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 ✅ test_array_like_slice.goo
 ✅ test_as_cast_convert.goo
@@ -150,16 +150,25 @@ Running all tests in ./goo/ directory...
 ❌ simple_range_test.goo
 ❌ step_by_step.goo
 ❌ test_all_features.goo
+✅ test_and_complex.goo
+✅ test_and_multiple.goo
+✅ test_and_or_mixed.goo
+✅ test_and_simple.goo
+✅ test_and_step_by_step.goo
 ❌ test_and_token.goo
+✅ test_and_with_comparisons.goo
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
 ✅ test_bool_not.goo
 ✅ test_builtin_is.goo
 ✅ test_charAt_comprehensive.goo
+✅ test_check_debug.goo
+✅ test_check_simple.goo
 ✅ test_class_methods_advanced.goo
 ❌ test_coalescing_elvis.goo
 ❌ test_comments_consolidated.goo
 ✅ test_complete_hash_comments.goo
+✅ test_complex_expr.goo
 ❌ test_conditional_compilation.goo
 ✅ test_conditional.goo
 ❌ test_conversions_consolidated.goo
@@ -174,6 +183,7 @@ Running all tests in ./goo/ directory...
 ❌ test_goo_file_import.goo
 ✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
+✅ test_if_debug.goo
 ❌ test_in_complete.goo
 ❌ test_in_operator_maps.goo
 ✅ test_is_simple.goo
@@ -187,14 +197,18 @@ Running all tests in ./goo/ directory...
 ✅ test_manual_truthy.goo
 ✅ test_map_dot_printf_only.goo
 ✅ test_map_string.goo
+✅ test_minimal_and.goo
 ✅ test_multi_return_try.goo
 ✅ test_multi_var_while_in.goo
+✅ test_nested_and.goo
 ✅ test_nil_coalescing.goo
 ✅ test_no_lambda.goo
+✅ test_no_parens.goo
 ❌ test_non_modifying.goo
 ✅ test_not_comprehensive.goo
 ❌ test_optional_chaining.goo
 ✅ test_original_examples.goo
+✅ test_parens_only.goo
 ✅ test_printf_enum_complete.goo
 ✅ test_printf_transform.goo
 ✅ test_put_concat.goo
@@ -216,8 +230,10 @@ Running all tests in ./goo/ directory...
 ✅ test_slices_user_direct.goo
 ✅ test_sort_clear.goo
 ✅ test_sort_simple.goo
+✅ test_step_by_step.goo
 ❌ test_string_concat.goo
 ❌ test_string_methods_consolidated.goo
+✅ test_true_and_true.goo
 ✅ test_truthiness_basic.goo
 ✅ test_truthy_and_basic.goo
 ✅ test_truthy_and_false.goo
@@ -234,9 +250,10 @@ Running all tests in ./goo/ directory...
 ✅ test_while_for_in.goo
 ✅ test_while_loops.goo
 ❌ test_whitespace_strings.goo
+✅ test_with_or.goo
 ✅ test_working_transforms.goo
 ❌ token_debug.goo
 ========================================
-Summary: 175/236 passed, 61 failed
+Summary: 193/253 passed, 60 failed
 ⚠️  Some tests failed
 Consider ./build-compiler.sh or do rollback!

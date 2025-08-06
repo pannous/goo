@@ -1,0 +1,5 @@
+aList := [1, 2, 3]
+
+check aList.sortDesc() == [3,2,1]
+check aList.pop() == 3
+check aList.shift() == 1

@@ -727,6 +727,55 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 			checks.recordBuiltinType(call.Fun, makeSig(Typ[Bool], args[0].typ, Typ[String]))
 		}
 
+	case _ListSortDesc:
+		// listSortDesc(list) interface{}
+		// Takes any slice/list type and returns the same type
+		x.mode = value
+		x.typ = args[0].typ  // Return same type as input
+		if checks.recordTypes() {
+			checks.recordBuiltinType(call.Fun, makeSig(args[0].typ, args[0].typ))
+		}
+
+	case _ListPop:
+		// listPop(list) interface{}
+		// Takes any slice/list type and returns element type
+		listType := args[0].typ
+		var elementType Type = Typ[Invalid]
+		
+		// Extract element type from slice type
+		if slice, ok := listType.Underlying().(*Slice); ok {
+			elementType = slice.elem
+		} else {
+			// For non-slice types, return interface{}
+			elementType = NewInterfaceType(nil, nil)
+		}
+		
+		x.mode = value
+		x.typ = elementType
+		if checks.recordTypes() {
+			checks.recordBuiltinType(call.Fun, makeSig(elementType, listType))
+		}
+
+	case _ListShift:
+		// listShift(list) interface{}
+		// Takes any slice/list type and returns element type
+		listType := args[0].typ
+		var elementType Type = Typ[Invalid]
+		
+		// Extract element type from slice type
+		if slice, ok := listType.Underlying().(*Slice); ok {
+			elementType = slice.elem
+		} else {
+			// For non-slice types, return interface{}
+			elementType = NewInterfaceType(nil, nil)
+		}
+		
+		x.mode = value
+		x.typ = elementType
+		if checks.recordTypes() {
+			checks.recordBuiltinType(call.Fun, makeSig(elementType, listType))
+		}
+
 	case _Add:
 		// unsafe.Add(ptr unsafe.Pointer, len IntegerType) unsafe.Pointer
 		checks.verifyVersionf(call.Fun, go1_17, "unsafe.Add")

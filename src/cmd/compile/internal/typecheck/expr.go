@@ -949,3 +949,26 @@ func transformMapEqualityCheck(n ir.Node, op ir.Op, l, r ir.Node) (ir.Node, ir.N
 	// Return the transformed call as the left operand, nil as right, bool as type
 	return result, nil, types.Types[types.TBOOL]
 }
+
+// tcListOps typechecks an OLISTSORTDESC, OLISTPOP, or OLISTSHIFT node.
+func tcListOps(n *ir.UnaryExpr) ir.Node {
+	n.X = Expr(n.X)
+	n.X = DefaultLit(n.X, nil)
+	l := n.X
+	t := l.Type()
+	if t == nil {
+		n.SetType(nil)
+		return n
+	}
+	
+	// Check if the argument is a slice type
+	if !t.IsSlice() {
+		base.Errorf("invalid argument %L for %v (need slice)", l, n.Op())
+		n.SetType(nil)
+		return n
+	}
+	
+	// For all list operations, return the same type as input (slice type)
+	n.SetType(t)
+	return n
+}

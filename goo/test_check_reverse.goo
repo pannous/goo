@@ -1,1 +1,4 @@
-check "hello".reverse() == "test"
+check "hello".reverse() == "olleh"
+printf("all checks passed!\n")
+
+

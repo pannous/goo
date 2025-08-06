@@ -477,6 +477,10 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return tcUnsafeData(n)
 
+	case ir.OLISTSORTDESC, ir.OLISTPOP, ir.OLISTSHIFT:
+		n := n.(*ir.UnaryExpr)
+		return tcListOps(n)
+
 	case ir.OITAB:
 		n := n.(*ir.UnaryExpr)
 		return tcITab(n)

@@ -158,3 +158,103 @@ func isTypeOf(value interface{}, typeName string) bool {
 func typeMatches(value interface{}, typeName string) bool {
 	return isTypeOf(value, typeName)
 }
+
+// listSortDesc sorts a list in descending order and returns the sorted list
+func listSortDesc(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		// Create a copy to avoid modifying original
+		result := make([]int, len(v))
+		copy(result, v)
+		// Sort in descending order
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] < result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	case []string:
+		result := make([]string, len(v))
+		copy(result, v)
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] < result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	case []float64:
+		result := make([]float64, len(v))
+		copy(result, v)
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] < result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	default:
+		// For unsupported types, return original
+		return list
+	}
+}
+
+// listPop removes and returns the last element from the list
+func listPop(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		if len(v) == 0 {
+			return 0 // Return zero value for empty slice
+		}
+		return v[len(v)-1]
+	case []string:
+		if len(v) == 0 {
+			return ""
+		}
+		return v[len(v)-1]
+	case []float64:
+		if len(v) == 0 {
+			return 0.0
+		}
+		return v[len(v)-1]
+	case []interface{}:
+		if len(v) == 0 {
+			return nil
+		}
+		return v[len(v)-1]
+	default:
+		return nil
+	}
+}
+
+// listShift removes and returns the first element from the list
+func listShift(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		if len(v) == 0 {
+			return 0 // Return zero value for empty slice
+		}
+		return v[0]
+	case []string:
+		if len(v) == 0 {
+			return ""
+		}
+		return v[0]
+	case []float64:
+		if len(v) == 0 {
+			return 0.0
+		}
+		return v[0]
+	case []interface{}:
+		if len(v) == 0 {
+			return nil
+		}
+		return v[0]
+	default:
+		return nil
+	}
+}

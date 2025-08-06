@@ -1,0 +1,4 @@
+aList := [1, 2, 3]
+result := aList.sortDesc()
+put("sortDesc result:")
+put(result)

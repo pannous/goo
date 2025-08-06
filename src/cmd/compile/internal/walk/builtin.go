@@ -1078,4 +1078,24 @@ func isChanLenCap(n ir.Node) bool {
 	return (n.Op() == ir.OLEN || n.Op() == ir.OCAP) && n.(*ir.UnaryExpr).X.Type().IsChan()
 }
 
+// walkListOperation converts list operations to runtime calls
+func walkListOperation(n *ir.UnaryExpr, init *ir.Nodes) ir.Node {
+	x := walkExpr(n.X, init)
+	
+	var runtimeFunc string
+	switch n.Op() {
+	case ir.OLISTSORTDESC:
+		runtimeFunc = "listSortDesc"
+	case ir.OLISTPOP:
+		runtimeFunc = "listPop"
+	case ir.OLISTSHIFT:
+		runtimeFunc = "listShift"
+	default:
+		base.Fatalf("walkListOperation: unknown op %v", n.Op())
+	}
+	
+	fn := typecheck.LookupRuntime(runtimeFunc)
+	return mkcall1(fn, n.Type(), init, x)
+}
+
 
