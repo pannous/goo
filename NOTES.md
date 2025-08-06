@@ -1,3 +1,7 @@
+Get Opus 4.1:
+Log out of Claude Code. Then go into your Claude settings on the Claude website, go to Claude Code, delete the authentication token.
+Now go back to your terminal, and do /login with claude code, follow the instructions, and that fixed it for me. Do /status when you get back in and hopefully it says Max...
+
 Because they serve different goals:
 
 ⸻

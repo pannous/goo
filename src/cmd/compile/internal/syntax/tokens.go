@@ -40,6 +40,7 @@ const (
 	_Semi      // ;
 	_Colon     // :
 	_Dot       // .
+	_DotDot    // ..
 	_DotDotDot // ...
 	// … .. ..? ..<
 
@@ -71,6 +72,7 @@ const (
 	_Type           // type
 	_Var            // var
 	_CUSTOM_TOKENS_ // the following tokens are only for .goo files:
+	_And            // and (truthy and operator)
 	_As             // as cast
 	_Enum           // enum
 	_Catch          // catch + try
@@ -133,6 +135,7 @@ var TokenNames = [...]string{
 	_Semi:           ";",
 	_Colon:          ":",
 	_Dot:            ".",
+	_DotDot:         "..",
 	_DotDotDot:      "...",
 	_As:             "as",
 	_Break:          "break",
@@ -204,7 +207,8 @@ const (
 	NullCoalesce // ??
 
 	// precAndAnd
-	AndAnd // &&
+	TruthyAnd // and (truthy and)
+	AndAnd    // &&
 
 	// precCmp
 	Eql // ==
@@ -230,6 +234,7 @@ const (
 	Shl    // <<
 	Shr    // >>
 	IS     // is
+	Range  // …
 )
 
 // OperatorNames provides string representations for Operator constants, replacing stringer-generated operator_string.go
@@ -241,6 +246,7 @@ var OperatorNames = [...]string{
 	Tilde:       "~",
 	OrOr:        "||",
 	NullCoalesce: "??",
+	TruthyAnd:   "and",
 	AndAnd:      "&&",
 	Eql:    "==",
 	Neq:    "!=",
@@ -261,6 +267,7 @@ var OperatorNames = [...]string{
 	Shl:    "<<",
 	Shr:    ">>",
 	IS:     "is",
+	Range:  "…",
 }
 
 // String returns the string representation of the Operator.

@@ -1,0 +1,53 @@
+import "slices"
+
+// Helper function to evaluate truthiness like Python
+func isTruthy(value any) bool {
+	if value == nil {
+		return false
+	}
+	
+	switch v := value.(type) {
+	case bool:
+		return v
+	case string:
+		return len(v) > 0
+	case int, int8, int16, int32, int64:
+		return v != 0
+	case uint, uint8, uint16, uint32, uint64:
+		return v != 0
+	case float32, float64:
+		return v != 0.0
+	default:
+		// For struct types and other objects, they're truthy if not nil
+		return true
+	}
+}
+
+class User {
+		Name string;
+		Age int;
+}
+
+// Test cases
+user := User{Name: "Alice", Age: 20}
+emptyUser := User{Name: "", Age: 0}
+
+// Should print "Alice" (user is truthy, so return user.Name)
+result1 := user and user.Name
+printf("user and user.Name: %v\n", result1)
+
+// Should return emptyUser (emptyUser is truthy as a struct, so return emptyUser.Name which is "")
+result2 := emptyUser and emptyUser.Name  
+printf("emptyUser and emptyUser.Name: %v\n", result2)
+
+// Should return 0 (emptyUser.Age is 0, falsy, so return 0)
+result3 := emptyUser.Age and "hello"
+printf("emptyUser.Age and \"hello\": %v\n", result3)
+
+// Should return "hello" (user.Age is 20, truthy, so return "hello")
+result4 := user.Age and "hello"
+printf("user.Age and \"hello\": %v\n", result4)
+
+if user and user.Name {
+	printf("OK - user and user.Name is truthy\n")
+}
