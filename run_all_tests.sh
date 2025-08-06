@@ -25,7 +25,6 @@ for test_file in goo/*.go goo/*.goo probes/*.goo; do
     if [[ -f "$test_file" ]]; then
         total=$((total + 1))
         filename=$(basename "$test_file")
-        
         # Run test and capture exit code, suppress all output
 #        gtimeout 30s
         if  ./bin/go run "$test_file" >/dev/null 2>&1; then
