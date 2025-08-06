@@ -1,0 +1,22 @@
+// Test range operator in non-for-loop context
+package main
+
+func testRangeExpression() {
+    // Try to use range operator in a general expression
+    // This would require the Range operator to be in binOps map
+    result := 1+2  // First test with normal operator
+    println("normal expression result:", result)
+    
+    // This line would fail if Range is not in binOps
+    rangeExpr := 0…5  // Test range in expression context
+    println("range expression result:", rangeExpr)
+}
+
+func main() {
+    testRangeExpression()
+    
+    // This works because it's handled by range_syntax_transform
+    for i in 0…3 {
+        println("for loop range:", i)
+    }
+}

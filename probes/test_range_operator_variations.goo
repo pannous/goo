@@ -1,0 +1,22 @@
+// Test various Range operator scenarios
+package main
+
+func main() {
+    println("Testing simple range 0…3:")
+    for i in 0…3 {
+        println(i)
+    }
+    
+    println("\nTesting range with variables:")
+    start := 2
+    end := 5
+    for i in start…end {
+        println(i)
+    }
+    
+    println("\nTesting range in expression context (should fail gracefully):")
+    // This should work if range expressions are fully supported
+    // r := 1…4  // Uncomment to test
+    
+    println("Done with range tests")
+}

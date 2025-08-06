@@ -1,0 +1,14 @@
+import "fmt"
+
+func main() {
+	// Test what our transformation actually produces
+	// This should become: for i := range 5
+	fmt.Println("Starting range test")
+	for i in 0…5 {
+		fmt.Println("Loop iteration:", i)
+		if i > 3 {
+			break // Safety break
+		}
+	}
+	fmt.Println("Done")
+}

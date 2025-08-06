@@ -1,0 +1,17 @@
+// Test range operator in expression context
+package main
+
+func main() {
+    // Test if range operator works in general expressions
+    x := 1
+    y := 2
+    // This might fail if Range operator is not in binOps
+    if x < y {  // Use normal operators to verify basic functionality first
+        println("basic operators work")
+    }
+    
+    // Now test range in for loop which is known to work
+    for i in 0…2 {
+        println("range in for loop:", i)
+    }
+}

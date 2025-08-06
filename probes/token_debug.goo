@@ -1,0 +1,6 @@
+func main() {
+	a := 5
+	b := 10
+	// Test if bare range works
+	c := a .. b
+}

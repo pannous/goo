@@ -1,0 +1,18 @@
+aList := []int{1, 2, 3}
+
+println("Testing basic array access:")
+println(aList[1])  // Should be 2
+
+println("Testing list methods:")
+println(aList.first())   // Should be 1
+println(aList.last())    // Should be 3  
+println(aList.size())    // Should be 3
+println(aList.length())  // Should be 3
+
+println("Testing slice method:")
+sliced := aList.slice(1, 2)
+println(len(sliced))  // Should be 1
+
+println("Testing append method:")
+appended := aList.append(4)
+println(len(appended))  // Should be 4

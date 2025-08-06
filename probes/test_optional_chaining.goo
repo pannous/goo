@@ -1,0 +1,41 @@
+type User struct {
+	Name    string
+	Profile *Profile
+}
+
+type Profile struct {
+	Bio  string
+	Age  int
+	Info *Info
+}
+
+type Info struct {
+	Location string
+}
+
+func main() {
+	// Test 1: user is nil
+	var user *User
+	name := user?.Name
+	println("user?.Name:", name)
+	check name == nil
+	
+	// Test 2: user exists but Profile is nil  
+	user2 := &User{Name: "Alice"}
+	bio := user2?.Profile?.Bio
+	println("user2?.Profile?.Bio:", bio)
+	check bio == nil
+	
+	// Test 3: full chain exists
+	user3 := &User{
+		Name: "Bob",
+		Profile: &Profile{
+			Bio: "Developer",
+			Age: 30,
+			Info: &Info{Location: "NYC"},
+		},
+	}
+	location := user3?.Profile?.Info?.Location
+	println("user3?.Profile?.Info?.Location:", location)
+	check location == "NYC"
+}

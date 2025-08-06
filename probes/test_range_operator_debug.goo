@@ -1,0 +1,9 @@
+// Test to debug the Range operator issue
+package main
+
+func main() {
+    // Simple range expression that should work
+    for i in 0…5 {
+        println(i)
+    }
+}

@@ -1,0 +1,10 @@
+// Test if the transformation results in a valid function call
+
+// Truthy and operator implementation
+func truthyAndOp(x, y any) any {
+	return y
+}
+
+// Test direct function call (should work)
+result := truthyAndOp(5, "hello")
+println("Result:", result)

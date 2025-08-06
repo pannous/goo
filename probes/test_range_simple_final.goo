@@ -1,0 +1,15 @@
+// Simple final test of Range operator fix
+package main
+
+func main() {
+    println("Range in for loop:")
+    for i in 0…3 {
+        println(i)
+    }
+    
+    println("Range in expression:")  
+    x := 1…5
+    println("result:", x)
+    
+    println("Range operator fix verified!")
+}

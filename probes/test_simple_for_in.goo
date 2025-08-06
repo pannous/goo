@@ -1,0 +1,5 @@
+// Test simple for loop with in operator
+numbers := [1, 2, 3]
+for num in numbers {
+    printf("num = %d\n", num)
+}

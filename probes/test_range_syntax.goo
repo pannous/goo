@@ -1,0 +1,23 @@
+import "fmt"
+
+func testBasicRange() {
+	for i in 0…5 {
+		fmt.Println(i)
+	}
+}
+
+func testRangeWithVariables() {
+	start := 2
+	end := 8
+	for i in start…end {
+		fmt.Println(i)
+	}
+}
+
+func testRangeStep() {
+	for i in 0…10 {
+		if i%2 == 0 {
+			fmt.Printf("Even: %d\n", i)
+		}
+	}
+}

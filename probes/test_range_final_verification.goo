@@ -1,0 +1,27 @@
+// Final verification that Range operator works in all contexts
+package main
+
+func main() {
+    println("=== Range Operator Tests ===")
+    
+    // Test 1: Range in for loops (should work as before)
+    println("1. Range in for loops:")
+    for i in 0…3 {
+        println("  ", i)
+    }
+    
+    // Test 2: Range in expressions (was failing, now fixed)
+    println("2. Range in expressions:")
+    result := 2…7  // This was causing "unknown operator" error
+    println("   2…7 =", result)
+    
+    // Test 3: Range with variables (verify no scanner issues) 
+    println("3. Range with variables:")
+    start := 1
+    end := 4
+    for i in start…end {
+        println("   var range:", i)
+    }
+    
+    println("=== All Range tests completed ===")
+}

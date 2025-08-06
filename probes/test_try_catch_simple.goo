@@ -1,0 +1,13 @@
+func riskyFunction() {
+	panic("something went wrong")
+}
+
+try {
+	put("Inside try block")
+	riskyFunction()
+	put("This should not print")
+} catch err {
+	printf("Caught error: %v\n", err)
+}
+
+put("After try-catch")
