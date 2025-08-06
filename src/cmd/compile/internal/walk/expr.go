@@ -161,6 +161,10 @@ func walkExpr1(n ir.Node, init *ir.Nodes) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return walkLenCap(n, init)
 
+	case ir.OTRUTHY:
+		n := n.(*ir.UnaryExpr)
+		return walkTruthy(n, init)
+
 	case ir.OLISTSORTDESC, ir.OLISTPOP, ir.OLISTSHIFT:
 		n := n.(*ir.UnaryExpr)
 		return walkListOperation(n, init)

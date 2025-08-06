@@ -1098,4 +1098,21 @@ func walkListOperation(n *ir.UnaryExpr, init *ir.Nodes) ir.Node {
 	return mkcall1(fn, n.Type(), init, x)
 }
 
+// walkTruthy converts truthy operations to runtime calls
+func walkTruthy(n *ir.UnaryExpr, init *ir.Nodes) ir.Node {
+	x := walkExpr(n.X, init)
+	
+	fn := typecheck.LookupRuntime("truthy")
+	return mkcall1(fn, n.Type(), init, x)
+}
+
+// walkTruthyAndOp converts truthyAndOp operations to runtime calls
+func walkTruthyAndOp(n *ir.CallExpr, init *ir.Nodes) ir.Node {
+	left := walkExpr(n.Args[0], init)
+	right := walkExpr(n.Args[1], init)
+	
+	fn := typecheck.LookupRuntime("truthyAndOp")
+	return mkcall1(fn, n.Type(), init, left, right)
+}
+
 

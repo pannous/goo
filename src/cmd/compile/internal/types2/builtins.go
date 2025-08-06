@@ -727,6 +727,27 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 			checks.recordBuiltinType(call.Fun, makeSig(Typ[Bool], args[0].typ, Typ[String]))
 		}
 
+	case _Truthy:
+		// truthy(value) bool
+		// Takes any type and returns bool
+		x.mode = value
+		x.typ = Typ[Bool]
+		if checks.recordTypes() {
+			checks.recordBuiltinType(call.Fun, makeSig(Typ[Bool], args[0].typ))
+		}
+
+	case _TruthyAndOp:
+		// truthyAndOp(left, right) interface{}
+		// Takes any two types and returns appropriate truthy result
+		leftType := args[0].typ
+		rightType := args[1].typ
+		
+		x.mode = value
+		x.typ = NewInterfaceType(nil, nil) // Return interface{}
+		if checks.recordTypes() {
+			checks.recordBuiltinType(call.Fun, makeSig(NewInterfaceType(nil, nil), leftType, rightType))
+		}
+
 	case _ListSortDesc:
 		// listSortDesc(list) interface{}
 		// Takes any slice/list type and returns the same type

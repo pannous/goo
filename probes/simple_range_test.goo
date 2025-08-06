@@ -1,6 +1,7 @@
-import "fmt"
+import fmt
+import slices
+x := 2…5
+put(x)
+#result := x.filter(i => i > 3)
+#put("Filtered:", result)
 
-func main() {
-	x := 1..5
-	fmt.Println(x)
-}

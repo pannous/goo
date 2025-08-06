@@ -1,24 +1,27 @@
+import "strings"
 import "slices"
 aList:=[1, 2, 3]
-check aList[1] == 2
-check aList.first() == 1
-## ^^ works in principle
-
 
 # TODOs
-#check [3,1,2].sort() == aList // TODO'NT slices.Sort([]int{…}) (no value) used as value => {xs.sort();xs} statement to something TOO HARD!
+aList.sort!() // sorts in place! ok, but:
+check [3,1,2].sort() == aList // TODO'NT slices.Sort([]int{…}) (no value) used as value => {xs.sort();xs} statement to something TOO HARD!
 check aList.sortDesc() == [3,2,1]
-
-check aList.pop() == 3 // and removes it
 check aList.shift() == 1 // and removes it
 
-#check aList.prepend(0) == [0,1,2,3] //TODO
+
+check aList.prepend(0) == [0,1,2,3] //TODO  missing type in composite literal
 check aList.insert(1,1) == [1,1,2,3]  // 0: before index 0 == prepend
-check aList.reverse() == [3, 2, 1] //TODO
+aList.reverse!() // ok, but:
+check aList.reverse() == [3, 2, 1]
+check aList == [3, 2, 1]
+check aList.pop() == 3 // and removes it
+#./test_list_methods_broken.goo:9:7: internal compiler error: <node Op(154)> (type []int) and int are not shape types
 
 
 #put("cannot use aList (variable of type []int) as []string value in argument to strings.Join")
-check aList.join("-") == "1-2-3"  // if all elements stringifiable TODO
+
+check ["1","2","3"].join("-") == "1-2-3"  // ok, but:
+check aList.join("-") == "1-2-3"  // if all elements stringifiable TODO cannot use aList (variable of type []int) as []string value in argument to strings.Join
 
 
 printf("All tests completed successfully.\n")

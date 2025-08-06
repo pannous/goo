@@ -1,3 +1,8 @@
-numbers := []int{1, 2, 3, 4, 5}
+import fmt // todo make auto import work again / here
+import slices // todo make auto import work again / here
+#numbers := []int{1, 2, 3, 4, 5}
+numbers := [1, 2, 3, 4, 5]
 result := numbers.filter(x => x > 3)
-println("Filtered:", result)
+put("Filtered:", result)
+check result == [4, 5]
+put("All tests passed!")

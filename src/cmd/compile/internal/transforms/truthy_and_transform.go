@@ -104,6 +104,40 @@ func (t *TruthyAndTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 			newCheck.Cond = newCond
 			return &newCheck
 		}
+	case *syntax.AssignStmt:
+		// Handle assignment statements like y := x and 7
+		newRhs := t.transformExpr(s.Rhs)
+		if newRhs != s.Rhs {
+			newAssign := *s
+			newAssign.Rhs = newRhs
+			return &newAssign
+		}
+	case *syntax.DeclStmt:
+		// Handle declaration statements  
+		decl := s.DeclList[0] // Assuming single declaration
+		if varDecl, ok := decl.(*syntax.VarDecl); ok {
+			if varDecl.Values != nil && len(varDecl.Values.(*syntax.ListExpr).ElemList) > 0 {
+				values := varDecl.Values.(*syntax.ListExpr).ElemList
+				changed := false
+				newValues := make([]syntax.Expr, len(values))
+				for i, value := range values {
+					newValue := t.transformExpr(value)
+					newValues[i] = newValue
+					if newValue != value {
+						changed = true
+					}
+				}
+				if changed {
+					newDecl := *s
+					newVarDecl := *varDecl
+					newValuesList := &syntax.ListExpr{ElemList: newValues}
+					newValuesList.SetPos(varDecl.Values.Pos())
+					newVarDecl.Values = newValuesList
+					newDecl.DeclList = []syntax.Decl{&newVarDecl}
+					return &newDecl
+				}
+			}
+		}
 	}
 	
 	return stmt
@@ -173,28 +207,35 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	return expr
 }
 
-// createTruthyAndCall creates a truthy and operation using boolean conversion
+// createTruthyAndCall creates a truthy and operation using truthy calls with &&
 func (t *TruthyAndTransform) createTruthyAndCall(left, right syntax.Expr, pos syntax.Pos) syntax.Expr {
-	println("DEBUG: Creating boolean AND with truthiness checks")
+	println("DEBUG: Creating truthy(x) && truthy(y)")
 	
-	// Ensure operands have proper position information
-	if left.Pos().IsKnown() {
-		// Keep original position
-	} else {
-		left.SetPos(pos)
+	// Create truthy(left) call
+	truthyName1 := &syntax.Name{Value: "truthy"}
+	truthyName1.SetPos(pos)
+	
+	leftTruthyCall := &syntax.CallExpr{
+		Fun:     truthyName1,
+		ArgList: []syntax.Expr{left},
 	}
+	leftTruthyCall.SetPos(pos)
 	
-	if right.Pos().IsKnown() {
-		// Keep original position  
-	} else {
-		right.SetPos(pos)
+	// Create truthy(right) call
+	truthyName2 := &syntax.Name{Value: "truthy"}
+	truthyName2.SetPos(pos)
+	
+	rightTruthyCall := &syntax.CallExpr{
+		Fun:     truthyName2,
+		ArgList: []syntax.Expr{right},
 	}
+	rightTruthyCall.SetPos(pos)
 	
-	// Create && operation with proper initialization
+	// Create && operation with truthy calls
 	andOp := &syntax.Operation{
 		Op: syntax.AndAnd,
-		X:  left,
-		Y:  right,
+		X:  leftTruthyCall,
+		Y:  rightTruthyCall,
 	}
 	andOp.SetPos(pos)
 	
