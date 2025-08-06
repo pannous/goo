@@ -157,6 +157,8 @@ var OpStringNames = map[Op]string{
 	OTAILCALL:           "TAILCALL",
 	OGETG:               "GETG",
 	OGETCALLERSP:        "GETCALLERSP",
+	OTYPEOF:             "TYPEOF",
+	OTYPEMATCHES:        "TYPEMATCHES",
 	OEND:                "END",
 }
 

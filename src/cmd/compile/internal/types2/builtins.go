@@ -712,6 +712,21 @@ func (checks *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) 
 			checks.recordBuiltinType(call.Fun, makeSig(Typ[String], args[0].typ))
 		}
 
+	case _TypeMatches:
+		// typeMatches(value, typeName) bool
+		// Second argument must be a string
+		y := args[1]
+		checks.assignment(y, Typ[String], "second argument to typeMatches")
+		if y.mode == invalid {
+			return
+		}
+		
+		x.mode = value
+		x.typ = Typ[Bool]
+		if checks.recordTypes() {
+			checks.recordBuiltinType(call.Fun, makeSig(Typ[Bool], args[0].typ, Typ[String]))
+		}
+
 	case _Add:
 		// unsafe.Add(ptr unsafe.Pointer, len IntegerType) unsafe.Pointer
 		checks.verifyVersionf(call.Fun, go1_17, "unsafe.Add")

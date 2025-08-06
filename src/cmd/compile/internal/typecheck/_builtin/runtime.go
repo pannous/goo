@@ -160,6 +160,7 @@ func truthy(interface{}) bool
 func falsey(interface{}) bool
 func truthyAndOp(interface{}, interface{}) interface{}
 func isTypeOf(interface{}, string) bool
+func typeMatches(interface{}, string) bool
 
 // *byte is really *runtime.Type
 func makemap64(mapType *byte, hint int64, mapbuf *any) (hmap map[any]any)

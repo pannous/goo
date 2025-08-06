@@ -136,6 +136,7 @@ var runtimeDecls = [...]struct {
 	{"falsey", funcTag, 82},
 	{"truthyAndOp", funcTag, 83},
 	{"isTypeOf", funcTag, 84},
+	{"typeMatches", funcTag, 84},
 	{"makemap64", funcTag, 86},
 	{"makemap", funcTag, 87},
 	{"makemap_small", funcTag, 88},

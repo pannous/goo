@@ -152,3 +152,9 @@ func isTypeOf(value interface{}, typeName string) bool {
 		return false
 	}
 }
+
+// typeMatches is an alias for isTypeOf for backward compatibility
+// This is used by the is operator transform: x is int -> typeMatches(x, "int")
+func typeMatches(value interface{}, typeName string) bool {
+	return isTypeOf(value, typeName)
+}
