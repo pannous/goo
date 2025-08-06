@@ -1,0 +1,37 @@
+import "reflect"
+
+// isTypeOf checks if value x has the same type as the type name
+def isTypeOf(x any, typeName string) bool {
+	if x == nil {
+		return typeName == "nil" || typeName == "*nil"
+	}
+	
+	xType := reflect.TypeOf(x)
+	return xType.String() == typeName
+}
+
+func main() {
+	// Test basic types
+	println("Testing basic types:")
+	check 1 is int        // Should pass
+	check !(1 is string)  // Should pass (not a string)
+	check "hello" is string // Should pass
+	check !(42.5 is int)   // Should pass (float, not int)
+
+	// Test with variables
+	x := 100
+	check x is int
+	y := "world"
+	check y is string
+
+	// Test slices
+	slice := [1, 2, 3]
+	check slice is []int
+	check !(slice is []string)
+
+	// Test with nil
+	var nilPtr *int = nil
+	check nilPtr is *int
+
+	println("All is operator tests passed!")
+}

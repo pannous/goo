@@ -1,0 +1,16 @@
+import "reflect"
+
+// isTypeOf checks if value x has the same type as the type name
+def isTypeOf(x any, typeName string) bool {
+	if x == nil {
+		return typeName == "nil" || typeName == "*nil"
+	}
+	
+	xType := reflect.TypeOf(x)
+	return xType.String() == typeName
+}
+
+// Simple test to debug IS operator parsing
+x := 1
+y := x is int
+println(y)

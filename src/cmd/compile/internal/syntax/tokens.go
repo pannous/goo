@@ -83,6 +83,7 @@ const (
 	_Try            // try
 	_Void           // void
 	_In             // in
+	_IS             // is (type checking operator)
 	_While          // while
 
 	// empty line comment to exclude it from .String
