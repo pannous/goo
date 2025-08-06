@@ -1,0 +1,6 @@
+class User {
+    Name string;
+}
+users := []User{{ Name: "Alice" }, { Name: "Bob" }}
+names := users.apply(u => u.Name)
+println("Names:", names)

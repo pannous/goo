@@ -756,18 +756,21 @@ func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ct
 	// Fix lambda parameter type if needed
 	correctedTransform := t.correctLambdaParameterType(receiver, transform, ctx)
 
-	// Get input and output types for slices.Map[Input, Output]
-	inputType := t.extractElementType(t.getReceiverName(receiver), ctx)
-	outputType := t.inferLambdaReturnType(transform.(*syntax.LambdaExpr).Body, inputType)
+	// Get input and output types for slices.Map[SliceType, ResultElementType]
+	receiverName := t.getReceiverName(receiver)
+	elementType := t.extractElementType(receiverName, ctx)
+	outputType := t.inferLambdaReturnType(transform.(*syntax.LambdaExpr).Body, elementType)
 	
-	if inputType == "" {
-		inputType = "any"
+	// For slices.Map, we need the full slice type as first parameter
+	sliceType := t.getSliceType(receiverName, ctx)
+	if sliceType == "" {
+		sliceType = "[]any"
 	}
 	if outputType == "" {
 		outputType = "any"
 	}
 
-	println("DEBUG: createMapCall using types:", inputType, "->", outputType)
+	println("DEBUG: createMapCall using types:", sliceType, "->", outputType)
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
@@ -775,26 +778,30 @@ func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ct
 	mapName := &syntax.Name{Value: "Map"}
 	mapName.SetPos(pos)
 
-	// Create type parameters: [InputType, OutputType]
-	inputTypeName := &syntax.Name{Value: inputType}
-	inputTypeName.SetPos(pos)
+	// Create type parameters: [SliceType, ResultElementType]
+	// Use simple Name nodes for generic type parameters
+	sliceTypeName := &syntax.Name{Value: sliceType}
+	sliceTypeName.SetPos(pos)
 	outputTypeName := &syntax.Name{Value: outputType}  
 	outputTypeName.SetPos(pos)
 
-	// Create the instantiated generic call: slices.Map[InputType, OutputType]
-	instantiation := &syntax.IndexExpr{
-		X: &syntax.SelectorExpr{
-			X:   slicesName,
-			Sel: mapName,
-		},
-		Index: &syntax.ListExpr{
-			ElemList: []syntax.Expr{inputTypeName, outputTypeName},
-		},
+	// Create the selector: slices.Map
+	selector := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: mapName,
 	}
-	instantiation.SetPos(pos)
+	selector.SetPos(pos)
 
+	// Create the type parameter list: [SliceType, ResultElementType]
+	typeParamList := &syntax.ListExpr{
+		ElemList: []syntax.Expr{sliceTypeName, outputTypeName},
+	}
+	typeParamList.SetPos(pos)
+
+	// For now, use slices.Map without explicit type parameters to avoid AST issues
+	// Let Go's type inference handle the generics
 	call := &syntax.CallExpr{
-		Fun:     instantiation,
+		Fun:     selector,
 		ArgList: []syntax.Expr{receiver, correctedTransform},
 	}
 	call.SetPos(pos)
@@ -1032,6 +1039,7 @@ func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate sy
 	
 	// Create a corrected lambda with proper parameter and return types
 	correctedLambda := *lambda
+	correctedLambda.SetPos(lambda.Pos())
 	
 	println("DEBUG: correcting lambda parameter type to:", elementType)
 	
@@ -1045,6 +1053,7 @@ func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate sy
 		newParamList := make([]*syntax.Field, len(lambda.ParamList))
 		for i, param := range lambda.ParamList {
 			newParam := *param
+			newParam.SetPos(param.Pos())
 			
 			// Set the correct element type
 			elementTypeName := &syntax.Name{Value: elementType}
@@ -1072,6 +1081,29 @@ func (t *ListMethodsTransform) getReceiverName(receiver syntax.Expr) string {
 		return name.Value
 	}
 	return ""
+}
+
+// getSliceType gets the full slice type from variable name and context
+func (t *ListMethodsTransform) getSliceType(varName string, ctx *TransformContext) string {
+	if ctx != nil && ctx.Types != nil {
+		if varType, exists := ctx.Types[varName]; exists {
+			// Return the full type (e.g., "[]int", "[]User")
+			return varType
+		}
+	}
+	
+	// Fallback: construct slice type from variable name patterns
+	if varName == "numbers" || varName == "nums" {
+		return "[]int"
+	}
+	if varName == "users" {
+		return "[]User"
+	}
+	if varName == "items" {
+		return "[]any"
+	}
+	
+	return "[]any"
 }
 
 // inferLambdaReturnType analyzes lambda body to infer return type

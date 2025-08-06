@@ -1,0 +1,2 @@
+// Simple test to see what AST is generated
+x := "hello"

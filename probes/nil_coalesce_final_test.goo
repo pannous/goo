@@ -1,0 +1,9 @@
+var s *string
+result := s ?? "works!"
+println("Nil coalescing result:", result)
+
+// Test with non-nil pointer
+hello := "hello world"
+ptr := &hello
+result2 := ptr ?? "fallback"  
+println("Non-nil result:", result2)

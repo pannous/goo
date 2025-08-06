@@ -1,0 +1,8 @@
+import "slices"
+
+class User {
+    Name string;
+}
+users := []User{{ Name: "Alice" }}
+names := users.apply(u => u.Name)
+println("Names:", names)
