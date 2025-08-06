@@ -51,14 +51,44 @@ type parser struct {
 	indent []byte // tracing support
 }
 
+// getBuildTags extracts build tags from environment and compiler context
+func getBuildTags() []string {
+	var tags []string
+	
+	// Check environment variables
+	if os.Getenv("DEBUG") != "" {
+		tags = append(tags, "DEBUG")
+	}
+	
+	if os.Getenv("RELEASE") != "" {
+		tags = append(tags, "RELEASE")
+	}
+	
+	// Add more build tags as needed
+	if os.Getenv("TESTING") != "" {
+		tags = append(tags, "TESTING")
+	}
+	
+	return tags
+}
+
 func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh PragmaHandler, mode Mode) {
 	p.top = true
 	p.file = file
 	p.errh = errh
 	p.mode = mode
 	p.pragh = pragh
+	
+	// Apply conditional preprocessor for .goo files
+	var sourceReader io.Reader = r
+	if file != nil && strings.HasSuffix(file.Filename(), ".goo") {
+		// Get build tags from environment or compiler flags
+		buildTags := getBuildTags()
+		sourceReader = NewConditionalPreprocessor(r, buildTags)
+	}
+	
 	p.scanner.init(
-		r,
+		sourceReader,
 		// Error and directive handler for scanner.
 		// Because the (line, col) positions passed to the
 		// handler is always at or after the current reading
@@ -1864,6 +1894,8 @@ loop:
 					break
 				}
 			}
+			// if we reach here and i is nil, it means we have x[:...] 
+			// i will be nil which is correct for slice expressions
 
 			// x[i:...
 			// For better error message, don't simply use p.want(_Colon) here (go.dev/issue/47704).
@@ -1903,7 +1935,7 @@ loop:
 		case _Hash:
 			// 1-indexed array access: x#i becomes x[i-1]
 			p.next()
-			i := p.unaryExpr()
+			index := p.unaryExpr()
 			// Create IndexExpr with subtraction to convert 1-indexed to 0-indexed
 			t := new(IndexExpr)
 			t.pos = pos
@@ -1917,7 +1949,7 @@ loop:
 			sub := new(Operation)
 			sub.pos = pos
 			sub.Op = Sub
-			sub.X = i
+			sub.X = index
 			sub.Y = one
 			t.Index = sub
 			x = t

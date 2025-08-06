@@ -1,0 +1,9 @@
+import "fmt"
+
+func main() {
+	fmt.Println("Before conditional")
+	#if DEBUG
+	fmt.Println("DEBUG: This is debug code")
+	#end
+	fmt.Println("After conditional")
+}

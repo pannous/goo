@@ -24,7 +24,7 @@
   // More ergonomic than build tags
   #if DEBUG
       println("Debug mode")
-  #endif
+  #end
 
 if name, ok := receiver.(*syntax.Name); ok {
 if name ?= receiver.(*syntax.Name) { ???

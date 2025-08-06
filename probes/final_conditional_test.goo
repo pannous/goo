@@ -1,0 +1,23 @@
+import "fmt"
+
+func main() {
+	fmt.Println("=== Conditional Compilation Test ===")
+	
+	fmt.Println("This line always appears")
+	
+	#if DEBUG
+	fmt.Println("🐛 DEBUG: Debug information enabled")
+	debugLevel := 5
+	fmt.Printf("🐛 DEBUG: Debug level is %d\n", debugLevel)
+	#end
+	
+	#if RELEASE
+	fmt.Println("🚀 RELEASE: Optimized release build")
+	#end
+	
+	#if TESTING
+	fmt.Println("🧪 TESTING: Test mode enabled")  
+	#end
+	
+	fmt.Println("End of conditional compilation test")
+}

@@ -1,0 +1,18 @@
+package main
+
+#if DEBUG
+	fmt.Println("Debug mode enabled")
+#end
+
+#if FEATURE_X
+	func specialFeature() {
+		fmt.Println("Special feature enabled")
+	}
+#end
+
+# This is a regular comment
+# Not a directive
+
+func main() {
+	fmt.Println("Hello, World!")
+}

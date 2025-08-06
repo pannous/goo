@@ -739,9 +739,9 @@ func (checks *Checker) errorUnusedPkg(obj *PkgName) {
 		elem = elem[i+1:]
 	}
 	if obj.name == "" || obj.name == "." || obj.name == elem {
-		checks.warningf(obj, UnusedImport, "%q imported and not used", path)
+		checks.warningf(obj, UnusedImport, "%q imported and not used (warning only)", path)
 	} else {
-		checks.warningf(obj, UnusedImport, "%q imported as %s and not used", path, obj.name)
+		checks.warningf(obj, UnusedImport, "%q imported as %s and not used (warning only)", path, obj.name)
 	}
 }
 
@@ -845,7 +845,7 @@ func injectFmtImportIfNeeded(file *syntax.File, fileDir string, checks *Checker,
 func injectSlicesImportIfNeeded(file *syntax.File, fileDir string, checks *Checker, fileScope *Scope) {
 	needsSlicesImport := false
 	hasSlicesImport := false
-	
+
 	println("DEBUG: injectSlicesImportIfNeeded called for file:", file.PkgName.Pos().RelFilename())
 
 	// First check if slices is already imported
@@ -866,9 +866,9 @@ func injectSlicesImportIfNeeded(file *syntax.File, fileDir string, checks *Check
 					methodName := selector.Sel.Value
 					// Check if this is a slices.Method call (after transform)
 					if receiverName, ok := selector.X.(*syntax.Name); ok && receiverName.Value == "slices" {
-						if methodName == "Contains" || methodName == "Index" || methodName == "Reverse" || 
-						   methodName == "Sort" || methodName == "Clone" || methodName == "Equal" ||
-						   methodName == "Min" || methodName == "Max" {
+						if methodName == "Contains" || methodName == "Index" || methodName == "Reverse" ||
+							methodName == "Sort" || methodName == "Clone" || methodName == "Equal" ||
+							methodName == "Min" || methodName == "Max" {
 							println("DEBUG: Found slices method call:", methodName)
 							needsSlicesImport = true
 							return false // found slices method, stop searching
@@ -938,24 +938,24 @@ func injectSlicesImportIfNeeded(file *syntax.File, fileDir string, checks *Check
 				break
 			}
 		}
-		
+
 		// Insert the import declaration into the file
 		newDeclList := make([]syntax.Decl, len(file.DeclList)+1)
 		copy(newDeclList[:insertPos], file.DeclList[:insertPos])
 		newDeclList[insertPos] = slicesImport
 		copy(newDeclList[insertPos+1:], file.DeclList[insertPos:])
 		file.DeclList = newDeclList
-		
+
 		println("DEBUG: Added slices import to file.DeclList at position", insertPos)
 	}
 }
 
-// injectStringsImportIfNeeded scans the file for string method usage and automatically  
+// injectStringsImportIfNeeded scans the file for string method usage and automatically
 // injects import "strings" if string methods are used but strings is not already imported.
 func injectStringsImportIfNeeded(file *syntax.File, fileDir string, checks *Checker, fileScope *Scope) {
 	needsStringsImport := false
 	hasStringsImport := false
-	
+
 	println("DEBUG: injectStringsImportIfNeeded called for file:", file.PkgName.Pos().RelFilename())
 
 	// Check if strings is already imported
@@ -976,11 +976,11 @@ func injectStringsImportIfNeeded(file *syntax.File, fileDir string, checks *Chec
 				if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
 					methodName := selector.Sel.Value
 					println("DEBUG: Found method call:", methodName)
-					// Check if this is a strings.Method call (after transform) 
+					// Check if this is a strings.Method call (after transform)
 					if receiverName, ok := selector.X.(*syntax.Name); ok && receiverName.Value == "strings" {
 						if methodName == "ToUpper" || methodName == "ToLower" || methodName == "Contains" ||
-						   methodName == "Index" || methodName == "LastIndex" || methodName == "Replace" || 
-						   methodName == "ReplaceAll" || methodName == "TrimSpace" || methodName == "Split" {
+							methodName == "Index" || methodName == "LastIndex" || methodName == "Replace" ||
+							methodName == "ReplaceAll" || methodName == "TrimSpace" || methodName == "Split" {
 							println("DEBUG: Found strings method call:", methodName)
 							needsStringsImport = true
 							return false // found strings method, stop searching
@@ -1054,14 +1054,14 @@ func injectStringsImportIfNeeded(file *syntax.File, fileDir string, checks *Chec
 				break
 			}
 		}
-		
+
 		// Insert the import declaration into the file
 		newDeclList := make([]syntax.Decl, len(file.DeclList)+1)
 		copy(newDeclList[:insertPos], file.DeclList[:insertPos])
 		newDeclList[insertPos] = stringsImport
 		copy(newDeclList[insertPos+1:], file.DeclList[insertPos:])
 		file.DeclList = newDeclList
-		
+
 		println("DEBUG: Added strings import to file.DeclList at position", insertPos)
 	}
 }
