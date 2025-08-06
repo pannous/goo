@@ -1,0 +1,17 @@
+// Test nil coalescing operator ??
+
+var ptr *string
+x := ptr ?? "default"
+println("x =", x) // should print: x = default
+
+y := ptr ?? "fallback"  
+println("y =", y) // should print: y = fallback
+
+alice := "Alice" 
+name := &alice
+z := name ?? "Anonymous"
+println("z =", z) // should print: z = Alice
+
+// Test with expressions  
+b := ptr ?? "fallback2"
+println("b =", b) // should print: b = fallback2

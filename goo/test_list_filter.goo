@@ -4,13 +4,15 @@ class User {
 		Name string;
 		Age number;
 }
-users := []User{{ Name: "Alice", Age: 20 }, { Name: "Bob", Age: 17 }, { Name: "Charlie", Age: 22 }, { Name: "Diana", Age: 15 }}
+users := []User{{ Name: "Bob", Age: 17 }, { Name: "Charlie", Age: 22 }, { Name: "Alice", Age: 20 }, { Name: "Diana", Age: 15 }}
 
 // Option 1: Single expression (current working approach)
-#xs := users.filter(u => u.Age > 18).apply(u => u.Name).sort().first()
+xs := users.filter(u => u.Age > 18).apply(u => u.Name).sort().first()
 
 // Option 2: Different variables for different types
 filtered := users.filter(u => u.Age > 18)        // []User
 names := filtered.apply(u => u.Name)              // []string
-sorted := names.sort()                            // []string
-result := sorted.first()                          // string
+names.sort!()                            // []string
+result := names.first()                          // string
+check result == "Alice"
+printf("First user over 18: %s\n", result)

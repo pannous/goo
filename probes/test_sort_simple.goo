@@ -1,0 +1,6 @@
+import "slices"
+
+numbers := []int{3, 1, 4}
+println("Before:", numbers)
+numbers.sort!()  
+println("After:", numbers)

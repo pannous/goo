@@ -1,0 +1,8 @@
+var s *string
+x := s ?? "default"
+println("Result:", x)
+
+str := "hello"
+s2 := &str
+y := s2 ?? "fallback"
+println("Result2:", y)
