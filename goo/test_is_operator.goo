@@ -1,0 +1,32 @@
+import "reflect"
+
+// isTypeOf checks if value x has the same type as the type of typeInstance
+def isTypeOf(x any, typeInstance any) bool {
+	if x == nil && typeInstance == nil {
+		return true
+	}
+	if x == nil || typeInstance == nil {
+		return false
+	}
+	
+	xType := reflect.TypeOf(x)
+	instanceType := reflect.TypeOf(typeInstance)
+	
+	// Remove pointer indirection from instanceType since we pass (*T)(nil)
+	if instanceType.Kind() == reflect.Ptr {
+		instanceType = instanceType.Elem()
+	}
+	
+	return xType == instanceType
+}
+
+ok := 1 is int    //     surprisingly hard to implement
+check ok
+
+// Test more complex types
+slice := [1, 2, 3]
+ok2 := slice is []int
+check ok2
+
+ok3 := slice is []any  // This should be false - different element types
+check !ok3

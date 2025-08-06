@@ -49,6 +49,7 @@ Running all tests in ./goo/ directory...
 ✅ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
+✅ test_is_operator.goo
 ✅ test_iterator_for_in.goo
 ✅ test_iterator_membership.goo
 ✅ test_iterator_simple.goo
@@ -123,6 +124,7 @@ Running all tests in ./goo/ directory...
 ✅ conditional_test.goo
 ✅ debug_ast.goo
 ❌ debug_dots.goo
+✅ debug_is_parsing.goo
 ❌ debug_simple.goo
 ❌ debug_spaces.goo
 ❌ debug_tokenize.goo
@@ -131,6 +133,7 @@ Running all tests in ./goo/ directory...
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
 ✅ final_conditional_test.goo
+❌ is_comprehensive_test.goo
 ❌ isTruthy_helper.goo
 ✅ manual_c_style.goo
 ❌ minimal_range.goo
@@ -171,6 +174,7 @@ Running all tests in ./goo/ directory...
 ✅ test_hash_index_vs_comment.goo
 ❌ test_in_complete.goo
 ❌ test_in_operator_maps.goo
+✅ test_is_simple.goo
 ✅ test_just_truthyAndOp.goo
 ❌ test_list_working.goo
 ❌ test_lists_consolidated.goo
@@ -221,6 +225,6 @@ Running all tests in ./goo/ directory...
 ✅ test_working_transforms.goo
 ❌ token_debug.goo
 ========================================
-Summary: 166/220 passed, 54 failed
+Summary: 169/224 passed, 55 failed
 ⚠️  Some tests failed
 Consider ./build-compiler.sh or do rollback!
