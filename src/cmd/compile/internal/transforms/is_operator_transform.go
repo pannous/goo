@@ -24,6 +24,28 @@ func (t *IsOperatorTransform) Priority() int {
 	return 30 // Run relatively early, before most other transforms
 }
 
+// NodeTransformer interface implementation
+func (t *IsOperatorTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle IS operations directly
+	if op, ok := node.(*syntax.Operation); ok {
+		return op.Op == syntax.IS
+	}
+	return false
+}
+
+func (t *IsOperatorTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.IS {
+		// Transform the IS operation directly
+		return t.convertIsToFunctionCall(op)
+	}
+	return nil
+}
+
+func (t *IsOperatorTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for is operator transform
+	return false
+}
+
 func (t *IsOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &isOperatorVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)

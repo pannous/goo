@@ -2,7 +2,44 @@
 
 wright down the Most important Essentials Insights of what you have learned into a file ending with guide and starting with the topic then at a line in your clot.ME mentioning that this guy can be found under the file
 
-Instead of every transformer searching the whole AST three for the matching pattern let us completely rewrite this mechanism so that only the main transformed that go file searches the whole AST for those patterns and then call the correspondence transformer 
+  ✅ The DRY Victory:
+
+  - Before: N transformers × M node types = N×M traversal code duplication
+  - After: 1 central visitor + N focused transformers = Single traversal + focused logic
+
+Big transformer visitor refactor!
+
+  Instead of every transformer searching the whole AST three for the matching pattern let us completely rewrite 
+  this mechanism so that only the main transform.go file searches the whole AST for those patterns and then calls
+   the correspondence transformer
+ 
+  +func (t *IsOperatorTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+  +       // Check if this node contains IS operations that we can handle
+  +       switch n := node.(type) {
+  +       case *syntax.Operation:
+  +               // Direct IS operation
+  +               if n.Op == syntax.IS {
+  +                       return true
+  +               }
+  +       case *syntax.ExprStmt:
+  +               if op, ok := n.X.(*syntax.Operation); ok && op.Op == syntax.IS {
+  +                       return true
+  +               }
+  +       case *syntax.AssignStmt:
+  +               if op, ok := n.Rhs.(*syntax.Operation); ok && op.Op == syntax.IS {
+  +                       return true
+  +               }
+  +       case *syntax.IfStmt:
+  +               if op, ok := n.Cond.(*syntax.Operation); ok && op.Op == syntax.IS {
+  +                       return true
+  +               }
+  +       case *syntax.CallExpr:
+  +               // Check if any arguments contain IS operations
+  +               for _, arg := range n.ArgList {
+  +                       if op, ok := arg.(*syntax.Operation); ok && o
+
+  Instead what should've happened is: The main transformer should traverse all nodes down to their leaves And 
+  then call CanHandle(node) for all transformers, So they don't have to check or traverse anything!
 
 
 Get Opus 4.1:

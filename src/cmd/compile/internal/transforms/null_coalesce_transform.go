@@ -28,6 +28,27 @@ func (t *NullCoalesceTransform) Priority() int {
 	return 75 // before lambda but after list methods
 }
 
+// NodeTransformer interface implementation
+func (t *NullCoalesceTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle null coalescing operations directly
+	if op, ok := node.(*syntax.Operation); ok {
+		return op.Op == syntax.NullCoalesce
+	}
+	return false
+}
+
+func (t *NullCoalesceTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
+		return t.createNullCoalesceCall(op)
+	}
+	return nil
+}
+
+func (t *NullCoalesceTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for null coalesce transform
+	return false
+}
+
 func (t *NullCoalesceTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &nullCoalesceVisitor{
 		transform: t,
@@ -48,19 +69,19 @@ func (v *nullCoalesceVisitor) Visit(node syntax.Node) syntax.Visitor {
 	switch n := node.(type) {
 	case *syntax.ExprStmt:
 		if op, ok := n.X.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-			n.X = v.createNullCoalesceCall(op)
+			n.X = v.transform.createNullCoalesceCall(op)
 			v.changed = true
 		}
 	case *syntax.AssignStmt:
 		if op, ok := n.Rhs.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-			n.Rhs = v.createNullCoalesceCall(op)
+			n.Rhs = v.transform.createNullCoalesceCall(op)
 			v.changed = true
 		}
 		// Handle multiple assignment values
 		if rhs, ok := n.Rhs.(*syntax.ListExpr); ok {
 			for i, expr := range rhs.ElemList {
 				if op, ok := expr.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-					rhs.ElemList[i] = v.createNullCoalesceCall(op)
+					rhs.ElemList[i] = v.transform.createNullCoalesceCall(op)
 					v.changed = true
 				}
 			}
@@ -68,7 +89,7 @@ func (v *nullCoalesceVisitor) Visit(node syntax.Node) syntax.Visitor {
 	case *syntax.VarDecl:
 		if n.Values != nil {
 			if op, ok := n.Values.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-				n.Values = v.createNullCoalesceCall(op)
+				n.Values = v.transform.createNullCoalesceCall(op)
 				v.changed = true
 			}
 		}
@@ -76,7 +97,7 @@ func (v *nullCoalesceVisitor) Visit(node syntax.Node) syntax.Visitor {
 		// Handle null coalescing in function arguments
 		for i, arg := range n.ArgList {
 			if op, ok := arg.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-				n.ArgList[i] = v.createNullCoalesceCall(op)
+				n.ArgList[i] = v.transform.createNullCoalesceCall(op)
 				v.changed = true
 			}
 		}
@@ -88,11 +109,11 @@ func (v *nullCoalesceVisitor) Visit(node syntax.Node) syntax.Visitor {
 		} else {
 			// Check operands for null coalescing
 			if op, ok := n.X.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-				n.X = v.createNullCoalesceCall(op)
+				n.X = v.transform.createNullCoalesceCall(op)
 				v.changed = true
 			}
 			if op, ok := n.Y.(*syntax.Operation); ok && op.Op == syntax.NullCoalesce {
-				n.Y = v.createNullCoalesceCall(op)
+				n.Y = v.transform.createNullCoalesceCall(op)
 				v.changed = true
 			}
 		}
@@ -102,7 +123,7 @@ func (v *nullCoalesceVisitor) Visit(node syntax.Node) syntax.Visitor {
 }
 
 // createNullCoalesceCall converts x ?? y to a simple call to helper function
-func (v *nullCoalesceVisitor) createNullCoalesceCall(op *syntax.Operation) syntax.Expr {
+func (t *NullCoalesceTransform) createNullCoalesceCall(op *syntax.Operation) syntax.Expr {
 	pos := op.Pos()
 	
 	// For now, let's just create a simpler transformation

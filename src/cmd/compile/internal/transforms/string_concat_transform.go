@@ -8,6 +8,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 )
 
 // StringConcatTransform handles automatic string conversion in concatenation.
@@ -16,7 +17,9 @@ import (
 // "result:" + z --> "result:" + fmt.Sprintf("%v", z) // works!
 // "result:" + z --> "result:" + z.String()  // NOT for int!
 
-type StringConcatTransform struct{}
+type StringConcatTransform struct{
+	needsFmtImport bool
+}
 
 // concatVisitor implements syntax.Visitor to transform string concatenations
 type concatVisitor struct {
@@ -32,6 +35,44 @@ func (t *StringConcatTransform) Name() string {
 
 func (t *StringConcatTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
+// NodeTransformer interface implementation
+func (t *StringConcatTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle ADD operations directly - the central visitor will find them
+	if op, ok := node.(*syntax.Operation); ok {
+		return op.Op == syntax.Add
+	}
+	return false
+}
+
+func (t *StringConcatTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Add {
+		// Check if it's string interpolation first
+		parts := t.extractInterpolationParts(op)
+		if len(parts) >= 3 && t.isStringInterpolationPattern(parts, ctx) {
+			t.needsFmtImport = true
+			return t.buildInterpolationChain(parts, ctx)
+		}
+		
+		// Otherwise check for regular concatenation
+		if transformed := t.transformConcatOperation(op, ctx); transformed != nil {
+			t.needsFmtImport = true
+			return transformed
+		}
+	}
+	
+	return nil
+}
+
+func (t *StringConcatTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// Add fmt import if needed
+	if t.needsFmtImport && !t.hasImport(file, "fmt") {
+		t.addFmtImport(file)
+		t.needsFmtImport = false
+		return true
+	}
+	return false
 }
 
 func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformContext) bool {

@@ -173,6 +173,9 @@ With the visitor pattern, we can only replace nodes in place, so not always appl
 we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
 Or use a hybrid.
 
+## Transformer Architecture
+The new NodeTransformer interface eliminates code duplication by using a centralized visitor pattern. The transformer architecture guide can be found under transformer-architecture-guide.md in the transforms folder. Key principle: Central visitor does ALL traversal, transformers handle only their specific node types (2-3 lines of CanHandle logic instead of 50+ lines of traversal duplication).
+
 
 # Assume mishearings
 I am using speech recognition which might misunderstand some words:

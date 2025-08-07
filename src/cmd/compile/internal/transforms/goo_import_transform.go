@@ -23,23 +23,65 @@ func (t *GooImportTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
-func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	// Get source file directory for relative path resolution
-	sourceDir := filepath.Dir(file.Path.Filename())
-	
-	changed := false
-
-	// Transform import declarations
-	for i, decl := range file.DeclList {
-		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if newImportDecl := t.transformImportDeclWithContext(importDecl, sourceDir); newImportDecl != importDecl {
-				file.DeclList[i] = newImportDecl
-				changed = true
-			}
+// NodeTransformer interface implementation
+func (t *GooImportTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle ImportDecl nodes with .goo imports
+	if importDecl, ok := node.(*syntax.ImportDecl); ok {
+		if importDecl.Path != nil && importDecl.Path.Kind == syntax.StringLit {
+			importPath := strings.Trim(importDecl.Path.Value, "\"")
+			return strings.HasSuffix(importPath, ".goo")
 		}
 	}
+	return false
+}
 
-	return changed
+func (t *GooImportTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if importDecl, ok := node.(*syntax.ImportDecl); ok {
+		return t.transformGooImport(importDecl)
+	}
+	return nil
+}
+
+func (t *GooImportTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for goo import transform
+	return false
+}
+
+func (t *GooImportTransform) transformGooImport(importDecl *syntax.ImportDecl) *syntax.ImportDecl {
+	if importDecl.Path == nil || importDecl.Path.Kind != syntax.StringLit {
+		return importDecl
+	}
+
+	importPath := strings.Trim(importDecl.Path.Value, "\"")
+
+	// Check if this is a .goo file import
+	if strings.HasSuffix(importPath, ".goo") {
+		// Extract base name for package directory
+		baseName := strings.TrimSuffix(filepath.Base(importPath), ".goo")
+
+		// Create new relative import path
+		newImportPath := "./" + baseName
+
+		// Create new import declaration
+		newImportDecl := *importDecl
+		newPath := *importDecl.Path
+		newPath.Value = "\"" + newImportPath + "\""
+		newImportDecl.Path = &newPath
+		
+		// Set position for the new node
+		newImportDecl.SetPos(importDecl.Pos())
+
+		return &newImportDecl
+	}
+
+	return importDecl
+}
+
+// Legacy Transform method for backward compatibility - not used in new architecture
+func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// This method is kept for interface compatibility but not used
+	// The new NodeTransformer interface methods are used instead
+	return false
 }
 
 func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.ImportDecl, sourceDir string) *syntax.ImportDecl {

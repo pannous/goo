@@ -9,7 +9,9 @@ import (
 )
 
 // PrintfTransform converts printf calls to fmt.Printf and put calls to fmt.Println, and adds fmt import
-type PrintfTransform struct{}
+type PrintfTransform struct{
+	needsFmtImport bool
+}
 
 type printfVisitor struct {
 	transform      *PrintfTransform
@@ -24,6 +26,47 @@ func (t *PrintfTransform) Name() string {
 
 func (t *PrintfTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
+}
+
+// NodeTransformer interface implementation
+func (t *PrintfTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Check if this is a function call to printf or put
+	if call, ok := node.(*syntax.CallExpr); ok {
+		if name, ok := call.Fun.(*syntax.Name); ok {
+			return name.Value == "printf" || name.Value == "put"
+		}
+	}
+	return false
+}
+
+func (t *PrintfTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if call, ok := node.(*syntax.CallExpr); ok {
+		if name, ok := call.Fun.(*syntax.Name); ok {
+			switch name.Value {
+			case "printf":
+				// Convert printf() to fmt.Printf()
+				t.convertToFmtPrintf(call, name)
+				t.needsFmtImport = true
+				return call
+			case "put":
+				// Convert put() to fmt.Println()
+				t.convertToFmtPrintln(call, name)
+				t.needsFmtImport = true
+				return call
+			}
+		}
+	}
+	return nil
+}
+
+func (t *PrintfTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// Add fmt import if needed
+	if t.needsFmtImport && !t.hasImport(file, "fmt") {
+		t.addFmtImport(file)
+		t.needsFmtImport = false
+		return true
+	}
+	return false
 }
 
 func (t *PrintfTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
@@ -67,11 +110,11 @@ func (v *printfVisitor) convertPrintfCall(call *syntax.CallExpr) bool {
 		switch name.Value {
 		case "printf":
 			// Convert printf() to fmt.Printf()
-			v.convertToFmtPrintf(call, name)
+			v.transform.convertToFmtPrintf(call, name)
 			return true
 		case "put":
 			// Convert put() to fmt.Println()  
-			v.convertToFmtPrintln(call, name)
+			v.transform.convertToFmtPrintln(call, name)
 			return true
 		}
 	}
@@ -80,7 +123,7 @@ func (v *printfVisitor) convertPrintfCall(call *syntax.CallExpr) bool {
 }
 
 // convertToFmtPrintf converts a call to fmt.Printf
-func (v *printfVisitor) convertToFmtPrintf(call *syntax.CallExpr, name *syntax.Name) {
+func (t *PrintfTransform) convertToFmtPrintf(call *syntax.CallExpr, name *syntax.Name) {
 	pos := call.Pos()
 	
 	// Create fmt identifier
@@ -103,7 +146,7 @@ func (v *printfVisitor) convertToFmtPrintf(call *syntax.CallExpr, name *syntax.N
 }
 
 // convertToFmtPrintln converts a call to fmt.Println
-func (v *printfVisitor) convertToFmtPrintln(call *syntax.CallExpr, name *syntax.Name) {
+func (t *PrintfTransform) convertToFmtPrintln(call *syntax.CallExpr, name *syntax.Name) {
 	pos := call.Pos()
 	
 	// Create fmt identifier

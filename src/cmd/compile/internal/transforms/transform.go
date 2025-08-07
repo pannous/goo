@@ -29,6 +29,318 @@ type Transformer interface {
 	Priority() int
 }
 
+// NodeTransformer represents a transformer that operates on specific node patterns
+type NodeTransformer interface {
+	// CanHandle returns true if this transformer can handle the given node
+	CanHandle(node syntax.Node, ctx *TransformContext) bool
+	
+	// TransformNode transforms the given node and returns the modified node or nil if no change
+	TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node
+	
+	// PostProcess is called after all transformations to handle file-level changes like imports
+	PostProcess(file *syntax.File, ctx *TransformContext) bool
+	
+	// Name returns a human-readable name for this transformer
+	Name() string
+	
+	// Priority returns the execution priority (lower numbers run first)
+	Priority() int
+}
+
+// CentralTransformVisitor implements the centralized pattern matching and transformation
+type CentralTransformVisitor struct {
+	context      *TransformContext
+	transformers []Transformer
+	changed      bool
+	appliedTransformers map[string]Transformer  // Track which transformer instances were applied
+}
+
+// WalkFile is the main entry point that walks the file and applies transformations
+func (v *CentralTransformVisitor) WalkFile(file *syntax.File) {
+	if file == nil {
+		return
+	}
+
+	// Initialize tracking
+	v.appliedTransformers = make(map[string]Transformer)
+
+	// Walk and transform nodes
+	for i, decl := range file.DeclList {
+		if newDecl := v.walkDecl(decl); newDecl != nil && newDecl != decl {
+			file.DeclList[i] = newDecl
+			v.changed = true
+		}
+	}
+	
+	// Post-process applied transformers (handle imports, etc.)
+	for _, transformer := range v.appliedTransformers {
+		if nodeTransformer, ok := transformer.(NodeTransformer); ok {
+			if nodeTransformer.PostProcess(file, v.context) {
+				v.changed = true
+			}
+		}
+	}
+}
+
+func (v *CentralTransformVisitor) walkDecl(decl syntax.Decl) syntax.Decl {
+	if decl == nil {
+		return nil
+	}
+
+	// Apply transformers to this declaration (only for relevant leaf nodes)
+	if newDecl := v.tryTransformLeafNode(decl); newDecl != nil {
+		if transformedDecl, ok := newDecl.(syntax.Decl); ok {
+			decl = transformedDecl
+		}
+	}
+
+	// Walk children
+	switch d := decl.(type) {
+	case *syntax.FuncDecl:
+		if newBody := v.walkStmt(d.Body); newBody != nil && newBody != d.Body {
+			if blockStmt, ok := newBody.(*syntax.BlockStmt); ok {
+				d.Body = blockStmt
+				v.changed = true
+			}
+		}
+	case *syntax.VarDecl:
+		if d.Values != nil {
+			if newValues := v.walkExpr(d.Values); newValues != nil && newValues != d.Values {
+				d.Values = newValues
+				v.changed = true
+			}
+		}
+	case *syntax.ConstDecl:
+		if d.Values != nil {
+			if newValues := v.walkExpr(d.Values); newValues != nil && newValues != d.Values {
+				d.Values = newValues
+				v.changed = true
+			}
+		}
+	}
+
+	return decl
+}
+
+func (v *CentralTransformVisitor) walkStmt(stmt syntax.Stmt) syntax.Stmt {
+	if stmt == nil {
+		return nil
+	}
+
+	// Apply transformers to this statement (only for relevant leaf nodes)
+	if newStmt := v.tryTransformLeafNode(stmt); newStmt != nil {
+		if transformedStmt, ok := newStmt.(syntax.Stmt); ok {
+			stmt = transformedStmt
+		}
+	}
+
+	// Walk children
+	switch s := stmt.(type) {
+	case *syntax.BlockStmt:
+		for i, childStmt := range s.List {
+			if newChildStmt := v.walkStmt(childStmt); newChildStmt != nil && newChildStmt != childStmt {
+				s.List[i] = newChildStmt
+				v.changed = true
+			}
+		}
+	case *syntax.ExprStmt:
+		if newX := v.walkExpr(s.X); newX != nil && newX != s.X {
+			s.X = newX
+			v.changed = true
+		}
+	case *syntax.AssignStmt:
+		if newLhs := v.walkExpr(s.Lhs); newLhs != nil && newLhs != s.Lhs {
+			s.Lhs = newLhs
+			v.changed = true
+		}
+		if newRhs := v.walkExpr(s.Rhs); newRhs != nil && newRhs != s.Rhs {
+			s.Rhs = newRhs
+			v.changed = true
+		}
+	case *syntax.DeclStmt:
+		for i, childDecl := range s.DeclList {
+			if newChildDecl := v.walkDecl(childDecl); newChildDecl != nil && newChildDecl != childDecl {
+				s.DeclList[i] = newChildDecl
+				v.changed = true
+			}
+		}
+	case *syntax.IfStmt:
+		if s.Init != nil {
+			if newInit := v.walkStmt(s.Init); newInit != nil && newInit != s.Init {
+				if simpleStmt, ok := newInit.(syntax.SimpleStmt); ok {
+					s.Init = simpleStmt
+					v.changed = true
+				}
+			}
+		}
+		if newCond := v.walkExpr(s.Cond); newCond != nil && newCond != s.Cond {
+			s.Cond = newCond
+			v.changed = true
+		}
+		if newThen := v.walkStmt(s.Then); newThen != nil && newThen != s.Then {
+			if blockStmt, ok := newThen.(*syntax.BlockStmt); ok {
+				s.Then = blockStmt
+				v.changed = true
+			}
+		}
+		if s.Else != nil {
+			if newElse := v.walkStmt(s.Else); newElse != nil && newElse != s.Else {
+				s.Else = newElse
+				v.changed = true
+			}
+		}
+	case *syntax.ForStmt:
+		if s.Init != nil {
+			if newInit := v.walkStmt(s.Init); newInit != nil && newInit != s.Init {
+				if simpleStmt, ok := newInit.(syntax.SimpleStmt); ok {
+					s.Init = simpleStmt
+					v.changed = true
+				}
+			}
+		}
+		if s.Cond != nil {
+			if newCond := v.walkExpr(s.Cond); newCond != nil && newCond != s.Cond {
+				s.Cond = newCond
+				v.changed = true
+			}
+		}
+		if s.Post != nil {
+			if newPost := v.walkStmt(s.Post); newPost != nil && newPost != s.Post {
+				if simpleStmt, ok := newPost.(syntax.SimpleStmt); ok {
+					s.Post = simpleStmt
+					v.changed = true
+				}
+			}
+		}
+		if newBody := v.walkStmt(s.Body); newBody != nil && newBody != s.Body {
+			if blockStmt, ok := newBody.(*syntax.BlockStmt); ok {
+				s.Body = blockStmt
+				v.changed = true
+			}
+		}
+	case *syntax.ReturnStmt:
+		if s.Results != nil {
+			if newResults := v.walkExpr(s.Results); newResults != nil && newResults != s.Results {
+				s.Results = newResults
+				v.changed = true
+			}
+		}
+	}
+
+	return stmt
+}
+
+func (v *CentralTransformVisitor) walkExpr(expr syntax.Expr) syntax.Expr {
+	if expr == nil {
+		return nil
+	}
+
+	// Apply transformers to this expression (only for relevant leaf nodes)
+	if newExpr := v.tryTransformLeafNode(expr); newExpr != nil {
+		if transformedExpr, ok := newExpr.(syntax.Expr); ok {
+			expr = transformedExpr
+		}
+	}
+
+	// Walk children
+	switch e := expr.(type) {
+	case *syntax.Operation:
+		if newX := v.walkExpr(e.X); newX != nil && newX != e.X {
+			e.X = newX
+			v.changed = true
+		}
+		if e.Y != nil {
+			if newY := v.walkExpr(e.Y); newY != nil && newY != e.Y {
+				e.Y = newY
+				v.changed = true
+			}
+		}
+	case *syntax.CallExpr:
+		if newFun := v.walkExpr(e.Fun); newFun != nil && newFun != e.Fun {
+			e.Fun = newFun
+			v.changed = true
+		}
+		if e.ArgList != nil {
+			for i, arg := range e.ArgList {
+				if newArg := v.walkExpr(arg); newArg != nil && newArg != arg {
+					e.ArgList[i] = newArg
+					v.changed = true
+				}
+			}
+		}
+	case *syntax.SelectorExpr:
+		if newX := v.walkExpr(e.X); newX != nil && newX != e.X {
+			e.X = newX
+			v.changed = true
+		}
+	case *syntax.IndexExpr:
+		if newX := v.walkExpr(e.X); newX != nil && newX != e.X {
+			e.X = newX
+			v.changed = true
+		}
+		if newIndex := v.walkExpr(e.Index); newIndex != nil && newIndex != e.Index {
+			e.Index = newIndex
+			v.changed = true
+		}
+	case *syntax.ListExpr:
+		for i, elem := range e.ElemList {
+			if newElem := v.walkExpr(elem); newElem != nil && newElem != elem {
+				e.ElemList[i] = newElem
+				v.changed = true
+			}
+		}
+	case *syntax.LambdaExpr:
+		if newBody := v.walkExpr(e.Body); newBody != nil && newBody != e.Body {
+			e.Body = newBody
+			v.changed = true
+		}
+	case *syntax.AsCastExpr:
+		if newX := v.walkExpr(e.X); newX != nil && newX != e.X {
+			e.X = newX
+			v.changed = true
+		}
+		if newType := v.walkExpr(e.Type); newType != nil && newType != e.Type {
+			e.Type = newType
+			v.changed = true
+		}
+	}
+
+	return expr
+}
+
+// tryTransformNode attempts to transform a node using all registered transformers
+func (v *CentralTransformVisitor) tryTransformNode(node syntax.Node) syntax.Node {
+	for _, transformer := range v.transformers {
+		if nodeTransformer, ok := transformer.(NodeTransformer); ok {
+			if nodeTransformer.CanHandle(node, v.context) {
+				if newNode := nodeTransformer.TransformNode(node, v.context); newNode != nil {
+					fmt.Printf("Node transformation applied by: %s\n", nodeTransformer.Name())
+					v.appliedTransformers[nodeTransformer.Name()] = transformer
+					return newNode
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// tryTransformLeafNode calls transformers on specific expression/operation nodes
+func (v *CentralTransformVisitor) tryTransformLeafNode(node syntax.Node) syntax.Node {
+	// Only call transformers on "leaf" nodes they actually care about
+	switch node.(type) {
+	case *syntax.Operation, *syntax.CallExpr, *syntax.CompositeLit, *syntax.FuncDecl, *syntax.AsCastExpr, *syntax.SelectorExpr, *syntax.TypeDecl, *syntax.ImportDecl, *syntax.LambdaExpr, *syntax.ReturnStmt, *syntax.TryStmt, *syntax.TryCatchStmt:
+		// These are the actual nodes transformers want to handle
+		return v.tryTransformNode(node)
+	}
+	return nil
+}
+
+// Legacy Visit method for compatibility (not used in new architecture)
+func (v *CentralTransformVisitor) Visit(node syntax.Node) syntax.Visitor {
+	// This is kept for compatibility but not used in the new architecture
+	return v
+}
+
 // ApplyTransformations runs all registered transformers on the syntax tree.
 // called bycmd/compile/internal/noder/unified.go
 func ApplyTransformations(files []*syntax.File) {
@@ -49,14 +361,35 @@ func ApplyTransformations(files []*syntax.File) {
 
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
+		
 		fmt.Printf("Transform execution order:\n")
 		for i, transformer := range TransformRegistry {
 			fmt.Printf("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
 		}
+		
+		// Use centralized visitor for NodeTransformers first
+		centralVisitor := &CentralTransformVisitor{
+			context: ctx,
+			transformers: TransformRegistry,
+			changed: false,
+			appliedTransformers: make(map[string]Transformer),
+		}
+		
+		centralVisitor.WalkFile(file)
+		
+		// Fall back to old interface for transformers that don't implement NodeTransformer
 		for _, transformer := range TransformRegistry {
-			if transformer.Transform(file, ctx) {
-				fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+			if _, ok := transformer.(NodeTransformer); !ok {
+				// Use old interface for backward compatibility
+				if transformer.Transform(file, ctx) {
+					fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+					centralVisitor.changed = true
+				}
 			}
+		}
+		
+		if centralVisitor.changed {
+			fmt.Printf("Applied transformations to package: %s\n", file.PkgName.Value)
 		}
 	}
 }

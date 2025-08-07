@@ -12,7 +12,9 @@ import (
 // It transforms expressions like:
 // class Person { name string; age int } --> type Person struct { name string; age int }
 // class methods and constructors are also transformed appropriately.
-type ClassTransform struct{}
+type ClassTransform struct{
+	classMethodsToAdd map[string][]*syntax.FuncDecl // className -> methods
+}
 
 func (t *ClassTransform) Name() string {
 	return "class_transform"
@@ -22,32 +24,53 @@ func (t *ClassTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
-func (t *ClassTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	changed := false
+// NodeTransformer interface implementation
+func (t *ClassTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle TypeDecl nodes that are class declarations
+	if typeDecl, ok := node.(*syntax.TypeDecl); ok {
+		return t.isClassDeclaration(typeDecl)
+	}
+	return false
+}
 
-	// Walk through all declarations in the file
-	for i, decl := range file.DeclList {
-		if typeDecl, ok := decl.(*syntax.TypeDecl); ok {
-			if t.isClassDeclaration(typeDecl) {
-				if transformed := t.transformClassDeclaration(typeDecl, ctx); transformed != nil {
-					file.DeclList[i] = transformed
-
-					// Add class methods to the file
-					methods := syntax.GetClassMethods(typeDecl.Name.Value)
-					if len(methods) > 0 {
-						// Add methods to the file (no transformation needed with self.field syntax)
-						for _, method := range methods {
-							file.DeclList = append(file.DeclList, method)
-						}
-					}
-
-					changed = true
+func (t *ClassTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if typeDecl, ok := node.(*syntax.TypeDecl); ok {
+		if t.isClassDeclaration(typeDecl) {
+			// Store methods for PostProcess
+			className := typeDecl.Name.Value
+			methods := syntax.GetClassMethods(className)
+			if len(methods) > 0 {
+				if t.classMethodsToAdd == nil {
+					t.classMethodsToAdd = make(map[string][]*syntax.FuncDecl)
 				}
+				t.classMethodsToAdd[className] = methods
 			}
+			return t.transformClassDeclaration(typeDecl, ctx)
 		}
 	}
+	return nil
+}
 
-	return changed
+func (t *ClassTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// Add class methods to the file
+	if t.classMethodsToAdd != nil && len(t.classMethodsToAdd) > 0 {
+		for _, methods := range t.classMethodsToAdd {
+			for _, method := range methods {
+				file.DeclList = append(file.DeclList, method)
+			}
+		}
+		// Clear the methods map for next file
+		t.classMethodsToAdd = make(map[string][]*syntax.FuncDecl)
+		return true
+	}
+	return false
+}
+
+// Legacy Transform method for backward compatibility - not used in new architecture
+func (t *ClassTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// This method is kept for interface compatibility but not used
+	// The new NodeTransformer interface methods are used instead
+	return false
 }
 
 // isClassDeclaration checks if this is a class declaration

@@ -13,12 +13,6 @@ import (
 // and "for x in map" to "for x := range map"
 type InLoopTransform struct{}
 
-type inLoopVisitor struct {
-	transform *InLoopTransform
-	ctx       *TransformContext
-	file      *syntax.File
-	changed   bool
-}
 
 func (t *InLoopTransform) Name() string {
 	return "in_loop_transform"
@@ -28,38 +22,49 @@ func (t *InLoopTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
-func (t *InLoopTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	visitor := &inLoopVisitor{transform: t, ctx: ctx, file: file}
-	
-	// Use syntax.Walk but with a better visitor implementation
-	syntax.Walk(file, visitor)
-	
-	return visitor.changed
+// NodeTransformer interface implementation
+func (t *InLoopTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle ForStmt nodes that contain InClause
+	if forStmt, ok := node.(*syntax.ForStmt); ok {
+		if forStmt.Init != nil {
+			if _, ok := forStmt.Init.(*syntax.InClause); ok {
+				return true
+			}
+		}
+	}
+	return false
 }
 
-// Visit implements syntax.Visitor interface
-func (v *inLoopVisitor) Visit(node syntax.Node) syntax.Visitor {
-	if node == nil {
-		return nil
-	}
-	
-	// Look for ForStmt nodes that contain InClause
+func (t *InLoopTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
 	if forStmt, ok := node.(*syntax.ForStmt); ok {
 		if forStmt.Init != nil {
 			if inClause, ok := forStmt.Init.(*syntax.InClause); ok {
 				// Transform the InClause to a RangeClause
-				rangeClause := v.transform.convertInClauseToRange(inClause, v.ctx)
+				rangeClause := t.convertInClauseToRange(inClause, ctx)
 				if rangeClause != nil {
-					forStmt.Init = rangeClause
-					v.changed = true
+					newForStmt := *forStmt
+					newForStmt.Init = rangeClause
+					newForStmt.SetPos(forStmt.Pos())
+					return &newForStmt
 				}
 			}
 		}
 	}
-	
-	// Continue visiting child nodes  
-	return v
+	return nil
 }
+
+func (t *InLoopTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for in loop transform
+	return false
+}
+
+// Legacy Transform method for backward compatibility - not used in new architecture
+func (t *InLoopTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// This method is kept for interface compatibility but not used
+	// The new NodeTransformer interface methods are used instead
+	return false
+}
+
 
 // convertInClauseToRange converts "for x in collection" to "for _, x := range collection"
 // or appropriate range syntax based on the collection type

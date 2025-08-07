@@ -28,6 +28,29 @@ func (t *AutoReturnTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
+// NodeTransformer interface implementation
+func (t *AutoReturnTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Check if this is a function declaration that needs auto-return
+	if funcDecl, ok := node.(*syntax.FuncDecl); ok {
+		return t.needsAutoReturn(funcDecl)
+	}
+	return false
+}
+
+func (t *AutoReturnTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if funcDecl, ok := node.(*syntax.FuncDecl); ok {
+		if t.transformFunction(funcDecl, ctx) {
+			return funcDecl // Return modified function
+		}
+	}
+	return nil
+}
+
+func (t *AutoReturnTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for auto return transform
+	return false
+}
+
 func (t *AutoReturnTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &autoReturnVisitor{transform: t, ctx: ctx}
 	

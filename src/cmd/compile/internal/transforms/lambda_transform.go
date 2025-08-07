@@ -13,12 +13,6 @@ import (
 // LambdaTransform converts lambda expressions to function literals
 type LambdaTransform struct{}
 
-type lambdaVisitor struct {
-	transform *LambdaTransform
-	ctx       *TransformContext
-	changed   bool
-}
-
 func (t *LambdaTransform) Name() string {
 	return "lambda_transform"
 }
@@ -27,199 +21,64 @@ func (t *LambdaTransform) Priority() int {
 	return 200 // Low priority - run after list methods and other transforms
 }
 
+// NodeTransformer interface implementation
+func (t *LambdaTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle LambdaExpr nodes directly
+	if _, ok := node.(*syntax.LambdaExpr); ok {
+		return true
+	}
+	return false
+}
+
+func (t *LambdaTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if lambda, ok := node.(*syntax.LambdaExpr); ok {
+		return t.convertLambdaToFuncLit(lambda)
+	}
+	return nil
+}
+
+func (t *LambdaTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for lambda transform
+	return false
+}
+
+// Legacy Transform method for backward compatibility - not used in new architecture
 func (t *LambdaTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	visitor := &lambdaVisitor{transform: t, ctx: ctx}
-	
-	// Use the general visitor pattern to walk all nodes
-	syntax.Walk(file, visitor)
-	
-	return visitor.changed
+	// This method is kept for interface compatibility but not used
+	// The new NodeTransformer interface methods are used instead
+	return false
 }
 
-// Visit implements syntax.Visitor
-func (v *lambdaVisitor) Visit(node syntax.Node) syntax.Visitor {
-	if node == nil {
-		return nil
-	}
-	
-	// Look for nodes that contain lambda expressions we can replace
-	switch n := node.(type) {
-	case *syntax.ExprStmt:
-		if lambda, ok := n.X.(*syntax.LambdaExpr); ok {
-			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-				n.X = newExpr
-				v.changed = true
-			}
-		}
-	case *syntax.AssignStmt:
-		if lambda, ok := n.Rhs.(*syntax.LambdaExpr); ok {
-			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-				n.Rhs = newExpr
-				v.changed = true
-			}
-		}
-	case *syntax.VarDecl:
-		if n.Values != nil {
-			if lambda, ok := n.Values.(*syntax.LambdaExpr); ok {
-				if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-					n.Values = newExpr
-					v.changed = true
-				}
-			}
-		}
-	case *syntax.CallExpr:
-		// Handle lambda expressions in function arguments
-		for i, arg := range n.ArgList {
-			if lambda, ok := arg.(*syntax.LambdaExpr); ok {
-				if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-					n.ArgList[i] = newExpr
-					v.changed = true
-				}
-			}
-		}
-	case *syntax.ReturnStmt:
-		if n.Results != nil {
-			if lambda, ok := n.Results.(*syntax.LambdaExpr); ok {
-				if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-					n.Results = newExpr
-					v.changed = true
-				}
-			}
-		}
-	case *syntax.CheckStmt:
-		if lambda, ok := n.Cond.(*syntax.LambdaExpr); ok {
-			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-				n.Cond = newExpr
-				v.changed = true
-			}
-		}
-	case *syntax.Operation:
-		if lambda, ok := n.X.(*syntax.LambdaExpr); ok {
-			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-				n.X = newExpr
-				v.changed = true
-			}
-		}
-		if lambda, ok := n.Y.(*syntax.LambdaExpr); ok {
-			if newExpr := v.transform.convertLambdaToFuncLit(lambda); newExpr != nil {
-				n.Y = newExpr
-				v.changed = true
-			}
-		}
-	}
-	
-	// Continue visiting child nodes
-	return v
-}
-
+// convertLambdaToFuncLit converts a lambda expression to a function literal
 func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syntax.FuncLit {
-	// Check if lambda body is nil
-	if lambda.Body == nil {
-		return nil
-	}
-
-	// Infer return type based on lambda body expression
-	returnTypeName := t.inferReturnType(lambda.Body)
-	returnType := &syntax.Name{Value: returnTypeName}
-	returnType.SetPos(lambda.Pos())
-
-	returnField := &syntax.Field{Type: returnType}
-	returnField.SetPos(lambda.Pos())
-
-	// Create function type
+	pos := lambda.Pos()
+	
+	// Create function type with parameters
 	funcType := &syntax.FuncType{
-		ParamList:  lambda.ParamList,
-		ResultList: []*syntax.Field{returnField},
+		ParamList: lambda.ParamList,
+		// Result type will be inferred from the body expression
 	}
-	// Make sure to set the position
-	funcType.SetPos(lambda.Pos())
-
-	// Create return statement with lambda body
+	funcType.SetPos(pos)
+	
+	// Create function body - wrap the expression in a return statement
 	returnStmt := &syntax.ReturnStmt{
 		Results: lambda.Body,
 	}
 	returnStmt.SetPos(lambda.Body.Pos())
-
-	// Create block statement containing the return
-	blockStmt := &syntax.BlockStmt{
+	
+	body := &syntax.BlockStmt{
 		List: []syntax.Stmt{returnStmt},
 	}
-	blockStmt.SetPos(lambda.Pos())
-
-	// Create function literal
+	body.SetPos(pos)
+	
+	// Create the function literal
 	funcLit := &syntax.FuncLit{
 		Type: funcType,
-		Body: blockStmt,
+		Body: body,
 	}
-	funcLit.SetPos(lambda.Pos())
-
-	return funcLit
-}
-
-// inferReturnType analyzes the lambda body expression to infer the return type
-func (t *LambdaTransform) inferReturnType(expr syntax.Expr) string {
-	switch e := expr.(type) {
-	case *syntax.Operation:
-		switch e.Op {
-		// Comparison operators return bool
-		case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq:
-			return "bool"
-		// Logical operators return bool
-		case syntax.AndAnd, syntax.OrOr:
-			return "bool"
-		// Arithmetic operators typically return int (simplified)
-		case syntax.Add, syntax.Sub, syntax.Mul, syntax.Div, syntax.Rem:
-			return "int"
-		// Bitwise operators return int
-		case syntax.And, syntax.Or, syntax.Xor, syntax.Shl, syntax.Shr, syntax.AndNot:
-			return "int"
-		}
-	case *syntax.BasicLit:
-		switch e.Kind {
-		case syntax.IntLit:
-			return "int"
-		case syntax.FloatLit:
-			return "float64"
-		case syntax.StringLit:
-			return "string"
-		case syntax.RuneLit:
-			return "rune"
-		}
-	case *syntax.SelectorExpr:
-		// Handle field access like u.Name, u.Age
-		if fieldName := e.Sel.Value; fieldName != "" {
-			// Use basic heuristics for common field names
-			return t.inferFieldTypeFromName(fieldName)
-		}
-		return "string" // Default for field access
-	case *syntax.Name:
-		// For variable references, we can't easily determine the type without more context
-		// Default to int for now
-		return "int"
-	case *syntax.CallExpr:
-		// Function call - would need more complex analysis
-		return "int"
-	}
+	funcLit.SetPos(pos)
 	
-	// Default to int if we can't determine the type
-	return "int"
-}
-
-// inferFieldTypeFromName uses heuristics to infer field types from field names
-func (t *LambdaTransform) inferFieldTypeFromName(fieldName string) string {
-	switch fieldName {
-	case "Name", "Title", "Description", "Text", "Message", "Label":
-		return "string"
-	case "Age", "Count", "Size", "Length", "Index", "ID", "Number":
-		return "int"
-	case "Price", "Amount", "Value", "Rate", "Score":
-		return "float64"
-	case "Active", "Enabled", "Valid", "Done", "Complete", "IsValid":
-		return "bool"
-	default:
-		// Default to string for unknown field names
-		return "string"
-	}
+	return funcLit
 }
 
 func init() {

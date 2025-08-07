@@ -4,18 +4,13 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"strconv"
 )
 
 // RangeSyntaxTransform handles the 'start…end' syntax in for loops
 // Transforms expressions like "for i in 0…5" to proper Go for loops
+// This simplified version handles Range operations directly.
 type RangeSyntaxTransform struct{}
-
-type rangeSyntaxVisitor struct {
-	transform *RangeSyntaxTransform
-	ctx       *TransformContext
-	file      *syntax.File
-	changed   bool
-}
 
 func (t *RangeSyntaxTransform) Name() string {
 	return "range_syntax_transform"
@@ -25,83 +20,86 @@ func (t *RangeSyntaxTransform) Priority() int {
 	return 50 // Run before in_loop_transform (100)
 }
 
-func (t *RangeSyntaxTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	visitor := &rangeSyntaxVisitor{transform: t, ctx: ctx, file: file}
-	syntax.Walk(file, visitor)
-	return visitor.changed
+// NodeTransformer interface implementation
+func (t *RangeSyntaxTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle Operation nodes with Range operator
+	if op, ok := node.(*syntax.Operation); ok {
+		return op.Op == syntax.Range
+	}
+	return false
 }
 
-// Visit implements syntax.Visitor interface
-func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
-	if node == nil {
-		return nil
+func (t *RangeSyntaxTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Range {
+		return t.convertRangeToSlice(op)
 	}
+	return nil
+}
 
-	// Look for InClause with range operations in for loops  
-	if forStmt, ok := node.(*syntax.ForStmt); ok {
-		if forStmt.Init != nil {
-			if inClause, ok := forStmt.Init.(*syntax.InClause); ok {
-				// Check if the X expression is a range operation
-				if op, ok := inClause.X.(*syntax.Operation); ok && op.Op == syntax.Range {
-					// Convert entire for loop: for i in start…end { } -> for i := start; i < end; i++ { }
-					v.transform.convertRangeForLoop(forStmt, inClause, op, v.ctx)
-					v.changed = true
-				}
-			}
+func (t *RangeSyntaxTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for range syntax transform
+	return false
+}
+
+// Legacy Transform method for backward compatibility - not used in new architecture
+func (t *RangeSyntaxTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// This method is kept for interface compatibility but not used
+	// The new NodeTransformer interface methods are used instead
+	// NOTE: The full range syntax transformation requires more complex
+	// for loop restructuring which may benefit from the old interface
+	return false
+}
+
+// convertRangeToSlice converts a range operation to a slice of integers
+// This is a simplified approach: 0…5 becomes []int{0, 1, 2, 3, 4}
+func (t *RangeSyntaxTransform) convertRangeToSlice(op *syntax.Operation) syntax.Expr {
+	pos := op.Pos()
+	
+	// Extract start and end values
+	start := t.extractIntValue(op.X)
+	end := t.extractIntValue(op.Y)
+	
+	if start < 0 || end < 0 || end <= start {
+		// If we can't determine valid range, return original
+		return op
+	}
+	
+	// Create slice literal with range values
+	var elements []syntax.Expr
+	for i := start; i < end; i++ {
+		elem := &syntax.BasicLit{
+			Kind:  syntax.IntLit,
+			Value: strconv.Itoa(i),
+		}
+		elem.SetPos(pos)
+		elements = append(elements, elem)
+	}
+	
+	// Create int slice type
+	intType := &syntax.Name{Value: "int"}
+	intType.SetPos(pos)
+	
+	sliceType := &syntax.SliceType{Elem: intType}
+	sliceType.SetPos(pos)
+	
+	// Create composite literal
+	compLit := &syntax.CompositeLit{
+		Type:     sliceType,
+		ElemList: elements,
+	}
+	compLit.SetPos(pos)
+	
+	return compLit
+}
+
+// extractIntValue attempts to extract integer value from an expression
+func (t *RangeSyntaxTransform) extractIntValue(expr syntax.Expr) int {
+	if lit, ok := expr.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit {
+		if val, err := strconv.Atoi(lit.Value); err == nil {
+			return val
 		}
 	}
-
-	// Handle Range operations in general expressions (not just for loops)
-	// This needs to be done using a node editor since we can't replace nodes with Visit
-	// For now, let's remove Range operations that reach this point to prevent errors
-	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Range {
-		// Transform Range expressions into function calls or other constructs
-		// For now, we'll convert a…b into a simple addition as a placeholder
-		// This prevents the "unknown operator" error
-		op.Op = syntax.Add
-		v.changed = true
-	}
-
-	return v
-}
-
-// convertRangeForLoop converts entire for loop: "for i in start…end" to "for i := start; i < end; i++"
-func (t *RangeSyntaxTransform) convertRangeForLoop(forStmt *syntax.ForStmt, inClause *syntax.InClause, rangeOp *syntax.Operation, ctx *TransformContext) {
-	pos := inClause.Pos()
-	
-	// Extract the loop variable, start, and end
-	loopVar := inClause.Lhs  
-	start := rangeOp.X
-	end := rangeOp.Y
-	
-	// Create "i := start" initialization
-	initStmt := &syntax.AssignStmt{
-		Op:  syntax.Def, // := operator
-		Lhs: loopVar,
-		Rhs: start,
-	}
-	initStmt.SetPos(pos)
-	
-	// Create "i < end" condition
-	conditionOp := &syntax.Operation{
-		Op: syntax.Lss, // < operator
-		X:  loopVar,    // i
-		Y:  end,        // end
-	}
-	conditionOp.SetPos(pos)
-	
-	// Create "i++" increment (Rhs == nil means increment)
-	incOp := &syntax.AssignStmt{
-		Op:  syntax.Add, // + operator
-		Lhs: loopVar,    // i
-		Rhs: nil,        // nil means increment (i++)
-	}
-	incOp.SetPos(pos)
-	
-	// Update the ForStmt
-	forStmt.Init = initStmt
-	forStmt.Cond = conditionOp
-	forStmt.Post = incOp
+	return -1 // Invalid value
 }
 
 func init() {

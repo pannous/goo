@@ -28,6 +28,28 @@ func (t *FalseyTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
+// NodeTransformer interface implementation
+func (t *FalseyTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Only handle 'not' operations directly
+	if op, ok := node.(*syntax.Operation); ok {
+		return op.Op == syntax.Not
+	}
+	return false
+}
+
+func (t *FalseyTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Not {
+		return t.createNotTruthyCall(op.X, ctx)
+	}
+	return nil
+}
+
+func (t *FalseyTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// No post-processing needed for falsey transform
+	return false
+}
+
+
 func (t *FalseyTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &falseyVisitor{transform: t, ctx: ctx}
 	
@@ -115,17 +137,22 @@ func (v *falseyVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-func (v *falseyVisitor) transformFalseyExpr(expr syntax.Expr) syntax.Expr {
+// transformFalseyExpr transforms expressions containing 'not' operations
+func (t *FalseyTransform) transformFalseyExpr(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
 	// Look for pattern: not x
 	if op, ok := expr.(*syntax.Operation); ok && op.Op == syntax.Not {
-		// Transform "not x" to "!truthy(x)"
-		return v.createNotTruthyCall(op.X)
+		// Transform "not x" to appropriate comparison
+		return t.createNotTruthyCall(op.X, ctx)
 	}
 	
 	return nil
 }
 
-func (v *falseyVisitor) createNotTruthyCall(expr syntax.Expr) syntax.Expr {
+func (v *falseyVisitor) transformFalseyExpr(expr syntax.Expr) syntax.Expr {
+	return v.transform.transformFalseyExpr(expr, v.ctx)
+}
+
+func (t *FalseyTransform) createNotTruthyCall(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
 	// For non-boolean types, we need to convert to truthiness check
 	// Transform "not x" to appropriate comparison based on type
 	
@@ -161,7 +188,7 @@ func (v *falseyVisitor) createNotTruthyCall(expr syntax.Expr) syntax.Expr {
 		}
 	case *syntax.Name:
 		// For variables, use type information to generate appropriate zero comparison
-		if varType, exists := v.ctx.Types[e.Value]; exists {
+		if varType, exists := ctx.Types[e.Value]; exists {
 			switch varType {
 			case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 				zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
