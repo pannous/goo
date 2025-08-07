@@ -1,3 +1,5 @@
+WTF go  true  = 0 == 0 // Untyped bool.
+
 @annotations
 
 wright down the Most important Essentials Insights of what you have learned into a file ending with guide and starting with the topic then at a line in your clot.ME mentioning that this guy can be found under the file

@@ -225,6 +225,12 @@ func (v *CentralTransformVisitor) walkStmt(stmt syntax.Stmt) syntax.Stmt {
 				v.changed = true
 			}
 		}
+	case *syntax.CheckStmt:
+		// Walk the condition expression inside check statements
+		if newCond := v.walkExpr(s.Cond); newCond != nil && newCond != s.Cond {
+			s.Cond = newCond
+			v.changed = true
+		}
 	}
 
 	return stmt

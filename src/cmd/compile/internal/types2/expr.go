@@ -243,7 +243,7 @@ func isShift(op syntax.Operator) bool {
 func isComparison(op syntax.Operator) bool {
 	// Note: tokens are not ordered well to make this much easier
 	switch op {
-	case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq:
+	case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq, syntax.In:
 		return true
 	}
 	return false
@@ -576,15 +576,26 @@ func (checks *Checker) comparison(x, y *operand, op syntax.Operator, switchCase 
 			goto Error
 		}
 
+	case syntax.In:
+		// 'in' operator - transformer should have converted types already
+		// Just allow it through
+
 	default:
 		panic("unreachable")
 	}
 
 	// comparison is ok
 	if x.mode == constant_ && y.mode == constant_ {
-		x.val = constant.MakeBool(constant.Compare(x.val, op2tok[op], y.val))
-		// The operands are never materialized; no need to update
-		// their types.
+		if op == syntax.In {
+			// 'in' operator cannot be evaluated at compile time, make it runtime
+			x.mode = value
+			checks.updateExprType(x.expr, Default(x.typ), true)
+			checks.updateExprType(y.expr, Default(y.typ), true)
+		} else {
+			x.val = constant.MakeBool(constant.Compare(x.val, op2tok[op], y.val))
+			// The operands are never materialized; no need to update
+			// their types.
+		}
 	} else {
 		x.mode = value
 		// The operands have now their final types, which at run-

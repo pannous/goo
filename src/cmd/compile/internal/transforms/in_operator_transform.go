@@ -14,7 +14,7 @@ import (
 // InOperatorTransform handles the 'in' operator for strings and collections
 // Transforms expressions like "hello" in str to strings.Contains(str, "hello")
 // and item in slice to slices.Contains(slice, item)
-type InOperatorTransform struct{}  // Clean implementation using centralized ImportManager
+type InOperatorTransform struct{} // Clean implementation using centralized ImportManager
 
 func (t *InOperatorTransform) Name() string {
 	return "in_operator_transform"
@@ -26,14 +26,18 @@ func (t *InOperatorTransform) Priority() int {
 
 // NodeTransformer interface implementation
 func (t *InOperatorTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
-	// Only handle IN operations directly
+	// Only handle IN operations directly - let the main transformer framework do tree walking
 	if op, ok := node.(*syntax.Operation); ok {
-		return op.Op == syntax.In
+		if op.Op == syntax.In {
+			print("FOUND IN OPERATION\n")
+			return true
+		}
 	}
 	return false
 }
 
 func (t *InOperatorTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	// Only handle direct IN operations - main transformer framework handles tree walking
 	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.In {
 		return t.convertInOperation(op, ctx)
 	}
@@ -53,13 +57,24 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	return false
 }
 
-// convertInOperation converts "item in collection" to appropriate Go code
+// convertInOperation converts "for item in collection" to appropriate Go code
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	pos := op.Pos()
-	
+	println("Converting rune to string for 'in' operation")
+
+	// Handle rune in string: convert rune to string
+	if t.isRuneLiteral(op.X) && t.inferContainerType(op.Y, ctx) == "string" {
+		println("Converting rune to string for 'in' operation")
+		op.X = &syntax.CallExpr{
+			Fun:     &syntax.Name{Value: "string"},
+			ArgList: []syntax.Expr{op.X},
+		}
+		op.X.SetPos(pos)
+	}
+
 	// Determine the type of operation based on the container (op.Y)
 	containerType := t.inferContainerType(op.Y, ctx)
-	
+
 	switch containerType {
 	case "string":
 		return t.createStringContainsCall(op, pos)
@@ -83,7 +98,12 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 			return "string"
 		}
 	}
-	
+
+	// Check for iterator function calls
+	if t.isIteratorType(container) {
+		return "iterator"
+	}
+
 	// Check for composite literals (slices/arrays/maps)
 	if comp, ok := container.(*syntax.CompositeLit); ok {
 		if comp.Type != nil {
@@ -102,12 +122,7 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 		// If no explicit type, infer from usage - composite literals are usually slices
 		return "slice"
 	}
-	
-	// Check for iterator function calls
-	if t.isIteratorType(container) {
-		return "iterator"
-	}
-	
+
 	// Check context for variable types
 	if name, ok := container.(*syntax.Name); ok && ctx != nil && ctx.Types != nil {
 		if varType, exists := ctx.Types[name.Value]; exists {
@@ -122,7 +137,7 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 			}
 		}
 	}
-	
+
 	return "unknown"
 }
 
@@ -130,32 +145,32 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
 	// Use centralized import manager (NEW approach)
 	RequestStringsImport()
-	
+
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
-	
+
 	containsName := &syntax.Name{Value: "Contains"}
 	containsName.SetPos(pos)
-	
+
 	selectorExpr := &syntax.SelectorExpr{
 		X:   stringsName,
 		Sel: containsName,
 	}
 	selectorExpr.SetPos(pos)
-	
+
 	callExpr := &syntax.CallExpr{
 		Fun:     selectorExpr,
 		ArgList: []syntax.Expr{op.Y, op.X}, // Note: argument order is reversed for strings.Contains
 	}
 	callExpr.SetPos(pos)
-	
+
 	return callExpr
 }
 
 func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
 	// Generate proper inline string containment check without external imports
 	// Create: len(container) >= len(item) && (len(item) == 0 || stringIndexOf(container, item) >= 0)
-	
+
 	// For simplicity, create a function literal that does the containment check
 	// func() bool {
 	//   s, sub := container, item
@@ -165,13 +180,13 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, p
 	//   }
 	//   return false
 	// }()
-	
+
 	// Create the function body statements
 	sParam := &syntax.Name{Value: "s"}
 	sParam.SetPos(pos)
 	subParam := &syntax.Name{Value: "sub"}
 	subParam.SetPos(pos)
-	
+
 	// Assignment: s, sub := container, item
 	assignStmt := &syntax.AssignStmt{
 		Op:  syntax.Def, // :=
@@ -179,7 +194,7 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, p
 		Rhs: &syntax.ListExpr{ElemList: []syntax.Expr{op.Y, op.X}}, // container, item
 	}
 	assignStmt.SetPos(pos)
-	
+
 	// if len(sub) == 0 { return true }
 	lenSubCall := &syntax.CallExpr{
 		Fun:     &syntax.Name{Value: "len"},
@@ -187,109 +202,110 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, p
 	}
 	lenSubCall.SetPos(pos)
 	lenSubCall.Fun.SetPos(pos)
-	
+
 	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
 	zeroLit.SetPos(pos)
-	
+
 	lenCondition := &syntax.Operation{
 		Op: syntax.Eql,
 		X:  lenSubCall,
 		Y:  zeroLit,
 	}
 	lenCondition.SetPos(pos)
-	
+
 	trueLit := &syntax.Name{Value: "true"}
 	trueLit.SetPos(pos)
-	
+
 	emptyReturnStmt := &syntax.ReturnStmt{Results: trueLit}
 	emptyReturnStmt.SetPos(pos)
-	
+
 	ifEmptyBody := &syntax.BlockStmt{List: []syntax.Stmt{emptyReturnStmt}}
 	ifEmptyBody.SetPos(pos)
-	
+
 	ifEmptyStmt := &syntax.IfStmt{
 		Cond: lenCondition,
 		Then: ifEmptyBody,
 	}
 	ifEmptyStmt.SetPos(pos)
-	
+
 	// Simple loop-free approach: generate multiple substring checks
 	// For practicality, we'll create a simpler version that uses string slicing
 	// return len(s) >= len(sub) && (len(s) == 0 || s[:len(sub)] == sub || (len(s) > len(sub) && stringContains(s, sub)))
-	
+
 	// Actually, let's use strings.Contains but make sure the import is added
 	RequestStringsImport()
-	
+	//RegisterImportWithPos("strings", pos)
+
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
-	
+
 	containsName := &syntax.Name{Value: "Contains"}
 	containsName.SetPos(pos)
-	
+
 	selectorExpr := &syntax.SelectorExpr{
 		X:   stringsName,
 		Sel: containsName,
 	}
 	selectorExpr.SetPos(pos)
-	
+
 	callExpr := &syntax.CallExpr{
 		Fun:     selectorExpr,
 		ArgList: []syntax.Expr{op.Y, op.X}, // container, item
 	}
 	callExpr.SetPos(pos)
-	
+
 	return callExpr
 }
 
 func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
 	// Request slices import through centralized import manager
 	RequestSlicesImport()
-	
+
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
-	
+
 	containsName := &syntax.Name{Value: "Contains"}
 	containsName.SetPos(pos)
-	
+
 	selectorExpr := &syntax.SelectorExpr{
 		X:   slicesName,
 		Sel: containsName,
 	}
 	selectorExpr.SetPos(pos)
-	
+
 	callExpr := &syntax.CallExpr{
 		Fun:     selectorExpr,
 		ArgList: []syntax.Expr{op.Y, op.X}, // Note: argument order is reversed for slices.Contains
 	}
 	callExpr.SetPos(pos)
-	
+
 	return callExpr
 }
 
 func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
 	// For maps, "key in map" becomes "_, exists := map[key]; exists"
 	// Create: (func() bool { _, ok := container[item]; return ok })()
-	
+
 	// Create index expression: container[item]
 	indexExpr := &syntax.IndexExpr{
 		X:     op.Y,
 		Index: op.X,
 	}
 	indexExpr.SetPos(pos)
-	
+
 	// Create variables: _, ok
 	blankVar := &syntax.Name{Value: "_"}
 	blankVar.SetPos(pos)
-	
+
 	okVar := &syntax.Name{Value: "ok"}
 	okVar.SetPos(pos)
-	
+
 	// Create LHS list: _, ok
 	lhsList := &syntax.ListExpr{
 		ElemList: []syntax.Expr{blankVar, okVar},
 	}
 	lhsList.SetPos(pos)
-	
+
 	// Create assignment: _, ok := container[item]
 	assignStmt := &syntax.AssignStmt{
 		Op:  syntax.Def,
@@ -297,41 +313,41 @@ func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, pos sy
 		Rhs: indexExpr,
 	}
 	assignStmt.SetPos(pos)
-	
+
 	// Create return statement: return ok
 	returnStmt := &syntax.ReturnStmt{
 		Results: okVar,
 	}
 	returnStmt.SetPos(pos)
-	
+
 	// Create function body
 	body := &syntax.BlockStmt{
 		List: []syntax.Stmt{assignStmt, returnStmt},
 	}
 	body.SetPos(pos)
-	
+
 	// Create function type: func() bool
 	boolType := &syntax.Name{Value: "bool"}
 	boolType.SetPos(pos)
-	
+
 	funcType := &syntax.FuncType{
 		ResultList: []*syntax.Field{{Type: boolType}},
 	}
 	funcType.SetPos(pos)
-	
+
 	// Create function literal
 	funcLit := &syntax.FuncLit{
 		Type: funcType,
 		Body: body,
 	}
 	funcLit.SetPos(pos)
-	
+
 	// Create function call: (func() bool { ... })()
 	callExpr := &syntax.CallExpr{
 		Fun: funcLit,
 	}
 	callExpr.SetPos(pos)
-	
+
 	return callExpr
 }
 
@@ -358,4 +374,11 @@ func (t *InOperatorTransform) isIteratorType(expr syntax.Expr) bool {
 
 func init() {
 	RegisterTransformer(&InOperatorTransform{})
+}
+
+func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {
+	if lit, ok := expr.(*syntax.BasicLit); ok && lit.Kind == syntax.RuneLit {
+		return true
+	}
+	return false
 }

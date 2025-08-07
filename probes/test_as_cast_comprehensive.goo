@@ -11,4 +11,6 @@ printf("'1' as int: %d\n", val3)
 val4 := 3 as float
 printf("3 as float: %f\n", val4)
 
+check 'a' as string == "a"
+
 printf("All as cast tests completed\n")

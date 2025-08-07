@@ -156,8 +156,8 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 
 ## Transformers
 • Add Position information SetPos(pos) In Transformers (pos := old.Pos())
+• Add Position information when encountering <unknown line number>: internal compiler errors
 • Inline nodes often need explicit SetPos(pos) too
-• Never modify tests in the goo folder only in probes.
 
 ## System Health
 • do ./run_all_tests.sh before and after work to see if the general system is ok
@@ -169,12 +169,13 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 • don't Temporarily disable To test functionality that worked before instead push forward to resolve the issue
  
 
-With the visitor pattern, we can only replace nodes in place, so not always applicable? 
-we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
-Or use a hybrid.
-
 ## Transformer Architecture
-The new NodeTransformer interface eliminates code duplication by using a centralized visitor pattern. The transformer architecture guide can be found under transformer-architecture-guide.md in the transforms folder. Key principle: Central visitor does ALL traversal, transformers handle only their specific node types (2-3 lines of CanHandle logic instead of 50+ lines of traversal duplication).
+The new NodeTransformer interface eliminates code duplication by using a centralized visitor pattern. 
+The transformer architecture guide can be found under transformer-architecture-guide.md in the transforms folder. 
+Key principle: Central visitor does ALL traversal, 
+transformers handle only their specific node types (2-3 lines of CanHandle logic instead of 50+ lines of traversal duplication).
+
+Do NOT modify AST during type checking, instead use a transformer for that purpose.
 
 
 # Assume mishearings

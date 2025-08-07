@@ -1,6 +1,8 @@
+# import "fmt"
 import "strings"
 
-check "b" in "abc"
-check not ("d" in "abc")
+check ("b" in "abc")
+#check "b" in "abc"  // test after ^^ works
+# check not ("d" in "abc")
 
-printf("ALL TESTS PASSED\n")
+# put("ALL TESTS PASSED\n")

@@ -1987,6 +1987,8 @@ func (w *writer) expr(expr syntax.Expr) {
 		switch expr.Op {
 		case syntax.Shl, syntax.Shr:
 			// ok: operands are allowed to have different types
+		case syntax.In:
+			// ok: 'in' operator allows different types (rune in string, etc.)
 		default:
 			xtyp := w.p.typeOf(expr.X)
 			ytyp := w.p.typeOf(expr.Y)
