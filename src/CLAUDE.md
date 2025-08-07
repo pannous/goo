@@ -26,10 +26,8 @@ GOROOT=/opt/other/go ./make.bash 2>&1 | head -10
 !! Important! Never do destructive commands like remove, rm, git clean, etc even in YOLO mode: get explicit user confirmation !!
 
 After long tasks with surprising observations, 
-Write down the most essential insights of what you’ve learned into a file starting with that topic ending in ‘_guide.md’. Then, add a line in CLAUDE.MD noting that this guide can be found under that filename.”
-
-### Architectural Issues
-**Goo imports guide**: See goo_imports_architectural_issue_guide.md for details on why .goo imports are fundamentally broken and the recommended solutions.
+Write down the most essential insights of what you’ve learned into a file starting with that topic ending in -guide.md 
+Then, add a line in CLAUDE.MD noting that this guide can be found under that filename.”
 
 ### Style Guidelines
 
@@ -128,7 +126,7 @@ Create exactly one new file <git_root>/goo/test_{feature}.goo to test cases for 
 Only create ONE new test per feature and reuse existing tests for very similar features.
 Before committing quickly run these new tests with the freshly built ../bin/go 
 
-# Test Reporting and Regression 
+# Test Reporting and Regression
 Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` increases, commit to git!
 Check for regressions with:
 git diff HEAD~4 test-report.md | grep "\-✅"
