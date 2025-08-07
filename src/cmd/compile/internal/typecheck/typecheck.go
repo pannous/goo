@@ -393,6 +393,10 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return tcLenCap(n)
 
+	case ir.OTRUTHY:
+		n := n.(*ir.UnaryExpr)
+		return tcTruthy(n)
+
 	case ir.OMIN, ir.OMAX:
 		n := n.(*ir.CallExpr)
 		return tcMinMax(n)

@@ -206,7 +206,7 @@ func (e *escape) call(ks []hole, call ir.Node) {
 		}
 		e.discard(call.RType)
 
-	case ir.OLEN, ir.OCAP, ir.OREAL, ir.OIMAG, ir.OCLOSE, ir.OLISTSORTDESC, ir.OLISTPOP, ir.OLISTSHIFT:
+	case ir.OLEN, ir.OCAP, ir.OREAL, ir.OIMAG, ir.OCLOSE, ir.OTRUTHY, ir.OLISTSORTDESC, ir.OLISTPOP, ir.OLISTSHIFT:
 		call := call.(*ir.UnaryExpr)
 		e.discard(call.X)
 

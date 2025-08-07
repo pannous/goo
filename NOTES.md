@@ -1,3 +1,10 @@
+@annotations
+
+wright down the Most important Essentials Insights of what you have learned into a file ending with guide and starting with the topic then at a line in your clot.ME mentioning that this guy can be found under the file
+
+Instead of every transformer searching the whole AST three for the matching pattern let us completely rewrite this mechanism so that only the main transformed that go file searches the whole AST for those patterns and then call the correspondence transformer 
+
+
 Get Opus 4.1:
 Log out of Claude Code. Then go into your Claude settings on the Claude website, go to Claude Code, delete the authentication token.
 Now go back to your terminal, and do /login with claude code, follow the instructions, and that fixed it for me. Do /status when you get back in and hopefully it says Max...
