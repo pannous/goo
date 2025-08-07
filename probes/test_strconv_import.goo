@@ -1,0 +1,7 @@
+import "strconv"
+
+func main() {
+    // Simple test to see strconv import issue
+    result := "hello"
+    _ = result
+}

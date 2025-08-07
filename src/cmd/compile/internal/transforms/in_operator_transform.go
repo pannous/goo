@@ -7,14 +7,20 @@ package transforms
 import (
 	"cmd/compile/internal/syntax"
 	"fmt"
-	"os"
-	"strings"
 )
 
 // InOperatorTransform handles the 'in' operator for strings and collections
 // Transforms expressions like "hello" in str to strings.Contains(str, "hello")
 // and item in slice to slices.Contains(slice, item)
-type InOperatorTransform struct{} // Clean implementation using centralized ImportManager
+type InOperatorTransform struct{}
+
+type inOperatorVisitor struct {
+	transform          *InOperatorTransform
+	ctx                *TransformContext
+	changed            bool
+	needsStringsImport bool
+	needsSlicesImport  bool
+}
 
 func (t *InOperatorTransform) Name() string {
 	return "in_operator_transform"
@@ -24,57 +30,78 @@ func (t *InOperatorTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
-// NodeTransformer interface implementation
-func (t *InOperatorTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
-	// Only handle IN operations directly - let the main transformer framework do tree walking
-	if op, ok := node.(*syntax.Operation); ok {
-		if op.Op == syntax.In {
-			print("FOUND IN OPERATION\n")
-			return true
+// Transform using EXACT same pattern as StringMethodsTransform
+func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	fmt.Printf("InOperatorTransform.Transform called for package: %s\n", file.PkgName.Value)
+	
+	visitor := &inOperatorVisitor{transform: t, ctx: ctx}
+	syntax.Walk(file, visitor)
+
+	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
+		println("Adding strings import")
+		t.addStringsImport(file)
+	}
+	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
+		println("Adding slices import")
+		t.addSlicesImport(file)
+	}
+
+	return visitor.changed
+}
+
+// Visit implements syntax.Visitor interface - EXACT same pattern as StringMethodsTransform
+func (v *inOperatorVisitor) Visit(node syntax.Node) syntax.Visitor {
+	if node == nil {
+		return nil
+	}
+
+	switch n := node.(type) {
+	case *syntax.Operation:
+		if n.Op == syntax.In {
+			fmt.Printf("FOUND IN OPERATION: Converting '%s in %s'\n", 
+				nodeToString(n.X), nodeToString(n.Y))
+			
+			// Convert the IN operation
+			newExpr := v.transform.convertInOperation(n, v.ctx)
+			if newExpr != nil {
+				*n = *newExpr.(*syntax.Operation)
+				v.changed = true
+				
+				// Determine which import is needed
+				containerType := v.transform.inferContainerType(n.Y, v.ctx)
+				switch containerType {
+				case "string":
+					v.needsStringsImport = true
+				case "slice":
+					v.needsSlicesImport = true
+				}
+			}
 		}
 	}
-	return false
+	return v
+}
+
+// NodeTransformer interface - disabled to use legacy Transform approach
+func (t *InOperatorTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	return false // Use legacy Transform method instead
 }
 
 func (t *InOperatorTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
-	// Only handle direct IN operations - main transformer framework handles tree walking
-	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.In {
-		return t.convertInOperation(op, ctx)
-	}
-	return nil
+	return nil // Use legacy Transform method instead
 }
 
 func (t *InOperatorTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
-	// Use EXACT same pattern as working StringMethodsTransform  
-	changed := false
-	if GlobalImportManager != nil && len(GlobalImportManager.GetRequestedImports()) > 0 {
-		requests := GlobalImportManager.GetRequestedImports()
-		if _, needsStrings := requests["strings"]; needsStrings {
-			fmt.Printf("InOperatorTransform: Adding strings import using EXACT working method\n")
-			t.addStringsImport(file)
-			changed = true
-		}
-		// Clear requests after applying
-		GlobalImportManager.neededImports = make(map[string]string)
-	}
-	return changed
-}
-
-// Legacy Transform method for backward compatibility - not used in new architecture
-func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	// This method is kept for interface compatibility but not used
-	// The new NodeTransformer interface methods are used instead
-	return false
+	return false // No post-processing needed
 }
 
 // convertInOperation converts "for item in collection" to appropriate Go code
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	pos := op.Pos()
-	println("Converting rune to string for 'in' operation")
+	fmt.Printf("Converting 'in' operation at position %v\n", pos)
 
 	// Handle rune in string: convert rune to string
 	if t.isRuneLiteral(op.X) && t.inferContainerType(op.Y, ctx) == "string" {
-		println("Converting rune to string for 'in' operation")
+		fmt.Printf("Converting rune to string for 'in' operation\n")
 		op.X = &syntax.CallExpr{
 			Fun:     &syntax.Name{Value: "string"},
 			ArgList: []syntax.Expr{op.X},
@@ -84,6 +111,7 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *Tran
 
 	// Determine the type of operation based on the container (op.Y)
 	containerType := t.inferContainerType(op.Y, ctx)
+	fmt.Printf("Container type detected: %s\n", containerType)
 
 	switch containerType {
 	case "string":
@@ -92,10 +120,8 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *Tran
 		return t.createSliceContainsCall(op, pos)
 	case "map":
 		return t.createMapContainsCall(op, pos)
-	case "iterator":
-		return t.createIteratorContainsCall(op, pos)
 	default:
-		// Try to determine at runtime or fall back to string
+		// Default to string
 		return t.createStringContainsCall(op, pos)
 	}
 }
@@ -107,11 +133,6 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 		if basic.Kind == syntax.StringLit {
 			return "string"
 		}
-	}
-
-	// Check for iterator function calls
-	if t.isIteratorType(container) {
-		return "iterator"
 	}
 
 	// Check for composite literals (slices/arrays/maps)
@@ -136,10 +157,10 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 	// Check context for variable types
 	if name, ok := container.(*syntax.Name); ok && ctx != nil && ctx.Types != nil {
 		if varType, exists := ctx.Types[name.Value]; exists {
-			if strings.Contains(varType, "[]") {
+			if len(varType) > 2 && varType[:2] == "[]" {
 				return "slice"
 			}
-			if strings.Contains(varType, "map[") {
+			if len(varType) > 4 && varType[:4] == "map[" {
 				return "map"
 			}
 			if varType == "string" {
@@ -148,14 +169,11 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 		}
 	}
 
-	return "unknown"
+	return "string" // Default to string for unknown types
 }
 
 // createStringContainsCall creates strings.Contains(container, item)
 func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
-	// Use centralized import manager (NEW approach)
-	RequestStringsImport()
-
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
 
@@ -177,100 +195,7 @@ func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, pos
 	return callExpr
 }
 
-func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
-	// Generate proper inline string containment check without external imports
-	// Create: len(container) >= len(item) && (len(item) == 0 || stringIndexOf(container, item) >= 0)
-
-	// For simplicity, create a function literal that does the containment check
-	// func() bool {
-	//   s, sub := container, item
-	//   if len(sub) == 0 { return true }
-	//   for i := 0; i <= len(s)-len(sub); i++ {
-	//     if s[i:i+len(sub)] == sub { return true }
-	//   }
-	//   return false
-	// }()
-
-	// Create the function body statements
-	sParam := &syntax.Name{Value: "s"}
-	sParam.SetPos(pos)
-	subParam := &syntax.Name{Value: "sub"}
-	subParam.SetPos(pos)
-
-	// Assignment: s, sub := container, item
-	assignStmt := &syntax.AssignStmt{
-		Op:  syntax.Def, // :=
-		Lhs: &syntax.ListExpr{ElemList: []syntax.Expr{sParam, subParam}},
-		Rhs: &syntax.ListExpr{ElemList: []syntax.Expr{op.Y, op.X}}, // container, item
-	}
-	assignStmt.SetPos(pos)
-
-	// if len(sub) == 0 { return true }
-	lenSubCall := &syntax.CallExpr{
-		Fun:     &syntax.Name{Value: "len"},
-		ArgList: []syntax.Expr{subParam},
-	}
-	lenSubCall.SetPos(pos)
-	lenSubCall.Fun.SetPos(pos)
-
-	zeroLit := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
-	zeroLit.SetPos(pos)
-
-	lenCondition := &syntax.Operation{
-		Op: syntax.Eql,
-		X:  lenSubCall,
-		Y:  zeroLit,
-	}
-	lenCondition.SetPos(pos)
-
-	trueLit := &syntax.Name{Value: "true"}
-	trueLit.SetPos(pos)
-
-	emptyReturnStmt := &syntax.ReturnStmt{Results: trueLit}
-	emptyReturnStmt.SetPos(pos)
-
-	ifEmptyBody := &syntax.BlockStmt{List: []syntax.Stmt{emptyReturnStmt}}
-	ifEmptyBody.SetPos(pos)
-
-	ifEmptyStmt := &syntax.IfStmt{
-		Cond: lenCondition,
-		Then: ifEmptyBody,
-	}
-	ifEmptyStmt.SetPos(pos)
-
-	// Simple loop-free approach: generate multiple substring checks
-	// For practicality, we'll create a simpler version that uses string slicing
-	// return len(s) >= len(sub) && (len(s) == 0 || s[:len(sub)] == sub || (len(s) > len(sub) && stringContains(s, sub)))
-
-	// Actually, let's use strings.Contains but make sure the import is added
-	RequestStringsImport()
-	//RegisterImportWithPos("strings", pos)
-
-	stringsName := &syntax.Name{Value: "strings"}
-	stringsName.SetPos(pos)
-
-	containsName := &syntax.Name{Value: "Contains"}
-	containsName.SetPos(pos)
-
-	selectorExpr := &syntax.SelectorExpr{
-		X:   stringsName,
-		Sel: containsName,
-	}
-	selectorExpr.SetPos(pos)
-
-	callExpr := &syntax.CallExpr{
-		Fun:     selectorExpr,
-		ArgList: []syntax.Expr{op.Y, op.X}, // container, item
-	}
-	callExpr.SetPos(pos)
-
-	return callExpr
-}
-
 func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
-	// Request slices import through centralized import manager
-	RequestSlicesImport()
-
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
 
@@ -294,8 +219,8 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, pos 
 
 func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
 	// For maps, "key in map" becomes "_, exists := map[key]; exists"
-	// Create: (func() bool { _, ok := container[item]; return ok })()
-
+	// Create: (func() bool { _, ok := container[item]; return ok })(
+	
 	// Create index expression: container[item]
 	indexExpr := &syntax.IndexExpr{
 		X:     op.Y,
@@ -361,31 +286,6 @@ func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, pos sy
 	return callExpr
 }
 
-func (t *InOperatorTransform) createIteratorContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
-	// For now, treat iterator as slice - this would need more sophisticated handling
-	return t.createSliceContainsCall(op, pos)
-}
-
-// isIteratorType checks if an expression represents an iterator
-func (t *InOperatorTransform) isIteratorType(expr syntax.Expr) bool {
-	// Check for function calls that return iterators
-	if call, ok := expr.(*syntax.CallExpr); ok {
-		if fun, ok := call.Fun.(*syntax.SelectorExpr); ok {
-			// Check for methods that typically return iterators
-			methodName := fun.Sel.Value
-			return methodName == "Iter" || methodName == "Iterator" || methodName == "Range"
-		}
-	}
-	return false
-}
-
-// Import handling is now centralized in ImportManager
-// No need for individual transformer import methods
-
-func init() {
-	RegisterTransformer(&InOperatorTransform{})
-}
-
 func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {
 	if lit, ok := expr.(*syntax.BasicLit); ok && lit.Kind == syntax.RuneLit {
 		return true
@@ -393,22 +293,11 @@ func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {
 	return false
 }
 
-// hasImport checks if the file already has the given import (copy from working system)
-func (t *InOperatorTransform) hasImport(file *syntax.File, importPath string) bool {
-	// Check for empty import path to prevent panic
-	if len(importPath) == 0 {
-		return false
-	}
-
-	// Normalize import path (add quotes if missing)
-	normalizedPath := importPath
-	if normalizedPath[0] != '"' {
-		normalizedPath = "\"" + normalizedPath + "\""
-	}
-	
+// EXACT same import handling as StringMethodsTransform
+func (t *InOperatorTransform) hasImport(file *syntax.File, pkg string) bool {
 	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
+			if importDecl.Path != nil && importDecl.Path.Value == "\""+pkg+"\"" {
 				return true
 			}
 		}
@@ -416,9 +305,8 @@ func (t *InOperatorTransform) hasImport(file *syntax.File, importPath string) bo
 	return false
 }
 
-// addStringsImport adds the strings import using EXACT copy of working StringMethodsTransform.addStringsImport
 func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
-	if t.hasStringsImport(file) {
+	if t.hasImport(file, "strings") {
 		return
 	}
 
@@ -428,7 +316,7 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 			Kind:  syntax.StringLit,
 		},
 	}
-	fmt.Printf("DEBUG InOperatorTransform: Creating STRINGS import with Value='\"strings\"', Kind=%d - file has %d declarations before insert\n", syntax.StringLit, len(file.DeclList))
+	fmt.Printf("DEBUG in_operator: Creating import with Value='\"strings\"', Kind=%d - file has %d declarations before insert\n", syntax.StringLit, len(file.DeclList))
 	stringsImport.SetPos(syntax.Pos{})
 
 	var insertPos int
@@ -445,25 +333,55 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 	newDeclList = append(newDeclList, stringsImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
-	fmt.Printf("DEBUG InOperatorTransform: STRINGS import added - file now has %d declarations\n", len(file.DeclList))
 	
-	// Debug: print all import declarations
-	fmt.Printf("DEBUG: All imports after adding:\n")
+	fmt.Printf("DEBUG in_operator: Added strings import, file now has %d declarations\n", len(file.DeclList))
+}
+
+func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
+	if t.hasImport(file, "slices") {
+		return
+	}
+
+	slicesImport := &syntax.ImportDecl{
+		Path: &syntax.BasicLit{
+			Value: "\"slices\"",
+			Kind:  syntax.StringLit,
+		},
+	}
+	slicesImport.SetPos(syntax.Pos{})
+
+	var insertPos int
 	for i, decl := range file.DeclList {
-		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			fmt.Printf("  [%d] Import: %s (Kind=%d)\n", i, importDecl.Path.Value, importDecl.Path.Kind)
+		if _, ok := decl.(*syntax.ImportDecl); ok {
+			insertPos = i + 1
+		} else {
+			break
 		}
+	}
+
+	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
+	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
+	newDeclList = append(newDeclList, slicesImport)
+	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
+	file.DeclList = newDeclList
+}
+
+// Helper function to convert node to string for debugging
+func nodeToString(node syntax.Expr) string {
+	if node == nil {
+		return "<nil>"
+	}
+	
+	switch n := node.(type) {
+	case *syntax.BasicLit:
+		return n.Value
+	case *syntax.Name:
+		return n.Value
+	default:
+		return fmt.Sprintf("<%T>", node)
 	}
 }
 
-// hasStringsImport checks if strings import already exists using EXACT copy of working system 
-func (t *InOperatorTransform) hasStringsImport(file *syntax.File) bool {
-	for _, decl := range file.DeclList {
-		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if importDecl.Path != nil && importDecl.Path.Value == "\"strings\"" {
-				return true
-			}
-		}
-	}
-	return false
+func init() {
+	RegisterTransformer(&InOperatorTransform{})
 }

@@ -1,0 +1,4 @@
+// Test simple rune to string conversion
+r := 'b'
+s := string(r)
+printf("Rune: %c, String: %s\n", r, s)

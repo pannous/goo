@@ -1,0 +1,7 @@
+// Test if the conversion works in comparison context
+r := 'b'
+s := "abc"
+converted := string(r)
+// This should work since both are strings now
+check converted == "b"
+printf("Conversion test passed\n")

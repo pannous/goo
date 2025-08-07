@@ -1,0 +1,5 @@
+func main() {
+    // Test string methods that use the OLD auto-import system
+    result := "hello".contains("ell")  // This should auto-import strings via old system
+    _ = result
+}

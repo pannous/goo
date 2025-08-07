@@ -1,0 +1,8 @@
+import "strconv"
+
+func main() {
+    // Test actual strconv usage
+    num, err := strconv.Atoi("42")
+    _ = num
+    _ = err
+}
