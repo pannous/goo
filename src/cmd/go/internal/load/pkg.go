@@ -882,6 +882,12 @@ func loadPackageData(ctx context.Context, path, parentPath, parentDir, parentRoo
 		if newPath, dir, ok := fips140.ResolveImport(path); ok {
 			r.path = newPath
 			r.dir = dir
+		} else if isGooSourceImport(path, parentDir) {
+			// Special handling for imports from .goo files that might be local
+			// This allows bare imports like "helper" to be treated as local "./helper" 
+			// Check this BEFORE module resolution to allow local .goo imports
+			r.dir = filepath.Join(parentDir, path)
+			r.path = dirToImportPath(r.dir)
 		} else if cfg.ModulesEnabled && !strings.HasSuffix(path, ".goo") {
 			r.dir, r.path, r.err = modload.Lookup(parentPath, parentIsStd, path)
 		} else if build.IsLocalImport(path) {
@@ -1430,6 +1436,62 @@ func hasGoFiles(dir string) bool {
 	files, _ := os.ReadDir(dir)
 	for _, f := range files {
 		if !f.IsDir() && (strings.HasSuffix(f.Name(), ".go") || strings.HasSuffix(f.Name(), ".goo")) {
+			return true
+		}
+	}
+	return false
+}
+
+// isGooSourceImport checks if an import path should be treated as local for .goo files
+func isGooSourceImport(importPath string, parentDir string) bool {
+	// Only apply this logic for simple bare imports (no slashes, dots, etc.)
+	if strings.Contains(importPath, "/") || strings.Contains(importPath, "\\") || strings.Contains(importPath, ".") {
+		return false
+	}
+	
+	// Skip standard library packages
+	if isStandardLibraryPackage(importPath) {
+		return false
+	}
+	
+	// Check if the parent directory contains .goo files
+	// This indicates we're processing imports from a .goo file
+	hasGooFiles := false
+	if files, err := os.ReadDir(parentDir); err == nil {
+		for _, f := range files {
+			if !f.IsDir() && strings.HasSuffix(f.Name(), ".goo") {
+				hasGooFiles = true
+				break
+			}
+		}
+	}
+	
+	if !hasGooFiles {
+		return false
+	}
+	
+	// Check if the target directory exists locally
+	targetDir := filepath.Join(parentDir, importPath)
+	if _, err := os.Stat(targetDir); err == nil {
+		return true
+	}
+	
+	return false
+}
+
+// isStandardLibraryPackage checks if the given import path is a standard library package
+func isStandardLibraryPackage(pkg string) bool {
+	// This is a subset of common standard library packages
+	// We don't need the complete list since we're being conservative here
+	stdPkgs := []string{
+		"fmt", "os", "io", "net", "time", "strings", "strconv", "bytes",
+		"bufio", "context", "errors", "log", "math", "path", "regexp", "sort",
+		"sync", "testing", "unicode", "encoding", "crypto", "runtime",
+		"unsafe", "syscall", "reflect", "slices", "maps", "iter", "cmp",
+	}
+	
+	for _, std := range stdPkgs {
+		if pkg == std {
 			return true
 		}
 	}

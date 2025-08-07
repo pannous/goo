@@ -1,5 +1,5 @@
 package helper
 
-func Greet(name string) string {
-    return "Hello, " + name + "!"
+func Hello() string {
+    return "Hello from helper!!"
 }

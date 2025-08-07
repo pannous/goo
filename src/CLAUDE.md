@@ -28,6 +28,9 @@ GOROOT=/opt/other/go ./make.bash 2>&1 | head -10
 After long tasks with surprising observations, 
 Write down the most essential insights of what you’ve learned into a file starting with that topic ending in ‘_guide.md’. Then, add a line in CLAUDE.MD noting that this guide can be found under that filename.”
 
+### Architectural Issues
+**Goo imports guide**: See goo_imports_architectural_issue_guide.md for details on why .goo imports are fundamentally broken and the recommended solutions.
+
 ### Style Guidelines
 
 Always replace interface{} with any

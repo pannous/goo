@@ -186,8 +186,7 @@ func (w *SyntaxWalker) walkExpr(expr syntax.Expr) {
 		}
 	}
 
-	e := expr
-	switch e := e.(type) {
+	switch e := expr.(type) {
 	case *syntax.Operation:
 		w.walkExpr(e.X)
 		if e.Y != nil {

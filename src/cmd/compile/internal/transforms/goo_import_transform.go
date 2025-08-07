@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -23,12 +24,15 @@ func (t *GooImportTransform) Priority() int {
 }
 
 func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// Get source file directory for relative path resolution
+	sourceDir := filepath.Dir(file.Path.Filename())
+	
 	changed := false
 
 	// Transform import declarations
 	for i, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if newImportDecl := t.transformImportDecl(importDecl); newImportDecl != importDecl {
+			if newImportDecl := t.transformImportDeclWithContext(importDecl, sourceDir); newImportDecl != importDecl {
 				file.DeclList[i] = newImportDecl
 				changed = true
 			}
@@ -38,21 +42,27 @@ func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext)
 	return changed
 }
 
-func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) *syntax.ImportDecl {
+func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.ImportDecl, sourceDir string) *syntax.ImportDecl {
 	if importDecl.Path == nil || importDecl.Path.Kind != syntax.StringLit {
 		return importDecl
 	}
 
 	importPath := strings.Trim(importDecl.Path.Value, "\"")
 
+	// Debug: print what we're processing
+	println("GooImportTransform processing import:", importPath)
+
 	// Check if this is a .goo file import
 	if strings.HasSuffix(importPath, ".goo") {
+		println("Transforming .goo import:", importPath)
 
 		// Extract base name for package directory
 		baseName := strings.TrimSuffix(filepath.Base(importPath), ".goo")
 
 		// Create new relative import path
 		newImportPath := "./" + baseName
+
+		println("Transformed .goo import to:", newImportPath)
 
 		// Create new import declaration
 		newImportDecl := *importDecl
@@ -64,8 +74,7 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 	}
 
 	// Check if this is a local directory import that should be converted to relative
-	if t.shouldConvertToLocalImport(importPath) {
-
+	if t.shouldConvertToLocalImport(importPath, sourceDir) {
 		// Convert bare directory name to relative import
 		newImportPath := "./" + importPath
 
@@ -82,11 +91,28 @@ func (t *GooImportTransform) transformImportDecl(importDecl *syntax.ImportDecl) 
 }
 
 // shouldConvertToLocalImport checks if a bare import should be treated as local directory
-func (t *GooImportTransform) shouldConvertToLocalImport(importPath string) bool {
-	// DISABLED: This was interfering with auto-import system
-	// The auto-import system needs to see bare package names like "strings"
-	// to know when to auto-inject imports. Converting them to "./strings"
-	// breaks this detection.
+func (t *GooImportTransform) shouldConvertToLocalImport(importPath string, sourceDir string) bool {
+	// Skip if already relative or absolute
+	if strings.HasPrefix(importPath, "./") || strings.HasPrefix(importPath, "../") || filepath.IsAbs(importPath) {
+		return false
+	}
+	
+	// Skip standard library packages (simple heuristic: no dots or well-known names)  
+	if t.isStandardLibrary(importPath) {
+		return false
+	}
+	
+	// Skip if it looks like a module path (contains dots/slashes)
+	if strings.Contains(importPath, ".") || strings.Contains(importPath, "/") {
+		return false
+	}
+	
+	// Check if local directory exists relative to the source file directory
+	localDir := filepath.Join(sourceDir, importPath)
+	if _, err := os.Stat(localDir); err == nil {
+		return true
+	}
+	
 	return false
 }
 
