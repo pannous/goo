@@ -25,6 +25,9 @@ GOROOT=/opt/other/go ./make.bash 2>&1 | head -10
 
 !! Important! Never do destructive commands like remove, rm, git clean, etc even in YOLO mode: get explicit user confirmation !!
 
+After long tasks with surprising observations, 
+Write down the most essential insights of what you’ve learned into a file starting with that topic ending in ‘_guide.md’. Then, add a line in CLAUDE.MD noting that this guide can be found under that filename.”
+
 ### Style Guidelines
 
 Always replace interface{} with any
@@ -174,7 +177,7 @@ Or use a hybrid.
 I am using speech recognition which might misunderstand some words:
 parcel => parser , fights => files
 
-# automatic imports.
+# automatic imports
 since we moved the import resolver in the pipeline to after the Transformers all the import issues were gone
 If you ever encounter automatic import problems again just look at: 
 goo/test_strings_auto_import.goo                                                                   │

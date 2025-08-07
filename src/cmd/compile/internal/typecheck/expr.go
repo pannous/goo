@@ -655,6 +655,21 @@ func tcLenCap(n *ir.UnaryExpr) ir.Node {
 	return n
 }
 
+func tcTruthy(n *ir.UnaryExpr) ir.Node {
+	n.X = Expr(n.X)
+	n.X = DefaultLit(n.X, nil)
+	l := n.X
+	t := l.Type()
+	if t == nil {
+		n.SetType(nil)
+		return n
+	}
+	
+	// truthy accepts any type and returns bool
+	n.SetType(types.Types[types.TBOOL])
+	return n
+}
+
 // tcUnsafeData typechecks an OUNSAFESLICEDATA or OUNSAFESTRINGDATA node.
 func tcUnsafeData(n *ir.UnaryExpr) ir.Node {
 	n.X = Expr(n.X)
