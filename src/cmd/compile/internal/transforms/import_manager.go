@@ -43,12 +43,14 @@ func (im *ImportManager) ApplyImports(file *syntax.File) bool {
 		return false
 	}
 	
+	fmt.Printf("DEBUG: ImportManager.ApplyImports called, file has %d declarations\n", len(file.DeclList))
+	
 	changed := false
 	for packageName, importPath := range im.neededImports {
 		if !im.hasImport(file, importPath) {
 			im.addImport(file, packageName, importPath)
 			changed = true
-			fmt.Printf("ImportManager: Added import %s (%s)\n", importPath, packageName)
+			fmt.Printf("ImportManager: Added import %s (%s) - file now has %d declarations\n", importPath, packageName, len(file.DeclList))
 		}
 	}
 	
@@ -76,27 +78,28 @@ func (im *ImportManager) hasImport(file *syntax.File, importPath string) bool {
 
 // addImport adds a new import to the file
 func (im *ImportManager) addImport(file *syntax.File, packageName, importPath string) {
+	// Use EXACT same logic as the working old system
+	if im.hasImport(file, importPath) {
+		return
+	}
+
 	// Normalize import path (add quotes if missing)
 	if importPath[0] != '"' {
 		importPath = "\"" + importPath + "\""
 	}
-	
-	// Create new import declaration
+
+	// EXACT copy of working addStringsImport pattern
 	newImport := &syntax.ImportDecl{
 		Path: &syntax.BasicLit{
-			Kind:  syntax.StringLit,
 			Value: importPath,
+			Kind:  syntax.StringLit,
 		},
 	}
-	
-	// If package name is different from default, add alias
-	defaultPackageName := im.getDefaultPackageName(importPath)
-	if packageName != defaultPackageName {
-		newImport.LocalPkgName = &syntax.Name{Value: packageName}
-	}
-	
-	// Find insertion point (after existing imports)
-	insertPos := 0
+	fmt.Printf("DEBUG ImportManager: Creating import with Value='%s', Kind=%d\n", importPath, syntax.StringLit)
+	newImport.SetPos(syntax.Pos{})
+
+	// Find insertion point (after existing imports)  
+	var insertPos int
 	for i, decl := range file.DeclList {
 		if _, ok := decl.(*syntax.ImportDecl); ok {
 			insertPos = i + 1
@@ -104,8 +107,8 @@ func (im *ImportManager) addImport(file *syntax.File, packageName, importPath st
 			break
 		}
 	}
-	
-	// Insert the new import
+
+	// Insert the new import using EXACT same pattern
 	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
 	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
 	newDeclList = append(newDeclList, newImport)

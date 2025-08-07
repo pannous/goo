@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ func (t *FalseyTransform) Name() string {
 }
 
 func (t *FalseyTransform) Priority() int {
-	return 100 // Default priority - between list methods (50) and lambda (200)
+	return 150 // Run after in_operator_transform (100) to handle "not (x in y)" properly
 }
 
 // NodeTransformer interface implementation
@@ -39,9 +40,68 @@ func (t *FalseyTransform) CanHandle(node syntax.Node, ctx *TransformContext) boo
 
 func (t *FalseyTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
 	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Not {
+		// First, check if the operand (op.X) contains IN operations that need to be transformed
+		// If it does, we should let those be processed first by returning nil (no transformation)
+		hasIn := t.containsInOperation(op.X)
+		fmt.Printf("DEBUG falsey: NOT operation, contains IN operations: %t\n", hasIn)
+		if hasIn {
+			return nil // Let IN operations be processed first, then this NOT will be processed later
+		}
 		return t.createNotTruthyCall(op.X, ctx)
 	}
 	return nil
+}
+
+// containsInOperation recursively checks if an expression contains IN operations
+func (t *FalseyTransform) containsInOperation(expr syntax.Expr) bool {
+	if expr == nil {
+		return false
+	}
+	
+	fmt.Printf("DEBUG containsInOperation: checking %T\n", expr)
+	
+	switch e := expr.(type) {
+	case *syntax.Operation:
+		fmt.Printf("DEBUG containsInOperation: Operation with Op=%v\n", e.Op)
+		if e.Op == syntax.In {
+			return true // Found an IN operation
+		}
+		// Recursively check operands
+		if t.containsInOperation(e.X) {
+			return true
+		}
+		if e.Y != nil && t.containsInOperation(e.Y) {
+			return true
+		}
+	case *syntax.CallExpr:
+		// Check function and arguments
+		if t.containsInOperation(e.Fun) {
+			return true
+		}
+		if e.ArgList != nil {
+			for _, arg := range e.ArgList {
+				if t.containsInOperation(arg) {
+					return true
+				}
+			}
+		}
+	case *syntax.SelectorExpr:
+		return t.containsInOperation(e.X)
+	case *syntax.IndexExpr:
+		return t.containsInOperation(e.X) || t.containsInOperation(e.Index)
+	case *syntax.ListExpr:
+		for _, elem := range e.ElemList {
+			if t.containsInOperation(elem) {
+				return true
+			}
+		}
+	case *syntax.ParenExpr:
+		// Handle parenthesized expressions like ("x" in "abc")
+		return t.containsInOperation(e.X)
+	// Add other expression types as needed
+	}
+	
+	return false
 }
 
 func (t *FalseyTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {

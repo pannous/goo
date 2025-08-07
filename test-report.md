@@ -124,11 +124,17 @@ Running all tests in ./goo/ directory...
 ✅ conditional_test.goo
 ✅ debug_ast.goo
 ❌ debug_dots.goo
+✅ debug_import_ast.goo
+✅ debug_import_comparison.goo
+✅ debug_import_manager.goo
+✅ debug_import_structure.goo
+❌ debug_in_operator.goo
 ✅ debug_is_parsing.goo
 ❌ debug_simple.goo
 ❌ debug_spaces.goo
 ❌ debug_tokenize.goo
 ✅ debug_transform.goo
+❌ debug_visitor_order.goo
 ✅ ellipsis_test.goo
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
@@ -151,6 +157,8 @@ Running all tests in ./goo/ directory...
 ✅ simple_range_test.goo
 ❌ step_by_step.goo
 ❌ test_all_features.goo
+❌ test_all_imports.goo
+✅ test_all_refactored_transformers.goo
 ✅ test_and_assignment.goo
 ✅ test_and_complex.goo
 ✅ test_and_multiple.goo
@@ -161,11 +169,14 @@ Running all tests in ./goo/ directory...
 ✅ test_and_with_comparisons.goo
 ✅ test_array_vs_slice.goo
 ❌ test_as_cast_comprehensive.goo
+❌ test_auto_imports_working.goo
+✅ test_auto_return_refactor.goo
 ✅ test_bool_not.goo
 ✅ test_both_checks.goo
 ❌ test_broken_fixed.goo
 ✅ test_builtin_check.goo
 ✅ test_builtin_is.goo
+❌ test_centralized_imports.goo
 ✅ test_charAt_comprehensive.goo
 ✅ test_check_b_in.goo
 ❌ test_check_complex.goo
@@ -175,6 +186,7 @@ Running all tests in ./goo/ directory...
 ✅ test_check_not.goo
 ✅ test_check_rune_in.goo
 ✅ test_check_simple.goo
+❌ test_check_structure.goo
 ✅ test_class_methods_advanced.goo
 ❌ test_coalescing_elvis.goo
 ❌ test_comments_consolidated.goo
@@ -189,6 +201,9 @@ Running all tests in ./goo/ directory...
 ✅ test_debug_rune_in.goo
 ❌ test_dotdot_scanner.goo
 ❌ test_dotdot_usage.goo
+❌ test_double_not_in.goo
+❌ test_empty_list_refactor.goo
+✅ test_empty_list_simple.goo
 ✅ test_env_with_import.goo
 ✅ test_error_message.goo
 ✅ test_error_msg_fix.goo
@@ -196,8 +211,10 @@ Running all tests in ./goo/ directory...
 ✅ test_exact_copy.goo
 ❌ test_exclamation_syntax.goo
 ✅ test_existing_dotdotdot.goo
+✅ test_falsey_refactor.goo
 ✅ test_falsey.goo
 ❌ test_filter_clean.goo
+✅ test_fmt_vs_strings.goo
 ✅ test_for_in_basic.goo
 ✅ test_for_in_consolidated.goo
 ✅ test_go111_debug.goo
@@ -212,13 +229,20 @@ Running all tests in ./goo/ directory...
 ✅ test_import_stdlib_in.goo
 ✅ test_import_transform.goo
 ❌ test_in_complete.goo
+❌ test_in_debug_simple.goo
 ❌ test_in_error.goo
+❌ test_in_import_fix.goo
+❌ test_in_operator_correctness.goo
 ✅ test_in_operator_debug.goo
 ❌ test_in_operator_maps.goo
 ✅ test_in_operator_simple.goo
+❌ test_in_simple.goo
+✅ test_is_operator_refactor.goo
 ✅ test_is_simple.goo
 ❌ test_just_sortdesc.goo
 ✅ test_just_truthyAndOp.goo
+❌ test_lambda_quick.goo
+❌ test_lambda_simple.goo
 ✅ test_list_working.goo
 ❌ test_lists_consolidated.goo
 ❌ test_lists_methods.goo
@@ -240,6 +264,11 @@ Running all tests in ./goo/ directory...
 ✅ test_no_parens.goo
 ❌ test_non_modifying.goo
 ✅ test_not_comprehensive.goo
+❌ test_not_in_variable.goo
+❌ test_not_in.goo
+✅ test_null_coalesce_refactor.goo
+✅ test_old_vs_new_import.goo
+❌ test_only_in_operator.goo
 ❌ test_optional_chaining.goo
 ✅ test_original_examples.goo
 ✅ test_parens_only.goo
@@ -275,6 +304,8 @@ Running all tests in ./goo/ directory...
 ✅ test_sort_simple.goo
 ❌ test_sortdesc_only.goo
 ✅ test_step_by_step.goo
+✅ test_strconv_import.goo
+✅ test_strconv_usage.goo
 ❌ test_string_concat.goo
 ❌ test_string_methods_consolidated.goo
 ✅ test_strings_contains.goo
@@ -284,11 +315,11 @@ Running all tests in ./goo/ directory...
 ✅ test_truthiness_basic.goo
 ✅ test_truthy_and_basic.goo
 ✅ test_truthy_and_false.goo
-❌ test_truthy_and_object.goo
+✅ test_truthy_and_object.goo
 ✅ test_truthy_and_pointer.goo
-❌ test_truthy_and_simple.goo
 ❌ test_truthy_and_working.goo
 ✅ test_truthy_direct.goo
+✅ test_truthy_working_simple.goo
 ✅ test_try_catch_simple.goo
 ✅ test_try_propagation.goo
 ✅ test_try_simple_assignment.goo
@@ -305,6 +336,6 @@ Running all tests in ./goo/ directory...
 ✅ test_working_transforms.goo
 ❌ token_debug.goo
 ========================================
-Summary: 241/304 passed, 63 failed
+Summary: 257/335 passed, 78 failed
 ⚠️  Some tests failed
 Consider ./build-compiler.sh or do rollback!

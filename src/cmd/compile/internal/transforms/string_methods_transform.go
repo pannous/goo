@@ -1002,6 +1002,7 @@ func (t *StringMethodsTransform) addStringsImport(file *syntax.File) {
 			Kind:  syntax.StringLit,
 		},
 	}
+	println("DEBUG string_methods: Creating import with Value='\"strings\"', Kind=", syntax.StringLit)
 	stringsImport.SetPos(syntax.Pos{})
 
 	var insertPos int

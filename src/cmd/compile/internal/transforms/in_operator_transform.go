@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -13,10 +14,7 @@ import (
 // InOperatorTransform handles the 'in' operator for strings and collections
 // Transforms expressions like "hello" in str to strings.Contains(str, "hello")
 // and item in slice to slices.Contains(slice, item)
-type InOperatorTransform struct{
-	needsStringsImport  bool
-	needsSlicesImport   bool
-}
+type InOperatorTransform struct{}  // Clean implementation using centralized ImportManager
 
 func (t *InOperatorTransform) Name() string {
 	return "in_operator_transform"
@@ -43,7 +41,8 @@ func (t *InOperatorTransform) TransformNode(node syntax.Node, ctx *TransformCont
 }
 
 func (t *InOperatorTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
-	// Imports are now handled centrally by ImportManager
+	// With centralized import manager, PostProcess is not needed for imports
+	// All imports are handled centrally by GlobalImportManager.ApplyImports()
 	return false
 }
 
@@ -129,7 +128,7 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 
 // createStringContainsCall creates strings.Contains(container, item)
 func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
-	// Request strings import through centralized import manager
+	// Use centralized import manager (NEW approach)
 	RequestStringsImport()
 	
 	stringsName := &syntax.Name{Value: "strings"}
@@ -219,7 +218,7 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, p
 	// return len(s) >= len(sub) && (len(s) == 0 || s[:len(sub)] == sub || (len(s) > len(sub) && stringContains(s, sub)))
 	
 	// Actually, let's use strings.Contains but make sure the import is added
-	t.needsStringsImport = true
+	RequestStringsImport()
 	
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
@@ -354,80 +353,8 @@ func (t *InOperatorTransform) isIteratorType(expr syntax.Expr) bool {
 	return false
 }
 
-// hasImport checks if a file already imports a package
-func (t *InOperatorTransform) hasImport(file *syntax.File, packageName string) bool {
-	if packageName[0] != '"' {
-		packageName = "\"" + packageName + "\""
-	}
-	for _, decl := range file.DeclList {
-		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if importDecl.Path != nil && importDecl.Path.Value == packageName {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// addStringsImport adds "strings" import to the file
-func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
-	if t.hasImport(file, "strings") {
-		return
-	}
-
-	stringsImport := &syntax.ImportDecl{
-		Path: &syntax.BasicLit{
-			Value: "\"strings\"",
-			Kind:  syntax.StringLit,
-		},
-	}
-	stringsImport.SetPos(syntax.Pos{})
-
-	var insertPos int
-	for i, decl := range file.DeclList {
-		if _, ok := decl.(*syntax.ImportDecl); ok {
-			insertPos = i + 1
-		} else {
-			break
-		}
-	}
-
-	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
-	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
-	newDeclList = append(newDeclList, stringsImport)
-	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
-	file.DeclList = newDeclList
-}
-
-// addSlicesImport adds "slices" import to the file
-func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
-	if t.hasImport(file, "slices") {
-		return
-	}
-
-	slicesImport := &syntax.ImportDecl{
-		Path: &syntax.BasicLit{
-			Value: "\"slices\"",
-			Kind:  syntax.StringLit,
-		},
-	}
-	slicesImport.SetPos(syntax.Pos{})
-
-	var insertPos int
-	for i, decl := range file.DeclList {
-		if _, ok := decl.(*syntax.ImportDecl); ok {
-			insertPos = i + 1
-		} else {
-			break
-		}
-	}
-
-	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
-	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
-	newDeclList = append(newDeclList, slicesImport)
-	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
-	file.DeclList = newDeclList
-}
+// Import handling is now centralized in ImportManager
+// No need for individual transformer import methods
 
 func init() {
 	RegisterTransformer(&InOperatorTransform{})

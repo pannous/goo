@@ -303,6 +303,12 @@ func (v *CentralTransformVisitor) walkExpr(expr syntax.Expr) syntax.Expr {
 			e.Type = newType
 			v.changed = true
 		}
+	case *syntax.ParenExpr:
+		// Handle parenthesized expressions like ("x" in "abc")
+		if newX := v.walkExpr(e.X); newX != nil && newX != e.X {
+			e.X = newX
+			v.changed = true
+		}
 	}
 
 	return expr
