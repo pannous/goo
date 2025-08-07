@@ -23,10 +23,10 @@ func (t *LambdaTransform) Priority() int {
 
 // NodeTransformer interface implementation
 func (t *LambdaTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
-	// Only handle LambdaExpr nodes that are NOT method call arguments
-	// Let list_methods_transform handle those first
-	if lambda, ok := node.(*syntax.LambdaExpr); ok {
-		return !t.isMethodCallArgument(lambda)
+	// Handle ALL LambdaExpr nodes as fallback (high priority 300 ensures other transforms run first)
+	// This prevents any lambda from reaching the Go compiler backend untransformed
+	if _, ok := node.(*syntax.LambdaExpr); ok {
+		return true // Always handle lambdas as fallback to prevent compiler panics
 	}
 	return false
 }
@@ -54,10 +54,17 @@ func (t *LambdaTransform) Transform(file *syntax.File, ctx *TransformContext) bo
 func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syntax.FuncLit {
 	pos := lambda.Pos()
 	
-	// Create function type with parameters
+	// Create function type with parameters and return type
+	// For now, assume most lambdas return bool (common case for filter/where operations)
+	boolType := &syntax.Name{Value: "bool"}
+	boolType.SetPos(lambda.Body.Pos()) // Copy position from lambda body
+	
+	resultField := &syntax.Field{Type: boolType}
+	resultField.SetPos(lambda.Body.Pos()) // Copy position from lambda body
+	
 	funcType := &syntax.FuncType{
 		ParamList: lambda.ParamList,
-		// Result type will be inferred from the body expression
+		ResultList: []*syntax.Field{resultField},
 	}
 	funcType.SetPos(pos)
 	

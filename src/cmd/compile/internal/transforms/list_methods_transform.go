@@ -10,14 +10,67 @@ import (
 
 // ListMethodsTransform handles automatic transformation of list/slice method calls
 // to their corresponding Go standard library function calls.
-type ListMethodsTransform struct{}
+type ListMethodsTransform struct{
+	needsSlicesImport bool
+	needsSortImport   bool
+}
 
 func (t *ListMethodsTransform) Name() string {
 	return "list_methods_transform"
 }
 
 func (t *ListMethodsTransform) Priority() int {
-	return 50 // High priority - run before lambda transform (200)
+	return 50 // High priority - run before lambda transform (300)
+}
+
+// NodeTransformer interface implementation
+func (t *ListMethodsTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
+	// Handle method calls on lists/slices
+	if call, ok := node.(*syntax.CallExpr); ok {
+		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
+			methodName := selector.Sel.Value
+			// Check if this is a list method we handle
+			listMethods := []string{
+				"size", "length", "len", "count", "isEmpty", 
+				"first", "head", "start", "begin", "last", "tail", "end", "final", "get",
+				"contains", "includes", "has", "holds", "indexOf", "lastIndexOf", "index", "lastIndex",
+				"append", "add", "push", "prepend", "unshift", "insert", "remove", "delete", "removeAt", "pop", "shift",
+				"slice", "sub", "from", "to", "reverse", "reversed", "sort", "sorted", "sortBy", "sortDesc", "copy", "clone",
+				"unique", "distinct", "filter", "where", "chose", "that", "which", "apply", "transform", "convert",
+				"join", "combine", "merge", "sum", "min", "max", "equals",
+			}
+			for _, method := range listMethods {
+				if method == methodName {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func (t *ListMethodsTransform) TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node {
+	if call, ok := node.(*syntax.CallExpr); ok {
+		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
+			methodName := selector.Sel.Value
+			return t.transformListMethod(selector.X, methodName, call.ArgList, ctx)
+		}
+	}
+	return nil
+}
+
+func (t *ListMethodsTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
+	// Add required imports
+	changed := false
+	if t.needsSlicesImport {
+		t.addSlicesImport(file)
+		changed = true
+	}
+	if t.needsSortImport {
+		t.addSortImport(file)
+		changed = true
+	}
+	return changed
 }
 
 // transformListMethod transforms list method calls to standard library calls
@@ -732,6 +785,9 @@ func (t *ListMethodsTransform) createUniqueCall(receiver syntax.Expr) syntax.Exp
 
 func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr, ctx *TransformContext) syntax.Expr {
 	pos := receiver.Pos()
+	
+	// Mark that we need slices import
+	t.needsSlicesImport = true
 
 	// Fix lambda parameter type if needed
 	correctedPredicate := t.correctLambdaParameterType(receiver, predicate, ctx)
@@ -1284,12 +1340,20 @@ func (t *ListMethodsTransform) inferOperationReturnType(op *syntax.Operation, pa
 func (t *ListMethodsTransform) extractElementType(varName string, ctx *TransformContext) string {
 	// First try to get the actual type from context
 	if ctx != nil && ctx.Types != nil {
+		println("DEBUG extractElementType: looking for", varName)
+		for k, v := range ctx.Types {
+			println("DEBUG extractElementType: ctx.Types[" + k + "] = " + v)
+		}
 		if varType, exists := ctx.Types[varName]; exists {
+			println("DEBUG extractElementType: found", varName, "->", varType)
 			// Parse slice type: "[]User" -> "User"
 			if len(varType) > 2 && varType[:2] == "[]" {
 				elementType := varType[2:] // Remove "[]" prefix
+				println("DEBUG extractElementType: extracted element type:", elementType)
 				return elementType
 			}
+		} else {
+			println("DEBUG extractElementType: NOT found", varName)
 		}
 	}
 	
