@@ -1,11 +1,11 @@
-import "slices"
-import "strings"
+#import "slices"
+#import "strings"
 #check 3.14 as string == "3.14"
 #import "fmt"
 #import "reflect"
 #check 'a' in "abcde"  // true
 #check 1 in [1,2,3]
-#check "a" in "abcde"  // true
+check "a" in "abcde"  // true
 printf("OK")
 
 
