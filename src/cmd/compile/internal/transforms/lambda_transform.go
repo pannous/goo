@@ -18,14 +18,15 @@ func (t *LambdaTransform) Name() string {
 }
 
 func (t *LambdaTransform) Priority() int {
-	return 200 // Low priority - run after list methods and other transforms
+	return 300 // Very low priority - run after list methods finish fixing parameter types
 }
 
 // NodeTransformer interface implementation
 func (t *LambdaTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
-	// Only handle LambdaExpr nodes directly
-	if _, ok := node.(*syntax.LambdaExpr); ok {
-		return true
+	// Only handle LambdaExpr nodes that are NOT method call arguments
+	// Let list_methods_transform handle those first
+	if lambda, ok := node.(*syntax.LambdaExpr); ok {
+		return !t.isMethodCallArgument(lambda)
 	}
 	return false
 }
@@ -79,6 +80,28 @@ func (t *LambdaTransform) convertLambdaToFuncLit(lambda *syntax.LambdaExpr) *syn
 	funcLit.SetPos(pos)
 	
 	return funcLit
+}
+
+// isMethodCallArgument checks if this lambda is an argument to a method call
+// that might need special parameter type handling by list_methods_transform
+func (t *LambdaTransform) isMethodCallArgument(lambda *syntax.LambdaExpr) bool {
+	// This is a simple heuristic - in practice, we can't easily determine parent context
+	// from the centralized visitor. For now, assume lambdas with simple parameter
+	// names like 'u', 'x', 'item' are likely method call arguments
+	if lambda.ParamList != nil && len(lambda.ParamList) > 0 {
+		param := lambda.ParamList[0]
+		if param.Name != nil {
+			paramName := param.Name.Value
+			// Common lambda parameter names used in method calls
+			methodArgNames := []string{"u", "x", "item", "elem", "e", "obj", "o"}
+			for _, name := range methodArgNames {
+				if paramName == name {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func init() {

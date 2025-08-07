@@ -1,0 +1,7 @@
+// Test auto return transformer refactor
+func meaning() int {
+    42
+}
+
+result := meaning()
+println(result)

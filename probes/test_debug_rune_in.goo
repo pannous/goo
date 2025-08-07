@@ -1,0 +1,3 @@
+import "strings"
+result := 'd' in "abc"
+print("'d' in \"abc\" =", result)

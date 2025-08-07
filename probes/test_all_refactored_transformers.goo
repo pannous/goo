@@ -1,0 +1,26 @@
+// Comprehensive test of all refactored transformers working together
+
+// Test auto return transform
+func getValue() int {
+    42
+}
+
+// Test empty list transform  
+emptyList := []
+println("Empty list length:", len(emptyList))
+
+// Test string concatenation transform
+name := "Go"
+message := "Hello " + name + "!"
+println(message)
+
+// Test is operator transform
+value := getValue()
+if value is int {
+    println("Value is an integer:", value)
+}
+
+// Multiple transformers in one expression
+result := value is int
+complexMessage := "Result: " + result + " for value " + value
+println(complexMessage)

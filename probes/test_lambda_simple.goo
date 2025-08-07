@@ -1,0 +1,11 @@
+class User {
+    Name string
+    Age int
+}
+
+func main() {
+    users := []User{{Name: "Bob", Age: 17}, {Name: "Charlie", Age: 22}}
+    // Test that lambda parameter types are correct - this should compile now
+    old_users := users.filter(u => u.Age > 18)
+    _ = old_users
+}

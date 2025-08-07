@@ -1,0 +1,3 @@
+// Test empty list transformer refactor
+emptyList := []
+println(len(emptyList))

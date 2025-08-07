@@ -367,6 +367,9 @@ func ApplyTransformations(files []*syntax.File) {
 			fmt.Printf("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
 		}
 		
+		// Initialize import manager for this file
+		GlobalImportManager = NewImportManager()
+		
 		// Use centralized visitor for NodeTransformers first
 		centralVisitor := &CentralTransformVisitor{
 			context: ctx,
@@ -386,6 +389,12 @@ func ApplyTransformations(files []*syntax.File) {
 					centralVisitor.changed = true
 				}
 			}
+		}
+		
+		// Apply all requested imports centrally
+		if GlobalImportManager.ApplyImports(file) {
+			fmt.Printf("ImportManager: Applied imports to package: %s\n", file.PkgName.Value)
+			centralVisitor.changed = true
 		}
 		
 		if centralVisitor.changed {

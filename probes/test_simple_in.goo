@@ -1,0 +1,2 @@
+result := "b" in "abc"
+print("'b' in \"abc\" =", result)

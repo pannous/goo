@@ -1,0 +1,4 @@
+// Test is operator transformer refactor  
+value := 42
+result := value is int
+println(result)

@@ -1,0 +1,17 @@
+// Comprehensive test of the refactored transformer system
+name := "World"
+age := 25
+score := 95.5
+
+// Test string concatenation with different types
+greeting := "Hello, " + name + "!"
+ageMsg := "Age: " + age
+scoreMsg := "Score: " + score
+
+fmt.Println(greeting)
+fmt.Println(ageMsg) 
+fmt.Println(scoreMsg)
+
+// Test multiple transformations in one expression
+result := "User " + name + " is " + age + " years old"
+fmt.Println(result)

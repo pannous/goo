@@ -46,12 +46,12 @@ func (t *PrintfTransform) TransformNode(node syntax.Node, ctx *TransformContext)
 			case "printf":
 				// Convert printf() to fmt.Printf()
 				t.convertToFmtPrintf(call, name)
-				t.needsFmtImport = true
+				RequestFmtImport()
 				return call
 			case "put":
 				// Convert put() to fmt.Println()
 				t.convertToFmtPrintln(call, name)
-				t.needsFmtImport = true
+				RequestFmtImport()
 				return call
 			}
 		}
@@ -60,12 +60,7 @@ func (t *PrintfTransform) TransformNode(node syntax.Node, ctx *TransformContext)
 }
 
 func (t *PrintfTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
-	// Add fmt import if needed
-	if t.needsFmtImport && !t.hasImport(file, "fmt") {
-		t.addFmtImport(file)
-		t.needsFmtImport = false
-		return true
-	}
+	// Imports are now handled centrally by ImportManager
 	return false
 }
 

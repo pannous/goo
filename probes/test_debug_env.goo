@@ -1,0 +1,2 @@
+import "os"
+print("GO111MODULE =", os.Getenv("GO111MODULE"))

@@ -1,0 +1,7 @@
+import "strings"
+rune_d := 'd'
+str_d := string(rune_d)
+result := strings.Contains("abc", str_d)
+print("rune 'd' =", rune_d)
+print("string(rune_d) =", str_d)
+print("strings.Contains(\"abc\", str_d) =", result)

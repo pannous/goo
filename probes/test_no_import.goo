@@ -1,0 +1,2 @@
+check not ('d' in "abc")
+print("Test passed!")

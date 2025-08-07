@@ -1,0 +1,5 @@
+import "strings"
+result1 := 'b' in "abc"  
+result2 := 'd' in "abc"
+print("'b' in \"abc\" =", result1)  
+print("'d' in \"abc\" =", result2)

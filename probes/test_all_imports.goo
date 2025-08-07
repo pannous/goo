@@ -1,0 +1,22 @@
+import slices  // This should be automatically added
+
+class User {
+    Name string
+    Age int
+}
+
+func main() {
+    // Multiple features requiring different imports
+    users := []User{{Name: "Alice", Age: 25}, {Name: "Bob", Age: 17}}
+    
+    // Should auto-import slices
+    old_users := users.filter(u => u.Age > 18) 
+    user := old_users.first()
+    
+    // Should auto-import strings  
+    hasHello := "hello" in user.Name
+    
+    // Should auto-import fmt
+    printf("User over 18: %s, has hello: %t\n", user.Name, hasHello)
+    put("Test complete")
+}

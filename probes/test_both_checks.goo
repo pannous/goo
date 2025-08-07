@@ -1,0 +1,3 @@
+check 'b' in "abc"
+check not ('d' in "abc")
+print("Both tests passed!")

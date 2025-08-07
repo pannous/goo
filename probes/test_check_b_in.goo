@@ -1,0 +1,2 @@
+check 'b' in "abc"
+print("Test passed!")

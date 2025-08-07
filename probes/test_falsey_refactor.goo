@@ -1,0 +1,8 @@
+// Test falsey transformer refactor
+x := 0
+result := not x
+println("not 0 =", result)
+
+y := 42
+result2 := not y  
+println("not 42 =", result2)

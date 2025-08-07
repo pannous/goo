@@ -1,0 +1,16 @@
+package main
+
+import "fmt"
+
+func main() {
+	// This should trigger multiple transformers:
+	str := "hello world"
+	result := "hello" in str  // in_operator_transform
+	not_result := not result // falsey_transform
+	
+	// map dot notation
+	m := map[string]int{"key": 42}
+	value := m.key  // map_dot_transform
+	
+	fmt.Println(not_result, value)
+}

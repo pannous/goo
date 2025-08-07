@@ -1,0 +1,17 @@
+func main() {
+    // Test the actual logic correctness
+    result1 := "hello" in "hello world"    // Should be true
+    result2 := "xyz" in "hello world"      // Should be false - this was broken!
+    
+    if result1 {
+        // Should print
+    } else {
+        panic("ERROR: 'hello' in 'hello world' should be true")
+    }
+    
+    if result2 {
+        panic("ERROR: 'xyz' in 'hello world' should be false but got true")
+    } else {
+        // Should NOT print
+    }
+}

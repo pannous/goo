@@ -1,0 +1,6 @@
+import "helper"
+
+// Test both import and in operator
+message := helper.Hello()
+print("Message:", message)
+check "Hello" in message

@@ -32,7 +32,6 @@ class User {
 user := User{Name: "Alice", Age: 20}
 emptyUser := User{Name: "", Age: 0}
 
-check x and y   // todo transform to isTruthy(x) and isTruthy(y)  REGARDLESS OF TYPE!
 
 // Should print "Alice" (user is truthy, so return user.Name)
 result1 := user and user.Name // todo transform to isTruthy(user) and isTruthy(user.Name)

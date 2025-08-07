@@ -1,0 +1,3 @@
+check 'b' in "abc"     // Should pass: b is in abc  
+check not ('d' in "abc") // Should pass: d is NOT in abc
+print("Both in operator tests passed!")

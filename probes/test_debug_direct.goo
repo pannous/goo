@@ -1,0 +1,6 @@
+// Test direct boolean results
+result1 := 'b' in "abc"  
+result2 := 'd' in "abc"
+print("'b' in \"abc\" =", result1)  
+print("'d' in \"abc\" =", result2)
+print("Expected: true, false")

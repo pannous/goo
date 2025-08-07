@@ -1,0 +1,14 @@
+func testTruthyAnd() string {
+    user_name := "Charlie"
+    var result string
+    if user_name and len(user_name) > 0 {
+        result = user_name
+    } else {
+        result = "Anonymous"
+    }
+    return result
+}
+
+func main() {
+    _ = testTruthyAnd()
+}

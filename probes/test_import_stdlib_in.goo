@@ -1,0 +1,6 @@
+import "fmt"
+
+// Test both stdlib import and in operator  
+message := "hello world"
+fmt.Printf("Message: %s\n", message)
+check "hello" in message

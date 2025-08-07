@@ -1,0 +1,9 @@
+func main() {
+    // Test multiple import requirements
+    text := "hello world"
+    result1 := "hello" in text      // Should request strings import
+    result2 := "xyz" in text        // Should request strings import  
+    
+    printf("'hello' in text: %t\n", result1)   // Should request fmt import
+    printf("'xyz' in text: %t\n", result2)     // Should request fmt import
+}

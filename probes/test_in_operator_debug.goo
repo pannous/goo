@@ -1,0 +1,10 @@
+package main
+
+import "fmt"
+
+func main() {
+	str := "hello world"
+	if "hello" in str {
+		fmt.Println("Found hello!")
+	}
+}

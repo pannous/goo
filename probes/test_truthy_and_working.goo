@@ -1,10 +1,13 @@
+import slices
+
 class User {
     Name string
     Age int
 }
 
 users := []User{{Name: "Bob", Age: 17}, {Name: "Charlie", Age: 22}, {Name: "Alice", Age: 20}}
-user := users.filter(u => u.Age > 18).first()
+old_users := users.filter(u => u.Age > 18)
+user := old_users.first()
 
 var result string
 if user and user.Name {

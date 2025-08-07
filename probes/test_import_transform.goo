@@ -1,0 +1,6 @@
+import "helper"
+
+func main() {
+    message := helper.Hello()
+    print("Message:", message)
+}

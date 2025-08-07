@@ -1,0 +1,1 @@
+check not ('a' in "xyz") and (5 > 3)

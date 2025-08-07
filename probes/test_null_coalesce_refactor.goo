@@ -1,0 +1,4 @@
+// Test null coalescing transformer refactor
+var x *int
+result := x ?? 42
+println("Result:", result)

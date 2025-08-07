@@ -1,0 +1,6 @@
+import "helper.goo"
+
+func main() {
+    message := helper.Hello()
+    print("Message:", message)
+}

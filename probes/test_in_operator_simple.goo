@@ -1,0 +1,6 @@
+package main
+
+func main() {
+	result := "hello" in "hello world"
+	println(result)
+}
