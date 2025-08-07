@@ -9,6 +9,7 @@ import (
 	"cmd/compile/internal/ir"
 	"cmd/compile/internal/types"
 	"cmd/internal/src"
+	"fmt"
 	"internal/types/errors"
 )
 
@@ -183,6 +184,11 @@ func tcCheckNil(n *ir.UnaryExpr) ir.Node {
 }
 
 func tcCheck(n *ir.CheckStmt) ir.Node {
+	// Try to capture more meaningful error message before transformation
+	if n.OrigText == "" {
+		n.OrigText = fmt.Sprintf("%v", n.Cond)
+	}
+	
 	n.Cond = Expr(n.Cond)
 	// Ensure the condition has a type - convert to interface{} if needed
 	if n.Cond.Type() != nil && n.Cond.Type().IsUntyped() {

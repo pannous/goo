@@ -1359,6 +1359,7 @@ func (w *writer) stmt1(stmt syntax.Stmt) {
 		w.Code(stmtCheck)
 		w.pos(stmt)
 		w.expr(stmt.Cond)
+		w.String(stmt.OrigText)
 
 	case *syntax.DeclStmt:
 		for _, decl := range stmt.DeclList {

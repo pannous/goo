@@ -180,6 +180,7 @@ func (n *BranchStmt) Sym() *types.Sym { return n.Label }
 type CheckStmt struct {
 	miniStmt
 	Cond Node
+	OrigText string // Original source text of the condition for error messages
 }
 
 func NewCheckStmt(pos src.XPos, cond Node) *CheckStmt {

@@ -4035,6 +4035,10 @@ func (p *parser) stmtOrNil() Stmt {
 		s.pos = p.pos()
 		p.next()
 		s.Cond = p.expr()
+		
+		// Capture original source text for error messages using syntax printer
+		s.OrigText = String(s.Cond)
+		
 		return s
 	}
 

@@ -425,6 +425,7 @@ type (
 
 	CheckStmt struct {
 		Cond Expr
+		OrigText string // Original source text for error messages
 		stmt
 	}
 

@@ -5,6 +5,8 @@
 package walk
 
 import (
+	"fmt"
+
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/ir"
 	"cmd/compile/internal/typecheck"
@@ -68,7 +70,7 @@ func walkStmt(n ir.Node) ir.Node {
 			n = ir.NewBlockStmt(n.Pos(), init)
 			init = nil
 		}
-		
+
 		if len(init) > 0 {
 			switch n.Op() {
 			case ir.OAS, ir.OAS2, ir.OBLOCK:
@@ -241,22 +243,36 @@ func walkCheck(n *ir.CheckStmt) ir.Node {
 	// Convert check condition to: if !runtime.truthy(condition) { panic("check failed") }
 	var init ir.Nodes
 	cond := walkExpr(n.Cond, &init)
-	
+
 	// Convert condition to interface{} for truthy call
 	condIface := typecheck.Conv(cond, types.Types[types.TINTER])
-	
+
 	// Create call to runtime.truthy
 	truthyCall := mkcall("truthy", types.Types[types.TBOOL], &init, condIface)
-	
+
 	// Create NOT expression: !runtime.truthy(condition)
 	notCond := ir.NewUnaryExpr(n.Pos(), ir.ONOT, truthyCall)
 	notCond.SetType(types.Types[types.TBOOL])
 	notCond.SetTypecheck(1)
-	
-	// Create panic call
-	condStr := ir.NewBasicLit(n.Pos(), types.Types[types.TSTRING], constant.MakeString("check failed"))
+
+	// Create panic call with condition text
+	var condText string
+	if n.OrigText != "" {
+		condText = n.OrigText
+	} else {
+		condText = fmt.Sprintf("%v", n.Cond)
+		// If we just have a simple boolean literal, try to provide a better message
+		if condText == "false" || condText == "true" {
+			condText = "<transformed expression>"
+		}
+	}
+	if condText == "" {
+		condText = "<unknown condition>"
+	}
+	message := "check failed: " + condText
+	condStr := ir.NewBasicLit(n.Pos(), types.Types[types.TSTRING], constant.MakeString(message))
 	panicCall := mkcall("gopanic", nil, &init, condStr)
-	
+
 	// Create if statement: if !runtime.truthy(condition) { panic(...) }
 	ifStmt := ir.NewIfStmt(n.Pos(), notCond, []ir.Node{panicCall}, nil)
 	if len(init) > 0 {
