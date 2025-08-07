@@ -1,14 +1,6 @@
-package main
+import "helper"
 
-import "fmt"
-import "helper.goo"
-
-greeting := helper.Greet("World")
-sum := helper.Add(5, 3)
-product := helper.Multiply(4, 7)
-
-fmt.Printf("Greeting: %s\n", greeting)
-fmt.Printf("Sum: %d\n", sum)
-fmt.Printf("Product: %d\n", product)
-fmt.Printf("Default greeting: %s\n", helper.DefaultGreeting)
-fmt.Printf("Max value: %d\n", helper.MaxValue)
+message := helper.Hello()
+print("Message:", message)
+check "Hello" in message
+print("Import working successfully!")

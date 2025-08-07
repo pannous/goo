@@ -1,6 +1,0 @@
-package helper
-
-const MaxValue = 1000
-const MinValue = 0
-
-var DefaultGreeting = "Hello, World!"

@@ -7,7 +7,7 @@ Running all tests in ./goo/ directory...
 ✅ test_unused_import_warning.go
 ✅ tests.go
 ✅ debug_precedence.goo
-✅ helper.goo
+❌ helper.goo
 ❌ kitchensink.goo
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
@@ -41,12 +41,13 @@ Running all tests in ./goo/ directory...
 ✅ test_implicit_main.goo
 ✅ test_import_bare_syntax.goo
 ❌ test_import_file.goo
-❌ test_import_folder.goo
-❌ test_in_operator_auto_import.goo
+✅ test_import_folder_no_in.goo
+✅ test_import_folder.goo
+✅ test_in_operator_auto_import.goo
 ❌ test_in_operator_maps.goo
-✅ test_in_operator_rune_strings.goo
+❌ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
-✅ test_in_operator_strings.goo
+❌ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_is_operator.goo
 ✅ test_iterator_for_in.goo
@@ -183,11 +184,19 @@ Running all tests in ./goo/ directory...
 ✅ test_for_in_basic.goo
 ✅ test_for_in_consolidated.goo
 ❌ test_goo_file_import.goo
+✅ test_goo_import.goo
 ✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
 ✅ test_if_debug.goo
+✅ test_import_and_in.goo
+✅ test_import_folder_simple.goo
+✅ test_import_no_in.goo
+✅ test_import_stdlib_in.goo
+✅ test_import_transform.goo
 ❌ test_in_complete.goo
+✅ test_in_operator_debug.goo
 ❌ test_in_operator_maps.goo
+✅ test_in_operator_simple.goo
 ✅ test_is_simple.goo
 ❌ test_just_sortdesc.goo
 ✅ test_just_truthyAndOp.goo
@@ -227,7 +236,9 @@ Running all tests in ./goo/ directory...
 ❌ test_runtime_debug.goo
 ✅ test_runtime_functions.goo
 ✅ test_simple_and.goo
+✅ test_simple_check.goo
 ✅ test_simple_for_in.goo
+✅ test_simple_import.goo
 ✅ test_simple_range_expression.goo
 ✅ test_simple_synonyms.goo
 ✅ test_simple_truthy.goo
@@ -240,6 +251,7 @@ Running all tests in ./goo/ directory...
 ✅ test_step_by_step.goo
 ❌ test_string_concat.goo
 ❌ test_string_methods_consolidated.goo
+✅ test_transformers_with_imports.goo
 ✅ test_true_and_true.goo
 ✅ test_truthiness_basic.goo
 ✅ test_truthy_and_basic.goo
@@ -262,6 +274,6 @@ Running all tests in ./goo/ directory...
 ✅ test_working_transforms.goo
 ❌ token_debug.goo
 ========================================
-Summary: 206/261 passed, 55 failed
+Summary: 217/273 passed, 56 failed
 ⚠️  Some tests failed
 Consider ./build-compiler.sh or do rollback!

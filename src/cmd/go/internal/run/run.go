@@ -74,8 +74,7 @@ func init() {
 // shouldDisableModulesForGoo checks if we should auto-disable modules for .goo files
 // Only disables modules if:
 // 1. .goo files are present in args AND
-// 2. No go.mod file exists in current directory or parents AND  
-// 3. GO111MODULE is not explicitly set by user
+// 2. GO111MODULE is not explicitly set by user
 func shouldDisableModulesForGoo(args []string) bool {
 	// Check if any .goo files are being run
 	hasGooFiles := false
@@ -94,18 +93,10 @@ func shouldDisableModulesForGoo(args []string) bool {
 		return false // User has explicitly set it, respect their choice
 	}
 
-	// Check if go.mod exists in current directory or any parent
-	wd, err := os.Getwd()
-	if err != nil {
-		return false
-	}
-	
-	for dir := wd; dir != filepath.Dir(dir); dir = filepath.Dir(dir) {
-		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return false // go.mod found, keep modules enabled
-		}
-	}
-	return true // Safe to disable modules
+	// For .goo files with local imports, we always need GOPATH mode
+	// even if there's a go.mod file, because local .goo imports
+	// are fundamentally incompatible with Go modules
+	return true // Disable modules for .goo files
 }
 
 func runRun(ctx context.Context, cmd *base.Command, args []string) {

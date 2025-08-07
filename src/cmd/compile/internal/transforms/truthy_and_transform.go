@@ -255,21 +255,21 @@ func (t *TruthyAndTransform) createTruthyCheck(expr syntax.Expr, pos syntax.Pos)
 			// Check if int != 0
 			zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
 			zero.SetPos(pos)
-			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+			neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: zero}
 			neq.SetPos(pos)
 			return neq
 		case syntax.StringLit:
 			// Check if string != ""
 			empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
 			empty.SetPos(pos)
-			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: empty}
+			neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: empty}
 			neq.SetPos(pos)
 			return neq
 		case syntax.FloatLit:
 			// Check if float != 0.0
 			zero := &syntax.BasicLit{Kind: syntax.FloatLit, Value: "0.0"}
 			zero.SetPos(pos)
-			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+			neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: zero}
 			neq.SetPos(pos)
 			return neq
 		}
@@ -278,7 +278,7 @@ func (t *TruthyAndTransform) createTruthyCheck(expr syntax.Expr, pos syntax.Pos)
 		// Let's just assume they're integers for now (this is a limitation)
 		zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
 		zero.SetPos(pos)
-		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: zero}
+		neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: zero}
 		neq.SetPos(pos)
 		return neq
 	}
@@ -301,17 +301,17 @@ func (t *TruthyAndTransform) createSmartTruthyCheck(expr syntax.Expr, pos syntax
 		// This handles the common case better than != 0
 		nilName := &syntax.Name{Value: "nil"}
 		nilName.SetPos(pos)
-		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: nilName}
+		neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: nilName}
 		neq.SetPos(pos)
 		return neq
 	case *syntax.BasicLit:
 		// For literals, use the appropriate zero comparison
-		return t.createTruthyCheck(expr, pos)
+		return t.createTruthyCheck(e, pos)
 	default:
 		// For complex expressions, try nil comparison (works for pointers/interfaces)
 		nilName := &syntax.Name{Value: "nil"}
 		nilName.SetPos(pos)
-		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: nilName}
+		neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: nilName}
 		neq.SetPos(pos)
 		return neq
 	}
@@ -327,22 +327,22 @@ func (t *TruthyAndTransform) createBooleanTruthyCheck(expr syntax.Expr, pos synt
 		// If it's already boolean, it will work as-is
 		// If it's not boolean, the type checker will handle the conversion
 		e.SetPos(pos)  // Ensure position information is set
-		return expr
+		return e
 	case *syntax.SelectorExpr:
 		// For field access like user.Name, assume it's a string and check != ""
 		empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
 		empty.SetPos(pos)
-		neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: empty}
+		neq := &syntax.Operation{Op: syntax.Neq, X: e, Y: empty}
 		neq.SetPos(pos)
 		return neq
 	case *syntax.BasicLit:
 		// Use the original truthiness check for literals
-		return t.createTruthyCheck(expr, pos)
+		return t.createTruthyCheck(e, pos)
 	default:
 		// For other expressions, try to be more conservative
 		// Just return the expression as-is if it might already be boolean
-		expr.SetPos(pos)  // Ensure position information is set
-		return expr
+		e.SetPos(pos)  // Ensure position information is set
+		return e
 	}
 }
 
