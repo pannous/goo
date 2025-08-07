@@ -1,0 +1,3 @@
+x := 5
+result := typeMatches(x, "int")
+printf("typeMatches result: %v\n", result)

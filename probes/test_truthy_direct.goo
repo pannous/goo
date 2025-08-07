@@ -1,0 +1,3 @@
+x := 5
+result := truthy(x)
+printf("truthy result: %v\n", result)
