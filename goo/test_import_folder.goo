@@ -1,4 +1,4 @@
-import "helper"
+import "helper" // folder import ok!
 
 message := helper.Hello()
 print("Message:", message)
