@@ -1,0 +1,3 @@
+// Test the working string conversion pattern
+check 'a' as string == "a"
+printf("Working string conversion test passed\n")

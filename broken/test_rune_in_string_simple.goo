@@ -1,0 +1,2 @@
+result := 'b' in "abc"
+printf("Result: %v\n", result)

@@ -1,0 +1,6 @@
+// Test manual conversion of rune in string
+r := 'b'
+s := "abc"
+converted := string(r)
+result := strings.Contains(s, converted)
+printf("'%c' in \"%s\": %v\n", r, s, result)

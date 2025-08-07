@@ -1,0 +1,7 @@
+func main() {
+    text := "abc"
+    
+    // Test NOT + IN with variables (like the failing test)
+    result := not ("x" in text)  // This might fail
+    printf("result: %t\n", result)
+}

@@ -1,0 +1,7 @@
+func main() {
+    // Test ONLY in_operator (no string methods that would trigger old system)
+    result := "hello" in "hello world"  
+    if result {
+        // Do nothing - avoid printf to isolate the strings import issue
+    }
+}

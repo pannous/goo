@@ -1,0 +1,4 @@
+import "fmt"
+
+result := 'b' in "abc"
+fmt.Printf("'b' in \"abc\" = %v\n", result)

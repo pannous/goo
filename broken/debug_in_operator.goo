@@ -1,0 +1,6 @@
+func main() {
+    // Test only the in operator which should use strings import
+    text := "hello world"
+    result := "hello" in text
+    println(result)
+}

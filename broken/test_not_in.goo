@@ -1,0 +1,5 @@
+func main() {
+    // Test NOT + IN operations  
+    result := not ("x" in "abc")  // This should cause the error
+    printf("result: %t\n", result)
+}

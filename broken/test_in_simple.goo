@@ -1,0 +1,8 @@
+func main() {
+    // Test plain IN operations (not inside NOT)
+    result1 := "hello" in "hello world"  // Should work
+    result2 := "x" in "abc"             // Should work
+    
+    printf("result1: %t\n", result1)
+    printf("result2: %t\n", result2)
+}

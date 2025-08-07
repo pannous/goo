@@ -1,0 +1,3 @@
+// Simple test to debug rune in string transformation
+r := 'b' in "abc"
+printf("r = %v\n", r)

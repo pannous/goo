@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 )
 
 // StringMethodsTransform handles automatic transformation of string method calls
@@ -1002,7 +1003,7 @@ func (t *StringMethodsTransform) addStringsImport(file *syntax.File) {
 			Kind:  syntax.StringLit,
 		},
 	}
-	println("DEBUG string_methods: Creating import with Value='\"strings\"', Kind=", syntax.StringLit)
+	fmt.Printf("DEBUG string_methods: Creating import with Value='\"strings\"', Kind=%d - file has %d declarations before insert\n", syntax.StringLit, len(file.DeclList))
 	stringsImport.SetPos(syntax.Pos{})
 
 	var insertPos int
@@ -1019,6 +1020,15 @@ func (t *StringMethodsTransform) addStringsImport(file *syntax.File) {
 	newDeclList = append(newDeclList, stringsImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
+	fmt.Printf("DEBUG string_methods: Import added - file now has %d declarations\n", len(file.DeclList))
+	
+	// Debug: print all import declarations
+	fmt.Printf("DEBUG: All imports after adding (string_methods):\n")
+	for i, decl := range file.DeclList {
+		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
+			fmt.Printf("  [%d] Import: %s (Kind=%d)\n", i, importDecl.Path.Value, importDecl.Path.Kind)
+		}
+	}
 }
 
 func (t *StringMethodsTransform) hasImport(file *syntax.File, name string) bool {

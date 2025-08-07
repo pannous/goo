@@ -1,0 +1,6 @@
+func main() {
+    // Simple lambda test
+    users := []string{"Alice", "Bob"}  
+    filtered := users.filter(x => len(x) > 3)
+    printf("filtered: %v\n", filtered)
+}

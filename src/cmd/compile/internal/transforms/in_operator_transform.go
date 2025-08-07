@@ -45,9 +45,19 @@ func (t *InOperatorTransform) TransformNode(node syntax.Node, ctx *TransformCont
 }
 
 func (t *InOperatorTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
-	// With centralized import manager, PostProcess is not needed for imports
-	// All imports are handled centrally by GlobalImportManager.ApplyImports()
-	return false
+	// Use EXACT same pattern as working StringMethodsTransform  
+	changed := false
+	if GlobalImportManager != nil && len(GlobalImportManager.GetRequestedImports()) > 0 {
+		requests := GlobalImportManager.GetRequestedImports()
+		if _, needsStrings := requests["strings"]; needsStrings {
+			fmt.Printf("InOperatorTransform: Adding strings import using EXACT working method\n")
+			t.addStringsImport(file)
+			changed = true
+		}
+		// Clear requests after applying
+		GlobalImportManager.neededImports = make(map[string]string)
+	}
+	return changed
 }
 
 // Legacy Transform method for backward compatibility - not used in new architecture
@@ -379,6 +389,81 @@ func init() {
 func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {
 	if lit, ok := expr.(*syntax.BasicLit); ok && lit.Kind == syntax.RuneLit {
 		return true
+	}
+	return false
+}
+
+// hasImport checks if the file already has the given import (copy from working system)
+func (t *InOperatorTransform) hasImport(file *syntax.File, importPath string) bool {
+	// Check for empty import path to prevent panic
+	if len(importPath) == 0 {
+		return false
+	}
+
+	// Normalize import path (add quotes if missing)
+	normalizedPath := importPath
+	if normalizedPath[0] != '"' {
+		normalizedPath = "\"" + normalizedPath + "\""
+	}
+	
+	for _, decl := range file.DeclList {
+		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
+			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// addStringsImport adds the strings import using EXACT copy of working StringMethodsTransform.addStringsImport
+func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
+	if t.hasStringsImport(file) {
+		return
+	}
+
+	stringsImport := &syntax.ImportDecl{
+		Path: &syntax.BasicLit{
+			Value: "\"strings\"",
+			Kind:  syntax.StringLit,
+		},
+	}
+	fmt.Printf("DEBUG InOperatorTransform: Creating STRINGS import with Value='\"strings\"', Kind=%d - file has %d declarations before insert\n", syntax.StringLit, len(file.DeclList))
+	stringsImport.SetPos(syntax.Pos{})
+
+	var insertPos int
+	for i, decl := range file.DeclList {
+		if _, ok := decl.(*syntax.ImportDecl); ok {
+			insertPos = i + 1
+		} else {
+			break
+		}
+	}
+
+	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
+	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
+	newDeclList = append(newDeclList, stringsImport)
+	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
+	file.DeclList = newDeclList
+	fmt.Printf("DEBUG InOperatorTransform: STRINGS import added - file now has %d declarations\n", len(file.DeclList))
+	
+	// Debug: print all import declarations
+	fmt.Printf("DEBUG: All imports after adding:\n")
+	for i, decl := range file.DeclList {
+		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
+			fmt.Printf("  [%d] Import: %s (Kind=%d)\n", i, importDecl.Path.Value, importDecl.Path.Kind)
+		}
+	}
+}
+
+// hasStringsImport checks if strings import already exists using EXACT copy of working system 
+func (t *InOperatorTransform) hasStringsImport(file *syntax.File) bool {
+	for _, decl := range file.DeclList {
+		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
+			if importDecl.Path != nil && importDecl.Path.Value == "\"strings\"" {
+				return true
+			}
+		}
 	}
 	return false
 }

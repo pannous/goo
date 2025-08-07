@@ -1,0 +1,8 @@
+func main() {
+    text := "hello world"
+    needle := "hello"
+    
+    // Test double NOT + IN
+    result := not not (needle in text)  // Should work
+    printf("result: %t\n", result)
+}

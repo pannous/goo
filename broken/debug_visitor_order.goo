@@ -1,0 +1,9 @@
+func main() {
+    // Simple IN operation (should work)
+    result1 := "x" in "abc"
+    
+    // NOT + IN operation (currently fails)  
+    result2 := not ("x" in "abc")
+    
+    printf("results: %t %t\n", result1, result2)
+}

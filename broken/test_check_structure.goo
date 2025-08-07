@@ -1,0 +1,4 @@
+func main() {
+    // Reproduce exact structure from failing test
+    check not ("x" in "abc")    // This is line 19 structure
+}

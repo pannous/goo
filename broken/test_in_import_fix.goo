@@ -1,0 +1,8 @@
+package main
+
+func main() {
+	name := "world"
+	if "or" in name {
+		println("Found 'or' in world")
+	}
+}

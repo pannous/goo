@@ -26,10 +26,13 @@ func NewImportManager() *ImportManager {
 	}
 }
 
-// RequestImport registers that a package is needed
+// RequestImport registers that a package is needed - IMMEDIATE MODE for compatibility
 func (im *ImportManager) RequestImport(packageName, importPath string) {
 	im.neededImports[packageName] = importPath
 	fmt.Printf("ImportManager: Requesting import %s -> %s\n", packageName, importPath)
+	
+	// NOTE: We don't add imports immediately here because we don't have access to the file
+	// This will be handled in ApplyImports which should be called immediately after transforms
 }
 
 // GetRequestedImports returns all requested imports
@@ -61,14 +64,20 @@ func (im *ImportManager) ApplyImports(file *syntax.File) bool {
 
 // hasImport checks if the file already has the given import
 func (im *ImportManager) hasImport(file *syntax.File, importPath string) bool {
+	// Check for empty import path to prevent panic
+	if len(importPath) == 0 {
+		return false
+	}
+
 	// Normalize import path (add quotes if missing)
-	if importPath[0] != '"' {
-		importPath = "\"" + importPath + "\""
+	normalizedPath := importPath
+	if normalizedPath[0] != '"' {
+		normalizedPath = "\"" + normalizedPath + "\""
 	}
 	
 	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if importDecl.Path != nil && importDecl.Path.Value == importPath {
+			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
 				return true
 			}
 		}
@@ -76,29 +85,41 @@ func (im *ImportManager) hasImport(file *syntax.File, importPath string) bool {
 	return false
 }
 
-// addImport adds a new import to the file
+// addImport adds a new import to the file using the exact working pattern from StringMethodsTransform
 func (im *ImportManager) addImport(file *syntax.File, packageName, importPath string) {
-	// Use EXACT same logic as the working old system
-	if im.hasImport(file, importPath) {
+	// Check for empty import path to prevent panic
+	if len(importPath) == 0 {
+		fmt.Printf("ERROR: ImportManager.addImport called with empty importPath\n")
 		return
 	}
 
-	// Normalize import path (add quotes if missing)
-	if importPath[0] != '"' {
-		importPath = "\"" + importPath + "\""
+	// Use EXACT same normalization as working system
+	normalizedPath := importPath
+	if normalizedPath[0] != '"' {
+		normalizedPath = "\"" + normalizedPath + "\""
 	}
 
-	// EXACT copy of working addStringsImport pattern
+	// Use EXACT same hasImport check as working system
+	for _, decl := range file.DeclList {
+		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
+			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
+				fmt.Printf("DEBUG ImportManager: Import %s already exists\n", normalizedPath)
+				return
+			}
+		}
+	}
+
+	// Use EXACT same import creation as StringMethodsTransform.addStringsImport
 	newImport := &syntax.ImportDecl{
 		Path: &syntax.BasicLit{
-			Value: importPath,
+			Value: normalizedPath,
 			Kind:  syntax.StringLit,
 		},
 	}
-	fmt.Printf("DEBUG ImportManager: Creating import with Value='%s', Kind=%d\n", importPath, syntax.StringLit)
+	fmt.Printf("DEBUG ImportManager: Creating import with Value='%s', Kind=%d (FIXED)\n", normalizedPath, syntax.StringLit)
 	newImport.SetPos(syntax.Pos{})
 
-	// Find insertion point (after existing imports)  
+	// Use EXACT same insertion logic as working system
 	var insertPos int
 	for i, decl := range file.DeclList {
 		if _, ok := decl.(*syntax.ImportDecl); ok {
@@ -108,7 +129,7 @@ func (im *ImportManager) addImport(file *syntax.File, packageName, importPath st
 		}
 	}
 
-	// Insert the new import using EXACT same pattern
+	// Use EXACT same slice construction as working system
 	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
 	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
 	newDeclList = append(newDeclList, newImport)

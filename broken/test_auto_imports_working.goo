@@ -1,0 +1,5 @@
+func main() {
+    // Test all the auto-imports that are supposedly working
+    result1 := "hello" in "hello world"  // Should auto-import strings
+    printf("Result: %t\n", result1)     // Should auto-import fmt
+}
