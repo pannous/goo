@@ -43,7 +43,7 @@ Running all tests in ./goo/ directory...
 ✅ test_import_folder.goo
 ✅ test_in_operator_auto_import.goo
 ❌ test_in_operator_maps.goo
-❌ test_in_operator_rune_strings.goo
+✅ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
 ❌ test_in_operator_strings.goo
 ✅ test_interpolation.goo
@@ -76,7 +76,7 @@ Running all tests in ./goo/ directory...
 ✅ test_mixed.goo
 ✅ test_modify.goo
 ✅ test_nil.goo
-❌ test_not_in_operator_rune_strings.goo
+✅ test_not_in_operator_rune_strings.goo
 ✅ test_not_truthiness.goo
 ✅ test_not.goo
 ✅ test_pipe.goo
@@ -96,7 +96,7 @@ Running all tests in ./goo/ directory...
 ✅ test_string_concat.goo
 ✅ test_string_format_chain.goo
 ✅ test_string_format_simple.goo
-❌ test_string_in_check.goo
+✅ test_string_in_check.goo
 ✅ test_string_interpolation.goo
 ✅ test_string_methods_todo.goo
 ✅ test_string_methods.goo
@@ -188,6 +188,7 @@ Running all tests in ./goo/ directory...
 ✅ test_check_not.goo
 ✅ test_check_rune_in.goo
 ❌ test_check_rune.goo
+❌ test_check_simple_in.goo
 ✅ test_check_simple.goo
 ❌ test_check_structure.goo
 ✅ test_class_methods_advanced.goo
@@ -260,6 +261,7 @@ Running all tests in ./goo/ directory...
 ✅ test_map_dot_printf_only.goo
 ✅ test_map_string.goo
 ✅ test_minimal_and.goo
+❌ test_minimal_in.goo
 ❌ test_minimal_rune.goo
 ✅ test_multi_return_try.goo
 ✅ test_multi_var_while_in.goo
@@ -308,6 +310,7 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_lambda.goo
 ✅ test_simple_range_expression.goo
 ✅ test_simple_rune_true.goo
+❌ test_simple_string_in.goo
 ✅ test_simple_synonyms.goo
 ✅ test_simple_truthy.goo
 ✅ test_single_dot.goo
@@ -350,6 +353,6 @@ Running all tests in ./goo/ directory...
 ✅ test_working_transforms.goo
 ❌ token_debug.goo
 ========================================
-Summary: 262/349 passed, 87 failed
+Summary: 265/352 passed, 87 failed
 ⚠️  Some tests failed
 Consider ./build-compiler.sh or do rollback!

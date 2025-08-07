@@ -1,8 +1,7 @@
-# import "fmt"
 import "strings"
 
 check ("b" in "abc")
-#check "b" in "abc"  // test after ^^ works
-# check not ("d" in "abc")
+check "b" in "abc"  // test after ^^ works
+check not ("d" in "abc")
 
-# put("ALL TESTS PASSED\n")
+print("ALL TESTS PASSED\n")
