@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build transforms
+
 package transforms
 
 import (
 	"cmd/compile/internal/syntax"
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -45,19 +46,8 @@ func (t *InOperatorTransform) TransformNode(node syntax.Node, ctx *TransformCont
 }
 
 func (t *InOperatorTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
-	// Use EXACT same pattern as working StringMethodsTransform  
-	changed := false
-	if GlobalImportManager != nil && len(GlobalImportManager.GetRequestedImports()) > 0 {
-		requests := GlobalImportManager.GetRequestedImports()
-		if _, needsStrings := requests["strings"]; needsStrings {
-			fmt.Printf("InOperatorTransform: Adding strings import using EXACT working method\n")
-			t.addStringsImport(file)
-			changed = true
-		}
-		// Clear requests after applying
-		GlobalImportManager.neededImports = make(map[string]string)
-	}
-	return changed
+	// Let centralized ImportManager handle all imports
+	return false
 }
 
 // Legacy Transform method for backward compatibility - not used in new architecture
@@ -405,7 +395,7 @@ func (t *InOperatorTransform) hasImport(file *syntax.File, importPath string) bo
 	if normalizedPath[0] != '"' {
 		normalizedPath = "\"" + normalizedPath + "\""
 	}
-	
+
 	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
 			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
@@ -446,7 +436,7 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
 	fmt.Printf("DEBUG InOperatorTransform: STRINGS import added - file now has %d declarations\n", len(file.DeclList))
-	
+
 	// Debug: print all import declarations
 	fmt.Printf("DEBUG: All imports after adding:\n")
 	for i, decl := range file.DeclList {
