@@ -1,0 +1,4 @@
+import "strings"
+text := "hello world"
+result := "hello" in text
+printf("With import: %t\n", result)

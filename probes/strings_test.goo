@@ -1,0 +1,4 @@
+import "strings"
+text := "hello world"
+result := strings.Contains(text, "hello")
+printf("Direct strings.Contains: %t\n", result)

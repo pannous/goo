@@ -1,0 +1,5 @@
+import "fmt"
+text := "hello world"
+// Test if this gets transformed to strings.Contains call
+result := "hello" in text
+fmt.Printf("Debug: result = %t\n", result)

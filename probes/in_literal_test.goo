@@ -1,0 +1,2 @@
+result := "hello" in "hello world"
+printf("Literal test: %t\n", result)
