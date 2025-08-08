@@ -1,0 +1,12 @@
+import "strings"
+
+text := "hello world"
+substr := "hello"
+
+result1 := substr in text        // variable in variable
+result2 := "world" in text       // literal in variable
+result3 := "hello" in "hello world"  // literal in literal
+
+printf("substr in text: %t\n", result1)
+printf("'world' in text: %t\n", result2)
+printf("'hello' in 'hello world': %t\n", result3)

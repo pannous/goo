@@ -1,0 +1,5 @@
+import "strings"
+text := "hello world"
+// This should transform to: strings.Contains(text, "hello")
+result := "hello" in text
+printf("Result: %t\n", result)

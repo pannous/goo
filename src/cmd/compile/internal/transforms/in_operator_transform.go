@@ -219,10 +219,9 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 // createStringContainsCall creates strings.Contains(container, item) or inline version for GOPATH mode
 func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
 	gomod := os.Getenv("GO111MODULE")
-	// In GOPATH mode (modules disabled), generate inline string containment check
-	// instead of using strings.Contains to avoid import issues
-	// When GO111MODULE is empty, we're in auto mode, but for .goo files it gets disabled
-	if gomod == "off" || gomod == "" {
+	// Only use inline string containment for explicitly disabled modules
+	// Default to strings.Contains for reliability
+	if gomod == "off" {
 		return t.createInlineStringContains(op, visitor, pos)
 	}
 	

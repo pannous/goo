@@ -1,0 +1,2 @@
+result := "ell" in "hello"
+printf("\"ell\" in \"hello\": %t\n", result)

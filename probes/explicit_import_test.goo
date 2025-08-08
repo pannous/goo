@@ -1,0 +1,5 @@
+import "strings"
+text := "hello"
+needle := "ell"
+result := needle in text
+printf("With explicit import: %t\n", result)

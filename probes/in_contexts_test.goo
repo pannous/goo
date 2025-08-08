@@ -1,0 +1,17 @@
+// Test different in operator contexts
+
+// 1. rune in string
+result1 := 'h' in "hello"
+printf("'h' in \"hello\": %t\n", result1)
+
+// 2. string in string  
+result2 := "ell" in "hello"
+printf("\"ell\" in \"hello\": %t\n", result2)
+
+// 3. element in slice
+numbers := [1, 2, 3]
+result3 := 2 in numbers
+printf("2 in [1,2,3]: %t\n", result3)
+
+// 4. for loop context (separate from boolean context)
+// for x in numbers { ... }
