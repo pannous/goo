@@ -1,0 +1,4 @@
+func main() {
+    // Test fmt import only (should work according to our tests)
+    printf("Testing fmt import\n")
+}

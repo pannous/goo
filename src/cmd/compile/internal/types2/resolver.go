@@ -739,9 +739,9 @@ func (checks *Checker) errorUnusedPkg(obj *PkgName) {
 		elem = elem[i+1:]
 	}
 	if obj.name == "" || obj.name == "." || obj.name == elem {
-		checks.warningf(obj, UnusedImport, "%q imported and not used (warning only)", path)
+		checks.warningf(obj, UnusedImport, "%q imported and not used (warning only)\n", path)
 	} else {
-		checks.warningf(obj, UnusedImport, "%q imported as %s and not used (warning only)", path, obj.name)
+		checks.warningf(obj, UnusedImport, "%q imported as %s and not used (warning only)\n", path, obj.name)
 	}
 }
 

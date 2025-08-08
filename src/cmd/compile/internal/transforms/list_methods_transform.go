@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 )
 
 // ListMethodsTransform handles automatic transformation of list/slice method calls
@@ -29,18 +30,27 @@ func (t *ListMethodsTransform) CanHandle(node syntax.Node, ctx *TransformContext
 	if call, ok := node.(*syntax.CallExpr); ok {
 		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
 			methodName := selector.Sel.Value
+			
+			// First check if this is a list expression - if not, don't handle it  
+			if !t.isListExpression(selector.X, ctx) {
+				fmt.Printf("DEBUG: CanHandle rejecting %s - not a list expression\n", methodName)
+				return false
+			}
+			fmt.Printf("DEBUG: CanHandle checking method %s on list expression\n", methodName)
+			
 			// Check if this is a list method we handle
 			listMethods := []string{
 				"size", "length", "len", "count", "isEmpty", 
 				"first", "head", "start", "begin", "last", "tail", "end", "final", "get",
-				"contains", "includes", "has", "holds", "indexOf", "lastIndexOf", "index", "lastIndex",
-				"append", "add", "push", "prepend", "unshift", "insert", "remove", "delete", "removeAt", "pop", "shift",
+				"contains", "includes", "has", "holds", "indexOf", "lastIndexOf", "index", "lastIndex", "find", "search", "locate",
+				"append", "add", "push", "concat", "prepend", "unshift", "insert", "remove", "delete", "removeAt", "pop", "shift",
 				"slice", "sub", "from", "to", "reverse", "reversed", "sort", "sorted", "sortBy", "sortDesc", "copy", "clone",
 				"unique", "distinct", "filter", "where", "chose", "that", "which", "apply", "transform", "convert",
 				"join", "combine", "merge", "sum", "min", "max", "equals",
 			}
 			for _, method := range listMethods {
 				if method == methodName {
+					fmt.Printf("DEBUG: CanHandle returning true for method %s\n", methodName)
 					return true
 				}
 			}
@@ -53,7 +63,14 @@ func (t *ListMethodsTransform) TransformNode(node syntax.Node, ctx *TransformCon
 	if call, ok := node.(*syntax.CallExpr); ok {
 		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
 			methodName := selector.Sel.Value
-			return t.transformListMethod(selector.X, methodName, call.ArgList, ctx)
+			fmt.Printf("DEBUG: TransformNode called with method %s\n", methodName)
+			result := t.transformListMethod(selector.X, methodName, call.ArgList, ctx)
+			if result != nil {
+				fmt.Printf("DEBUG: TransformNode returning transformed node for %s\n", methodName)
+			} else {
+				fmt.Printf("DEBUG: TransformNode returning nil for %s\n", methodName)
+			}
+			return result
 		}
 	}
 	return nil
@@ -100,10 +117,12 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 	// Search methods
 	case "contains", "includes", "has", "holds":
 		if len(args) == 1 {
+			t.needsSlicesImport = true
 			return t.createContainsCall(receiver, args[0])
 		}
 	case "indexOf", "find", "search", "locate":
 		if len(args) == 1 {
+			t.needsSlicesImport = true
 			return t.createIndexCall(receiver, args[0])
 		}
 	case "lastIndexOf":
@@ -180,6 +199,7 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		}
 	case "apply", "transform", "convert":
 		if len(args) == 1 {
+			fmt.Printf("DEBUG: transformListMethod processing apply method\n")
 			return t.createMapCall(receiver, args[0], ctx)
 		}
 
@@ -211,6 +231,7 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 }
 
 func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	fmt.Printf("DEBUG: ListMethodsTransform.Transform called (old interface)\n")
 	changed := false
 
 	// Transform all declarations with enhanced traversal
@@ -222,12 +243,11 @@ func (t *ListMethodsTransform) Transform(file *syntax.File, ctx *TransformContex
 		}
 	}
 
-	// For now, skip adding slices import to avoid import errors
-	// TODO: Add smart import detection based on which methods are used
-	// if changed && !t.hasImport(file, "slices") {
-	// 	println("Adding slices import")
-	// 	t.addSlicesImport(file)
-	// }
+	// Add slices import only if we actually use slices functions (following breakthrough.md solution)
+	if changed && t.needsSlicesImport && !t.hasImport(file, "slices") {
+		println("Adding slices import")
+		t.addSlicesImport(file)
+	}
 
 	return changed
 }
@@ -816,38 +836,9 @@ func (t *ListMethodsTransform) createFilterCall(receiver, predicate syntax.Expr,
 func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ctx *TransformContext) syntax.Expr {
 	pos := receiver.Pos()
 
-	// Fix lambda parameter type if needed - we'll compute element type first
-	correctedTransform := transform
-
-	// Get input and output types for slices.Map[SliceType, ResultElementType]
-	receiverName := t.getReceiverName(receiver)
-	
-	// Use enhanced chained method type inference
-	sliceType := t.inferChainedMethodType(receiver, "self", ctx)
-	if sliceType == "" {
-		sliceType = t.getSliceType(receiverName, ctx)
-	}
-	if sliceType == "" {
-		sliceType = "[]any"
-	}
-	
-	// Extract element type for lambda parameter inference
-	elementType := ""
-	if len(sliceType) > 2 && sliceType[:2] == "[]" {
-		elementType = sliceType[2:]
-	} else {
-		elementType = t.extractElementType(receiverName, ctx)
-	}
-	
-	// Now fix the lambda with the correct element type
-	correctedTransform = t.correctLambdaParameterTypeWithElement(transform, elementType, ctx)
-	
-	outputType := t.inferLambdaReturnType(transform.(*syntax.LambdaExpr).Body, elementType)
-	if outputType == "" {
-		outputType = "any"
-	}
-
-	println("DEBUG: createMapCall using types:", sliceType, "->", outputType, "(element:", elementType, ")")
+	fmt.Printf("DEBUG: createMapCall called for apply/transform/convert\n")
+	// Use slices.Map for proper transformation
+	t.needsSlicesImport = true
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
@@ -855,31 +846,15 @@ func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ct
 	mapName := &syntax.Name{Value: "Map"}
 	mapName.SetPos(pos)
 
-	// Create type parameters: [SliceType, ResultElementType]
-	// Use simple Name nodes for generic type parameters
-	sliceTypeName := &syntax.Name{Value: sliceType}
-	sliceTypeName.SetPos(pos)
-	outputTypeName := &syntax.Name{Value: outputType}  
-	outputTypeName.SetPos(pos)
-
-	// Create the selector: slices.Map
 	selector := &syntax.SelectorExpr{
 		X:   slicesName,
 		Sel: mapName,
 	}
 	selector.SetPos(pos)
 
-	// Create the type parameter list: [SliceType, ResultElementType]
-	typeParamList := &syntax.ListExpr{
-		ElemList: []syntax.Expr{sliceTypeName, outputTypeName},
-	}
-	typeParamList.SetPos(pos)
-
-	// For now, use slices.Map without explicit type parameters to avoid AST issues
-	// Let Go's type inference handle the generics
 	call := &syntax.CallExpr{
 		Fun:     selector,
-		ArgList: []syntax.Expr{receiver, correctedTransform},
+		ArgList: []syntax.Expr{receiver, transform},
 	}
 	call.SetPos(pos)
 
@@ -963,6 +938,10 @@ func (t *ListMethodsTransform) isListExpression(expr syntax.Expr, ctx *Transform
 	if name, ok := expr.(*syntax.Name); ok {
 		if ctx != nil && ctx.Types != nil {
 			varType := ctx.Types[name.Value]
+			// Explicitly exclude string types
+			if varType == "string" {
+				return false
+			}
 			// Check if it's any slice type (starts with []...)
 			if len(varType) >= 2 && varType[:2] == "[]" {
 				return true

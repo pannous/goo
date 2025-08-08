@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build transforms
+// //go:build transforms WE NEED IT as interface
 
 package transforms
 
@@ -26,11 +26,16 @@ func NewImportManager() *ImportManager {
 	}
 }
 
+// Reset clears all requested imports
+func (im *ImportManager) Reset() {
+	im.neededImports = make(map[string]string)
+}
+
 // RequestImport registers that a package is needed - IMMEDIATE MODE for compatibility
 func (im *ImportManager) RequestImport(packageName, importPath string) {
 	im.neededImports[packageName] = importPath
 	fmt.Printf("ImportManager: Requesting import %s -> %s\n", packageName, importPath)
-	
+
 	// NOTE: We don't add imports immediately here because we don't have access to the file
 	// This will be handled in ApplyImports which should be called immediately after transforms
 }
@@ -45,18 +50,24 @@ func (im *ImportManager) ApplyImports(file *syntax.File) bool {
 	if len(im.neededImports) == 0 {
 		return false
 	}
-	
+
 	fmt.Printf("DEBUG: ImportManager.ApplyImports called, file has %d declarations\n", len(file.DeclList))
-	
+	fmt.Printf("DEBUG: ImportManager has %d requested imports\n", len(im.neededImports))
+	for pkg, path := range im.neededImports {
+		fmt.Printf("DEBUG: ImportManager requested: %s -> %s\n", pkg, path)
+	}
+
 	changed := false
 	for packageName, importPath := range im.neededImports {
 		if !im.hasImport(file, importPath) {
 			im.addImport(file, packageName, importPath)
 			changed = true
 			fmt.Printf("ImportManager: Added import %s (%s) - file now has %d declarations\n", importPath, packageName, len(file.DeclList))
+		} else {
+			fmt.Printf("DEBUG: ImportManager: import %s already exists, skipping\n", importPath)
 		}
 	}
-	
+
 	// Clear requests after applying
 	im.neededImports = make(map[string]string)
 	return changed
@@ -74,7 +85,7 @@ func (im *ImportManager) hasImport(file *syntax.File, importPath string) bool {
 	if normalizedPath[0] != '"' {
 		normalizedPath = "\"" + normalizedPath + "\""
 	}
-	
+
 	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
 			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
@@ -141,7 +152,7 @@ func (im *ImportManager) addImport(file *syntax.File, packageName, importPath st
 func (im *ImportManager) getDefaultPackageName(importPath string) string {
 	// Remove quotes
 	path := strings.Trim(importPath, "\"")
-	
+
 	// Extract last component
 	parts := strings.Split(path, "/")
 	if len(parts) > 0 {

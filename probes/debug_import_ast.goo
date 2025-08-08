@@ -1,0 +1,9 @@
+func main() {
+    // Test with string methods (working)
+    result1 := "hello".contains("ell")
+    
+    // Test with in operator (failing)  
+    result2 := "hello" in "hello world"
+    
+    _, _ = result1, result2
+}

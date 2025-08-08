@@ -1,0 +1,5 @@
+import "fmt"
+
+result1 := "hello".toUpper()  // This should trigger string_methods_transform
+result2 := 'b' in "abc"       // This should trigger in_operator_transform  
+fmt.Printf("Results: %s, %v\n", result1, result2)

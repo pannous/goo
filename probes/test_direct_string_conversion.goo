@@ -1,0 +1,3 @@
+// Test direct string conversion
+check string('a') == "a"
+printf("Direct string conversion test passed\n")

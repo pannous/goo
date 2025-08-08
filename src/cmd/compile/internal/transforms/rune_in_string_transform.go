@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build transforms
+
 package transforms
 
 import (
@@ -25,14 +27,14 @@ func (t *RuneInStringTransform) CanHandle(node syntax.Node, ctx *TransformContex
 	if op, ok := node.(*syntax.Operation); ok {
 		return op.Op == syntax.In && t.isRuneInString(op)
 	}
-	
+
 	// Handle check statements that contain In operations
 	if checkStmt, ok := node.(*syntax.CheckStmt); ok {
 		if op, ok := checkStmt.Cond.(*syntax.Operation); ok {
 			return op.Op == syntax.In && t.isRuneInString(op)
 		}
 	}
-	
+
 	return false
 }
 
@@ -43,7 +45,7 @@ func (t *RuneInStringTransform) TransformNode(node syntax.Node, ctx *TransformCo
 			return t.convertRuneToString(op)
 		}
 	}
-	
+
 	// Handle check statements that contain In operations
 	if checkStmt, ok := node.(*syntax.CheckStmt); ok {
 		if op, ok := checkStmt.Cond.(*syntax.Operation); ok && op.Op == syntax.In {
@@ -58,7 +60,7 @@ func (t *RuneInStringTransform) TransformNode(node syntax.Node, ctx *TransformCo
 			}
 		}
 	}
-	
+
 	return nil
 }
 
@@ -86,16 +88,16 @@ func (t *RuneInStringTransform) isRuneInString(op *syntax.Operation) bool {
 // convertRuneToString converts 'r' in "string" to string('r') in "string"
 func (t *RuneInStringTransform) convertRuneToString(op *syntax.Operation) syntax.Expr {
 	pos := op.Pos()
-	
+
 	// Ensure the original operands have position information
 	if op.X != nil && op.X.Pos().IsKnown() {
 		pos = op.X.Pos()
 	}
-	
+
 	// Create string type name with position
 	stringName := &syntax.Name{Value: "string"}
 	stringName.SetPos(pos)
-	
+
 	// Create string conversion call: string(op.X)
 	// Make sure op.X has position info
 	if op.X.Pos().IsKnown() == false && pos.IsKnown() {
@@ -104,13 +106,13 @@ func (t *RuneInStringTransform) convertRuneToString(op *syntax.Operation) syntax
 			basicLit.SetPos(pos)
 		}
 	}
-	
+
 	stringConversion := &syntax.CallExpr{
 		Fun:     stringName,
 		ArgList: []syntax.Expr{op.X},
 	}
 	stringConversion.SetPos(pos)
-	
+
 	// Create new operation: string(op.X) in op.Y
 	newOp := &syntax.Operation{
 		Op: syntax.In,
@@ -118,7 +120,7 @@ func (t *RuneInStringTransform) convertRuneToString(op *syntax.Operation) syntax
 		Y:  op.Y,
 	}
 	newOp.SetPos(pos)
-	
+
 	return newOp
 }
 

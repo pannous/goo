@@ -1,0 +1,7 @@
+import "strings"
+
+func main() {
+    // This should work - manual strings import
+    result := strings.ToUpper("hello")
+    println(result)
+}

@@ -1,0 +1,11 @@
+import "fmt"
+
+func main() {
+    // This should work with manual import
+    fmt.Printf("Manual import works\n")
+    
+    // This should fail with auto import
+    text := "hello"
+    result := text.toUpper()  
+    fmt.Printf("Result: %s\n", result)
+}

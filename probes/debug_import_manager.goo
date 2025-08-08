@@ -1,0 +1,4 @@
+func main() {
+    // Test only the centralized import manager with printf
+    printf("Testing centralized imports\n")
+}
