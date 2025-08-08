@@ -7,7 +7,6 @@ package transforms
 import (
 	"cmd/compile/internal/syntax"
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -77,7 +76,7 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 // convertInOperation converts "for item in collection" to appropriate Go code
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	pos := op.Pos()
-	
+
 	// Debug: print what we're converting
 	fmt.Printf("DEBUG: Converting IN operation: X=%#v, Y=%#v\n", op.X, op.Y)
 	println("Converting rune to string for 'in' operation")
@@ -423,7 +422,7 @@ func (t *InOperatorTransform) hasImport(file *syntax.File, importPath string) bo
 	if normalizedPath[0] != '"' {
 		normalizedPath = "\"" + normalizedPath + "\""
 	}
-	
+
 	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
 			if importDecl.Path != nil && importDecl.Path.Value == normalizedPath {
@@ -464,7 +463,7 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
 	fmt.Printf("DEBUG InOperatorTransform: STRINGS import added - file now has %d declarations\n", len(file.DeclList))
-	
+
 	// Debug: print all import declarations
 	fmt.Printf("DEBUG: All imports after adding:\n")
 	for i, decl := range file.DeclList {
