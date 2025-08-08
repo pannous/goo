@@ -1,0 +1,11 @@
+import "strings"
+text2 := "goodbye world"
+needleText2 := "goodbye"
+
+result1 := needleText2 in text2
+printf("needleText2 in text2: %t\n", result1)
+
+check (needleText2 in text2)
+check not not (needleText2 in text2)
+
+printf("All specific tests passed\n")

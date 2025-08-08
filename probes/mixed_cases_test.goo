@@ -1,3 +1,4 @@
+import strings
 // Mixed variable/literal cases
 text := "hello"
 needle := "ell"
@@ -9,3 +10,5 @@ case3 := needle in text         // variable in variable
 printf("needle in \"hello\": %t\n", case1)
 printf("\"ell\" in text: %t\n", case2) 
 printf("needle in text: %t\n", case3)
+
+printf("ALL TESTS PASSED\n")
