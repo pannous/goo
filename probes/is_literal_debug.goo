@@ -1,0 +1,2 @@
+check [1, 2, 3] is []int
+printf("Literal test passed\n")
