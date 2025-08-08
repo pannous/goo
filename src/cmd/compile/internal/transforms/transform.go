@@ -324,6 +324,9 @@ func (v *CentralTransformVisitor) walkExpr(expr syntax.Expr) syntax.Expr {
 func (v *CentralTransformVisitor) tryTransformNode(node syntax.Node) syntax.Node {
 	for _, transformer := range v.transformers {
 		if nodeTransformer, ok := transformer.(NodeTransformer); ok {
+			if transformer.Name() == "in_operator_transform" {
+				fmt.Printf("DEBUG: Found in_operator_transform as NodeTransformer\n")
+			}
 			if nodeTransformer.CanHandle(node, v.context) {
 				if newNode := nodeTransformer.TransformNode(node, v.context); newNode != nil {
 					fmt.Printf("Node transformation applied by: %s\n", nodeTransformer.Name())
@@ -331,6 +334,8 @@ func (v *CentralTransformVisitor) tryTransformNode(node syntax.Node) syntax.Node
 					return newNode
 				}
 			}
+		} else if transformer.Name() == "in_operator_transform" {
+			fmt.Printf("DEBUG: in_operator_transform is NOT NodeTransformer - type is %T\n", transformer)
 		}
 	}
 	return nil
@@ -339,8 +344,13 @@ func (v *CentralTransformVisitor) tryTransformNode(node syntax.Node) syntax.Node
 // tryTransformLeafNode calls transformers on specific expression/operation nodes
 func (v *CentralTransformVisitor) tryTransformLeafNode(node syntax.Node) syntax.Node {
 	// Only call transformers on "leaf" nodes they actually care about
-	switch node.(type) {
-	case *syntax.Operation, *syntax.CallExpr, *syntax.CompositeLit, *syntax.FuncDecl, *syntax.AsCastExpr, *syntax.SelectorExpr, *syntax.TypeDecl, *syntax.ImportDecl, *syntax.LambdaExpr, *syntax.ReturnStmt, *syntax.TryStmt, *syntax.TryCatchStmt:
+	switch n := node.(type) {
+	case *syntax.Operation:
+		if n.Op == syntax.In {
+			fmt.Printf("LEAF: Found IN operation, calling tryTransformNode\n")
+		}
+		return v.tryTransformNode(node)
+	case *syntax.CallExpr, *syntax.CompositeLit, *syntax.FuncDecl, *syntax.AsCastExpr, *syntax.SelectorExpr, *syntax.TypeDecl, *syntax.ImportDecl, *syntax.LambdaExpr, *syntax.ReturnStmt, *syntax.TryStmt, *syntax.TryCatchStmt:
 		// These are the actual nodes transformers want to handle
 		return v.tryTransformNode(node)
 	}
@@ -394,8 +404,11 @@ func ApplyTransformations(files []*syntax.File) {
 		
 		// Fall back to old interface for transformers that don't implement NodeTransformer
 		for _, transformer := range TransformRegistry {
-			if _, ok := transformer.(NodeTransformer); !ok {
+			if nodeTransformer, ok := transformer.(NodeTransformer); ok {
+				// This transformer implements NodeTransformer, skip it (already handled by centralVisitor)
+			} else {
 				// Use old interface for backward compatibility
+				fmt.Printf("DEBUG LEGACY: Processing %s as legacy transformer\n", transformer.Name())
 				if transformer.Transform(file, ctx) {
 					fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 					centralVisitor.changed = true

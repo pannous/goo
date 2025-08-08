@@ -11,10 +11,13 @@ import (
 	"strings"
 )
 
-// InOperatorTransform handles the 'in' operator for strings and collections
+// InOperatorTransform handles the 'in' operator for strings and collections  
 // Transforms expressions like "hello" in str to strings.Contains(str, "hello")
 // and item in slice to slices.Contains(slice, item)
 type InOperatorTransform struct{} // Clean implementation using centralized ImportManager
+
+// Ensure interface compliance
+var _ NodeTransformer = (*InOperatorTransform)(nil)
 
 func (t *InOperatorTransform) Name() string {
 	return "in_operator_transform"
