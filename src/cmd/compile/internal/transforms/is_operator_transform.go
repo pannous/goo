@@ -21,7 +21,7 @@ func (t *IsOperatorTransform) Name() string {
 }
 
 func (t *IsOperatorTransform) Priority() int {
-	return 30 // Run relatively early, before most other transforms
+	return 5 // Run very early, before check processing and other transforms
 }
 
 func (t *IsOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
@@ -67,6 +67,13 @@ func (v *isOperatorVisitor) Visit(node syntax.Node) syntax.Visitor {
 			}
 		}
 	case *syntax.IfStmt:
+		if isOp, ok := n.Cond.(*syntax.Operation); ok && isOp.Op == syntax.IS {
+			if newExpr := v.transform.convertIsToFunctionCall(isOp); newExpr != isOp {
+				n.Cond = newExpr
+				v.changed = true
+			}
+		}
+	case *syntax.CheckStmt:
 		if isOp, ok := n.Cond.(*syntax.Operation); ok && isOp.Op == syntax.IS {
 			if newExpr := v.transform.convertIsToFunctionCall(isOp); newExpr != isOp {
 				n.Cond = newExpr
