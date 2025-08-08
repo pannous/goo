@@ -1,0 +1,3 @@
+text := "hello world"
+result := "hello" in text
+printf("Result: %t\n", result)

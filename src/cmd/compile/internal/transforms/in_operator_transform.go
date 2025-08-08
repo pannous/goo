@@ -38,11 +38,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	// Use syntax.Walk to traverse the entire AST
 	syntax.Walk(file, visitor)
 	
-	// Add imports if needed (skip if modules are disabled to avoid GOPATH issues)
+	// Add imports if needed
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
-		if os.Getenv("GO111MODULE") != "off" {
-			t.addStringsImport(file)
-		}
+		t.addStringsImport(file)
 	}
 	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
 		t.addSlicesImport(file)
@@ -260,7 +258,18 @@ func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, vis
 // createInlineStringContains creates inline string containment check for GOPATH mode
 // Uses simple logic to avoid import dependencies
 func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
-	// If both operands are literals, we can compute the result at compile time
+	// Handle string literal in string literal case
+	if itemExpr, ok := op.X.(*syntax.BasicLit); ok && itemExpr.Kind == syntax.StringLit {
+		if containerExpr, ok := op.Y.(*syntax.BasicLit); ok && containerExpr.Kind == syntax.StringLit {
+			// Both are string literals - compute at compile time
+			result := t.computeStringInString(itemExpr.Value, containerExpr.Value)
+			resultLit := &syntax.Name{Value: result}
+			resultLit.SetPos(pos)
+			return resultLit
+		}
+	}
+	
+	// Handle rune literal in string literal case  
 	if runeExpr, ok := op.X.(*syntax.BasicLit); ok && runeExpr.Kind == syntax.RuneLit {
 		if stringExpr, ok := op.Y.(*syntax.BasicLit); ok && stringExpr.Kind == syntax.StringLit {
 			// Both are literals - compute at compile time
@@ -271,11 +280,35 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, v
 		}
 	}
 	
-	// For non-literal cases, create runtime comparison using string conversion and loops
-	// This is more complex, so for now fall back to false
-	falseLit := &syntax.Name{Value: "false"}
-	falseLit.SetPos(pos)
-	return falseLit
+	// For non-literal cases, fall back to strings.Contains even in GOPATH mode
+	// This is better than always returning false
+	visitor.needsStringsImport = true
+	
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+	
+	containsName := &syntax.Name{Value: "Contains"}
+	containsName.SetPos(pos)
+	
+	stringsContains := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: containsName,
+	}
+	stringsContains.SetPos(pos)
+	
+	// Check if the item (op.X) is a rune literal that needs conversion
+	item := op.X
+	if t.isRuneLiteral(op.X) {
+		item = t.convertRuneToString(op.X, pos)
+	}
+	
+	call := &syntax.CallExpr{
+		Fun:     stringsContains,
+		ArgList: []syntax.Expr{op.Y, item}, // Y is container, X is item
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 // Helper function to get expression type as string for debugging
@@ -616,6 +649,27 @@ func (t *InOperatorTransform) convertRuneToString(runeExpr syntax.Expr, pos synt
 	call.SetPos(pos)
 	
 	return call
+}
+
+// computeStringInString computes whether a string literal is contained in another string literal at compile time
+func (t *InOperatorTransform) computeStringInString(itemLiteral, containerLiteral string) string {
+	// Parse the item string literal (e.g., "hello" -> hello)
+	if len(itemLiteral) < 2 || itemLiteral[0] != '"' || itemLiteral[len(itemLiteral)-1] != '"' {
+		return "false" // Invalid string literal
+	}
+	itemContent := itemLiteral[1 : len(itemLiteral)-1] // Remove quotes
+
+	// Parse the container string literal (e.g., "hello world" -> hello world)
+	if len(containerLiteral) < 2 || containerLiteral[0] != '"' || containerLiteral[len(containerLiteral)-1] != '"' {
+		return "false" // Invalid string literal
+	}
+	containerContent := containerLiteral[1 : len(containerLiteral)-1] // Remove quotes
+
+	// Simple substring check
+	if strings.Contains(containerContent, itemContent) {
+		return "true"
+	}
+	return "false"
 }
 
 // computeRuneInString computes whether a rune literal is contained in a string literal at compile time
