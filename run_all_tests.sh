@@ -8,6 +8,7 @@ GOROOT_BOOTSTRAP=/opt/other/go-darwin-arm64-bootstrap
 GOCACHE=/tmp/go-cache
 GOOS=darwin
 GOARCH=arm64
+GOO_USE_TRANSFORMERS=1
 
 # Test runner for all tests in ./goo/ directory
 # Suppresses output and shows ✅/🔴 summary per test

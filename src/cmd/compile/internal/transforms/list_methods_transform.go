@@ -311,6 +311,33 @@ func (t *ListMethodsTransform) transformExpr(expr syntax.Expr, ctx *TransformCon
 			
 			if t.isListExpression(transformedReceiver, ctx) {
 				methodName := selector.Sel.Value
+				// CRITICAL FIX: Only handle if receiver is NOT a string literal
+				if t.isStringReceiver(transformedReceiver) {
+					// Let string_methods_transform handle string methods
+					// Still transform arguments if needed
+					var newArgList []syntax.Expr
+					if e.ArgList != nil {
+						newArgList = make([]syntax.Expr, len(e.ArgList))
+						for i, arg := range e.ArgList {
+							newArgList[i] = t.transformExpr(arg, ctx)
+						}
+					}
+					// Return call with transformed receiver and args, but don't apply list method transformation
+					if transformedReceiver != selector.X || newArgList != nil {
+						newSelector := &syntax.SelectorExpr{
+							X:   transformedReceiver,
+							Sel: selector.Sel,
+						}
+						newSelector.SetPos(selector.Pos())
+						newCall := &syntax.CallExpr{
+							Fun:     newSelector,
+							ArgList: newArgList,
+						}
+						newCall.SetPos(e.Pos())
+						return newCall
+					}
+					return expr // No changes needed
+				}
 				if transformed := t.transformListMethod(transformedReceiver, methodName, e.ArgList, ctx); transformed != nil {
 					return transformed
 				}
@@ -1340,6 +1367,15 @@ func (t *ListMethodsTransform) createPopCall(receiver syntax.Expr) syntax.Expr {
 	call.SetPos(pos)
 	
 	return call
+}
+
+// isStringReceiver checks if the receiver is a string literal or string type
+func (t *ListMethodsTransform) isStringReceiver(receiver syntax.Expr) bool {
+	// Check for string literals
+	if basic, ok := receiver.(*syntax.BasicLit); ok {
+		return basic.Kind == syntax.StringLit
+	}
+	return false
 }
 
 func (t *ListMethodsTransform) createShiftCall(receiver syntax.Expr) syntax.Expr {

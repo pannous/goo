@@ -733,6 +733,27 @@ func (p *printer) printRawNode(n Node) {
 			p.printDeclList(n.DeclList)
 		}
 
+	case *AsCastExpr:
+		p.print(n.X, blank, _As, blank, n.Type)
+	
+	case *LambdaExpr:
+		// Format: x => expr or (x, y) => expr  
+		if len(n.ParamList) == 1 && n.ParamList[0].Name != nil {
+			p.print(n.ParamList[0].Name)
+		} else {
+			p.print(_Lparen)
+			for i, param := range n.ParamList {
+				if i > 0 {
+					p.print(_Comma, blank)
+				}
+				if param.Name != nil {
+					p.print(param.Name)
+				}
+			}
+			p.print(_Rparen)
+		}
+		p.print(blank, _Lambda, blank, n.Body)
+
 	default:
 		panic(fmt.Sprintf("syntax.Iterate: unexpected node type %T", n))
 	}
