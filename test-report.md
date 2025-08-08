@@ -11,8 +11,8 @@ Running all tests in ./goo/ directory...
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 ✅ test_array_like_slice.goo
-✅ test_as_cast_convert.goo
-✅ test_as_cast.goo
+❌ test_as_cast_convert.goo
+❌ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
 ✅ test_check_reverse.goo
@@ -25,7 +25,7 @@ Running all tests in ./goo/ directory...
 ✅ test_debug_imports.goo
 ✅ test_def_simple.goo
 ✅ test_def.goo
-✅ test_enum_string.goo
+❌ test_enum_string.goo
 ✅ test_enum.goo
 ✅ test_explicit_main.goo
 ✅ test_filter_simple.goo
@@ -36,22 +36,22 @@ Running all tests in ./goo/ directory...
 ✅ test_hash_index.goo
 ✅ test_implicit_main.goo
 ✅ test_import_bare_syntax.goo
-✅ test_import_folder.goo
-✅ test_in_operator_auto_import.goo
+❌ test_import_folder.goo
+❌ test_in_operator_auto_import.goo
 ✅ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
-✅ test_interpolation.goo
+❌ test_interpolation.goo
 ✅ test_is_operator.goo
 ✅ test_iterator_for_in.goo
 ✅ test_iterator_membership.goo
 ✅ test_iterator_simple.goo
-✅ test_lambda_arg.goo
-✅ test_lambda.goo
+❌ test_lambda_arg.goo
+❌ test_lambda.goo
 ✅ test_list_comparison.goo
 ✅ test_list_comparison2.goo
 ✅ test_list_equality.goo
 ✅ test_list_filter.goo
-✅ test_list_lambda.goo
+❌ test_list_lambda.goo
 ✅ test_list_map.goo
 ✅ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
@@ -88,14 +88,14 @@ Running all tests in ./goo/ directory...
 ✅ test_string_format_chain.goo
 ✅ test_string_format_simple.goo
 ✅ test_string_in_check.goo
-✅ test_string_interpolation.goo
+❌ test_string_interpolation.goo
 ✅ test_string_methods_todo.goo
 ✅ test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
 ✅ test_string_replace.goo
 ✅ test_string_reverse.goo
-✅ test_string_var_spacing.goo
+❌ test_string_var_spacing.goo
 ✅ test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
@@ -114,10 +114,6 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ conditional_test.goo
 ✅ debug_ast.goo
-✅ debug_import_ast.goo
-✅ debug_import_comparison.goo
-✅ debug_import_manager.goo
-✅ debug_import_structure.goo
 ✅ debug_is_parsing.goo
 ✅ debug_transform.goo
 ✅ ellipsis_test.goo
@@ -155,7 +151,7 @@ Running all tests in ./goo/ directory...
 ✅ test_check_debug.goo
 ✅ test_check_not_in.goo
 ✅ test_check_not.goo
-✅ test_check_rune_in.goo
+❌ test_check_rune_in.goo
 ✅ test_check_simple.goo
 ✅ test_class_methods_advanced.goo
 ✅ test_complete_hash_comments.goo
@@ -165,7 +161,6 @@ Running all tests in ./goo/ directory...
 ✅ test_debug_direct.goo
 ✅ test_debug_env.goo
 ✅ test_debug_rune_in.goo
-✅ test_direct_string_conversion.goo
 ✅ test_empty_list_simple.goo
 ✅ test_env_with_import.goo
 ✅ test_error_message.goo
@@ -174,7 +169,6 @@ Running all tests in ./goo/ directory...
 ✅ test_existing_dotdotdot.goo
 ✅ test_falsey_refactor.goo
 ✅ test_falsey.goo
-✅ test_fmt_vs_strings.goo
 ✅ test_for_in_basic.goo
 ✅ test_for_in_consolidated.goo
 ✅ test_go111_debug.goo
@@ -182,15 +176,15 @@ Running all tests in ./goo/ directory...
 ✅ test_hash_index_still_works.goo
 ✅ test_hash_index_vs_comment.goo
 ✅ test_if_debug.goo
-✅ test_import_and_in.goo
-❌ test_import_debug.goo
+❌ test_import_and_in.goo
 ✅ test_import_folder_simple.goo
-❌ test_import_manager_fix.goo
 ✅ test_import_no_in.goo
-✅ test_import_stdlib_in.goo
+❌ test_import_stdlib_in.goo
 ✅ test_import_transform.goo
 ✅ test_in_operator_debug.goo
+❌ test_in_operator_final.goo
 ✅ test_in_operator_simple.goo
+✅ test_in_with_imports.goo
 ✅ test_is_operator_refactor.goo
 ✅ test_is_simple.goo
 ✅ test_just_truthyAndOp.goo
@@ -210,7 +204,6 @@ Running all tests in ./goo/ directory...
 ✅ test_no_parens.goo
 ✅ test_not_comprehensive.goo
 ✅ test_null_coalesce_refactor.goo
-✅ test_old_vs_new_import.goo
 ✅ test_original_examples.goo
 ✅ test_parens_only.goo
 ✅ test_printf_enum_complete.goo
@@ -220,16 +213,13 @@ Running all tests in ./goo/ directory...
 ✅ test_range_operator_debug.goo
 ✅ test_range_simple_final.goo
 ✅ test_refactor_comprehensive.goo
-✅ test_rune_conversion_in_comparison.goo
 ✅ test_rune_conversion.goo
-✅ test_rune_string_conversion.goo
 ✅ test_runtime_functions.goo
 ✅ test_simple_and.goo
 ✅ test_simple_check.goo
 ✅ test_simple_for_in.goo
 ✅ test_simple_import.goo
 ✅ test_simple_in.goo
-✅ test_simple_lambda.goo
 ✅ test_simple_range_expression.goo
 ✅ test_simple_rune_true.goo
 ✅ test_simple_synonyms.goo
@@ -240,8 +230,6 @@ Running all tests in ./goo/ directory...
 ✅ test_sort_clear.goo
 ✅ test_sort_simple.goo
 ✅ test_step_by_step.goo
-✅ test_strconv_import.goo
-✅ test_strconv_usage.goo
 ✅ test_strings_contains.goo
 ✅ test_transformer_refactor.goo
 ✅ test_transformers_with_imports.goo
@@ -264,9 +252,8 @@ Running all tests in ./goo/ directory...
 ✅ test_with_or.goo
 ✅ test_with_printf.goo
 ✅ test_with_strings_import.goo
-✅ test_working_import.goo
 ✅ test_working_in.goo
 ✅ test_working_transforms.goo
 ========================================
-Summary: 265/267 passed, 2 failed
+Summary: 239/254 passed, 15 failed
 ⚠️  Some tests failed
