@@ -7,7 +7,6 @@ package transforms
 import (
 	"cmd/compile/internal/syntax"
 	"fmt"
-	"os"
 	"strings"
 )
 
