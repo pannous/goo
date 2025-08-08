@@ -219,7 +219,7 @@ fi
 # Bootstrap installs a proper cmd/dist, built with the new toolchain.
 # Throw ours, built with the bootstrap toolchain, away after bootstrap.
 ./cmd/dist/dist bootstrap -a $vflag $GO_DISTFLAGS "$@"
-# GOO_USE_TRANSFORMERS=1 
+GOO_USE_TRANSFORMERS=1 
 /opt/other/go/bin/go build -tags=transforms -o ./bin/go ./cmd/go
 rm -f ./cmd/dist/dist
 

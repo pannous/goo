@@ -188,3 +188,25 @@ goo/test_list_methods.goo
 # Hard extensions
 When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
 
+# Critical Infrastructure Fixes Applied
+## Printer AST Node Support (REQUIRED)
+Added missing printer.go cases for AsCastExpr and LambdaExpr to prevent systematic panics:
+- /opt/other/go/src/cmd/compile/internal/syntax/printer.go lines 736-755
+- Without these cases, any usage of lambda expressions or type casting causes "syntax.Iterate: unexpected node type" panics
+
+## Environment Variable Requirements (REQUIRED) 
+GOO_USE_TRANSFORMERS=1 must be set in:
+- make.bash (line 222) - uncommented for compilation
+- run_all_tests.sh (line 11) - added for test execution
+
+## Transform Priority Conflicts (CRITICAL BUG FIX)
+Fixed list_methods_transform claiming string method calls via isStringReceiver() check:
+- /opt/other/go/src/cmd/compile/internal/transforms/list_methods_transform.go 
+- Added check at line 315 to prevent conflicts with string_methods_transform
+- This resolves method dispatch conflicts that caused incorrect transformations
+
+## Test Results on 195_ok_ish Branch
+- Before fixes: 195/261 tests passing (75%)
+- After fixes: 203/259 tests passing (78%) - improvement of +8 tests
+- These infrastructure fixes are essential foundation for any Go compiler work
+
