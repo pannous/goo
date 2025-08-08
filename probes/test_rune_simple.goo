@@ -1,0 +1,2 @@
+result := 'h' in "hello world"
+print("Rune in string:", result)

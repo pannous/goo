@@ -1,0 +1,3 @@
+import "strings"
+result := strings.Contains("hello world", "hello")
+print("Direct strings.Contains result:", result)

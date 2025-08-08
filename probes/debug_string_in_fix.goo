@@ -1,0 +1,9 @@
+import "strings"
+
+// Test what the transform should generate
+result1 := strings.Contains("hello world", "hello")
+print("Direct strings.Contains result:", result1)
+
+// Test the transform
+result2 := "hello" in "hello world"
+print("Transform result:", result2)

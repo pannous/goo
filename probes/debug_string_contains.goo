@@ -1,0 +1,7 @@
+// Test string in string (failing)
+result1 := "hello" in "hello world"
+print("String in string:", result1)
+
+// Test rune in string (working)
+result2 := 'h' in "hello world"
+print("Rune in string:", result2)

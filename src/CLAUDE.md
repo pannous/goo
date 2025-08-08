@@ -162,6 +162,9 @@ Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
 ## System Health
 • do ./run_all_tests.sh before and after work to see if the general system is ok
 
+## File Protection
+NEVER modify files in the goo/ folder - these are user's test files that should not be touched.
+
 ## Code File Guidelines
 • omit package main and func main in .goo files
 

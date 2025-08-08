@@ -16,7 +16,7 @@ func (t *RuneInStringTransform) Name() string {
 }
 
 func (t *RuneInStringTransform) Priority() int {
-	return 999 // Disable for now - run after everything
+	return -1 // DISABLED - might be interfering
 }
 
 // NodeTransformer interface implementation

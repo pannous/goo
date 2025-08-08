@@ -1,0 +1,5 @@
+import "strings"
+text := "hello world"
+result := "hello" in text
+put("Result should be true:", result)
+put("Direct strings.Contains:", strings.Contains(text, "hello"))

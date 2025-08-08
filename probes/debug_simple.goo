@@ -1,0 +1,6 @@
+import "strings"
+
+text := "hello world"
+check "hello" in "hello world"
+check "hello" in text
+print("Test passed")

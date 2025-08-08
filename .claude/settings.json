@@ -1,0 +1,13 @@
+{
+  "tools": {
+    "edit": {
+      "exclude": ["goo/**"]
+    },
+    "multiEdit": {
+      "exclude": ["goo/**"]
+    },
+    "write": {
+      "exclude": ["goo/**"]
+    }
+  }
+}

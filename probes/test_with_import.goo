@@ -1,0 +1,3 @@
+import "strings"
+result := 'h' in "hello world"
+print("With explicit import:", result)

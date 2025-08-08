@@ -24,12 +24,12 @@ func (t *InOperatorTransform) Priority() int {
 	return 100 // Default priority - between list methods (50) and lambda (200)
 }
 
-// NodeTransformer interface implementation
+// NodeTransformer interface implementation  
 func (t *InOperatorTransform) CanHandle(node syntax.Node, ctx *TransformContext) bool {
 	// Only handle IN operations directly - let the main transformer framework do tree walking
 	if op, ok := node.(*syntax.Operation); ok {
 		if op.Op == syntax.In {
-			print("FOUND IN OPERATION\n")
+			fmt.Printf("CANHANDLE: Found IN operation: %#v\n", node)
 			return true
 		}
 	}
@@ -45,31 +45,38 @@ func (t *InOperatorTransform) TransformNode(node syntax.Node, ctx *TransformCont
 }
 
 func (t *InOperatorTransform) PostProcess(file *syntax.File, ctx *TransformContext) bool {
-	// Use EXACT same pattern as working StringMethodsTransform  
-	changed := false
-	if GlobalImportManager != nil && len(GlobalImportManager.GetRequestedImports()) > 0 {
-		requests := GlobalImportManager.GetRequestedImports()
-		if _, needsStrings := requests["strings"]; needsStrings {
-			fmt.Printf("InOperatorTransform: Adding strings import using EXACT working method\n")
-			t.addStringsImport(file)
-			changed = true
-		}
-		// Clear requests after applying
-		GlobalImportManager.neededImports = make(map[string]string)
-	}
-	return changed
+	// With centralized import manager, PostProcess is not needed for imports
+	// All imports are handled centrally by GlobalImportManager.ApplyImports()
+	return false
 }
 
-// Legacy Transform method for backward compatibility - not used in new architecture
+// Legacy Transform method for backward compatibility - ACTUALLY BEING USED!
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	// This method is kept for interface compatibility but not used
-	// The new NodeTransformer interface methods are used instead
-	return false
+	fmt.Printf("LEGACY TRANSFORM CALLED for in_operator_transform\n")
+	// This method is actually being used despite the new architecture
+	changed := false
+	syntax.Inspect(file, func(node syntax.Node) bool {
+		if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.In {
+			fmt.Printf("LEGACY: Found IN operation via old Transform method\n")
+			// Apply the transformation
+			newNode := t.convertInOperation(op, ctx)
+			if newNode != op {
+				// Replace the node (this is tricky with syntax.Inspect)
+				*op = *newNode.(*syntax.Operation)
+				changed = true
+			}
+		}
+		return true
+	})
+	return changed
 }
 
 // convertInOperation converts "for item in collection" to appropriate Go code
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	pos := op.Pos()
+	
+	// Debug: print what we're converting
+	fmt.Printf("DEBUG: Converting IN operation: X=%#v, Y=%#v\n", op.X, op.Y)
 	println("Converting rune to string for 'in' operation")
 
 	// Handle rune in string: convert rune to string
@@ -84,9 +91,11 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, ctx *Tran
 
 	// Determine the type of operation based on the container (op.Y)
 	containerType := t.inferContainerType(op.Y, ctx)
+	fmt.Printf("DEBUG: containerType = %s\n", containerType)
 
 	switch containerType {
 	case "string":
+		fmt.Printf("DEBUG: Taking string case\n")
 		return t.createStringContainsCall(op, pos)
 	case "slice":
 		return t.createSliceContainsCall(op, pos)
@@ -105,6 +114,7 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 	// Check for string literals
 	if basic, ok := container.(*syntax.BasicLit); ok {
 		if basic.Kind == syntax.StringLit {
+			fmt.Printf("DEBUG: Container is string literal: %s\n", basic.Value)
 			return "string"
 		}
 	}
@@ -136,6 +146,7 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 	// Check context for variable types
 	if name, ok := container.(*syntax.Name); ok && ctx != nil && ctx.Types != nil {
 		if varType, exists := ctx.Types[name.Value]; exists {
+			fmt.Printf("DEBUG: Variable %s has type %s\n", name.Value, varType)
 			if strings.Contains(varType, "[]") {
 				return "slice"
 			}
@@ -146,6 +157,8 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 				return "string"
 			}
 		}
+	} else if name, ok := container.(*syntax.Name); ok {
+		fmt.Printf("DEBUG: Variable %s - no context or no type info\n", name.Value)
 	}
 
 	return "unknown"
@@ -168,6 +181,8 @@ func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, pos
 	}
 	selectorExpr.SetPos(pos)
 
+	// DEBUG: Print what we're generating
+	fmt.Printf("DEBUG: Creating strings.Contains(%#v, %#v)\n", op.Y, op.X)
 	callExpr := &syntax.CallExpr{
 		Fun:     selectorExpr,
 		ArgList: []syntax.Expr{op.Y, op.X}, // Note: argument order is reversed for strings.Contains
