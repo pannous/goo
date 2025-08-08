@@ -5,7 +5,6 @@ Running all tests in ./goo/ directory...
 ✅ test_printf_with_fmt.go
 ✅ test_simple.go
 ✅ test_unused_import_warning.go
-✅ tests.go
 ✅ debug_precedence.goo
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
@@ -117,22 +116,34 @@ Running all tests in ./goo/ directory...
 ❌ tests.goo
 ✅ conditional_test.goo
 ✅ debug_ast.goo
+✅ debug_generation.goo
+❌ debug_in_test.goo
 ✅ debug_is_parsing.goo
 ✅ debug_transform.goo
 ✅ ellipsis_test.goo
 ✅ empty_list_comprehensive.goo
 ✅ existing_slice_syntax.goo
+✅ explicit_import_test.goo
 ✅ final_conditional_test.goo
+❌ in_contexts_test.goo
+✅ in_literal_test.goo
+✅ in_with_import_test.goo
 ✅ manual_c_style.goo
+❌ mixed_cases_test.goo
 ✅ nil_coalesce_final_test.goo
 ✅ regular_range_test.goo
+✅ rune_in_string_test.goo
 ✅ simple_conditional_test.goo
 ✅ simple_dotdot_test.goo
 ✅ simple_filter_test.goo
+✅ simple_in_test.goo
 ✅ simple_is_test.goo
 ✅ simple_map_test.goo
 ✅ simple_nil_test.goo
 ✅ simple_range_test.goo
+✅ string_in_string_test.goo
+✅ strings_test_simple.goo
+✅ strings_test.goo
 ✅ test_and_assignment.goo
 ✅ test_and_complex.goo
 ✅ test_and_multiple.goo
@@ -211,5 +222,5 @@ Running all tests in ./goo/ directory...
 ✅ test_with_or.goo
 ✅ test_working_transforms.goo
 ========================================
-Summary: 203/210 passed, 7 failed
+Summary: 211/221 passed, 10 failed
 ⚠️  Some tests failed
