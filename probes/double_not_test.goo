@@ -1,0 +1,8 @@
+import "strings"
+text := "goodbye world"
+needle := "goodbye"
+
+check (needle in text)               // should be true
+check not not (needle in text)      // should also be true
+
+printf("Tests completed\n")

@@ -1,0 +1,4 @@
+import "slices"
+numbers := [1, 2, 3]
+result := 2 in numbers
+printf("2 in [1,2,3]: %t\n", result)

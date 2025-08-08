@@ -574,13 +574,20 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 		return
 	}
 
+	// Use file position instead of empty position
+	pos := syntax.Pos{}
+	if len(file.DeclList) > 0 {
+		pos = file.DeclList[0].Pos()
+	}
+
 	stringsImport := &syntax.ImportDecl{
 		Path: &syntax.BasicLit{
 			Value: "\"strings\"",
 			Kind:  syntax.StringLit,
 		},
 	}
-	stringsImport.SetPos(syntax.Pos{})
+	stringsImport.SetPos(pos)
+	stringsImport.Path.SetPos(pos)
 
 	var insertPos int
 	for i, decl := range file.DeclList {
@@ -603,13 +610,20 @@ func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
 		return
 	}
 
+	// Use file position instead of empty position
+	pos := syntax.Pos{}
+	if len(file.DeclList) > 0 {
+		pos = file.DeclList[0].Pos()
+	}
+
 	slicesImport := &syntax.ImportDecl{
 		Path: &syntax.BasicLit{
 			Value: "\"slices\"",
 			Kind:  syntax.StringLit,
 		},
 	}
-	slicesImport.SetPos(syntax.Pos{})
+	slicesImport.SetPos(pos)
+	slicesImport.Path.SetPos(pos)
 
 	var insertPos int
 	for i, decl := range file.DeclList {

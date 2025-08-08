@@ -1,0 +1,3 @@
+text := "hello"
+result := "ell" in text
+printf("Auto strings: %t\n", result)
