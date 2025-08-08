@@ -1,6 +1,9 @@
 // Copyright 2025 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// //go:build transforms WE NEED IT as interface
+
 package transforms
 
 import (
@@ -33,26 +36,26 @@ type Transformer interface {
 type NodeTransformer interface {
 	// CanHandle returns true if this transformer can handle the given node
 	CanHandle(node syntax.Node, ctx *TransformContext) bool
-	
+
 	// TransformNode transforms the given node and returns the modified node or nil if no change
 	TransformNode(node syntax.Node, ctx *TransformContext) syntax.Node
-	
+
 	// PostProcess is called after all transformations to handle file-level changes like imports
 	PostProcess(file *syntax.File, ctx *TransformContext) bool
-	
+
 	// Name returns a human-readable name for this transformer
 	Name() string
-	
+
 	// Priority returns the execution priority (lower numbers run first)
 	Priority() int
 }
 
 // CentralTransformVisitor implements the centralized pattern matching and transformation
 type CentralTransformVisitor struct {
-	context      *TransformContext
-	transformers []Transformer
-	changed      bool
-	appliedTransformers map[string]Transformer  // Track which transformer instances were applied
+	context             *TransformContext
+	transformers        []Transformer
+	changed             bool
+	appliedTransformers map[string]Transformer // Track which transformer instances were applied
 }
 
 // WalkFile is the main entry point that walks the file and applies transformations
@@ -71,7 +74,7 @@ func (v *CentralTransformVisitor) WalkFile(file *syntax.File) {
 			v.changed = true
 		}
 	}
-	
+
 	// Post-process applied transformers (handle imports, etc.)
 	for _, transformer := range v.appliedTransformers {
 		if nodeTransformer, ok := transformer.(NodeTransformer); ok {
@@ -373,25 +376,25 @@ func ApplyTransformations(files []*syntax.File) {
 
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
-		
+
 		fmt.Printf("Transform execution order:\n")
 		for i, transformer := range TransformRegistry {
 			fmt.Printf("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
 		}
-		
-		// Initialize import manager for this file
-		GlobalImportManager = NewImportManager()
-		
+
+		// Reset import manager for this file
+		GlobalImportManager.Reset()
+
 		// Use centralized visitor for NodeTransformers first
 		centralVisitor := &CentralTransformVisitor{
-			context: ctx,
-			transformers: TransformRegistry,
-			changed: false,
+			context:             ctx,
+			transformers:        TransformRegistry,
+			changed:             false,
 			appliedTransformers: make(map[string]Transformer),
 		}
-		
+
 		centralVisitor.WalkFile(file)
-		
+
 		// Fall back to old interface for transformers that don't implement NodeTransformer
 		for _, transformer := range TransformRegistry {
 			if _, ok := transformer.(NodeTransformer); !ok {
@@ -402,13 +405,13 @@ func ApplyTransformations(files []*syntax.File) {
 				}
 			}
 		}
-		
+
 		// Apply all requested imports centrally
 		if GlobalImportManager.ApplyImports(file) {
 			fmt.Printf("ImportManager: Applied imports to package: %s\n", file.PkgName.Value)
 			centralVisitor.changed = true
 		}
-		
+
 		if centralVisitor.changed {
 			fmt.Printf("Applied transformations to package: %s\n", file.PkgName.Value)
 		}
@@ -583,7 +586,7 @@ func RegisterTransformer(t Transformer) {
 		}
 	}
 	TransformRegistry = append(TransformRegistry, t)
-	
+
 	// Sort by priority (lower numbers run first)
 	sort.Slice(TransformRegistry, func(i, j int) bool {
 		return TransformRegistry[i].Priority() < TransformRegistry[j].Priority()
@@ -650,7 +653,7 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 			if receiverName, ok := selector.X.(*syntax.Name); ok {
 				receiverType := ctx.Types[receiverName.Value]
 				methodName := selector.Sel.Value
-				
+
 				// Infer return type based on method and receiver type
 				return inferMethodReturnType(receiverType, methodName)
 			}
@@ -663,7 +666,7 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 func inferMethodReturnType(receiverType, methodName string) string {
 	if len(receiverType) >= 2 && receiverType[:2] == "[]" {
 		elementType := receiverType[2:] // e.g., "User" from "[]User"
-		
+
 		switch methodName {
 		case "filter", "where", "chose", "that", "which":
 			// filter returns same type as input: []User -> []User
@@ -784,7 +787,7 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 					ctx.Types[lhs.Value] = "map[" + keyType + "]" + valueType
 				}
 			}
-			
+
 			// Handle method call assignments like: filtered := users.filter(...)
 			inferredType := inferTypeFromExpression(rhsElems[i], ctx)
 			if inferredType != "" {

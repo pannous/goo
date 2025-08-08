@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build transforms
+
 package transforms
 
 import (
@@ -33,7 +35,7 @@ func (t *InOperatorTransform) Priority() int {
 // Transform using EXACT same pattern as StringMethodsTransform
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	fmt.Printf("InOperatorTransform.Transform called for package: %s\n", file.PkgName.Value)
-	
+
 	visitor := &inOperatorVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
 
@@ -58,15 +60,15 @@ func (v *inOperatorVisitor) Visit(node syntax.Node) syntax.Visitor {
 	switch n := node.(type) {
 	case *syntax.Operation:
 		if n.Op == syntax.In {
-			fmt.Printf("FOUND IN OPERATION: Converting '%s in %s'\n", 
+			fmt.Printf("FOUND IN OPERATION: Converting '%s in %s'\n",
 				nodeToString(n.X), nodeToString(n.Y))
-			
+
 			// Convert the IN operation
 			newExpr := v.transform.convertInOperation(n, v.ctx)
 			if newExpr != nil {
 				*n = *newExpr.(*syntax.Operation)
 				v.changed = true
-				
+
 				// Determine which import is needed
 				containerType := v.transform.inferContainerType(n.Y, v.ctx)
 				switch containerType {
@@ -220,7 +222,7 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, pos 
 func (t *InOperatorTransform) createMapContainsCall(op *syntax.Operation, pos syntax.Pos) syntax.Expr {
 	// For maps, "key in map" becomes "_, exists := map[key]; exists"
 	// Create: (func() bool { _, ok := container[item]; return ok })(
-	
+
 	// Create index expression: container[item]
 	indexExpr := &syntax.IndexExpr{
 		X:     op.Y,
@@ -333,7 +335,7 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 	newDeclList = append(newDeclList, stringsImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
-	
+
 	fmt.Printf("DEBUG in_operator: Added strings import, file now has %d declarations\n", len(file.DeclList))
 }
 
@@ -371,7 +373,7 @@ func nodeToString(node syntax.Expr) string {
 	if node == nil {
 		return "<nil>"
 	}
-	
+
 	switch n := node.(type) {
 	case *syntax.BasicLit:
 		return n.Value

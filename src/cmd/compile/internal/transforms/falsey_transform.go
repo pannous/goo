@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build transforms
+
 package transforms
 
 import (
@@ -57,9 +59,9 @@ func (t *FalseyTransform) containsInOperation(expr syntax.Expr) bool {
 	if expr == nil {
 		return false
 	}
-	
+
 	fmt.Printf("DEBUG containsInOperation: checking %T\n", expr)
-	
+
 	switch e := expr.(type) {
 	case *syntax.Operation:
 		fmt.Printf("DEBUG containsInOperation: Operation with Op=%v\n", e.Op)
@@ -98,9 +100,9 @@ func (t *FalseyTransform) containsInOperation(expr syntax.Expr) bool {
 	case *syntax.ParenExpr:
 		// Handle parenthesized expressions like ("x" in "abc")
 		return t.containsInOperation(e.X)
-	// Add other expression types as needed
+		// Add other expression types as needed
 	}
-	
+
 	return false
 }
 
@@ -109,13 +111,12 @@ func (t *FalseyTransform) PostProcess(file *syntax.File, ctx *TransformContext) 
 	return false
 }
 
-
 func (t *FalseyTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &falseyVisitor{transform: t, ctx: ctx}
-	
+
 	// Use the visitor pattern to walk all nodes
 	syntax.Walk(file, visitor)
-	
+
 	return visitor.changed
 }
 
@@ -124,7 +125,7 @@ func (v *falseyVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if node == nil {
 		return nil
 	}
-	
+
 	// Look for nodes that contain expressions we can replace
 	switch n := node.(type) {
 	case *syntax.ExprStmt:
@@ -192,7 +193,7 @@ func (v *falseyVisitor) Visit(node syntax.Node) syntax.Visitor {
 			}
 		}
 	}
-	
+
 	// Continue visiting child nodes
 	return v
 }
@@ -204,7 +205,7 @@ func (t *FalseyTransform) transformFalseyExpr(expr syntax.Expr, ctx *TransformCo
 		// Transform "not x" to appropriate comparison
 		return t.createNotTruthyCall(op.X, ctx)
 	}
-	
+
 	return nil
 }
 
@@ -215,10 +216,10 @@ func (v *falseyVisitor) transformFalseyExpr(expr syntax.Expr) syntax.Expr {
 func (t *FalseyTransform) createNotTruthyCall(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
 	// For non-boolean types, we need to convert to truthiness check
 	// Transform "not x" to appropriate comparison based on type
-	
+
 	// For now, let's generate the pattern that works with existing truthiness:
 	// Convert "not x" to "x == zero_value_of_type"
-	
+
 	// This is a simplified approach - we'll create comparisons for common types
 	switch e := expr.(type) {
 	case *syntax.BasicLit:
@@ -232,7 +233,7 @@ func (t *FalseyTransform) createNotTruthyCall(expr syntax.Expr, ctx *TransformCo
 			eq.SetPos(expr.Pos())
 			return eq
 		case syntax.StringLit:
-			// not "" -> "" == "" (true), not "x" -> "x" == "" (false)  
+			// not "" -> "" == "" (true), not "x" -> "x" == "" (false)
 			empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
 			empty.SetPos(expr.Pos())
 			eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: empty}
@@ -299,7 +300,7 @@ func (t *FalseyTransform) createNotTruthyCall(expr syntax.Expr, ctx *TransformCo
 				eq.SetPos(expr.Pos())
 				return eq
 			}
-			// Handle pointer types  
+			// Handle pointer types
 			if strings.HasPrefix(varType, "*") {
 				// For pointers: not ptr -> ptr == nil
 				nilName := &syntax.Name{Value: "nil"}
@@ -336,7 +337,7 @@ func (t *FalseyTransform) createNotTruthyCall(expr syntax.Expr, ctx *TransformCo
 			return eq
 		}
 	}
-	
+
 	// Fallback: for boolean expressions, use regular !
 	notExpr := &syntax.Operation{
 		Op: syntax.Not,
