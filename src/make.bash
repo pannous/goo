@@ -3,6 +3,11 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+cd $GOROOT
+echo "CLEANING ALL!"
+go clean -cache -modcache -testcache -i
+rm -rf ./bin ./pkg ./build
+
 cd $GOROOT/src
 
 # See golang.org/s/go15bootstrap for an overview of the build process.
