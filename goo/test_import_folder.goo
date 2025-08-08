@@ -2,5 +2,5 @@ import "helper" // folder import ok!
 
 message := helper.Hello()
 print("Message:", message)
-check "Hello" in message
+check ("Hello" in message)
 print("Import working successfully!")

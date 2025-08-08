@@ -1,0 +1,4 @@
+text := "hello world"
+// Test what should work: rune in string variable  
+check 'h' in text
+put("✅ rune in string variable works")
