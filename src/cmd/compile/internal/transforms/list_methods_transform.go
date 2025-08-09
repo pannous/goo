@@ -1,7 +1,5 @@
 // Copyright 2025 The Goo Authors. All rights reserved.
 
-//go:build transforms
-
 package transforms
 
 import (
@@ -614,10 +612,29 @@ func (t *ListMethodsTransform) createToCall(receiver, end syntax.Expr) syntax.Ex
 	return slice
 }
 
-// createReverseCall creates a non-modifying reverse that returns a new reversed slice
+// createReverseCall creates a non-modifying reverse that returns a new reversed slice  
 func (t *ListMethodsTransform) createReverseCall(receiver syntax.Expr) syntax.Expr {
-	// For now, use the in-place version until we implement clone+reverse
-	return t.createReverseInPlaceCall(receiver)
+	pos := receiver.Pos()
+	
+	// Generate slices.CloneAndReverse(receiver)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	cloneAndReverseName := &syntax.Name{Value: "CloneAndReverse"}
+	cloneAndReverseName.SetPos(pos)
+	
+	slicesCloneAndReverse := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: cloneAndReverseName,
+	}
+	slicesCloneAndReverse.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesCloneAndReverse,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 // createReverseInPlaceCall creates an in-place reverse that modifies the original slice
@@ -644,8 +661,27 @@ func (t *ListMethodsTransform) createReverseInPlaceCall(receiver syntax.Expr) sy
 
 // createSortCall creates a non-modifying sort that returns a new sorted slice  
 func (t *ListMethodsTransform) createSortCall(receiver syntax.Expr) syntax.Expr {
-	// For now, use the in-place version until we implement clone+sort
-	return t.createSortInPlaceCall(receiver)
+	pos := receiver.Pos()
+	
+	// Generate slices.CloneAndSort(receiver)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	cloneAndSortName := &syntax.Name{Value: "CloneAndSort"}
+	cloneAndSortName.SetPos(pos)
+	
+	slicesCloneAndSort := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: cloneAndSortName,
+	}
+	slicesCloneAndSort.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesCloneAndSort,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 // createSortInPlaceCall creates an in-place sort that modifies the original slice
@@ -1376,6 +1412,90 @@ func (t *ListMethodsTransform) isStringReceiver(receiver syntax.Expr) bool {
 		return basic.Kind == syntax.StringLit
 	}
 	return false
+}
+
+// createCloneAndApplyPattern generates: func() []T { cloned := slices.Clone(receiver); operation(cloned); return cloned }()
+func (t *ListMethodsTransform) createCloneAndApplyPattern(receiver, cloneCall, operationCall syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create variable name: cloned
+	clonedVar := &syntax.Name{Value: "cloned"}
+	clonedVar.SetPos(pos)
+	
+	// Create assignment: cloned := slices.Clone(receiver)
+	assignStmt := &syntax.AssignStmt{
+		Op:  syntax.Def, // :=
+		Lhs: clonedVar,
+		Rhs: cloneCall,
+	}
+	assignStmt.SetPos(pos)
+	
+	// Create operation statement (using cloned variable instead of original call)
+	// Replace the cloneCall in operationCall with clonedVar
+	modifiedOpCall := t.replaceExprInCall(operationCall, cloneCall, clonedVar)
+	
+	opStmt := &syntax.ExprStmt{
+		X: modifiedOpCall,
+	}
+	opStmt.SetPos(pos)
+	
+	// Create return statement: return cloned
+	returnStmt := &syntax.ReturnStmt{
+		Results: clonedVar,
+	}
+	returnStmt.SetPos(pos)
+	
+	// Create function body
+	body := &syntax.BlockStmt{
+		List: []syntax.Stmt{assignStmt, opStmt, returnStmt},
+	}
+	body.SetPos(pos)
+	
+	// Create return type for the function (slice type)
+	// For simplicity, we'll use interface{} and let the type checker handle it
+	returnType := &syntax.Name{Value: "any"}
+	returnType.SetPos(pos)
+	
+	// Create anonymous function with return type
+	funcLit := &syntax.FuncLit{
+		Type: &syntax.FuncType{
+			ResultList: []*syntax.Field{{Type: returnType}},
+		},
+		Body: body,
+	}
+	funcLit.SetPos(pos)
+	funcLit.Type.SetPos(pos)
+	
+	// Create function call
+	call := &syntax.CallExpr{
+		Fun: funcLit,
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+// replaceExprInCall replaces oldExpr with newExpr in a CallExpr's arguments
+func (t *ListMethodsTransform) replaceExprInCall(callExpr syntax.Expr, oldExpr, newExpr syntax.Expr) syntax.Expr {
+	if call, ok := callExpr.(*syntax.CallExpr); ok {
+		newCall := &syntax.CallExpr{
+			Fun: call.Fun,
+		}
+		newCall.SetPos(call.Pos())
+		
+		// Replace arguments
+		if call.ArgList != nil {
+			newArgList := make([]syntax.Expr, len(call.ArgList))
+			for i, arg := range call.ArgList {
+				if arg == oldExpr {
+					newArgList[i] = newExpr
+				} else {
+					newArgList[i] = arg
+				}
+			}
+			newCall.ArgList = newArgList
+		}
+		return newCall
+	}
+	return callExpr
 }
 
 func (t *ListMethodsTransform) createShiftCall(receiver syntax.Expr) syntax.Expr {

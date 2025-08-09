@@ -1,10 +1,5 @@
 Running all tests in ./goo/ directory...
 ========================================
-✅ test_printf_fmt.go
-✅ test_printf_go.go
-✅ test_printf_with_fmt.go
-✅ test_simple.go
-✅ test_unused_import_warning.go
 ✅ debug_precedence.goo
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
@@ -40,7 +35,7 @@ Running all tests in ./goo/ directory...
 ❌ test_in_operator_maps.goo
 ✅ test_in_operator_rune_strings.goo
 ✅ test_in_operator_slices.goo
-❌ test_in_operator_strings.goo
+✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_is_operator.goo
 ✅ test_iterator_for_in.goo
@@ -61,7 +56,7 @@ Running all tests in ./goo/ directory...
 ✅ test_list.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_comprehensive.goo
-❌ test_map_dot_nested.goo
+✅ test_map_dot_nested.goo
 ✅ test_map_dot_notation.goo
 ✅ test_map_fields.goo
 ✅ test_map_type_inference.goo
@@ -113,34 +108,55 @@ Running all tests in ./goo/ directory...
 ✅ test_unicode.goo
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
-❌ tests.goo
+✅ tests.goo
+❌ auto_strings_test.goo
+✅ clone_test.goo
+✅ complete_non_modifying_test.goo
 ✅ conditional_test.goo
 ✅ debug_ast.goo
 ✅ debug_generation.goo
 ❌ debug_in_test.goo
 ✅ debug_is_parsing.goo
+✅ debug_map_transform.goo
 ✅ debug_transform.goo
+❌ direct_runtime_test.goo
+✅ double_not_test.goo
 ✅ ellipsis_test.goo
 ✅ empty_list_comprehensive.goo
+❌ existing_runtime_test.goo
 ✅ existing_slice_syntax.goo
 ✅ explicit_import_test.goo
 ✅ final_conditional_test.goo
 ❌ in_contexts_test.goo
 ✅ in_literal_test.goo
 ✅ in_with_import_test.goo
+✅ is_literal_debug.goo
+✅ is_test_debug.goo
+✅ list_methods_debug.goo
+❌ list_pop_test.goo
+❌ list_sort_desc_test.goo
 ✅ manual_c_style.goo
-❌ mixed_cases_test.goo
+✅ mixed_cases_test.goo
 ✅ nil_coalesce_final_test.goo
+✅ non_modifying_test.goo
 ✅ regular_range_test.goo
 ✅ rune_in_string_test.goo
+✅ runtime_function_test.goo
+✅ runtime_test.goo
 ✅ simple_conditional_test.goo
 ✅ simple_dotdot_test.goo
 ✅ simple_filter_test.goo
-✅ simple_in_test.goo
+❌ simple_in_test.goo
 ✅ simple_is_test.goo
 ✅ simple_map_test.goo
+✅ simple_nested_map.goo
 ✅ simple_nil_test.goo
+✅ simple_non_modifying_test.goo
 ✅ simple_range_test.goo
+✅ simple_reverse_test.goo
+✅ simple_sort_test.goo
+✅ slice_explicit_test.goo
+✅ specific_case_test.goo
 ✅ string_in_string_test.goo
 ✅ strings_test_simple.goo
 ✅ strings_test.goo
@@ -221,6 +237,7 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ test_with_or.goo
 ✅ test_working_transforms.goo
+✅ truthy_test.goo
 ========================================
-Summary: 211/221 passed, 10 failed
+Summary: 226/238 passed, 12 failed
 ⚠️  Some tests failed

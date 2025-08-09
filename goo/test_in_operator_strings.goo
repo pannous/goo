@@ -24,6 +24,7 @@ text2 := "goodbye world"
 check not ("hello" in text2)  // false
 check not ("xyz" in text2)  // false
 needleText2 := "goodbye"
+check (needleText2 in text2)  // false
 check not not (needleText2 in text2)  // false
 
 printf("ALL TESTS PASSED\n")
