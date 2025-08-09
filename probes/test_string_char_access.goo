@@ -1,0 +1,5 @@
+i := 2
+check "你" == '你'
+check "你好"#2 == '好' // charAt returns a rune at the given index
+check "你好"#i == '好'
+printf("String character access test completed successfully.\n")

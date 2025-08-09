@@ -1,0 +1,6 @@
+arr := [1, 2, 3]
+check arr#1 == 1
+check arr#2 == 2
+slice := []int{10, 20, 30}
+check slice#3 == 30
+printf("Array/slice indexing still works correctly.\n")
