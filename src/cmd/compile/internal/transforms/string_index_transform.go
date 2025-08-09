@@ -88,8 +88,8 @@ func (t *StringIndexTransform) transformStringIndex(indexExpr *syntax.IndexExpr)
 	}
 	runeConversion.SetPos(pos)
 	
-	// The parser already converted 1-based to 0-based, so use index as-is
-	adjustedIndex := indexExpr.Index
+	// Handle different indexing patterns
+	adjustedIndex := t.handleIndexConversion(indexExpr.Index, runeConversion, pos)
 	
 	// Create new IndexExpr with rune slice
 	result := &syntax.IndexExpr{
@@ -100,7 +100,55 @@ func (t *StringIndexTransform) transformStringIndex(indexExpr *syntax.IndexExpr)
 	
 	return result
 }
+// handleIndexConversion handles both hash and bracket indexing patterns
+func (t *StringIndexTransform) handleIndexConversion(index syntax.Expr, runeSlice syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Pattern 1: Hash-generated negative indexing: (-N) - 1 → len(runes) - N
+	if op, ok := index.(*syntax.Operation); ok && op.Op == syntax.Sub {
+		// Check if Y is literal 1 (from parser's 1-based conversion)
+		if lit, ok := op.Y.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit && lit.Value == "1" {
+			// Check if X is a unary minus operation  
+			if unary, ok := op.X.(*syntax.Operation); ok {
+				if unary.Op == syntax.Sub && unary.Y == nil {
+					// This is (-N) - 1, convert to len(runes) - N
+					if negLit, ok := unary.X.(*syntax.BasicLit); ok && negLit.Kind == syntax.IntLit {
+						return t.createNegativeIndex(runeSlice, negLit, pos)
+					}
+				}
+			}
+		}
+	}
+	
+	// Pattern 2: Regular bracket negative indexing: -N → len(runes) - N  
+	if unary, ok := index.(*syntax.Operation); ok && unary.Op == syntax.Sub && unary.Y == nil {
+		if negLit, ok := unary.X.(*syntax.BasicLit); ok && negLit.Kind == syntax.IntLit {
+			return t.createNegativeIndex(runeSlice, negLit, pos)
+		}
+	}
+	
+	// For non-negative indices, return as-is
+	return index
+}
 
+// createNegativeIndex creates len(runes) - N for negative indexing
+func (t *StringIndexTransform) createNegativeIndex(runeSlice syntax.Expr, negLit *syntax.BasicLit, pos syntax.Pos) syntax.Expr {
+	// Create len(runeSlice)
+	lenCall := &syntax.CallExpr{
+		Fun:     &syntax.Name{Value: "len"},
+		ArgList: []syntax.Expr{runeSlice},
+	}
+	lenCall.SetPos(pos)
+	lenCall.Fun.SetPos(pos)
+	
+	// Create len(runes) - N (where N is the positive value)
+	result := &syntax.Operation{
+		Op: syntax.Sub,
+		X:  lenCall,
+		Y:  negLit,
+	}
+	result.SetPos(pos)
+	
+	return result
+}
 
 func init() {
 	RegisterTransformer(&StringIndexTransform{})

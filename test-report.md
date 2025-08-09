@@ -105,11 +105,22 @@ Running all tests in ./goo/ directory...
 ✅ test_try_propagation.goo
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
-✅ test_unicode.goo
+❌ test_unicode.goo
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
+❌ debug_negative_transform.goo
+✅ debug_string_positions.goo
+❌ debug_string_var_type.goo
+✅ debug_syntax_negative.goo
+✅ test_array_index_still_works.goo
+✅ test_chinese_var_explicit.goo
+✅ test_chinese_var_positive.goo
+✅ test_chinese_variable_negative_index.goo
+✅ test_chinese_variable_working.goo
+✅ test_simple_string_var.goo
+✅ test_string_char_access.goo
 ✅ test_string_indexof_overload.goo
 ========================================
-Summary: 107/110 passed, 3 failed
+Summary: 115/121 passed, 6 failed
 ⚠️  Some tests failed
