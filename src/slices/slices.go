@@ -8,6 +8,7 @@ package slices
 import (
 	"cmp"
 	"math/bits"
+	"strings"
 	"unsafe"
 )
 
@@ -613,62 +614,58 @@ func JoinStringify[S ~[]E, E any](s S, sep string) string {
 	}
 	
 	// Use strings.Join to join the string slice
-	return joinStrings(strSlice, sep)
+	return strings.Join(strSlice, sep)
+}
+
+// Stringer interface for types that have String() method
+type Stringer interface {
+	String() string
 }
 
 // toString converts any value to a string representation
+// Checks for String() method first, then falls back to basic conversions
 func toString[T any](v T) string {
-	// Use fmt.Sprintf to convert any type to string
-	return sprintf("%v", v)
-}
-
-// joinStrings joins string slices - equivalent to strings.Join
-func joinStrings(strs []string, sep string) string {
-	if len(strs) == 0 {
-		return ""
-	}
-	if len(strs) == 1 {
-		return strs[0]
+	// Check if the type implements String() method
+	if s, ok := any(v).(Stringer); ok {
+		return s.String()
 	}
 	
-	// Calculate total length needed
-	totalLen := len(strs[0])
-	for i := 1; i < len(strs); i++ {
-		totalLen += len(sep) + len(strs[i])
-	}
-	
-	// Build result string efficiently
-	result := make([]byte, 0, totalLen)
-	result = append(result, strs[0]...)
-	for i := 1; i < len(strs); i++ {
-		result = append(result, sep...)
-		result = append(result, strs[i]...)
-	}
-	
-	return string(result)
-}
-
-// sprintf is a placeholder - in real implementation we'd import fmt
-// For now, we'll implement basic cases
-func sprintf(format string, v any) string {
-	// This is a simplified implementation
-	// In reality, we'd use fmt.Sprintf or similar
-	switch val := v.(type) {
-	case int:
-		return intToString(val)
+	// Fall back to basic type conversions
+	switch val := any(v).(type) {
 	case string:
 		return val
+	case int:
+		return intToString(val)
+	case int8:
+		return intToString(int(val))
+	case int16:
+		return intToString(int(val))
+	case int32:
+		return intToString(int(val))
+	case int64:
+		return intToString(int(val))
+	case uint:
+		return intToString(int(val))
+	case uint8:
+		return intToString(int(val))
+	case uint16:
+		return intToString(int(val))
+	case uint32:
+		return intToString(int(val))
+	case uint64:
+		return intToString(int(val))
 	case bool:
 		if val {
 			return "true"
 		}
 		return "false"
+	case float32:
+		return floatToString(float64(val))
 	case float64:
 		return floatToString(val)
 	default:
-		// For other types, we'll need to handle them case by case
-		// This is a simplified approach
-		return "unknown"
+		// For unknown types, return a placeholder
+		return "<value>"
 	}
 }
 
@@ -706,4 +703,26 @@ func floatToString(f float64) string {
 	// This is a very simplified implementation
 	// Just handle integer part for now
 	return intToString(int(f))
+}
+
+// PopElement returns the last element of the slice.
+// Note: This doesn't modify the original slice (Go limitation)
+// The user should use slice = slice[:len(slice)-1] to actually remove it
+func PopElement[S ~[]E, E any](s S) E {
+	if len(s) == 0 {
+		var zero E
+		return zero // Return zero value for empty slice
+	}
+	return s[len(s)-1]
+}
+
+// ShiftElement returns the first element of the slice.
+// Note: This doesn't modify the original slice (Go limitation)  
+// The user should use slice = slice[1:] to actually remove it
+func ShiftElement[S ~[]E, E any](s S) E {
+	if len(s) == 0 {
+		var zero E
+		return zero // Return zero value for empty slice
+	}
+	return s[0]
 }

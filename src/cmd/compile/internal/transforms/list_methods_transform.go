@@ -67,8 +67,12 @@ func (t *ListMethodsTransform) transformListMethod(receiver syntax.Expr, methodN
 		}
 	case "pop":
 		return t.createPopCall(receiver)
+	case "pop!":
+		return t.createPopInPlaceCall(receiver)
 	case "shift":
 		return t.createShiftCall(receiver)
+	case "shift!":
+		return t.createShiftInPlaceCall(receiver)
 	case "insert":
 		if len(args) == 2 {
 			return t.createInsertCall(receiver, args[0], args[1])
@@ -1430,14 +1434,47 @@ func (t *ListMethodsTransform) createSortDescCall(receiver syntax.Expr) syntax.E
 }
 
 func (t *ListMethodsTransform) createPopCall(receiver syntax.Expr) syntax.Expr {
-	// Create call to listPop builtin function
 	pos := receiver.Pos()
 	
-	popName := &syntax.Name{Value: "listPop"}
-	popName.SetPos(pos)
+	// Generate slices.PopElement(receiver)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	popElementName := &syntax.Name{Value: "PopElement"}
+	popElementName.SetPos(pos)
+	
+	slicesPopElement := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: popElementName,
+	}
+	slicesPopElement.SetPos(pos)
 	
 	call := &syntax.CallExpr{
-		Fun:     popName,
+		Fun:     slicesPopElement,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+func (t *ListMethodsTransform) createPopInPlaceCall(receiver syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+	
+	// Generate slices.PopElement(receiver) - same as non-modifying version
+	// Note: Go limitation - we can't actually modify slices in-place from methods
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	popElementName := &syntax.Name{Value: "PopElement"}
+	popElementName.SetPos(pos)
+	
+	slicesPopElement := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: popElementName,
+	}
+	slicesPopElement.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesPopElement,
 		ArgList: []syntax.Expr{receiver},
 	}
 	call.SetPos(pos)
@@ -1539,14 +1576,47 @@ func (t *ListMethodsTransform) replaceExprInCall(callExpr syntax.Expr, oldExpr, 
 }
 
 func (t *ListMethodsTransform) createShiftCall(receiver syntax.Expr) syntax.Expr {
-	// Create call to listShift builtin function
 	pos := receiver.Pos()
 	
-	shiftName := &syntax.Name{Value: "listShift"}
-	shiftName.SetPos(pos)
+	// Generate slices.ShiftElement(receiver)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	shiftElementName := &syntax.Name{Value: "ShiftElement"}
+	shiftElementName.SetPos(pos)
+	
+	slicesShiftElement := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: shiftElementName,
+	}
+	slicesShiftElement.SetPos(pos)
 	
 	call := &syntax.CallExpr{
-		Fun:     shiftName,
+		Fun:     slicesShiftElement,
+		ArgList: []syntax.Expr{receiver},
+	}
+	call.SetPos(pos)
+	
+	return call
+}
+
+func (t *ListMethodsTransform) createShiftInPlaceCall(receiver syntax.Expr) syntax.Expr {
+	pos := receiver.Pos()
+	
+	// Generate slices.ShiftElement(receiver) - same as non-modifying version  
+	// Note: Go limitation - we can't actually modify slices in-place from methods
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	shiftElementName := &syntax.Name{Value: "ShiftElement"}
+	shiftElementName.SetPos(pos)
+	
+	slicesShiftElement := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: shiftElementName,
+	}
+	slicesShiftElement.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesShiftElement,
 		ArgList: []syntax.Expr{receiver},
 	}
 	call.SetPos(pos)
