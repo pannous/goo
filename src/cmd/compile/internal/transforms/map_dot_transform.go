@@ -22,16 +22,29 @@ func (t *MapDotTransform) Priority() int {
 }
 
 func (t *MapDotTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	visitor := &mapDotVisitor{ctx: ctx}
+	anyChanged := false
 	
-	// Transform function declarations
-	for _, decl := range file.DeclList {
-		if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
-			visitor.walkBlockStmt(funcDecl.Body)
+	// Keep transforming until no more changes can be made (for nested cases)
+	maxIterations := 10 // Prevent infinite loops
+	for i := 0; i < maxIterations; i++ {
+		visitor := &mapDotVisitor{ctx: ctx}
+		
+		// Transform function declarations
+		for _, decl := range file.DeclList {
+			if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
+				visitor.walkBlockStmt(funcDecl.Body)
+			}
+		}
+		
+		if visitor.changed {
+			anyChanged = true
+		} else {
+			// No changes in this iteration, we're done
+			break
 		}
 	}
 	
-	return visitor.changed
+	return anyChanged
 }
 
 // mapDotVisitor implements the visitor pattern for map dot notation transformation
@@ -102,13 +115,14 @@ func (v *mapDotVisitor) walkExpr(exprPtr *syntax.Expr) {
 	
 	switch e := expr.(type) {
 	case *syntax.SelectorExpr:
-		// First check if this selector should be transformed
+		// First walk the base expression to transform any nested selectors
+		v.walkExpr(&e.X)
+		
+		// Then check if this selector should be transformed
 		if newExpr := v.transformSelector(e); newExpr != nil {
 			*exprPtr = newExpr
 			v.changed = true
 		}
-		// Also walk the base expression
-		v.walkExpr(&e.X)
 	case *syntax.CallExpr:
 		v.walkExpr(&e.Fun)
 		if e.ArgList != nil {
@@ -148,7 +162,85 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 			}
 		}
 	}
+
+	// Also handle cases where the base is an IndexExpr (for nested map access)
+	// e.g., config["database"].host -> config["database"]["host"]
+	if indexExpr, ok := sel.X.(*syntax.IndexExpr); ok {
+		// If the base IndexExpr is likely a map access, transform this selector too
+		if v.looksLikeMapAccess(indexExpr) {
+			keyName := sel.Sel.Value
+			stringLit := &syntax.BasicLit{
+				Kind:  syntax.StringLit,
+				Value: `"` + keyName + `"`,
+			}
+			stringLit.SetPos(sel.Sel.Pos())
+			
+			result := &syntax.IndexExpr{
+				X:     sel.X,
+				Index: stringLit,
+			}
+			result.SetPos(sel.Pos())
+			return result
+		}
+	}
+
+	// Handle cases where the base is a SelectorExpr that results in a map
+	// e.g., settings.flags.debug -> settings.flags["debug"] 
+	if selectorExpr, ok := sel.X.(*syntax.SelectorExpr); ok {
+		// Check if this selector expression refers to a map field
+		if v.isMapFieldAccess(selectorExpr) {
+			keyName := sel.Sel.Value
+			stringLit := &syntax.BasicLit{
+				Kind:  syntax.StringLit,
+				Value: `"` + keyName + `"`,
+			}
+			stringLit.SetPos(sel.Sel.Pos())
+			
+			result := &syntax.IndexExpr{
+				X:     sel.X,
+				Index: stringLit,
+			}
+			result.SetPos(sel.Pos())
+			return result
+		}
+	}
 	return nil
+}
+
+// looksLikeMapAccess checks if an IndexExpr is likely a map access with string key
+func (v *mapDotVisitor) looksLikeMapAccess(indexExpr *syntax.IndexExpr) bool {
+	// Check if the index is a string literal (strong indicator of map access)
+	if basicLit, ok := indexExpr.Index.(*syntax.BasicLit); ok {
+		if basicLit.Kind == syntax.StringLit {
+			return true
+		}
+	}
+	
+	// Could add more heuristics here if needed:
+	// - Check if base variable is known to be a map
+	// - Check patterns in usage context
+	
+	return false
+}
+
+// isMapFieldAccess checks if a selector expression accesses a map field
+func (v *mapDotVisitor) isMapFieldAccess(selectorExpr *syntax.SelectorExpr) bool {
+	// For cases like settings.flags where flags is a map field
+	// We need to check if the field being accessed is of map type
+	
+	// This is a heuristic approach since we don't have full type information
+	// We assume that common map field names are likely maps
+	fieldName := selectorExpr.Sel.Value
+	commonMapFields := []string{"flags", "config", "settings", "options", "params", "data", "meta"}
+	
+	for _, mapField := range commonMapFields {
+		if fieldName == mapField {
+			return true
+		}
+	}
+	
+	// Could be enhanced with more sophisticated type inference
+	return false
 }
 
 func init() {

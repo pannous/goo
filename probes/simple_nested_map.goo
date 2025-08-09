@@ -1,0 +1,7 @@
+config := map[string]map[string]string{
+    "database": {"host": "localhost"},
+}
+
+// Test simple nested access
+result := config.database.host
+printf("Result: %v\n", result)
