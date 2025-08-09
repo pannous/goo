@@ -31,7 +31,8 @@
       "Bash(timeout:*)",
       "Bash(git ls-tree:*)",
       "Bash(git commit:*)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(git cherry-pick:*)"
     ],
     "deny": []
   }
