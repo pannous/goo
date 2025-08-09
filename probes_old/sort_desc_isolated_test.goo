@@ -1,0 +1,8 @@
+import "slices"
+
+aList := [1, 2, 3]
+
+// Test the exact line from the original test
+check aList.sortDesc() == [3,2,1]
+
+printf("sortDesc test passed!\n")

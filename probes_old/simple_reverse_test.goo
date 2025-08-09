@@ -1,0 +1,6 @@
+original := [3, 1, 2]
+printf("Original: %v\n", original)
+
+// Test the non-modifying reverse method
+reversed := original.reverse()
+printf("After reverse(): original=%v, reversed=%v\n", original, reversed)

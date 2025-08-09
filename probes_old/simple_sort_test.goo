@@ -1,0 +1,6 @@
+original := [3, 1, 2]
+printf("Original: %v\n", original)
+
+// Test the non-modifying sort method
+sorted := original.sort()
+printf("After sort(): original=%v, sorted=%v\n", original, sorted)

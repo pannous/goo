@@ -1,0 +1,5 @@
+// Test if listSortDesc function works directly  
+original := [3, 1, 2]
+printf("Original: %v\n", original)
+result := listSortDesc(original)
+printf("listSortDesc result: %v\n", result)

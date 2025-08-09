@@ -1,0 +1,11 @@
+import "slices"
+
+aList := [1, 2, 3]
+printf("Original aList: %v\n", aList)
+
+// Test sortDesc method
+result := aList.sortDesc()
+printf("After sortDesc(): aList=%v, result=%v\n", aList, result)
+
+// Test if result matches expected [3, 2, 1]
+printf("Expected: [3 2 1], Got: %v\n", result)

@@ -1,0 +1,13 @@
+original := [3, 1, 2]
+printf("Original: %v\n", original)
+
+// Test non-modifying sort
+sorted := original.sort()
+printf("After sort(): original=%v, sorted=%v\n", original, sorted)
+
+// Test non-modifying reverse  
+reversed := original.reverse()
+printf("After reverse(): original=%v, reversed=%v\n", original, reversed)
+
+// Verify original is still unchanged
+printf("Final original: %v\n", original)

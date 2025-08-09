@@ -1,0 +1,20 @@
+import "slices"
+
+// Test the exact lines from the original test
+aList := [1, 2, 3]
+
+// After sort!() aList becomes [1, 2, 3] 
+aList.sort!()
+printf("After sort!(): aList = %v\n", aList)
+
+check aList.shift!() == 1 // and removes it
+printf("shift!() test passed\n")
+
+// After reverse!() aList becomes [3, 2, 1] 
+aList.reverse!()  
+printf("After reverse!(): aList = %v\n", aList)
+
+check aList.pop!() == 3 // and removes it
+printf("pop!() test passed\n")
+
+printf("Both pop! and shift! tests passed!\n")

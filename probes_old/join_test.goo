@@ -1,0 +1,17 @@
+import "slices"
+
+// Test string slice join (should work like before)
+stringSlice := ["1", "2", "3"]
+printf("String slice: %v\n", stringSlice)
+result1 := stringSlice.join("-")
+printf("String join result: %s\n", result1)
+
+// Test integer slice join (the new functionality)
+intSlice := [1, 2, 3]
+printf("Integer slice: %v\n", intSlice)
+result2 := intSlice.join("-")
+printf("Integer join result: %s\n", result2)
+
+// Test if results match expected
+printf("Expected string: \"1-2-3\", Got string: \"%s\"\n", result1)
+printf("Expected integer: \"1-2-3\", Got integer: \"%s\"\n", result2)
