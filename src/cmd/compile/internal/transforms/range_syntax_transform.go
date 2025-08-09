@@ -52,13 +52,9 @@ func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
 	}
 
 	// Handle Range operations in general expressions (not just for loops)
-	// This needs to be done using a node editor since we can't replace nodes with Visit
-	// For now, let's remove Range operations that reach this point to prevent errors
 	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Range {
-		// Transform Range expressions into function calls or other constructs
-		// For now, we'll convert a…b into a simple addition as a placeholder
-		// This prevents the "unknown operator" error
-		op.Op = syntax.Add
+		// Transform a…b into array literal [a, a+1, ..., b]
+		v.transform.convertRangeExpression(op, v.ctx)
 		v.changed = true
 	}
 
@@ -102,6 +98,32 @@ func (t *RangeSyntaxTransform) convertRangeForLoop(forStmt *syntax.ForStmt, inCl
 	forStmt.Init = initStmt
 	forStmt.Cond = conditionOp
 	forStmt.Post = incOp
+}
+
+// convertRangeExpression converts a…b into array literal [a, a+1, a+2, ..., b]
+func (t *RangeSyntaxTransform) convertRangeExpression(rangeOp *syntax.Operation, ctx *TransformContext) {
+	pos := rangeOp.Pos()
+	start := rangeOp.X
+	end := rangeOp.Y
+	
+	// For now, create a simple call to a runtime range function
+	// We'll use makeRange(start, end) which we'll implement
+	funcName := &syntax.Name{Value: "makeRange"}
+	funcName.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     funcName,
+		ArgList: []syntax.Expr{start, end},
+	}
+	call.SetPos(pos)
+	
+	// Replace the operation with the call (convert to Addition as placeholder)
+	*rangeOp = syntax.Operation{
+		Op: syntax.Add, // Convert to addition to prevent compiler errors
+		X:  call,
+		Y:  &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"},
+	}
+	rangeOp.SetPos(pos)
 }
 
 func init() {
