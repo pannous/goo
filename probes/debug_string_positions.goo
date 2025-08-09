@@ -1,0 +1,7 @@
+var 变量 = "Chinese variable 变量"
+runes := []rune(变量)
+printf("String: %s\n", 变量)
+printf("Length: %d\n", len(runes))
+for i := 0; i < len(runes); i++ {
+    printf("Index %d (1-based %d): '%c'\n", i, i+1, runes[i])
+}

@@ -1,0 +1,4 @@
+var 变量 = "Chinese variable 变量"
+runes := []rune(变量)
+check runes[len(runes)-1] == '量'
+printf("Chinese variable explicit test completed.\n")

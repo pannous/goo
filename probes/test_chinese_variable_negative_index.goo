@@ -1,0 +1,3 @@
+var 变量 = "Chinese variable 变量"
+check 变量#19 == '量'
+printf("Chinese variable test completed successfully.\n")
