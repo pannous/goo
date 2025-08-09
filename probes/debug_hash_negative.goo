@@ -1,0 +1,2 @@
+var test = "hello"
+check test#-1 == 'o'
