@@ -907,14 +907,20 @@ func (t *StringMethodsTransform) createContainsCall(receiver, arg syntax.Expr) s
 	return call
 }
 
-// createIndexCall creates strings.Index(receiver, arg)
+// createIndexCall creates strings.Index(receiver, arg) or strings.IndexByte(receiver, arg) for rune literals
 func (t *StringMethodsTransform) createIndexCall(receiver, arg syntax.Expr) syntax.Expr {
 	pos := receiver.Pos()
 
 	stringsName := &syntax.Name{Value: "strings"}
 	stringsName.SetPos(pos)
 
-	funcName := &syntax.Name{Value: "Index"}
+	// Check if arg is a rune literal for automatic overloading
+	var funcName *syntax.Name
+	if t.isRuneLiteral(arg) {
+		funcName = &syntax.Name{Value: "IndexByte"}
+	} else {
+		funcName = &syntax.Name{Value: "Index"}
+	}
 	funcName.SetPos(pos)
 
 	selector := &syntax.SelectorExpr{
@@ -2273,6 +2279,14 @@ func (t *StringMethodsTransform) createMustWrapper(pos syntax.Pos, call syntax.E
 	funcCall.SetPos(pos)
 	
 	return funcCall
+}
+
+// isRuneLiteral checks if an expression is a rune literal (e.g. 'a', 'b')
+func (t *StringMethodsTransform) isRuneLiteral(expr syntax.Expr) bool {
+	if lit, ok := expr.(*syntax.BasicLit); ok {
+		return lit.Kind == syntax.RuneLit
+	}
+	return false
 }
 
 func init() {
