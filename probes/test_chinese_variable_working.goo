@@ -1,0 +1,5 @@
+var 变量 = "Chinese variable 变量"
+check 变量#1 == 'C'
+check 变量#9 == 'v'
+check 变量#18 == '变'
+printf("Chinese variable indexing works!\n")

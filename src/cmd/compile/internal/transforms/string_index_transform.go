@@ -40,7 +40,7 @@ func (v *stringIndexVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 	// Look for IndexExpr nodes that need transformation
 	if indexExpr, ok := node.(*syntax.IndexExpr); ok {
-		if v.transform.isStringLiteralIndex(indexExpr) {
+		if v.transform.isStringLiteralIndex(indexExpr, v.ctx) {
 			// Transform in place
 			newExpr := v.transform.transformStringIndex(indexExpr)
 			*indexExpr = *newExpr.(*syntax.IndexExpr)
@@ -51,16 +51,26 @@ func (v *stringIndexVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// isStringLiteralIndex checks if this is ONLY a string literal being indexed
-func (t *StringIndexTransform) isStringLiteralIndex(indexExpr *syntax.IndexExpr) bool {
-	// ONLY handle string literals - extremely conservative
+// isStringLiteralIndex checks if this is a string being indexed
+func (t *StringIndexTransform) isStringLiteralIndex(indexExpr *syntax.IndexExpr, ctx *TransformContext) bool {
+	// Handle string literals
 	if lit, ok := indexExpr.X.(*syntax.BasicLit); ok {
 		return lit.Kind == syntax.StringLit
 	}
+	
+	// Handle string variables by checking type context
+	if name, ok := indexExpr.X.(*syntax.Name); ok {
+		if ctx != nil && ctx.Types != nil {
+			if varType, exists := ctx.Types[name.Value]; exists {
+				return varType == "string"
+			}
+		}
+	}
+	
 	return false
 }
 
-// transformStringIndex transforms string[index] to []rune(string)[index]
+// transformStringIndex transforms string[index] to []rune(string)[adjustedIndex]
 func (t *StringIndexTransform) transformStringIndex(indexExpr *syntax.IndexExpr) syntax.Expr {
 	pos := indexExpr.Pos()
 	
@@ -71,22 +81,26 @@ func (t *StringIndexTransform) transformStringIndex(indexExpr *syntax.IndexExpr)
 	sliceType := &syntax.SliceType{Elem: runeType}
 	sliceType.SetPos(pos)
 	
-	// Create []rune(string_literal)
+	// Create []rune(string_expr)
 	runeConversion := &syntax.CallExpr{
 		Fun:     sliceType,
 		ArgList: []syntax.Expr{indexExpr.X},
 	}
 	runeConversion.SetPos(pos)
 	
+	// The parser already converted 1-based to 0-based, so use index as-is
+	adjustedIndex := indexExpr.Index
+	
 	// Create new IndexExpr with rune slice
 	result := &syntax.IndexExpr{
 		X:     runeConversion,
-		Index: indexExpr.Index, // Keep same index (parser already handles 1-based to 0-based)
+		Index: adjustedIndex,
 	}
 	result.SetPos(pos)
 	
 	return result
 }
+
 
 func init() {
 	RegisterTransformer(&StringIndexTransform{})

@@ -283,6 +283,11 @@ func collectFromVarDecl(varDecl *syntax.VarDecl, ctx *TransformContext) {
 // inferTypeFromExpression attempts to infer the type of an expression
 func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 	switch e := expr.(type) {
+	case *syntax.BasicLit:
+		// Handle string literals like "hello"
+		if e.Kind == syntax.StringLit {
+			return "string"
+		}
 	case *syntax.CompositeLit:
 		// Handle []User{{...}} literals
 		if arrayType, ok := e.Type.(*syntax.ArrayType); ok {
