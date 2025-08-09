@@ -1,0 +1,5 @@
+check "abc".indexOf("b") == 1
+check "abc".indexOf("x") == -1  
+check "abc".indexOf('b') == 1  // magic 'overload' via transform! => strings.IndexByte
+check "abc".indexOf('x') == -1
+printf("String indexOf overloading test completed successfully.\n")
