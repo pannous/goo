@@ -159,6 +159,84 @@ func typeMatches(value interface{}, typeName string) bool {
 	return isTypeOf(value, typeName)
 }
 
+// listSort sorts a list in ascending order and returns the sorted list
+func listSort(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		// Create a copy to avoid modifying original
+		result := make([]int, len(v))
+		copy(result, v)
+		// Simple bubble sort in ascending order
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] > result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	case []string:
+		result := make([]string, len(v))
+		copy(result, v)
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] > result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	case []float64:
+		result := make([]float64, len(v))
+		copy(result, v)
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] > result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	default:
+		// For unsupported types, return original
+		return list
+	}
+}
+
+// listReverse reverses a list and returns the reversed list  
+func listReverse(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		// Create a copy to avoid modifying original
+		result := make([]int, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	case []string:
+		result := make([]string, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	case []float64:
+		result := make([]float64, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	case []interface{}:
+		result := make([]interface{}, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	default:
+		// For unsupported types, return original
+		return list
+	}
+}
+
 // listSortDesc sorts a list in descending order and returns the sorted list
 func listSortDesc(list interface{}) interface{} {
 	switch v := list.(type) {
@@ -256,5 +334,82 @@ func listShift(list interface{}) interface{} {
 		return v[0]
 	default:
 		return nil
+	}
+}
+
+// sliceCloneAndSort creates a clone of the slice and sorts it
+func sliceCloneAndSort(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		// Create a copy
+		result := make([]int, len(v))
+		copy(result, v)
+		// Simple bubble sort in ascending order
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] > result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	case []string:
+		result := make([]string, len(v))
+		copy(result, v)
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] > result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	case []float64:
+		result := make([]float64, len(v))
+		copy(result, v)
+		for i := 0; i < len(result); i++ {
+			for j := i + 1; j < len(result); j++ {
+				if result[i] > result[j] {
+					result[i], result[j] = result[j], result[i]
+				}
+			}
+		}
+		return result
+	default:
+		// For unsupported types, return original
+		return list
+	}
+}
+
+// sliceCloneAndReverse creates a clone of the slice and reverses it  
+func sliceCloneAndReverse(list interface{}) interface{} {
+	switch v := list.(type) {
+	case []int:
+		result := make([]int, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	case []string:
+		result := make([]string, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	case []float64:
+		result := make([]float64, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	case []interface{}:
+		result := make([]interface{}, len(v))
+		for i, val := range v {
+			result[len(v)-1-i] = val
+		}
+		return result
+	default:
+		// For unsupported types, return original
+		return list
 	}
 }

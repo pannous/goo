@@ -555,3 +555,21 @@ func Filter[S ~[]E, E any](s S, f func(E) bool) S {
 	}
 	return result
 }
+
+// CloneAndSort returns a copy of the slice with elements sorted in ascending order.
+// The original slice is not modified.
+func CloneAndSort[S ~[]E, E cmp.Ordered](s S) S {
+	result := Clone(s)
+	Sort(result)
+	return result
+}
+
+// CloneAndReverse returns a copy of the slice with elements in reverse order.
+// The original slice is not modified.
+func CloneAndReverse[S ~[]E, E any](s S) S {
+	result := make(S, len(s))
+	for i, v := range s {
+		result[len(s)-1-i] = v
+	}
+	return result
+}

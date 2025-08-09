@@ -6,6 +6,11 @@
 check 'a' in "abcde"  // true
 #check 1 in [1,2,3]
 check "a" in "abcde"  // true
+ok := [1, 2, 3] is []int
+check ok
+check not false
+check not not true
+check [1, 2, 3] is []int
 printf("OK")
 
 
