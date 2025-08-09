@@ -41,9 +41,15 @@ func (v *stringIndexVisitor) Visit(node syntax.Node) syntax.Visitor {
 	// Look for IndexExpr nodes that need transformation
 	if indexExpr, ok := node.(*syntax.IndexExpr); ok {
 		if v.transform.isStringLiteralIndex(indexExpr, v.ctx) {
-			// Transform in place
+			// Transform - might return CallExpr or IndexExpr
 			newExpr := v.transform.transformStringIndex(indexExpr)
-			*indexExpr = *newExpr.(*syntax.IndexExpr)
+			if newIndex, ok := newExpr.(*syntax.IndexExpr); ok {
+				// Rune slice indexing - replace in place
+				*indexExpr = *newIndex
+			} else {
+				// Character search call - need to replace the parent node
+				// For now, convert back to index expr format (this is a limitation)
+			}
 			v.changed = true
 		}
 	}
@@ -70,10 +76,73 @@ func (t *StringIndexTransform) isStringLiteralIndex(indexExpr *syntax.IndexExpr,
 	return false
 }
 
-// transformStringIndex transforms string[index] to []rune(string)[adjustedIndex]
+// isRuneIndex checks if the index is a rune literal for character-based indexing
+func (t *StringIndexTransform) isRuneIndex(index syntax.Expr) bool {
+	// Direct rune literal
+	if lit, ok := index.(*syntax.BasicLit); ok {
+		return lit.Kind == syntax.RuneLit
+	}
+	
+	// Parser-generated pattern: (rune_literal) - 1 from hash syntax
+	if op, ok := index.(*syntax.Operation); ok && op.Op == syntax.Sub {
+		if lit, ok := op.Y.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit && lit.Value == "1" {
+			if runeLit, ok := op.X.(*syntax.BasicLit); ok && runeLit.Kind == syntax.RuneLit {
+				return true
+			}
+		}
+	}
+	
+	return false
+}
+
+// createCharacterIndexCall creates strings.IndexByte(receiver, char) for character-based indexing
+func (t *StringIndexTransform) createCharacterIndexCall(receiver, index syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Extract the actual rune literal from parser pattern or use directly
+	var runeLit syntax.Expr
+	if op, ok := index.(*syntax.Operation); ok && op.Op == syntax.Sub {
+		// Parser pattern: (rune_literal) - 1
+		if lit, ok := op.Y.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit && lit.Value == "1" {
+			if rune, ok := op.X.(*syntax.BasicLit); ok && rune.Kind == syntax.RuneLit {
+				runeLit = rune
+			}
+		}
+	} else {
+		// Direct rune literal
+		runeLit = index
+	}
+	
+	// Create strings.IndexByte call
+	stringsName := &syntax.Name{Value: "strings"}
+	stringsName.SetPos(pos)
+	
+	indexByteName := &syntax.Name{Value: "IndexByte"}
+	indexByteName.SetPos(pos)
+	
+	selector := &syntax.SelectorExpr{
+		X:   stringsName,
+		Sel: indexByteName,
+	}
+	selector.SetPos(pos)
+	
+	// Create function call
+	result := &syntax.CallExpr{
+		Fun:     selector,
+		ArgList: []syntax.Expr{receiver, runeLit},
+	}
+	result.SetPos(pos)
+	
+	return result
+}
+
+// transformStringIndex transforms string[index] to []rune(string)[adjustedIndex] or strings.IndexByte
 func (t *StringIndexTransform) transformStringIndex(indexExpr *syntax.IndexExpr) syntax.Expr {
 	pos := indexExpr.Pos()
 	
+	
+	// TODO: Character-based indexing "abc"#'b' not yet implemented
+	// Would need more sophisticated node replacement to return CallExpr from IndexExpr context
+	
+	// Regular numeric indexing: convert to rune slice access
 	// Create []rune type
 	runeType := &syntax.Name{Value: "rune"}
 	runeType.SetPos(pos)
@@ -100,6 +169,7 @@ func (t *StringIndexTransform) transformStringIndex(indexExpr *syntax.IndexExpr)
 	
 	return result
 }
+
 // handleIndexConversion handles both hash and bracket indexing patterns
 func (t *StringIndexTransform) handleIndexConversion(index syntax.Expr, runeSlice syntax.Expr, pos syntax.Pos) syntax.Expr {
 	// Pattern 1: Hash-generated negative indexing: (-N) - 1 → len(runes) - N
