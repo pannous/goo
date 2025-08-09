@@ -1,0 +1,7 @@
+config := map[string]string{
+    "host": "localhost",
+}
+
+// Test single level - this should work
+result1 := config.host
+printf("Single level: %v\n", result1)
