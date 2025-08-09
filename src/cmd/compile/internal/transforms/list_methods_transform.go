@@ -774,7 +774,27 @@ func (t *ListMethodsTransform) createPrependCall(receiver, value syntax.Expr) sy
 }
 
 func (t *ListMethodsTransform) createInsertCall(receiver, index, value syntax.Expr) syntax.Expr {
-	return t.createCompilerError(receiver, "insert", "insert_at_index")
+	pos := receiver.Pos()
+	
+	// Generate slices.CloneAndInsert(receiver, index, value)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	cloneAndInsertName := &syntax.Name{Value: "CloneAndInsert"}
+	cloneAndInsertName.SetPos(pos)
+	
+	slicesCloneAndInsert := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: cloneAndInsertName,
+	}
+	slicesCloneAndInsert.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesCloneAndInsert,
+		ArgList: []syntax.Expr{receiver, index, value},
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 func (t *ListMethodsTransform) createRemoveCall(receiver, value syntax.Expr) syntax.Expr {
@@ -894,15 +914,27 @@ func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ct
 }
 
 func (t *ListMethodsTransform) createJoinCall(receiver, separator syntax.Expr) syntax.Expr {
-	// For now, create a simple join implementation using string conversion
-	// This is a placeholder - a full implementation would need runtime support
-	return &syntax.CallExpr{
-		Fun: &syntax.SelectorExpr{
-			X:   &syntax.Name{Value: "strings"},
-			Sel: &syntax.Name{Value: "Join"},
-		},
+	pos := receiver.Pos()
+	
+	// Generate slices.JoinStringify(receiver, separator)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	joinStringifyName := &syntax.Name{Value: "JoinStringify"}
+	joinStringifyName.SetPos(pos)
+	
+	slicesJoinStringify := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: joinStringifyName,
+	}
+	slicesJoinStringify.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun:     slicesJoinStringify,
 		ArgList: []syntax.Expr{receiver, separator},
 	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 func (t *ListMethodsTransform) createSumCall(receiver syntax.Expr) syntax.Expr {
@@ -1374,14 +1406,22 @@ func (t *ListMethodsTransform) extractElementType(varName string, ctx *Transform
 // Create methods for the new list operations
 
 func (t *ListMethodsTransform) createSortDescCall(receiver syntax.Expr) syntax.Expr {
-	// Create call to listSortDesc builtin function
 	pos := receiver.Pos()
 	
-	sortDescName := &syntax.Name{Value: "listSortDesc"}
-	sortDescName.SetPos(pos)
+	// Generate slices.CloneAndSortDesc(receiver)
+	slicesName := &syntax.Name{Value: "slices"}
+	slicesName.SetPos(pos)
+	cloneAndSortDescName := &syntax.Name{Value: "CloneAndSortDesc"}
+	cloneAndSortDescName.SetPos(pos)
+	
+	slicesCloneAndSortDesc := &syntax.SelectorExpr{
+		X:   slicesName,
+		Sel: cloneAndSortDescName,
+	}
+	slicesCloneAndSortDesc.SetPos(pos)
 	
 	call := &syntax.CallExpr{
-		Fun:     sortDescName,
+		Fun:     slicesCloneAndSortDesc,
 		ArgList: []syntax.Expr{receiver},
 	}
 	call.SetPos(pos)

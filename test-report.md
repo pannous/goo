@@ -130,6 +130,8 @@ Running all tests in ./goo/ directory...
 ❌ in_contexts_test.goo
 ✅ in_literal_test.goo
 ✅ in_with_import_test.goo
+✅ insert_isolated_test.goo
+✅ insert_test.goo
 ✅ is_literal_debug.goo
 ✅ is_test_debug.goo
 ✅ list_methods_debug.goo
@@ -156,6 +158,8 @@ Running all tests in ./goo/ directory...
 ✅ simple_reverse_test.goo
 ✅ simple_sort_test.goo
 ✅ slice_explicit_test.goo
+✅ sort_desc_isolated_test.goo
+✅ sort_desc_test.goo
 ✅ specific_case_test.goo
 ✅ string_in_string_test.goo
 ✅ strings_test_simple.goo
@@ -239,5 +243,5 @@ Running all tests in ./goo/ directory...
 ✅ test_working_transforms.goo
 ✅ truthy_test.goo
 ========================================
-Summary: 226/238 passed, 12 failed
+Summary: 230/242 passed, 12 failed
 ⚠️  Some tests failed
