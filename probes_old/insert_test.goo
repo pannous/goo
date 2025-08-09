@@ -1,0 +1,11 @@
+import "slices"
+
+aList := [1, 2, 3]
+printf("Original aList: %v\n", aList)
+
+// Test insert method - should insert 1 at index 1
+result := aList.insert(1, 1)
+printf("After insert(1, 1): aList=%v, result=%v\n", aList, result)
+
+// Test if result matches expected [1, 1, 2, 3]
+printf("Expected: [1 1 2 3], Got: %v\n", result)

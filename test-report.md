@@ -49,7 +49,7 @@ Running all tests in ./goo/ directory...
 ✅ test_list_filter.goo
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
-❌ test_list_methods_broken.goo
+✅ test_list_methods_broken.goo
 ✅ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
 ✅ test_list_typed.goo
@@ -113,6 +113,7 @@ Running all tests in ./goo/ directory...
 ✅ clone_test.goo
 ✅ complete_non_modifying_test.goo
 ✅ conditional_test.goo
+✅ corrected_test.goo
 ✅ debug_ast.goo
 ✅ debug_generation.goo
 ❌ debug_in_test.goo
@@ -134,6 +135,8 @@ Running all tests in ./goo/ directory...
 ✅ insert_test.goo
 ✅ is_literal_debug.goo
 ✅ is_test_debug.goo
+✅ join_isolated_test.goo
+✅ join_test.goo
 ✅ list_methods_debug.goo
 ❌ list_pop_test.goo
 ❌ list_sort_desc_test.goo
@@ -141,6 +144,8 @@ Running all tests in ./goo/ directory...
 ✅ mixed_cases_test.goo
 ✅ nil_coalesce_final_test.goo
 ✅ non_modifying_test.goo
+❌ pop_shift_isolated_test.goo
+✅ pop_shift_test.goo
 ✅ regular_range_test.goo
 ✅ rune_in_string_test.goo
 ✅ runtime_function_test.goo
@@ -161,7 +166,10 @@ Running all tests in ./goo/ directory...
 ✅ sort_desc_isolated_test.goo
 ✅ sort_desc_test.goo
 ✅ specific_case_test.goo
+✅ step_by_step_test.goo
 ✅ string_in_string_test.goo
+✅ string_interface_test.goo
+✅ string_method_test.goo
 ✅ strings_test_simple.goo
 ✅ strings_test.goo
 ✅ test_and_assignment.goo
@@ -243,5 +251,5 @@ Running all tests in ./goo/ directory...
 ✅ test_working_transforms.goo
 ✅ truthy_test.goo
 ========================================
-Summary: 230/242 passed, 12 failed
+Summary: 238/250 passed, 12 failed
 ⚠️  Some tests failed

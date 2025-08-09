@@ -1,0 +1,3 @@
+printf("Testing direct runtime call:\n")
+result := sliceCloneAndSort([3, 1, 2])
+printf("sliceCloneAndSort result: %v\n", result)

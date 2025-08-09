@@ -1,0 +1,5 @@
+// Test if listPop function works directly  
+original := [1, 2, 3]
+printf("Original: %v\n", original)
+result := listPop(original)
+printf("listPop result: %v\n", result)

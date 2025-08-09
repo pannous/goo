@@ -1,0 +1,11 @@
+import "slices"
+import "time"
+
+// Test with time.Time which has a String() method
+now := time.Now()
+times := []time.Time{now}
+printf("Time slice: %v\n", times)
+
+// Test join with time values
+result := times.join(", ")
+printf("Time join result: %s\n", result)

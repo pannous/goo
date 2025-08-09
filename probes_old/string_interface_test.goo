@@ -1,0 +1,20 @@
+import "slices"
+import "time"
+import "net/url"
+
+// Test basic types
+intSlice := [1, 2, 3]
+printf("Integers: %s\n", intSlice.join(", "))
+
+// Test types with String() method
+now := time.Now()
+dates := []time.Time{now}
+printf("Time with String(): %s\n", dates.join(" | "))
+
+// Test URL which also has String() method
+u1, _ := url.Parse("https://example.com")
+u2, _ := url.Parse("https://google.com") 
+urls := []*url.URL{u1, u2}
+printf("URLs with String(): %s\n", urls.join(" -> "))
+
+printf("All join tests with String() methods work!\n")

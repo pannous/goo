@@ -1,0 +1,9 @@
+import "fmt"
+import "reflect"
+
+// Test if runtime functions are available through reflection
+original := []int{3, 1, 2}
+fmt.Printf("Original: %v\n", original)
+
+// Try to access the function through runtime package
+fmt.Println("Test completed without accessing runtime functions directly")

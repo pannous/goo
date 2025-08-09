@@ -1,0 +1,9 @@
+original := [3, 1, 2]
+printf("Original: %v\n", original)
+
+// Test basic cloning functionality 
+cloned := original.sort()
+printf("After sort() (should be cloned): original=%v, cloned=%v\n", original, cloned)
+
+reversed := original.reverse()
+printf("After reverse() (should be cloned): original=%v, reversed=%v\n", original, reversed)

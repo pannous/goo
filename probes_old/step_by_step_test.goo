@@ -1,0 +1,25 @@
+import "slices"
+
+// Follow the exact sequence from the original test
+aList := [1, 2, 3]
+printf("Initial: aList = %v\n", aList)
+
+// Step 1: sort!()
+aList.sort!()
+printf("After sort!(): aList = %v\n", aList)
+
+// Should be: aList.sortDesc() == [3,2,1] (but this is non-modifying)
+descResult := aList.sortDesc()
+printf("sortDesc() returns: %v, aList still: %v\n", descResult, aList)
+
+// Step 2: shift!() should return 1 and remove it (but we can't actually remove)
+shiftResult := aList.shift!()
+printf("shift!() returns: %v, aList still: %v\n", shiftResult, aList)
+
+// Step 3: reverse!()  
+aList.reverse!()
+printf("After reverse!(): aList = %v\n", aList)
+
+// Step 4: What should pop!() return?
+popResult := aList.pop!()
+printf("pop!() returns: %v from aList = %v\n", popResult, aList)

@@ -1,0 +1,3 @@
+printf("Testing existing runtime function:\n")
+result := listSortDesc([3, 1, 2])
+printf("listSortDesc result: %v\n", result)

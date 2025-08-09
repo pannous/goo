@@ -1,0 +1,8 @@
+import "slices"
+
+aList := [1, 2, 3]
+
+// Test the exact line from the original test
+check aList.insert(1,1) == [1,1,2,3]  // 0: before index 0 == prepend
+
+printf("insert test passed!\n")

@@ -1,0 +1,15 @@
+import "slices"
+
+// Test shift!() method
+aList := [1, 2, 3]
+printf("Original aList: %v\n", aList)
+
+// Test shift! - should return first element
+shifted := aList.shift!()
+printf("shift!() returned: %v\n", shifted)
+printf("aList after shift!(): %v (note: not actually modified due to Go limitation)\n", aList)
+
+// Test pop! - should return last element  
+popped := aList.pop!()
+printf("pop!() returned: %v\n", popped)
+printf("aList after pop!(): %v (note: not actually modified due to Go limitation)\n", aList)

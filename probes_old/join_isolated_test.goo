@@ -1,0 +1,7 @@
+import "slices"
+
+// Test the exact lines from the original test
+check ["1","2","3"].join("-") == "1-2-3"  // ok, but:
+check [1,2,3].join("-") == "1-2-3"       // if all elements stringifiable
+
+printf("Both join tests passed!\n")
