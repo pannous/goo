@@ -67,7 +67,7 @@ Universal for-in syntax:
   
 ✅ while keyword as plain synonym for 'for'
 
-☐  for i in 0…5  NOT working
+✅ for i in 0…5 {put(i)}  // range loops now working!
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
