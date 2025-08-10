@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"strings"
 )
 
 // InLoopTransform handles the 'for x in collection' syntax
@@ -82,13 +83,15 @@ func (t *InLoopTransform) convertInClauseToRange(inClause *syntax.InClause, ctx 
 		rangeClause.Lhs = inClause.Lhs // Use key,value as-is
 		rangeClause.Def = true
 	} else {
-		// "for x in collection" -> "for _, x := range collection" (for slices/arrays/strings)
-		// or "for x in collection" -> "for x := range collection" (for maps/iterators)
+		// "for x in collection" -> determine based on collection type
 		if t.isIteratorType(inClause.X) {
 			// Iterator functions only allow single variable: for x := range iterator()
 			rangeClause.Lhs = inClause.Lhs
+		} else if t.isMapType(inClause.X, ctx) {
+			// Maps: "for x in myMap" -> "for x := range myMap" (keys only)
+			rangeClause.Lhs = inClause.Lhs
 		} else {
-			// Non-iterators use blank identifier for value access
+			// Slices/arrays/strings: "for x in collection" -> "for _, x := range collection" (values)
 			rangeLhs := t.createRangeLhs(inClause.Lhs, pos)
 			rangeClause.Lhs = rangeLhs
 		}
@@ -159,6 +162,26 @@ func (t *InLoopTransform) looksLikeIteratorFunction(name string) bool {
 		   len(name) > len(pattern) && name[len(name)-len(pattern):] == pattern ||
 		   len(name) > len(pattern) && name[:len(pattern)] == pattern {
 			return true
+		}
+	}
+	
+	return false
+}
+
+// isMapType checks if the expression refers to a map type
+func (t *InLoopTransform) isMapType(expr syntax.Expr, ctx *TransformContext) bool {
+	// Check if it's a variable with known map type
+	if name, ok := expr.(*syntax.Name); ok {
+		if varType, exists := ctx.Types[name.Value]; exists {
+			isMap := strings.HasPrefix(varType, "map[")
+			return isMap
+		}
+	}
+	
+	// Check if it's a map literal by examining the expression structure
+	if comp, ok := expr.(*syntax.CompositeLit); ok {
+		if mapType, ok := comp.Type.(*syntax.MapType); ok {
+			return mapType != nil
 		}
 	}
 	

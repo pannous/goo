@@ -5,27 +5,27 @@ myMap := map[string]int{
 	"cherry": 3,
 }
 
-println("Single variable (keys only):")
+printf("Single variable (keys only):\n")
 for key in myMap {
-	printf("Key: %s\n", key)
+	put(key)
 }
 
-println("\nDouble variable (key-value pairs):")
+printf("\nDouble variable (key-value pairs):\n")
 for key, value in myMap {
 	printf("Key: %s, Value: %d\n", key, value)
 }
 
-println("\nTesting with slice:")
+printf("\nTesting with slice:")
 numbers := [10, 20, 30]
 
-println("Single variable (values):")
+printf("Single variable (values):\n")
 for num in numbers {
 	printf("Value: %d\n", num)
 }
 
-println("\nDouble variable (index-value pairs):")
+printf("\nDouble variable (index-value pairs):\n")
 for i, num in numbers {
 	printf("Index: %d, Value: %d\n", i, num)
 }
 
-println("All key-value tests completed!")
+printf("All key-value tests completed!")
