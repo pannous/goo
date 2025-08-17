@@ -771,7 +771,19 @@ func (s *scanner) number(seenPoint bool) {
 func (s *scanner) scanPotentialUnit() string {
 	// Check if the current position starts a valid unit suffix
 	// Order by length (longest first) to match correctly  
-	validUnits := []string{"MHz", "GHz", "kHz", "min", "km", "cm", "mm", "ms", "Hz", "m", "s", "h"}
+	validUnits := []string{
+		// Multi-character units (longest first)
+		"BTU/h", "fl oz", "kcal", "keV", "MeV", "kWh", "mmHg", "torr", "grad", "turn",
+		"MHz", "GHz", "THz", "kHz", "min", "rpm", "kPa", "MPa", "bar", "atm", "psi",
+		"km", "cm", "mm", "ms", "μm", "nm", "pm", "fm", "in", "ft", "yd", "mi", "nmi",
+		"AU", "ly", "pc", "μs", "ns", "ps", "wk", "mo", "yr", "kg", "mg", "μg", "lb", 
+		"oz", "st", "°C", "°F", "°R", "kJ", "MJ", "cal", "BTU", "eV", "kW", "MW", "GW",
+		"hp", "Pa", "Wb", "ha", "ac", "m²", "km²", "cm²", "mm²", "ft²", "in²", "m³",
+		"mL", "gal", "qt", "pt", "cup", "bbl", "m/s", "km/h", "mph", "kn", "ft/s",
+		"m/s²", "gf", "rad",
+		// Single character units  
+		"Hz", "m", "s", "h", "d", "g", "t", "u", "K", "J", "W", "A", "V", "F", "H", "T", "L", "°",
+	}
 	
 	// Check each unit pattern
 	for _, unit := range validUnits {

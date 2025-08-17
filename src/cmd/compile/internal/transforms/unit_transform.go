@@ -260,9 +260,55 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 	
 	// Map unit suffix to qualified units package reference
 	unitMapping := map[string]string{
-		"m": "M", "km": "Km", "cm": "Cm", "mm": "Mm",
-		"s": "S", "ms": "Ms", "h": "H", "min": "Min",
-		"Hz": "Hz_unit", "kHz": "KHz_unit", "MHz": "MHz", "GHz": "GHz",
+		// Length units
+		"m": "M", "km": "Km", "cm": "Cm", "mm": "Mm", "μm": "Um", "nm": "Nm", "pm": "Pm", "fm": "Fm",
+		"in": "Inch", "ft": "Ft", "yd": "Yard", "mi": "Mile", "nmi": "NauticalMile",
+		"AU": "AU", "ly": "LightYear", "pc": "Parsec",
+		
+		// Time units
+		"s": "S", "ms": "Ms", "μs": "Us", "ns": "Ns", "ps": "Ps",
+		"min": "Min", "h": "H", "d": "Day", "wk": "Week", "mo": "Month", "yr": "Year",
+		
+		// Mass units
+		"kg": "Kg", "g": "G", "mg": "Mg", "μg": "Ug", "t": "Ton",
+		"lb": "Lb", "oz": "Oz", "st": "Stone", "u": "Amu",
+		
+		// Temperature units
+		"K": "K", "°C": "C", "°F": "F", "°R": "R",
+		
+		// Energy units
+		"J": "J", "kJ": "KJ", "MJ": "MJ", "cal": "Cal", "kcal": "Kcal",
+		"BTU": "BTU", "kWh": "KWh", "eV": "EV", "keV": "KeV", "MeV": "MeV",
+		
+		// Power units
+		"W": "W", "kW": "KW", "MW": "MW", "GW": "GW", "hp": "HP", "BTU/h": "BTUh",
+		
+		// Pressure units
+		"Pa": "Pa", "kPa": "KPa", "MPa": "MPa", "bar": "Bar", "atm": "Atm",
+		"psi": "Psi", "mmHg": "MmHg", "torr": "Torr",
+		
+		// Electric units
+		"A": "A", "V": "V", "Ω": "Ohm", "F": "F_unit", "H": "H_unit", "Wb": "Wb", "T": "T_unit",
+		
+		// Frequency units
+		"Hz": "Hz_unit", "kHz": "KHz_unit", "MHz": "MHz", "GHz": "GHz", "THz": "THz", "rpm": "Rpm",
+		
+		// Area units
+		"m²": "M2", "km²": "Km2", "cm²": "Cm2", "mm²": "Mm2", "ha": "Hectare", "ac": "Acre",
+		"ft²": "SqFt", "in²": "SqIn",
+		
+		// Volume units
+		"m³": "M3", "L": "L", "mL": "ML", "gal": "Gallon", "qt": "Quart", "pt": "Pint",
+		"cup": "Cup", "fl oz": "FlOz", "bbl": "Barrel",
+		
+		// Velocity units
+		"m/s": "Mps", "km/h": "Kmh", "mph": "Mph", "kn": "Knot", "ft/s": "Fps",
+		
+		// Acceleration units
+		"m/s²": "Mps2", "gf": "G_force",
+		
+		// Angle units
+		"rad": "Rad", "°": "Deg", "grad": "Grad", "turn": "Turn",
 	}
 	
 	unitsConstant, ok := unitMapping[node.Unit]
@@ -466,7 +512,36 @@ func (t *UnitTransformer) isNumericLiteral(expr syntax.Expr) bool {
 func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
 	// Check for simple unit constants: m, km, s, etc.
 	if name, ok := expr.(*syntax.Name); ok {
-		units := []string{"m", "km", "cm", "mm", "s", "ms", "h", "min", "Hz", "kHz", "MHz", "GHz"}
+		units := []string{
+			// Length units
+			"m", "km", "cm", "mm", "μm", "nm", "pm", "fm", "in", "ft", "yd", "mi", "nmi", "AU", "ly", "pc",
+			// Time units
+			"s", "ms", "μs", "ns", "ps", "min", "h", "d", "wk", "mo", "yr",
+			// Mass units
+			"kg", "g", "mg", "μg", "t", "lb", "oz", "st", "u",
+			// Temperature units
+			"K", "°C", "°F", "°R",
+			// Energy units
+			"J", "kJ", "MJ", "cal", "kcal", "BTU", "kWh", "eV", "keV", "MeV",
+			// Power units
+			"W", "kW", "MW", "GW", "hp", "BTU/h",
+			// Pressure units
+			"Pa", "kPa", "MPa", "bar", "atm", "psi", "mmHg", "torr",
+			// Electric units
+			"A", "V", "Ω", "F", "H", "Wb", "T",
+			// Frequency units
+			"Hz", "kHz", "MHz", "GHz", "THz", "rpm",
+			// Area units
+			"m²", "km²", "cm²", "mm²", "ha", "ac", "ft²", "in²",
+			// Volume units
+			"m³", "L", "mL", "gal", "qt", "pt", "cup", "fl oz", "bbl",
+			// Velocity units
+			"m/s", "km/h", "mph", "kn", "ft/s",
+			// Acceleration units
+			"m/s²", "gf",
+			// Angle units
+			"rad", "°", "grad", "turn",
+		}
 		for _, unit := range units {
 			if name.Value == unit {
 				return true
@@ -477,7 +552,36 @@ func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
 	// Check for qualified unit constants: units.M, units.Km, etc.
 	if sel, ok := expr.(*syntax.SelectorExpr); ok {
 		if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
-			units := []string{"M", "Km", "Cm", "Mm", "S", "Ms", "H", "Min", "Hz", "KHz", "MHz", "GHz"}
+			units := []string{
+				// Length units
+				"M", "Km", "Cm", "Mm", "Um", "Nm", "Pm", "Fm", "Inch", "Ft", "Yard", "Mile", "NauticalMile", "AU", "LightYear", "Parsec",
+				// Time units
+				"S", "Ms", "Us", "Ns", "Ps", "Min", "H", "Day", "Week", "Month", "Year",
+				// Mass units
+				"Kg", "G", "Mg", "Ug", "Ton", "Lb", "Oz", "Stone", "Amu",
+				// Temperature units
+				"K", "C", "F", "R",
+				// Energy units
+				"J", "KJ", "MJ", "Cal", "Kcal", "BTU", "KWh", "EV", "KeV", "MeV",
+				// Power units
+				"W", "KW", "MW", "GW", "HP", "BTUh",
+				// Pressure units
+				"Pa", "KPa", "MPa", "Bar", "Atm", "Psi", "MmHg", "Torr",
+				// Electric units
+				"A", "V", "Ohm", "F_unit", "H_unit", "Wb", "T_unit",
+				// Frequency units
+				"Hz_unit", "KHz_unit", "MHz", "GHz", "THz", "Rpm",
+				// Area units
+				"M2", "Km2", "Cm2", "Mm2", "Hectare", "Acre", "SqFt", "SqIn",
+				// Volume units
+				"M3", "L", "ML", "Gallon", "Quart", "Pint", "Cup", "FlOz", "Barrel",
+				// Velocity units
+				"Mps", "Kmh", "Mph", "Knot", "Fps",
+				// Acceleration units
+				"Mps2", "G_force",
+				// Angle units
+				"Rad", "Deg", "Grad", "Turn",
+			}
 			for _, unit := range units {
 				if sel.Sel.Value == unit {
 					return true
