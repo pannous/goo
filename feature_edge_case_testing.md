@@ -16,7 +16,7 @@
 - **Edge Cases Needed**: None identified
 - **Status**: Well tested
 
-### ⚠️ Try-Catch Error Handling  
+### ⚠️ Try-Catch Error Handling
 - **Basic Test**: `test_try_catch.goo` - simple panic/catch
 - **Edge Cases Needed**:
   - Nested try-catch blocks
@@ -24,9 +24,9 @@
   - Try-catch in different scopes (function, loop, conditional)
   - Multiple panic types (string, error, custom types)
 
-### ⚠️ Try Assignment (Error Propagation)
+### ✅ Try Assignment (Error Propagation)
 - **Basic Test**: `test_try_assign.goo`, `test_try_propagation.goo`
-- **Edge Cases Needed**:
+- **Edge Cases Secondary**:
   - Try assignment in nested expressions
   - Multiple try assignments in same statement
   - Try assignment with complex function calls
@@ -116,7 +116,7 @@
   - Def with generic type parameters
   - Def with receiver methods: `def (r Receiver) method()`
 
-### ⚠️ Enum Types
+### ✅⚠️ Enum Types (NOT YET)
 - **Basic Test**: `test_enum.goo`, `test_enum_string.goo`
 - **Edge Cases Needed**:
   - Enum with explicit values: `enum Status { OK = 1, BAD = 2 }`
@@ -144,7 +144,7 @@
 
 ## String and Character Operations
 
-### ⚠️ String Methods  
+### ⚠️ String Methods
 - **Basic Test**: `test_string_methods.goo`
 - **Edge Cases Tested**: `probes/edge_case_string_methods.goo` (partial)
   - ✅ String methods with empty strings work: `"".size()` returns 0
@@ -155,7 +155,7 @@
   - ☐ String methods with very long strings - not tested yet
 - **Critical Issue Found**: Method chaining not supported
 
-### ⚠️ Type Casting (as operator)  
+### ⚠️ Type Casting (as operator)
 - **Basic Test**: `test_as_cast.goo`, `test_as_cast_convert.goo`
 - **Edge Cases Needed**:
   - Invalid casts: `"hello" as int` (should error gracefully)
@@ -288,7 +288,7 @@
 - **After**: 133/143 tests passing  
 - **Improvement**: +10 passing tests, +13 total tests
 
-## Summary  
+## Summary
 - **Well Tested**: 8 features (improved from 6)
 - **Need Edge Cases**: 16 features (improved from 18)
 - **Critical Issues Found**: 2 features need fixes (method chaining, direct range for-loops)

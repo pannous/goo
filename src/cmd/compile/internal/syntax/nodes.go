@@ -161,6 +161,13 @@ type (
 		expr
 	}
 
+	// UnitLitExpr represents a unit literal like 5m, 2.3kg, 100Hz
+	UnitLitExpr struct {
+		Value string // numeric part (e.g., "5", "2.3") 
+		Unit  string // unit part (e.g., "m", "kg", "Hz")
+		expr
+	}
+
 	// Type { ElemList[0], ElemList[1], ... }
 	CompositeLit struct {
 		Type     Expr // nil means no literal type

@@ -1,0 +1,14 @@
+import "units" 
+
+s := units.S
+ms := units.Ms
+check 500*ms + 5*s == 5500*ms
+check 500·ms + 5·s == 5500·ms
+check 500ms + 5s == 5500ms
+
+m := units.M
+km := units.Km
+check 1200m + 2km == 3.2km
+check 1200*m + 2*km == 3.2*km
+
+print("All unit tests passed successfully!")

@@ -1,5 +1,25 @@
 # Python-like Features in Goo Language
 
+### **8. List Methods**
+- `.extend()` - extend with another list
+- `.insert(index, item)` - insert at position
+- `.remove(item)` - remove first occurrence
+- `.pop(index)` - remove and return item
+- `.count(item)` - count occurrences
+- `.index(item)` - find index (with error if not found)
+
+3. **Multiple assignment** - `a, b = b, a` tuple unpacking
+
+### **11. String Formatting**
+```python
+# Python
+f"Hello {name}, you are {age} years old"
+"Hello {} {}".format(first, last)
+```
+
+
+
+
 ## **Missing Python-like Features**
 
 ### **1. List Comprehensions**
@@ -34,6 +54,7 @@ Goo has basic slicing but no step parameter.
 ### **5. Range Function**
 ```python
 # Python
+we have 1…10 !
 for i in range(10):        # 0 to 9
 for i in range(5, 10):     # 5 to 9  
 for i in range(0, 10, 2):  # 0,2,4,6,8
@@ -51,13 +72,6 @@ for i, item in enumerate(items):
 for a, b in zip(list1, list2):
 ```
 
-### **8. List Methods**
-- `.extend()` - extend with another list
-- `.insert(index, item)` - insert at position
-- `.remove(item)` - remove first occurrence
-- `.pop(index)` - remove and return item
-- `.count(item)` - count occurrences
-- `.index(item)` - find index (with error if not found)
 
 ### **9. Set Operations**
 ```python
@@ -72,12 +86,6 @@ for a, b in zip(list1, list2):
 sum(x*x for x in range(10))
 ```
 
-### **11. String Formatting**
-```python
-# Python
-f"Hello {name}, you are {age} years old"
-"Hello {} {}".format(first, last)
-```
 
 ### **12. Context Managers (with statement)**
 ```python
@@ -230,7 +238,7 @@ with open("file.txt") as f:
 2. **List slicing with step** - `list[::-1]` for reverse, `list[::2]` for every nth
 3. **Multiple assignment** - `a, b = b, a` tuple unpacking
 
-### **Phase 2: Enhanced List Operations (Medium Impact)**  
+### **Phase 2: Enhanced List Operations (Medium Impact)**
 4. **Missing list methods** - `.pop()`, `.insert()`, `.remove()`, `.extend()`
 5. **Enumerate function** - `for i, item in enumerate(list)`
 

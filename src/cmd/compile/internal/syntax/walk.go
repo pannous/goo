@@ -113,6 +113,7 @@ func (w walker) node(n Node) {
 	case *BadExpr: // nothing to do
 	case *Name: // nothing to do
 	case *BasicLit: // nothing to do
+	case *UnitLitExpr: // nothing to do
 
 	case *CompositeLit:
 		if n.Type != nil {

@@ -374,6 +374,9 @@ func (p *printer) printRawNode(n Node) {
 	case *BasicLit:
 		p.print(_Name, n.Value) // _Name requires actual value following immediately
 
+	case *UnitLitExpr:
+		p.print(_Name, n.Value+n.Unit) // print value and unit together
+
 	case *FuncLit:
 		p.print(n.Type, blank)
 		if n.Body != nil {

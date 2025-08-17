@@ -190,6 +190,7 @@ const (
 	ImagLit
 	RuneLit
 	StringLit
+	UnitLit
 )
 
 type Operator uint
@@ -227,15 +228,16 @@ const (
 	In  // in
 
 	// precMul
-	Mul    // *
-	Div    // /
-	Rem    // %
-	And    // &
-	AndNot // &^
-	Shl    // <<
-	Shr    // >>
-	IS     // is
-	Range  // …
+	Mul       // *
+	MiddleDot // ·
+	Div       // /
+	Rem       // %
+	And       // &
+	AndNot    // &^
+	Shl       // <<
+	Shr       // >>
+	IS        // is
+	Range     // …
 )
 
 // OperatorNames provides string representations for Operator constants, replacing stringer-generated operator_string.go
@@ -260,8 +262,9 @@ var OperatorNames = [...]string{
 	Sub:    "-",
 	Or:     "|",
 	Xor:    "^",
-	Mul:    "*",
-	Div:    "/",
+	Mul:       "*",
+	MiddleDot: "·",
+	Div:       "/",
 	Rem:    "%",
 	And:    "&",
 	AndNot: "&^",
