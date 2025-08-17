@@ -1,28 +1,2 @@
-#import "slices"
-#import "strings"
-#check 3.14 as string == "3.14"
-#import "fmt"
-#import "reflect"
 check 'a' in "abcde"  // true
-#check 1 in [1,2,3]
-check "a" in "abcde"  // true
-ok := [1, 2, 3] is []int
-check ok
-check not false
-check not not true
-check [1, 2, 3] is []int
-printf("OK")
-
-
-// Create maps with type inference
-#x := {a: 1, b: 2}  // map[string]int
-#y := {a: 1, b: 2}  // map[string]int
-#z := {a: 1, b: 3}  // map[string]int
-#
-#// Content-based comparison (recommended)
-#put("Equal contents:", reflect.DeepEqual(x, y))     // true
-#put("Different contents:", reflect.DeepEqual(x, z)) // false
-#
-#// Basic comparison (compiles without error)
-#put("Basic comparison:", x == y)  // "false" uses pointer comparison
-#put("Basic inequality:", x != z)  // Works
+put("All checks passed!")

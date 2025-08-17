@@ -1665,7 +1665,7 @@ func (p *parser) operand(keep_parens bool) Expr {
 		return p.name()
 
 	case _Literal:
-		return p.oliteral()
+		return p.oliteral_expr()
 
 	case _Lparen:
 		pos := p.pos()
@@ -2858,13 +2858,58 @@ func (p *parser) arrayOrTArgs() Expr {
 
 func (p *parser) oliteral() *BasicLit {
 	if p.tok == _Literal {
-		b := new(BasicLit)
-		b.pos = p.pos()
-		b.Value = p.lit
-		b.Kind = p.kind
-		b.Bad = p.bad
+		b := &BasicLit{
+			Value: p.lit,
+			Kind:  p.kind,
+			Bad:   p.bad,
+			expr:  expr{node: node{pos: p.pos()}},
+		}
 		p.next()
 		return b
+	}
+	return nil
+}
+
+// oliteral_expr parses literals and returns appropriate expression type
+func (p *parser) oliteral_expr() Expr {
+	if p.tok == _Literal {
+		if p.kind == UnitLit {
+			// Parse unit literal: extract value and unit parts
+			lit := p.lit
+			pos := p.pos()
+			p.next()
+			
+			// Find where the unit part starts (first letter)
+			var valueEnd int
+			for i, r := range lit {
+				if isLetter(rune(r)) {
+					valueEnd = i
+					break
+				}
+			}
+			
+			if valueEnd == 0 {
+				// No numeric part found
+				return &BasicLit{Value: lit, Kind: StringLit, Bad: true, expr: expr{node: node{pos: pos}}}
+			}
+			
+			u := &UnitLitExpr{
+				Value: lit[:valueEnd],
+				Unit:  lit[valueEnd:],
+				expr:  expr{node: node{pos: pos}},
+			}
+			return u
+		} else {
+			// Regular literal
+			b := &BasicLit{
+				Value: p.lit,
+				Kind:  p.kind,
+				Bad:   p.bad,
+				expr:  expr{node: node{pos: p.pos()}},
+			}
+			p.next()
+			return b
+		}
 	}
 	return nil
 }

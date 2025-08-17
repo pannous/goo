@@ -289,11 +289,16 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 			return "string"
 		}
 	case *syntax.CompositeLit:
-		// Handle []User{{...}} literals
+		// Handle []User{{...}} literals with explicit types
 		if arrayType, ok := e.Type.(*syntax.ArrayType); ok {
 			if elementType, ok := arrayType.Elem.(*syntax.Name); ok {
 				return "[]" + elementType.Value
 			}
+		}
+		
+		// Handle object literals without explicit type: {name: "Alice", age: 30}
+		if e.Type == nil && len(e.ElemList) > 0 {
+			return inferMapTypeFromElements(e.ElemList)
 		}
 	case *syntax.CallExpr:
 		// Handle method calls like users.filter(...)
@@ -443,4 +448,53 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 			}
 		}
 	}
+}
+
+// inferMapTypeFromElements infers map type from object literal elements
+func inferMapTypeFromElements(elements []syntax.Expr) string {
+	if len(elements) == 0 {
+		return ""
+	}
+	
+	// Analyze the first element to determine key/value types
+	firstElem := elements[0]
+	
+	// Check if it's a key-value pair (KeyValueExpr)
+	if kv, ok := firstElem.(*syntax.KeyValueExpr); ok {
+		keyType := inferElementType(kv.Key)
+		valueType := inferElementType(kv.Value)
+		
+		if keyType != "" && valueType != "" {
+			return "map[" + keyType + "]" + valueType
+		}
+	}
+	
+	return "map[string]any" // Default fallback
+}
+
+// inferElementType infers the type of a single element
+func inferElementType(expr syntax.Expr) string {
+	switch e := expr.(type) {
+	case *syntax.BasicLit:
+		switch e.Kind {
+		case syntax.StringLit:
+			return "string"
+		case syntax.IntLit:
+			return "int"
+		case syntax.FloatLit:
+			return "float64"
+		case syntax.RuneLit:
+			return "rune"
+		}
+	case *syntax.Name:
+		// For bare identifiers in keys (like {name: "Alice"}), assume string
+		return "string"
+	case *syntax.CompositeLit:
+		// Nested object - recursively infer type
+		if e.Type == nil && len(e.ElemList) > 0 {
+			return inferMapTypeFromElements(e.ElemList)
+		}
+		return "any"
+	}
+	return "any"
 }

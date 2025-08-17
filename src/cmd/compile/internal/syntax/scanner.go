@@ -44,6 +44,9 @@ type scanner struct {
 	kind      LitKind  // valid if tok is _Literal
 	op        Operator // valid if tok is _Operator, _Star, _AssignOp, or _IncOp
 	prec      int      // valid if tok is _Operator, _Star, _AssignOp, or _IncOp
+	
+	// implicit multiplication state
+	implicitMul bool // if true, emit '*' operator next
 }
 
 func (s *scanner) init(src io.Reader, errh func(line, col uint, msg string), mode uint, filename string) {
@@ -93,6 +96,15 @@ func (s *scanner) next() {
 	nlsemi := s.nlsemi
 	s.nlsemi = false
 
+	// Handle implicit multiplication state
+	if s.implicitMul {
+		s.implicitMul = false
+		s.op, s.prec = Mul, precMul
+		s.tok = _Operator
+		s.lit = "*"
+		return
+	}
+
 redo:
 	// skip white space
 	s.stop()
@@ -105,7 +117,7 @@ redo:
 	s.line, s.col = s.pos()
 	s.blank = s.line > startLine || startCol == colbase
 	s.start()
-	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.atIdentChar(true) {
+	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.ch != '·' && s.atIdentChar(true) {
 		s.nextch()
 		s.ident()
 		return
@@ -204,6 +216,11 @@ redo:
 	case '…': // ellipsis as range operator
 		s.nextch()
 		s.op, s.prec = Range, precAdd
+		s.tok = _Operator
+
+	case '·': // Middle dot (U+00B7) as multiplication operator
+		s.nextch()
+		s.op, s.prec = MiddleDot, precMul
 		s.tok = _Operator
 
 	case '+':
@@ -597,12 +614,10 @@ func useTransforms() bool {
 // transformsEnabled returns true if .goo syntax should be enabled for this scanner
 func (s *scanner) transformsEnabled() bool {
 	// Check environment variable first
-	if os.Getenv("GOO_USE_TRANSFORMERS") == "1" {
-		// Only enable if we're scanning a .goo file or if no filename is provided
-		return s.filename == "" || strings.HasSuffix(s.filename, ".goo")
-	}
-	// Also check file extension directly (for cases where env var isn't set)
-	return strings.HasSuffix(s.filename, ".goo")
+	envSet := os.Getenv("GOO_USE_TRANSFORMERS") == "1"
+	hasGooExt := strings.HasSuffix(s.filename, ".goo")
+	result := envSet && (s.filename == "" || hasGooExt) || hasGooExt
+	return result
 }
 
 func lower(ch rune) rune     { return ('a' - 'A') | ch } // returns lower-case ch iff ch is ASCII letter
@@ -719,10 +734,21 @@ func (s *scanner) number(seenPoint bool) {
 		ok = false
 	}
 
-	// suffix 'i'
+	// suffix 'i' for imaginary numbers
 	if s.ch == 'i' {
 		kind = ImagLit
 		s.nextch()
+	} else if s.transformsEnabled() && isLetter(s.ch) {
+		// Check if this might be a unit literal before defaulting to implicit multiplication
+		if unitSuffix := s.scanPotentialUnit(); unitSuffix != "" {
+			// Create unit literal: 500ms, 2km, etc.
+			kind = UnitLit
+			s.lit = s.lit + unitSuffix
+		} else {
+			// Implicit multiplication: 3x -> 3 * x
+			// Don't consume the letter, just set implicit multiplication flag
+			s.implicitMul = true
+		}
 	}
 
 	s.setLit(kind, ok) // do this now so we can use s.lit below
@@ -740,6 +766,50 @@ func (s *scanner) number(seenPoint bool) {
 	}
 
 	s.bad = !ok // correct s.bad
+}
+
+func (s *scanner) scanPotentialUnit() string {
+	// Check if the current position starts a valid unit suffix
+	// Order by length (longest first) to match correctly  
+	validUnits := []string{"MHz", "GHz", "kHz", "min", "km", "cm", "mm", "ms", "Hz", "m", "s", "h"}
+	
+	// Check each unit pattern
+	for _, unit := range validUnits {
+		if s.matchesUnit(unit) {
+			return unit
+		}
+	}
+	
+	return ""
+}
+
+// Helper function to check if current position matches a unit and consume it
+func (s *scanner) matchesUnit(unit string) bool {
+	// Save position
+	savedR := s.r  
+	savedCh := s.ch
+	
+	// Check if each character of the unit matches
+	for _, r := range unit {
+		if s.ch != r {
+			// Restore position
+			s.r = savedR
+			s.ch = savedCh
+			return false
+		}
+		s.nextch()
+	}
+	
+	// Check that this is the end of the identifier (no more letters after unit)
+	if isLetter(s.ch) {
+		// Restore position
+		s.r = savedR
+		s.ch = savedCh
+		return false
+	}
+	
+	// Match found and characters already consumed
+	return true
 }
 
 func baseName(base int) string {

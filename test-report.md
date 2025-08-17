@@ -19,6 +19,7 @@ Running all tests in ./goo/ directory...
 ✅ test_debug_imports.goo
 ✅ test_def_simple.goo
 ✅ test_def.goo
+✅ test_ellipsis.goo
 ✅ test_enum_string.goo
 ✅ test_enum.goo
 ✅ test_explicit_main.goo
@@ -105,22 +106,45 @@ Running all tests in ./goo/ directory...
 ✅ test_try_propagation.goo
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
-❌ test_unicode.goo
+✅ test_unicode.goo
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
-❌ debug_negative_transform.goo
+✅ debug_array_type_detection.goo
+✅ debug_array_vs_string.goo
+✅ debug_exact_repro.goo
+✅ debug_for_in_ast.goo
+✅ debug_for_range_priority.goo
+✅ debug_hash_negative.goo
+✅ debug_map_key_type.goo
+✅ debug_negative_array.goo
+✅ debug_negative_transform.goo
+✅ debug_put_vs_printf.goo
+✅ debug_range_context.goo
+❌ debug_rune_detection.goo
 ✅ debug_string_positions.goo
 ❌ debug_string_var_type.goo
 ✅ debug_syntax_negative.goo
+✅ edge_case_hash_index.goo
+✅ edge_case_method_chaining_simple.goo
+✅ edge_case_method_chaining.goo
+✅ edge_case_range_for_loops.goo
+❌ edge_case_range_loops.goo
+✅ edge_case_simple_try.goo
+❌ edge_case_string_methods.goo
+❌ edge_case_try_catch.goo
+✅ edge_case_typeof.goo
 ✅ test_array_index_still_works.goo
+❌ test_bracket_rune_indexing.goo
+❌ test_character_hash_indexing.goo
 ✅ test_chinese_var_explicit.goo
 ✅ test_chinese_var_positive.goo
 ✅ test_chinese_variable_negative_index.goo
 ✅ test_chinese_variable_working.goo
+✅ test_readme_range_loop.goo
 ✅ test_simple_string_var.goo
 ✅ test_string_char_access.goo
 ✅ test_string_indexof_overload.goo
 ========================================
-Summary: 115/121 passed, 6 failed
+Summary: 135/145 passed, 10 failed
 ⚠️  Some tests failed

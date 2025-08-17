@@ -1123,6 +1123,12 @@ func (checks *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint T
 			goto Error
 		}
 
+	case *syntax.UnitLitExpr:
+		// Unit literals should be handled by transformers before reaching type checker
+		// If we get here, transformation didn't occur - treat as error
+		checks.error(e, InvalidSyntaxTree, "unit literal not transformed")
+		goto Error
+
 	case *syntax.FuncLit:
 		checks.funcLit(x, e)
 		if x.mode == invalid {
