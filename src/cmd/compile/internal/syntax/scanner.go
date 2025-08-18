@@ -573,7 +573,13 @@ func (s *scanner) atIdentChar(first bool) bool {
 	case s.ch == '≠' || s.ch == '¬':
 		// allow special Unicode operators
 	case s.ch >= utf8.RuneSelf:
-		s.errorf("invalid character %#U in identifier", s.ch)
+		// Allow Unicode symbols commonly used in units when transformers are enabled
+		if s.transformsEnabled() && s.isUnicodeSymbol(s.ch) {
+			// Allow Unicode unit symbols like °, ², ³, μ, Ω, π, τ
+			// ok
+		} else {
+			s.errorf("invalid character %#U in identifier", s.ch)
+		}
 	default:
 		return false
 	}
@@ -735,7 +741,7 @@ func (s *scanner) number(seenPoint bool) {
 	}
 
 	// Check for units first, then imaginary numbers
-	if s.transformsEnabled() && isLetter(s.ch) {
+	if s.transformsEnabled() && (isLetter(s.ch) || s.isUnicodeSymbol(s.ch)) {
 		// Check if this might be a unit literal before checking for imaginary numbers
 		if unitSuffix := s.scanPotentialUnit(); unitSuffix != "" {
 			// Create unit literal: 500ms, 2km, 12inch, etc.
@@ -817,8 +823,10 @@ func (s *scanner) matchesUnit(unit string) bool {
 		s.nextch()
 	}
 	
-	// Check that this is the end of the identifier (no more letters after unit)
-	if isLetter(s.ch) {
+	// For units with Unicode symbols (like °, ²), we need more permissive boundary detection
+	// Check that this is the end of the identifier (no more ASCII letters after unit)
+	// Allow Unicode symbols as terminal characters
+	if isLetter(s.ch) && !s.isUnicodeSymbol(s.ch) {
 		// Restore position
 		s.r = savedR
 		s.ch = savedCh
@@ -827,6 +835,16 @@ func (s *scanner) matchesUnit(unit string) bool {
 	
 	// Match found and characters already consumed
 	return true
+}
+
+// Check if character is a Unicode symbol commonly used in units
+func (s *scanner) isUnicodeSymbol(ch rune) bool {
+	switch ch {
+	case '²', '³', '°', 'μ', 'Ω', 'π', 'τ': // Common unit symbols
+		return true
+	default:
+		return false
+	}
 }
 
 func baseName(base int) string {
