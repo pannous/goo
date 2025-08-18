@@ -172,6 +172,9 @@ func (w walker) node(n Node) {
 			w.node(n.Y)
 		}
 
+	case *PostfixExpr:
+		w.node(n.X)
+
 	case *CallExpr:
 		w.node(n.Fun)
 		w.exprList(n.ArgList)

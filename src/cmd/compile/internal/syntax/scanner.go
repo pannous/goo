@@ -117,7 +117,7 @@ redo:
 	s.line, s.col = s.pos()
 	s.blank = s.line > startLine || startCol == colbase
 	s.start()
-	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.ch != '·' && s.atIdentChar(true) {
+	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.ch != '·' && s.ch != '²' && s.ch != '³' && s.atIdentChar(true) {
 		s.nextch()
 		s.ident()
 		return
@@ -404,10 +404,37 @@ redo:
 			goto redo
 		}
 
+	case '²', '³':
+		// Handle superscript operators for mathematical expressions like 3², 2³
+		if s.transformsEnabled() {
+			ch := s.ch // Save the current character before advancing
+			s.tok = _Superscript
+			s.lit = string(ch) // Save the superscript symbol
+			s.nextch()
+		} else {
+			s.errorf("invalid character %#U", s.ch)
+			s.nextch()
+			goto redo
+		}
+
 	default:
-		s.errorf("invalid character %#U", s.ch)
-		s.nextch()
-		goto redo
+		// Check for superscript characters specifically
+		if s.ch == '²' || s.ch == '³' {
+			if s.transformsEnabled() {
+				ch := s.ch
+				s.tok = _Superscript
+				s.lit = string(ch)
+				s.nextch()
+			} else {
+				s.errorf("invalid character %#U", s.ch)
+				s.nextch()
+				goto redo
+			}
+		} else {
+			s.errorf("invalid character %#U", s.ch)
+			s.nextch()
+			goto redo
+		}
 	}
 
 	return
@@ -714,7 +741,7 @@ func (s *scanner) number(seenPoint bool) {
 	}
 
 	// exponent
-	if e := lower(s.ch); e == 'e' || e == 'p' {
+	if e := lower(s.ch); e == 'e' || (e == 'p' && s.isValidExponentContext()) {
 		if ok {
 			switch {
 			case e == 'e' && prefix != 0 && prefix != '0':
@@ -740,8 +767,13 @@ func (s *scanner) number(seenPoint bool) {
 		ok = false
 	}
 
-	// Check for units first, then imaginary numbers
-	if s.transformsEnabled() && (isLetter(s.ch) || s.isUnicodeSymbol(s.ch)) {
+	// Check for postfix operators first, then units, then imaginary numbers
+	if s.transformsEnabled() && (s.ch == '²' || s.ch == '³') {
+		// Standalone ² or ³ after a number should be treated as postfix operators, not units
+		// Don't consume the character - let the main scanner loop handle it as _Superscript
+		// This prevents the unit scanner from treating 3² as "3 * ²"
+		s.implicitMul = false // Make sure we don't trigger implicit multiplication
+	} else if s.transformsEnabled() && (isLetter(s.ch) || s.isUnicodeSymbol(s.ch)) {
 		// Check if this might be a unit literal before checking for imaginary numbers
 		if unitSuffix := s.scanPotentialUnit(); unitSuffix != "" {
 			// Create unit literal: 500ms, 2km, 12inch, etc.
@@ -845,6 +877,31 @@ func (s *scanner) isUnicodeSymbol(ch rune) bool {
 	default:
 		return false
 	}
+}
+
+// Check if 'p'/'P' should be treated as an exponent vs part of a unit
+func (s *scanner) isValidExponentContext() bool {
+	// Look ahead to see what follows 'P'
+	r := s.r
+	ch := s.ch
+	s.nextch() // Move past 'P'
+	
+	// P should be treated as exponent if followed by:
+	// 1. Digits (P10, P5)
+	// 2. + or - followed by digits (P+10, P-5)
+	isExponent := false
+	if s.ch == '+' || s.ch == '-' {
+		s.nextch()
+	}
+	if isDecimal(s.ch) {
+		isExponent = true
+	}
+	
+	// Restore position
+	s.r = r
+	s.ch = ch
+	
+	return isExponent
 }
 
 func baseName(base int) string {

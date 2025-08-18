@@ -263,6 +263,13 @@ type (
 		expr
 	}
 
+	// PostfixExpr represents postfix operators like 3², 2³
+	PostfixExpr struct {
+		X  Expr   // base expression
+		Op string // postfix operator (², ³)
+		expr
+	}
+
 	// Fun(ArgList[0], ArgList[1], ...)
 	CallExpr struct {
 		Fun     Expr

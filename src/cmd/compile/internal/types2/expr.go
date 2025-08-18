@@ -941,6 +941,49 @@ func (checks *Checker) binary(x *operand, e syntax.Expr, lhs, rhs syntax.Expr, o
 	// x.typ is unchanged
 }
 
+// postfix handles postfix operators like 3², 2³
+func (checks *Checker) postfix(x *operand, e *syntax.PostfixExpr) {
+	checks.expr(nil, x, e.X)
+	if x.mode == invalid {
+		return
+	}
+
+	// Check that the base expression is numeric
+	if !allNumeric(x.typ) {
+		checks.errorf(x, UndefinedOp, "postfix operator %s not defined on %s", e.Op, x)
+		x.mode = invalid
+		return
+	}
+
+	// Handle specific postfix operators
+	switch e.Op {
+	case "²":
+		// Square operator: x²
+		if x.mode == constant_ {
+			// For constants, compute x * x at compile time
+			x.val = constant.BinaryOp(x.val, token.MUL, x.val)
+		}
+		// x.typ remains unchanged (numeric type)
+		
+	case "³":
+		// Cube operator: x³
+		if x.mode == constant_ {
+			// For constants, compute x * x * x at compile time
+			squared := constant.BinaryOp(x.val, token.MUL, x.val)
+			x.val = constant.BinaryOp(squared, token.MUL, x.val)
+		}
+		// x.typ remains unchanged (numeric type)
+		
+	default:
+		checks.errorf(e, InvalidSyntaxTree, "unknown postfix operator %s", e.Op)
+		x.mode = invalid
+		return
+	}
+
+	x.mode = value
+	// x.typ is unchanged
+}
+
 // matchTypes attempts to convert any untyped types x and y such that they match.
 // If an error occurs, x.mode is set to invalid.
 func (checks *Checker) matchTypes(x, y *operand) {
@@ -1275,6 +1318,13 @@ func (checks *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint T
 
 		// binary expression
 		checks.binary(x, e, e.X, e.Y, e.Op)
+		if x.mode == invalid {
+			goto Error
+		}
+
+	case *syntax.PostfixExpr:
+		// Handle postfix operators like 3², 2³
+		checks.postfix(x, e)
 		if x.mode == invalid {
 			goto Error
 		}

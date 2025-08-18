@@ -464,6 +464,10 @@ func (p *printer) printRawNode(n Node) {
 			p.print(n.X, blank, n.Op, blank, n.Y)
 		}
 
+	case *PostfixExpr:
+		// postfix expr like 3², 2³
+		p.print(n.X, _Name, n.Op)
+
 	case *KeyValueExpr:
 		p.print(n.Key, _Colon, blank, n.Value)
 
