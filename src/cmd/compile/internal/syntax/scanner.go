@@ -791,7 +791,7 @@ func (s *scanner) scanPotentialUnit() string {
 		"oz", "st", "°C", "°F", "°R", "kJ", "MJ", "cal", "BTU", "eV", "kW", "MW", "GW",
 		"hp", "Pa", "Wb", "ha", "ac", "m²", "km²", "cm²", "mm²", "ft²", "in²", "m³",
 		"mL", "gal", "qt", "pt", "cup", "bbl", "m/s", "km/h", "mph", "kn", "ft/s",
-		"m/s²", "gf", "rad",
+		"m/s²", "mps2", "gf", "rad", "deg", "sqm", "cbm",
 		// Single character units  
 		"Hz", "m", "s", "h", "d", "g", "t", "u", "K", "J", "W", "A", "V", "F", "H", "T", "L", "°",
 	}
