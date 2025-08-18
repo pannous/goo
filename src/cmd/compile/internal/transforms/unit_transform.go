@@ -305,10 +305,13 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 		"m/s": "Mps", "km/h": "Kmh", "mph": "Mph", "kn": "Knot", "ft/s": "Fps",
 		
 		// Acceleration units
-		"m/s²": "Mps2", "gf": "G_force",
+		"m/s²": "Mps2", "mps2": "Mps2", "gf": "G_force",
 		
 		// Angle units
-		"rad": "Rad", "°": "Deg", "grad": "Grad", "turn": "Turn",
+		"rad": "Rad", "°": "Deg", "deg": "Deg", "grad": "Grad", "turn": "Turn",
+		
+		// ASCII alternatives for compound units
+		"sqm": "M2", "cbm": "M3",
 	}
 	
 	unitsConstant, ok := unitMapping[node.Unit]
@@ -538,9 +541,11 @@ func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
 			// Velocity units
 			"m/s", "km/h", "mph", "kn", "ft/s",
 			// Acceleration units
-			"m/s²", "gf",
+			"m/s²", "mps2", "gf",
 			// Angle units
-			"rad", "°", "grad", "turn",
+			"rad", "°", "deg", "grad", "turn",
+			// ASCII alternatives
+			"sqm", "cbm",
 		}
 		for _, unit := range units {
 			if name.Value == unit {
