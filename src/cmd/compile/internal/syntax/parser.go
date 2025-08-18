@@ -2045,6 +2045,15 @@ loop:
 			t.Type = p.type_()
 			x = t
 
+		case _Superscript:
+			// Handle postfix operators like 3², 2³
+			t := new(PostfixExpr)
+			t.pos = pos
+			t.X = x
+			t.Op = p.lit // Get the superscript symbol (², ³)
+			p.next()
+			x = t
+
 		default:
 			break loop
 		}

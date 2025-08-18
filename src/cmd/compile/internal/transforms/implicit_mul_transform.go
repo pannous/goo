@@ -23,14 +23,8 @@ func (t *ImplicitMulTransformer) Priority() int {
 }
 
 func (t *ImplicitMulTransformer) Transform(file *syntax.File, ctx *TransformContext) bool {
-	if !t.shouldTransform(file) {
-		return false
-	}
-
-	// This transformer works by preprocessing the source text
-	// It converts patterns like "3x" to "3*x" before normal parsing
-	
-	return true // We'll implement this differently
+	// Temporarily disable this transformer to test postfix operators
+	return false
 }
 
 func (t *ImplicitMulTransformer) shouldTransform(file *syntax.File) bool {

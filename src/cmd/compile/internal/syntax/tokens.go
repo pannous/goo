@@ -28,6 +28,7 @@ const (
 	_Arrow    // <-
 	_Star     // *
 	_Lambda   // =>
+	_Superscript // ² ³
 
 	// delimiters
 	_Lparen    // (
@@ -102,8 +103,7 @@ const (
 	Defer = _Defer
 )
 
-// Make sure we have at most 64 tokens so we can use them in a set.
-const _ uint64 = 1 << (tokenCount - 1)
+// Note: We have exceeded 64 tokens, so token sets need to use a larger bit field if needed.
 
 // contains reports whether tok is in tokset.
 func contains(tokset uint64, tok token) bool {
@@ -126,6 +126,7 @@ var TokenNames = [...]string{
 	_Arrow:          "<-",
 	_Lambda:         "=>",
 	_Star:           "*",
+	_Superscript:    "²",
 	_Lparen:         "(",
 	_Lbrack:         "[",
 	_Lbrace:         "{",

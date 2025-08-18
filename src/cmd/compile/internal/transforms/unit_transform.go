@@ -336,14 +336,15 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 	methodCall.SetPos(pos)
 	methodCall.Sel.SetPos(pos)
 	
+	valueLit := &syntax.BasicLit{
+		Value: node.Value,
+		Kind:  syntax.FloatLit,
+	}
+	valueLit.SetPos(pos)
+	
 	call := &syntax.CallExpr{
 		Fun: methodCall,
-		ArgList: []syntax.Expr{
-			&syntax.BasicLit{
-				Value: node.Value,
-				Kind:  syntax.FloatLit,
-			},
-		},
+		ArgList: []syntax.Expr{valueLit},
 	}
 	call.SetPos(pos)
 	
@@ -433,12 +434,16 @@ func (t *UnitTransformer) addUnitsImport(file *syntax.File) {
 	}
 	
 	// Add units import
-	importDecl := &syntax.ImportDecl{
-		Path: &syntax.BasicLit{
-			Value: `"units"`,
-			Kind:  syntax.StringLit,
-		},
+	pathLit := &syntax.BasicLit{
+		Value: `"units"`,
+		Kind:  syntax.StringLit,
 	}
+	pathLit.SetPos(syntax.Pos{}) // Use empty position for imports
+	
+	importDecl := &syntax.ImportDecl{
+		Path: pathLit,
+	}
+	importDecl.SetPos(syntax.Pos{})
 	
 	// Insert at the beginning of declarations  
 	file.DeclList = append([]syntax.Decl{importDecl}, file.DeclList...)
@@ -468,10 +473,14 @@ func (t *UnitTransformer) addUnitConstants(file *syntax.File) {
 	var newDecls []syntax.Decl
 	for localName, unitsRef := range unitMappings {
 		// Create: var m = units.M
+		nameNode := &syntax.Name{Value: localName}
+		nameNode.SetPos(syntax.Pos{}) // Use empty position for generated declarations
+		
 		varDecl := &syntax.VarDecl{
-			NameList: []*syntax.Name{{Value: localName}},
-			Values:   t.createUnitsReference(unitsRef),
+			NameList: []*syntax.Name{nameNode},
+			Values:   t.createUnitsReference(unitsRef, syntax.Pos{}),
 		}
+		varDecl.SetPos(syntax.Pos{})
 		newDecls = append(newDecls, varDecl)
 	}
 	
@@ -492,17 +501,26 @@ func (t *UnitTransformer) addUnitConstants(file *syntax.File) {
 	file.DeclList = newDeclList
 }
 
-func (t *UnitTransformer) createUnitsReference(unitsRef string) syntax.Expr {
+func (t *UnitTransformer) createUnitsReference(unitsRef string, pos syntax.Pos) syntax.Expr {
 	// Parse "units.M" into SelectorExpr
 	parts := strings.Split(unitsRef, ".")
 	if len(parts) != 2 {
 		panic("Invalid units reference: " + unitsRef)
 	}
 	
-	return &syntax.SelectorExpr{
-		X:   &syntax.Name{Value: parts[0]}, // "units"
-		Sel: &syntax.Name{Value: parts[1]}, // "M"
+	xName := &syntax.Name{Value: parts[0]} // "units"
+	xName.SetPos(pos)
+	
+	selName := &syntax.Name{Value: parts[1]} // "M"
+	selName.SetPos(pos)
+	
+	selectorExpr := &syntax.SelectorExpr{
+		X:   xName,
+		Sel: selName,
 	}
+	selectorExpr.SetPos(pos)
+	
+	return selectorExpr
 }
 
 func (t *UnitTransformer) isNumericLiteral(expr syntax.Expr) bool {

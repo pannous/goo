@@ -270,3 +270,137 @@ var (
 	Turn = NewUnit("turn", "turn", "rad", 6.283185307179586, "angle").withValue(1.0)
 )
 
+// Available returns a map of all supported units organized by category
+func Available() map[string][]string {
+	categories := make(map[string][]string)
+	
+	// Collect all unit categories from the global constants
+	units := []*Unit{
+		// Length units
+		M, Km, Cm, Mm, Um, Nm, Pm, Fm,
+		Inch, Ft, Yard, Mile, NauticalMile, AU, LightYear, Parsec,
+		
+		// Time units
+		S, Ms, Us, Ns, Ps, Min, H, Day, Week, Month, Year,
+		
+		// Mass units
+		Kg, G, Mg, Ug, Ton, Lb, Oz, Stone, Amu,
+		
+		// Temperature units
+		K, C, F, R,
+		
+		// Energy units
+		J, KJ, MJ, Cal, Kcal, BTU, KWh, EV, KeV, MeV,
+		
+		// Power units
+		W, KW, MW, GW, HP, BTUh,
+		
+		// Pressure units
+		Pa, KPa, MPa, Bar, Atm, Psi, MmHg, Torr,
+		
+		// Electric units
+		A, V, Ohm, F_unit, H_unit, Wb, T_unit,
+		
+		// Frequency units
+		Hz_unit, KHz_unit, MHz, GHz, THz, Rpm,
+		
+		// Area units
+		M2, Km2, Cm2, Mm2, Hectare, Acre, SqFt, SqIn,
+		
+		// Volume units
+		M3, L, ML, Gallon, Quart, Pint, Cup, FlOz, Barrel,
+		
+		// Velocity units
+		Mps, Kmh, Mph, Knot, Fps,
+		
+		// Acceleration units
+		Mps2, G_force,
+		
+		// Angle units
+		Rad, Deg, Grad, Turn,
+	}
+	
+	for _, unit := range units {
+		categories[unit.category] = append(categories[unit.category], unit.symbol)
+	}
+	
+	return categories
+}
+
+// AvailableFlat returns a flat list of all supported unit symbols
+func AvailableFlat() []string {
+	var symbols []string
+	
+	units := []*Unit{
+		M, Km, Cm, Mm, Um, Nm, Pm, Fm,
+		Inch, Ft, Yard, Mile, NauticalMile, AU, LightYear, Parsec,
+		S, Ms, Us, Ns, Ps, Min, H, Day, Week, Month, Year,
+		Kg, G, Mg, Ug, Ton, Lb, Oz, Stone, Amu,
+		K, C, F, R,
+		J, KJ, MJ, Cal, Kcal, BTU, KWh, EV, KeV, MeV,
+		W, KW, MW, GW, HP, BTUh,
+		Pa, KPa, MPa, Bar, Atm, Psi, MmHg, Torr,
+		A, V, Ohm, F_unit, H_unit, Wb, T_unit,
+		Hz_unit, KHz_unit, MHz, GHz, THz, Rpm,
+		M2, Km2, Cm2, Mm2, Hectare, Acre, SqFt, SqIn,
+		M3, L, ML, Gallon, Quart, Pint, Cup, FlOz, Barrel,
+		Mps, Kmh, Mph, Knot, Fps,
+		Mps2, G_force,
+		Rad, Deg, Grad, Turn,
+	}
+	
+	for _, unit := range units {
+		symbols = append(symbols, unit.symbol)
+	}
+	
+	return symbols
+}
+
+// ListByCategory prints all units organized by category
+func ListByCategory() {
+	categories := Available()
+	for category, units := range categories {
+		fmt.Printf("%s units: %s\n", category, fmt.Sprintf("%v", units))
+	}
+}
+
+// Unit constructor functions for easier access with values
+var (
+	// Distance synonyms - functions that return units with specified values
+	Meter     = func(value float64) *Unit { return M.withValue(value) }
+	Kilometer = func(value float64) *Unit { return Km.withValue(value) }
+	
+	// Time synonyms
+	Second = func(value float64) *Unit { return S.withValue(value) }
+	Minute = func(value float64) *Unit { return Min.withValue(value) }
+	Hour   = func(value float64) *Unit { return H.withValue(value) }
+	
+	// Mass synonyms
+	Gram     = func(value float64) *Unit { return G.withValue(value) }
+	Kilogram = func(value float64) *Unit { return Kg.withValue(value) }
+	
+	// Temperature synonyms
+	Kelvin  = func(value float64) *Unit { return K.withValue(value) }
+	Celsius = func(value float64) *Unit { return C.withValue(value) }
+	
+	// Pressure synonyms
+	Pascal = func(value float64) *Unit { return Pa.withValue(value) }
+	
+	// Energy synonyms
+	Joule = func(value float64) *Unit { return J.withValue(value) }
+	
+	// Power synonyms
+	Watt = func(value float64) *Unit { return W.withValue(value) }
+	
+	// Electric synonyms
+	Ampere = func(value float64) *Unit { return A.withValue(value) }
+	Volt   = func(value float64) *Unit { return V.withValue(value) }
+	
+	// Volume synonyms
+	Liter = func(value float64) *Unit { return L.withValue(value) }
+	
+	// Angle synonyms
+	Radian = func(value float64) *Unit { return Rad.withValue(value) }
+	Degree = func(value float64) *Unit { return Deg.withValue(value) }
+)
+
