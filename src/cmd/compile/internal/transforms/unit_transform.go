@@ -262,7 +262,7 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 	unitMapping := map[string]string{
 		// Length units
 		"m": "M", "km": "Km", "cm": "Cm", "mm": "Mm", "μm": "Um", "nm": "Nm", "pm": "Pm", "fm": "Fm",
-		"in": "Inch", "ft": "Ft", "yd": "Yard", "mi": "Mile", "nmi": "NauticalMile",
+		"inch": "Inch", "in": "Inch", "ft": "Ft", "yd": "Yard", "mi": "Mile", "nmi": "NauticalMile",
 		"AU": "AU", "ly": "LightYear", "pc": "Parsec",
 		
 		// Time units
@@ -514,7 +514,7 @@ func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
 	if name, ok := expr.(*syntax.Name); ok {
 		units := []string{
 			// Length units
-			"m", "km", "cm", "mm", "μm", "nm", "pm", "fm", "in", "ft", "yd", "mi", "nmi", "AU", "ly", "pc",
+			"m", "km", "cm", "mm", "μm", "nm", "pm", "fm", "inch", "in", "ft", "yd", "mi", "nmi", "AU", "ly", "pc",
 			// Time units
 			"s", "ms", "μs", "ns", "ps", "min", "h", "d", "wk", "mo", "yr",
 			// Mass units

@@ -734,21 +734,26 @@ func (s *scanner) number(seenPoint bool) {
 		ok = false
 	}
 
-	// suffix 'i' for imaginary numbers
-	if s.ch == 'i' {
-		kind = ImagLit
-		s.nextch()
-	} else if s.transformsEnabled() && isLetter(s.ch) {
-		// Check if this might be a unit literal before defaulting to implicit multiplication
+	// Check for units first, then imaginary numbers
+	if s.transformsEnabled() && isLetter(s.ch) {
+		// Check if this might be a unit literal before checking for imaginary numbers
 		if unitSuffix := s.scanPotentialUnit(); unitSuffix != "" {
-			// Create unit literal: 500ms, 2km, etc.
+			// Create unit literal: 500ms, 2km, 12inch, etc.
 			kind = UnitLit
 			s.lit = s.lit + unitSuffix
+		} else if s.ch == 'i' {
+			// Only treat as imaginary if it's a standalone 'i' (not part of a unit like 'inch')
+			kind = ImagLit
+			s.nextch()
 		} else {
 			// Implicit multiplication: 3x -> 3 * x
 			// Don't consume the letter, just set implicit multiplication flag
 			s.implicitMul = true
 		}
+	} else if s.ch == 'i' {
+		// suffix 'i' for imaginary numbers (when transforms disabled)
+		kind = ImagLit
+		s.nextch()
 	}
 
 	s.setLit(kind, ok) // do this now so we can use s.lit below
@@ -775,7 +780,7 @@ func (s *scanner) scanPotentialUnit() string {
 		// Multi-character units (longest first)
 		"BTU/h", "fl oz", "kcal", "keV", "MeV", "kWh", "mmHg", "torr", "grad", "turn",
 		"MHz", "GHz", "THz", "kHz", "min", "rpm", "kPa", "MPa", "bar", "atm", "psi",
-		"km", "cm", "mm", "ms", "μm", "nm", "pm", "fm", "in", "ft", "yd", "mi", "nmi",
+		"inch", "km", "cm", "mm", "ms", "μm", "nm", "pm", "fm", "in", "ft", "yd", "mi", "nmi",
 		"AU", "ly", "pc", "μs", "ns", "ps", "wk", "mo", "yr", "kg", "mg", "μg", "lb", 
 		"oz", "st", "°C", "°F", "°R", "kJ", "MJ", "cal", "BTU", "eV", "kW", "MW", "GW",
 		"hp", "Pa", "Wb", "ha", "ac", "m²", "km²", "cm²", "mm²", "ft²", "in²", "m³",
