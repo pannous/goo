@@ -2,7 +2,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 	"strings"
 )
 
@@ -674,10 +673,10 @@ func (t *UnitTransformer) findUnitVariableAssignments(file *syntax.File) map[str
 		
 		// Check package-level variable declarations
 		if varDecl, ok := decl.(*syntax.VarDecl); ok {
-			// Check for: ms := units.Ms  
+			// Check for: ms := units.Ms or j_val := 1000J
 			if len(varDecl.NameList) == 1 && varDecl.Values != nil {
 				varName := varDecl.NameList[0].Value
-				if t.isUnitConstant(varDecl.Values) {
+				if t.isUnitConstant(varDecl.Values) || t.isUnitExpression(varDecl.Values) {
 					unitVars[varName] = true
 				}
 			}
@@ -700,20 +699,20 @@ func (t *UnitTransformer) scanStmtForUnitAssignments(stmt syntax.Stmt, unitVars 
 	case *syntax.DeclStmt:
 		for _, decl := range s.DeclList {
 			if varDecl, ok := decl.(*syntax.VarDecl); ok {
-				// Check for: m := units.M
+				// Check for: m := units.M or j_val := 1000J
 				if len(varDecl.NameList) == 1 && varDecl.Values != nil {
 					varName := varDecl.NameList[0].Value
-					if t.isUnitConstant(varDecl.Values) {
+					if t.isUnitConstant(varDecl.Values) || t.isUnitExpression(varDecl.Values) {
 						unitVars[varName] = true
 					}
 				}
 			}
 		}
 	case *syntax.AssignStmt:
-		// Check for: m := units.M  
+		// Check for: m := units.M or j_val := 1000J
 		if s.Op == syntax.Def {
 			if name, ok := s.Lhs.(*syntax.Name); ok {
-				if t.isUnitConstant(s.Rhs) {
+				if t.isUnitConstant(s.Rhs) || t.isUnitExpression(s.Rhs) {
 					unitVars[name.Value] = true
 				}
 			}

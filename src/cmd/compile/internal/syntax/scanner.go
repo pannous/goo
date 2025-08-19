@@ -245,6 +245,12 @@ redo:
 
 	case '*':
 		s.nextch()
+		if s.ch == '*' && s.isPowerContext() {
+			s.nextch()
+			s.op, s.prec = Power, precPower
+			s.tok = _Power
+			break
+		}
 		s.op, s.prec = Mul, precMul
 		// don't goto assignop - want _Star token
 		if s.ch == '=' {
@@ -651,6 +657,35 @@ func (s *scanner) transformsEnabled() bool {
 	hasGooExt := strings.HasSuffix(s.filename, ".goo")
 	result := envSet && (s.filename == "" || hasGooExt) || hasGooExt
 	return result
+}
+
+// isPowerContext determines if ** should be treated as power operator vs pointer-to-pointer
+func (s *scanner) isPowerContext() bool {
+	// Only treat ** as power operator in .goo files
+	if !strings.HasSuffix(s.filename, ".goo") {
+		return false
+	}
+	
+	// Look at the character before the first * to determine context
+	if s.source.r >= 3 {
+		prevChar := s.source.buf[s.source.r-3] // Character before first *
+		
+		// Power context: digit, identifier, ) or whitespace before **
+		// Examples: "3 ** 2", "x**2", "(a+b)**3"  
+		if (prevChar >= '0' && prevChar <= '9') || // digit
+		   (prevChar >= 'a' && prevChar <= 'z') || // lowercase letter
+		   (prevChar >= 'A' && prevChar <= 'Z') || // uppercase letter  
+		   prevChar == '_' || prevChar == ')' ||   // identifier chars or closing paren
+		   prevChar == ' ' || prevChar == '\t' {   // whitespace
+			return true
+		}
+		
+		// Type context: comma, opening paren, or other type indicators
+		// Examples: "func(a **int)", "var x **Type"
+		return false
+	}
+	
+	return false
 }
 
 func lower(ch rune) rune     { return ('a' - 'A') | ch } // returns lower-case ch iff ch is ASCII letter

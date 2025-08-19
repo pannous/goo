@@ -1453,7 +1453,7 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 		x = p.handleStringInterpolation(x)
 	}
 
-	for (p.tok == _Operator || p.tok == _Star) && p.prec > prec {
+	for (p.tok == _Operator || p.tok == _Star || p.tok == _Power) && p.prec > prec {
 		// Stop parsing if we encounter 'in' operator in for-loop context
 		if p.inForLoop && p.tok == _Operator && p.op == In {
 			break
