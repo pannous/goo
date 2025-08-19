@@ -1,0 +1,8 @@
+import "fmt"
+
+a := 42
+b := 42
+
+fmt.Printf("Testing check with integers: %d == %d\n", a, b)
+check a == b
+fmt.Println("Check passed!")

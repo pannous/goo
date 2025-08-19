@@ -1,0 +1,8 @@
+// Test method chaining edge case
+simple := "hello"
+printf("simple.toUpper() = '%s'\n", simple.toUpper())
+
+// This should work but currently fails:
+// result := "hello".toUpper().reverse()
+
+printf("Method chaining test completed\n")

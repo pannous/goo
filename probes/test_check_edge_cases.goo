@@ -1,0 +1,21 @@
+// Test cases that might cause transformer issues
+x := [1, 2, 3]
+y := [1, 2, 3]
+
+// Test with list comparison
+check len(x) == len(y)
+
+// Test with method calls
+s1 := "hello"
+s2 := "world"
+check s1.length() == 5
+
+// Test with map access
+m := {"key": "value"}
+check m["key"] == "value"
+
+// Test with complex boolean logic
+check true && (1 == 1)
+check false || (2 == 2)
+
+printf("All edge case checks passed!\n")

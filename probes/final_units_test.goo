@@ -1,0 +1,31 @@
+import "units"
+
+// Set up unit variables
+ms := units.Ms
+s := units.S
+m := units.M
+km := units.Km
+
+// Test operator syntax (this is what we fixed!)
+time1 := 500 * ms      // number * unit
+time2 := ms * 500      // unit * number  
+time3 := s * 5         // unit * number
+distance1 := 1200 * m  // number * unit
+distance2 := km * 2    // unit * number
+
+// Test complex expressions with operators
+total_time := time1.Add(time3)           // 500ms + 5s = 5500ms
+total_distance := distance1.Add(distance2) // 1200m + 2km = 3200m
+
+print("Time tests:")
+print(time1.Value())  // Should be 500
+print(time2.Value())  // Should be 500
+print(time3.Value())  // Should be 5000 (5 seconds = 5000 ms)
+print(total_time.Value()) // Should be 5500
+
+print("Distance tests:")
+print(distance1.Value()) // Should be 1200
+print(distance2.Value()) // Should be 2000 (2 km = 2000 m)
+print(total_distance.Value()) // Should be 3200
+
+print("All unit operator tests passed!")

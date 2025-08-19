@@ -1,0 +1,39 @@
+import "units"
+
+func test() {
+    // Test 1: Regular multiplication with explicit unit variables
+    ms := units.Ms
+    s := units.S
+    result1 := 500 * ms
+    result2 := ms * 500
+    
+    // Test 2: Middle dot operator
+    result3 := 500 · ms
+    result4 := ms · 500
+    
+    // Test 3: Unit literals  
+    result5 := 500ms
+    result6 := 5s
+    
+    // Test 4: Addition operations
+    result7 := result5.Add(result6)  // 500ms + 5s = 5500ms
+    
+    print("Regular multiplication:")
+    print(result1.Value())  // 500
+    print(result2.Value())  // 500
+    
+    print("Middle dot operator:")
+    print(result3.Value())  // 500
+    print(result4.Value())  // 500
+    
+    print("Unit literals:")
+    print(result5.Value())  // 500
+    print(result6.Value())  // 5000 (5s in ms)
+    
+    print("Addition:")
+    print(result7.Value())  // 5500
+    
+    print("All unit syntax features work!")
+}
+
+test()

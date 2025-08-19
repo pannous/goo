@@ -1,0 +1,18 @@
+// Simple try-catch edge case
+
+printf("=== Simple Try-Catch ===\n")
+
+// Test different panic types
+try {
+	panic(42)
+} catch numErr {
+	printf("Caught number: %v\n", numErr)
+}
+
+try {
+	panic("string error")
+} catch strErr {
+	printf("Caught string: %v\n", strErr)
+}
+
+printf("Simple try-catch completed!\n")

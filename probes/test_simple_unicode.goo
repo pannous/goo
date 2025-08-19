@@ -1,0 +1,12 @@
+// Simple test of what happens with Unicode
+import "units"
+
+print("Testing...")
+// Let's see if even basic Unicode identifiers work
+test90 := 90deg  // This should work
+print("90deg =", test90.Value())
+
+// Now try a Unicode version  
+// test90u := 90°  // This fails
+
+print("ASCII degree works, Unicode needs different approach")

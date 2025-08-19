@@ -1,0 +1,9 @@
+import "units"
+
+func test() {
+    ms := units.Ms
+    result := 500 · ms
+    print(result.Value())
+}
+
+test()

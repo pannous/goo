@@ -1,0 +1,15 @@
+// Test the README claim "for i in 0…5 NOT working"
+
+printf("=== Range For-Loop Test ===\n")
+
+// Direct syntax (this should fail according to README)
+printf("Testing direct syntax (may fail):\n")
+
+// Workaround using variable
+nums := 0…3
+printf("Using variable workaround:\n")
+for i in nums {
+	printf("i = %d\n", i)
+}
+
+printf("Range for-loop test completed!\n")

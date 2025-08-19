@@ -1,2 +1,0 @@
-x := -1
-printf("Debug negative syntax\n")

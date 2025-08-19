@@ -1,0 +1,15 @@
+j_val := 42
+kj_val := 42
+
+// This should work - direct boolean expression
+if j_val == kj_val {
+	printf("if works\n")
+}
+
+// This should work - assignment of boolean
+result := j_val == kj_val
+printf("assignment result: %v\n", result)
+
+// This is failing according to the user
+check j_val == kj_val
+printf("check works\n")

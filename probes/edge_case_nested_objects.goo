@@ -1,0 +1,37 @@
+// Test nested object literals
+
+printf("=== Nested Object Literals ===\n")
+
+// Simple nested object
+user := {
+	name: "Alice",
+	age: 30,
+	address: {
+		street: "123 Main St",
+		city: "Boston",
+		zipcode: 12345
+	}
+}
+
+printf("user.name = %s\n", user.name)
+printf("user.age = %d\n", user.age)
+printf("user.address.street = %s\n", user.address.street)
+printf("user.address.city = %s\n", user.address.city)
+printf("user.address.zipcode = %d\n", user.address.zipcode)
+
+// Deeply nested
+config := {
+	database: {
+		host: "localhost",
+		port: 5432,
+		credentials: {
+			username: "admin",
+			password: "secret"
+		}
+	}
+}
+
+printf("config.database.host = %s\n", config.database.host)
+printf("config.database.credentials.username = %s\n", config.database.credentials.username)
+
+printf("Nested object literals test completed!\n")

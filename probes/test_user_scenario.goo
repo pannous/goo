@@ -1,0 +1,17 @@
+import "fmt"
+
+j_val := 42
+kj_val := 42
+
+// User says this works
+if j_val == kj_val {
+    fmt.Println("if works")
+}
+
+// User says this works
+result := j_val == kj_val
+fmt.Printf("result: %v\n", result)
+
+// User says this fails
+check j_val == kj_val
+fmt.Println("check works")

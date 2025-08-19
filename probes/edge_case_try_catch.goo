@@ -1,0 +1,31 @@
+// Edge case testing for try-catch
+
+printf("=== Try-Catch Edge Cases ===\n")
+
+// Test nested try-catch
+printf("Nested try-catch:\n")
+try {
+	try {
+		panic("inner panic")
+	} catch inner {
+		printf("Caught inner: %v\n", inner)
+		panic("outer panic")
+	}
+} catch outer {
+	printf("Caught outer: %v\n", outer)
+}
+
+// Test try-catch with return (in function context)
+def testTryCatchReturn() string {
+	try {
+		panic("test error")
+		return "success"
+	} catch err {
+		return "caught: " + err.(string)
+	}
+}
+
+result := testTryCatchReturn()
+printf("Function try-catch result: %s\n", result)
+
+printf("Try-catch edge cases completed!\n")

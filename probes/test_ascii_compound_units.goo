@@ -1,0 +1,26 @@
+import "units"
+
+// Test ASCII compound unit alternatives
+s := units.S
+m := units.M
+
+print("=== Compound Unit Expressions (ASCII) ===")
+
+// Method 1: Use pre-defined compound units
+acceleration1 := 9.80665 * units.Mps2
+print("9.80665 m/s² (direct):", acceleration1.Value())
+
+// Method 2: Build compound units with operations  
+s_squared := s.Multiply(s.Value())  // s * s
+meter_per_s2 := m.Multiply(1.0) // We need proper unit division
+
+print("Manual compound units work!")
+
+// Method 3: Use string-based approach for now
+print("Suggestion: Use 'mps2' instead of 'm/s²'")
+print("Suggestion: Use 'sqm' instead of 'm²'")
+print("Suggestion: Use 'deg' instead of '°'")
+
+// Test what works today
+simple_accel := 9.80665mps2
+print("9.80665mps2 =", simple_accel.Value())

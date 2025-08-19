@@ -1,0 +1,13 @@
+import "units"
+
+s := units.S
+ms := units.Ms
+
+// Test unit equality - this should now use the Equal method
+left := 500 * ms + 5 * s    // 5500ms in base units 
+right := 5500 * ms          // 5500ms in base units
+
+print("Left value:", left.Value())    // Should be 5500
+print("Right value:", right.Value())  // Should be 5500  
+print("Are equal:", left.Equal(right)) // Direct method call
+print("Operator equality:", left == right) // This should transform to Equal method

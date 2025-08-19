@@ -1,0 +1,2 @@
+// Test single Unicode unit literal
+angle := 90°

@@ -1,0 +1,33 @@
+// Test units.Available() and unit synonyms
+import "units"
+
+func main() {
+	// Test Available() function
+	println("Testing units.Available()...")
+	categories := units.Available()
+	for category, unitList := range categories {
+		println("Category:", category, "Units:", len(unitList), "available")
+	}
+	
+	// Test unit synonyms like units.M == units.Meter
+	println("Testing unit synonyms...")
+	distance := units.Meter(5.0)
+	println("Distance:", distance.ToString())
+	
+	// Test various synonyms
+	time := units.Second(10.0)
+	mass := units.Kilogram(2.5)
+	temp := units.Celsius(25.0)
+	
+	println("Time:", time.ToString())
+	println("Mass:", mass.ToString()) 
+	println("Temperature:", temp.ToString())
+	
+	// Test units with direct access
+	distance2 := units.M.Multiply(5.0)
+	println("Distance2:", distance2.ToString())
+	
+	// Test flat list
+	flatList := units.AvailableFlat()
+	println("Total units available:", len(flatList))
+}

@@ -1,0 +1,5 @@
+// Test simple Pa unit
+func main() {
+    pressure := 100000Pa
+    println(pressure)
+}

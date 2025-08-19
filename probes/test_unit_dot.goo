@@ -1,0 +1,10 @@
+func main() {
+    // Test middle dot syntax: 2·km  
+    distance := 2·km + 500·m
+    time := 5·s + 200·ms
+    total := distance + 1·km
+    
+    print("Distance:", distance)
+    print("Time:", time)
+    print("Total:", total)
+}

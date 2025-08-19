@@ -1,0 +1,19 @@
+import "units" 
+
+// Test direct method calls (these work)
+s := units.S
+ms := units.Ms
+
+result1 := ms.Multiply(500).Add(s.Multiply(5))
+expected1 := ms.Multiply(5500)
+check result1.Value() == expected1.Value()
+
+m := units.M
+km := units.Km
+
+result2 := m.Multiply(1200).Add(km.Multiply(2))
+expected2_m := result2.Value()
+expected2_km := expected2_m / 1000.0
+check expected2_km == 3.2
+
+print("Units test passed!")

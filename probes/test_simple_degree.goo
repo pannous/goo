@@ -1,0 +1,5 @@
+import "units"
+
+print("Testing degree symbol...")
+result := units.Deg.Multiply(180)
+print("180 degrees:", result.Value())

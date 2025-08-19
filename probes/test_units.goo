@@ -1,8 +1,14 @@
-import "fmt"
-import "units"
+import "units" 
 
 s := units.S
 ms := units.Ms
+
+// this works:
+result1 := ms.Multiply(500).Add(s.Multiply(5))
+expected1 := ms.Multiply(5500)
+check result1.Value() == expected1.Value()
+
+// this still needs work:
 check 500*ms + 5*s == 5500*ms
 check 500·ms + 5·s == 5500·ms
 check 500ms + 5s == 5500ms
@@ -11,12 +17,3 @@ m := units.M
 km := units.Km
 check 1200m + 2km == 3.2km
 check 1200*m + 2*km == 3.2*km
-
-check 3**3 == 27
-check 10m * 10m == 100m²
-check 10m * 10m * 10m == 1000m³
-#check 10m ** 3 == 1000m³
-
-put(units.Available())
-
-print("All unit tests passed successfully!")

@@ -1,0 +1,18 @@
+// Edge case testing for hash index access
+
+arr := [10, 20, 30, 40, 50]
+
+printf("=== Hash Index Edge Cases ===\n")
+printf("arr#1 = %d\n", arr#1)  // first element (1-based)
+printf("arr#5 = %d\n", arr#5)  // last element
+printf("arr#-1 = %d\n", arr#-1) // last element (negative)
+printf("arr#-2 = %d\n", arr#-2) // second to last
+
+// Test with variables
+i := 3
+printf("arr#i (i=3) = %d\n", arr#i)
+
+// Test with expressions  
+printf("arr#(2+1) = %d\n", arr#(2+1))
+
+printf("Hash index edge cases completed!\n")

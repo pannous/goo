@@ -1,0 +1,17 @@
+// Very simple units test
+import "units"
+
+func main() {
+	println("=== Very Simple Units Test ===")
+	
+	// Test only basic creation without any comparisons
+	distance := 5m
+	time := 10s
+	mass := 2kg
+	
+	println("Distance created")
+	println("Time created") 
+	println("Mass created")
+	
+	println("All units created successfully!")
+}

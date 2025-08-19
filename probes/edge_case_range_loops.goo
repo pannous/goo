@@ -1,0 +1,19 @@
+// Test range loops as mentioned in README: "for i in 0…5 NOT working"
+
+printf("=== Range Loop Edge Cases ===\n")
+
+// Test basic range loop
+printf("Basic range loop 0…3:\n")
+for i in 0…3 {
+	printf("i = %d\n", i)
+}
+
+// Test range with variables
+start := 2
+end := 4
+printf("Variable range %d…%d:\n", start, end)
+for i in start…end {
+	printf("i = %d\n", i)
+}
+
+printf("Range loop tests completed!\n")

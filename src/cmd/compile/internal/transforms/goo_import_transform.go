@@ -123,7 +123,8 @@ func (t *GooImportTransform) isStandardLibrary(importPath string) bool {
 		"bufio", "context", "errors", "log", "math", "path", "regexp", "sort",
 		"sync", "testing", "unicode", "encoding", "crypto", "database", "debug",
 		"go", "hash", "html", "image", "index", "mime", "reflect", "runtime",
-		"text", "unsafe", "archive", "compress", "container", "embed",
+		"text", "unsafe", "archive", "compress", "container", "embed", "slices",
+		"maps", "cmp", "iter",
 	}
 
 	for _, pkg := range stdLibPackages {

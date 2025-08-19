@@ -1,0 +1,9 @@
+// Hero challenge: make 3² == 9 work
+print("Hero challenge: 3² == 9")
+
+// This should work when implemented:
+// check 3² == 9
+// check 4² == 16
+// check 2³ == 8
+
+print("Challenge accepted!")

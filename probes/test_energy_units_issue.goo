@@ -1,0 +1,21 @@
+import "units"
+
+// Test the specific energy units issue: 1000J should equal 1kJ
+j1000 := 1000J
+kj1 := 1kJ
+
+print("1000J:", j1000.ToString())
+print("1kJ:", kj1.ToString()) 
+print("1000J value:", j1000.Value())
+print("1kJ value:", kj1.Value())
+
+// Test equality - this should work
+print("1000J == 1kJ:", j1000.Equal(kj1))
+
+// Test base unit conversion manually
+print("1000J in base units:", j1000.Value() * 1.0)    // J has factor 1.0
+print("1kJ in base units:", kj1.Value() * 1000.0)     // kJ has factor 1000.0
+
+// Test direct comparison syntax
+check 1000J == 1kJ  // This should pass
+print("Direct comparison 1000J == 1kJ passed!")

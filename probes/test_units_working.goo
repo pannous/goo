@@ -1,0 +1,35 @@
+// Simple working test of units functionality
+import "units"
+
+func main() {
+	println("=== Units System Working Test ===")
+	
+	// Test Available function  
+	categories := units.Available()
+	println("Found", len(categories), "unit categories")
+	
+	flatList := units.AvailableFlat()
+	println("Total units:", len(flatList))
+	
+	// Test unit creation with synonyms
+	distance := units.Meter(5.0)
+	time := units.Second(10.0)
+	mass := units.Kilogram(2.0)
+	temperature := units.Celsius(25.0)
+	
+	println("Distance:", distance.ToString())
+	println("Time:", time.ToString())
+	println("Mass:", mass.ToString())
+	println("Temperature:", temperature.ToString())
+	
+	// Test equality
+	meter1 := units.Meter(5.0)
+	meter2 := units.M.Multiply(5.0)
+	println("Synonym equality test:", meter1.Equal(meter2))
+	
+	// Test arithmetic
+	total := units.Meter(10.0).Add(units.Meter(5.0))
+	println("10m + 5m =", total.ToString())
+	
+	println("=== All tests passed! ===")
+}

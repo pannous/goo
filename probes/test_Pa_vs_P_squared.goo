@@ -1,0 +1,13 @@
+// Test Pa unit vs P² variable
+func main() {
+    // This should work as Pascal pressure unit
+    pressure := 100000Pa
+    println(pressure)
+    
+    // This should work as P squared 
+    P := 5
+    result := 100000 * P²
+    println(result) // Should be 100000 * 25 = 2500000
+    
+    check result == 2500000
+}

@@ -1,0 +1,10 @@
+import "units"
+
+// Test with unit literals - should work with transformers
+if 1000mm == 1m {
+    printf("Unit literal comparison works in if: 1000mm == 1m\n") 
+} else {
+    printf("Unit literal comparison FAILS in if: 1000mm != 1m\n")
+}
+
+printf("done\n")

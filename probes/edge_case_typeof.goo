@@ -1,0 +1,25 @@
+// Edge case testing for typeof operator
+
+printf("=== Typeof Edge Cases ===\n")
+
+// Basic types
+printf("typeof(42) = %s\n", typeof(42))
+printf("typeof(\"hello\") = %s\n", typeof("hello"))
+printf("typeof('a') = %s\n", typeof('a'))
+
+// Complex types
+arr := [1, 2, 3]
+printf("typeof(arr) = %s\n", typeof(arr))
+
+myMap := {"key": "value"}  
+printf("typeof(myMap) = %s\n", typeof(myMap))
+
+// Nil values
+var nilPtr *int
+printf("typeof(nilPtr) = %s\n", typeof(nilPtr))
+
+// Interface{} values
+var anyVal any = 42
+printf("typeof(anyVal) = %s\n", typeof(anyVal))
+
+printf("Typeof edge cases completed!\n")

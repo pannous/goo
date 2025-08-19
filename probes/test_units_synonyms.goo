@@ -1,0 +1,43 @@
+// Test unit synonyms like units.M == units.Meter
+import "units"
+
+func main() {
+	println("Testing unit synonyms and comparisons...")
+	
+	// Test distance synonyms
+	distance1 := units.Meter(5.0)
+	distance2 := units.M.Multiply(5.0)  // Should be equivalent 
+	println("5 meters via Meter():", distance1.ToString())
+	println("5 meters via M.Multiply():", distance2.ToString())
+	println("Are they equal?", distance1.Equal(distance2))
+	
+	// Test time synonyms
+	time1 := units.Second(30.0)
+	time2 := units.S.Multiply(30.0)
+	println("30 seconds via Second():", time1.ToString())
+	println("30 seconds via S.Multiply():", time2.ToString())
+	println("Are they equal?", time1.Equal(time2))
+	
+	// Test mass synonyms
+	mass1 := units.Kilogram(2.0)
+	mass2 := units.Kg.Multiply(2.0)
+	println("2 kg via Kilogram():", mass1.ToString())
+	println("2 kg via Kg.Multiply():", mass2.ToString())
+	println("Are they equal?", mass1.Equal(mass2))
+	
+	// Test temperature synonyms
+	temp1 := units.Celsius(25.0)
+	temp2 := units.C.Multiply(25.0)
+	println("25°C via Celsius():", temp1.ToString())
+	println("25°C via C.Multiply():", temp2.ToString())
+	println("Are they equal?", temp1.Equal(temp2))
+	
+	// Test arithmetic with synonyms
+	println("\nTesting arithmetic...")
+	result := units.Meter(10.0).Add(units.Meter(5.0))
+	println("10m + 5m =", result.ToString())
+	
+	// Test ListByCategory
+	println("\nAll available units by category:")
+	units.ListByCategory()
+}

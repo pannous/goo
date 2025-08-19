@@ -1,0 +1,16 @@
+import "units"
+
+// Test compound unit expressions
+s := units.S
+m := units.M
+
+// These should work:
+s_squared := s.Multiply(s.Value())  // s²
+acceleration := m.Multiply(1.0).Divide(s_squared.Value()) // m/s²
+
+print("s² =", s_squared.Value())
+print("m/s² =", acceleration.Value())
+
+// Test the specific case
+mps2_direct := units.Mps2.Multiply(9.80665)
+print("9.80665 m/s² =", mps2_direct.Value())

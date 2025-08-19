@@ -1,0 +1,26 @@
+// Test postfix operators ² and ³
+
+// Basic postfix operations
+check 3² == 9
+check 2³ == 8
+check 4² == 16
+check 10² == 100
+
+// Mixed with variables
+x := 5
+check x² == 25
+
+y := 3
+check y³ == 27
+
+// Float operations
+check 2.5² == 6.25
+check 1.5³ == 3.375
+
+// With parentheses
+check (2 + 1)² == 9
+check (1 + 2)³ == 27
+
+// Negative numbers
+check (-3)² == 9
+check (-2)³ == -8

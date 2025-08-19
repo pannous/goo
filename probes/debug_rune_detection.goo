@@ -1,2 +1,0 @@
-// Test if rune literal is detected correctly
-check "abc"#'a' == 0

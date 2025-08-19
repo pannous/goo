@@ -1,0 +1,5 @@
+import "units"
+
+j_val := 1000J
+kj_val := 1kJ
+check j_val == kj_val

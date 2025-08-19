@@ -1,0 +1,23 @@
+// Test τ (tau) mathematical constant 
+x := τ
+println("τ =", x)
+println("τ ≈ 6.28318:", τ > 6.28 && τ < 6.29)
+
+// Test τ vs 2π relationship
+println("τ vs 2π:")
+println("τ =", τ)
+println("2π =", 2 * π)
+println("τ = 2π:", τ == 2 * π)
+
+// Test τ in circle calculations
+radius := 3.0
+circumference_tau := τ * radius    // τ * r (simpler than 2πr)
+circumference_pi := 2 * π * radius // traditional 2πr
+
+println("Circle calculations with radius 3:")
+println("Circumference using τ * r =", circumference_tau)
+println("Circumference using 2π * r =", circumference_pi)
+println("Results equal:", circumference_tau == circumference_pi)
+
+// Test τ/2 = π
+println("τ/2 = π:", τ/2 == π)

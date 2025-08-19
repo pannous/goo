@@ -1,0 +1,18 @@
+a := 42
+b := 42
+
+// Test different comparison operators
+check a == b
+check a >= b
+check a <= b
+check a != 43
+
+// Test with different types
+str1 := "hello"
+str2 := "hello"
+check str1 == str2
+
+// Test with complex expression
+check (a + 1) == (b + 1)
+
+printf("All checks passed!\n")

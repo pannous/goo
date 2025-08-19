@@ -1,0 +1,22 @@
+// Debug units functionality
+import "units"
+
+func main() {
+	println("=== Debug Units Test ===")
+	
+	// Test basic creation
+	distance1 := 5m
+	distance2 := 5m
+	
+	println("distance1:", distance1.ToString())
+	println("distance2:", distance2.ToString())
+	
+	// Test equality with explicit method call
+	isEqual := distance1.Equal(distance2)
+	println("distance1.Equal(distance2):", isEqual)
+	
+	// Test what the check operator is doing
+	// The check fails because the transformation might be wrong
+	
+	println("Debug test completed!")
+}

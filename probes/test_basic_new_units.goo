@@ -1,0 +1,14 @@
+import "units"
+
+// Test just the new units that should work
+kg_val := units.Kg
+g_val := units.G
+j_val := units.J
+
+// Test basic operations
+result1 := kg_val.Multiply(5)
+result2 := g_val.Multiply(1000) 
+
+print("Kg value:", result1.Value())
+print("G value:", result2.Value())
+print("Conversion works:", result1.Equal(result2))
