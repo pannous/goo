@@ -1,0 +1,18 @@
+import "units"
+import "fmt"
+
+func test() {
+    ms := units.Ms
+    s := units.S
+    
+    result1 := 500ms
+    result2 := 5s  
+    result3 := result1.Add(result2)
+    
+    // put(result1)  todo better .String() => 5.5s
+    print(result1.Value()) // Should be 500
+    print(result2.Value()) // Should be 5000 
+    print(result3.Value()) // Should be 5500
+}
+
+test()

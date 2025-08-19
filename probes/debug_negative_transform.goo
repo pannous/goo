@@ -1,3 +1,0 @@
-var 变量 = "Chinese variable 变量"
-// Test if literal -1 gets detected properly
-check "hello"#-1 == 'o'

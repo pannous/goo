@@ -1,0 +1,15 @@
+// Test high-precision π constant
+import "fmt"
+
+// Test maximum precision output
+fmt.Printf("π with high precision: %.50f\n", π)
+fmt.Printf("π as string: %s\n", π)
+
+// Test precision in calculations
+fmt.Printf("π * 2 high precision: %.50f\n", π * 2)
+fmt.Printf("π / 2 high precision: %.50f\n", π / 2)
+
+// Compare with known precision
+precise_pi := 3.1415926535897932384626433832795028841971693993751
+fmt.Printf("Expected high precision: %.50f\n", precise_pi)
+fmt.Printf("Difference: %.50f\n", π - precise_pi)

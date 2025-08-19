@@ -1,0 +1,10 @@
+// Test Pa vs P² parsing (compilation test only)
+func main() {
+    // Test that Pa is recognized as a unit (should trigger unit transform)
+    println("Testing Pa unit...")
+    
+    // Test that P² is recognized as postfix (should trigger postfix transform)  
+    P := 5
+    result := P²
+    println(result)
+}

@@ -1,0 +1,5 @@
+func main() {
+    x := 5
+    result := 3x  // Should parse as 3 * x
+    print("Result:", result)
+}

@@ -1,0 +1,20 @@
+func main() {
+    // Test implicit multiplication: 3x -> 3*x
+    x := 5
+    y := 10
+    abc := 7
+    
+    // These should be parsed as 3*x, 2*y, 5*abc
+    result1 := 3x    // Should be 3 * x = 15
+    result2 := 2y    // Should be 2 * y = 20  
+    result3 := 5abc  // Should be 5 * abc = 35
+    
+    print("x =", x)
+    print("3x =", result1)
+    print("2y =", result2) 
+    print("5abc =", result3)
+    
+    // Mixed expressions
+    total := 3x + 2y + 5abc  // Should be 70
+    print("Total:", total)
+}

@@ -1,0 +1,16 @@
+// Test τ ≈ 2π equality
+import "math"
+
+println("τ ≈ 2π:", τ ≈ 2*π)
+println("τ value:", τ)
+println("2π value:", 2*π)
+
+// Test some basic approximate equalities
+a := 3.14159
+b := 3.14160
+println("3.14159 ≈ 3.14160:", a ≈ b)
+
+c := 0.1 + 0.2
+d := 0.3
+println("(0.1 + 0.2) ≈ 0.3:", c ≈ d)
+println("(0.1 + 0.2) == 0.3:", c == d)

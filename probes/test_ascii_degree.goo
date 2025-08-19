@@ -1,0 +1,12 @@
+import "units"
+
+// Test degree units with ASCII representation
+print("Testing degree units...")
+
+// Use 'deg' instead of '°' for now
+angle1 := units.Deg.Multiply(180)
+angle2 := units.Deg.Multiply(90)
+
+print("180 degrees:", angle1.Value())
+print("90 degrees:", angle2.Value())
+print("Degrees work with ASCII representation!")

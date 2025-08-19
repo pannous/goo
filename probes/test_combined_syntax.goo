@@ -1,0 +1,21 @@
+func main() {
+    // Test that both implicit multiplication AND units work together
+    
+    // Regular variables with implicit multiplication
+    x := 10
+    y := 5
+    
+    result1 := 3x      // 3 * x = 30
+    result2 := 2y      // 2 * y = 10
+    
+    print("3x =", result1)
+    print("2y =", result2)
+    
+    // Unit multiplication (this will use the unit system when available)
+    // distance := 2*km + 3*m    // This would work with units
+    // time := 5*s + 100*ms      // This would work with units
+    
+    // Mathematical polynomial 
+    polynomial := 2x + 3y  // Should be 2*10 + 3*5 = 35
+    print("2x + 3y =", polynomial)
+}

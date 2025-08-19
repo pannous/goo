@@ -1,0 +1,16 @@
+// Minimal units test to find the exact cause
+import "units"
+
+func main() {
+	println("=== Minimal Units Test ===")
+	
+	// Test only the basic operations we know work
+	distance := 5m
+	time := 10s
+	
+	// Test basic equality
+	check distance == 5m
+	check time == 10s
+	
+	println("Basic units test passed!")
+}

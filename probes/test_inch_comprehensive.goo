@@ -1,0 +1,37 @@
+import "units"
+
+// Comprehensive test of inch vs imaginary number parsing
+
+print("=== Inch Unit Tests ===")
+length1 := 12inch
+length2 := 12in  // Both should work
+check length1.Equal(length2)
+print("12inch == 12in: ✓")
+
+// Convert to meters  
+meters := length1.Multiply(0.0254) // 1 inch = 0.0254 meters
+print("12 inches in meters:", meters.Value())
+
+print("=== Imaginary Number Tests ===")
+z1 := 3 + 4i
+z2 := 12i
+print("Complex number 3+4i:", z1)
+print("Complex number 12i:", z2)
+
+print("=== Mixed Usage Test ===")
+// These should all work correctly in the same file
+width := 24inch
+height := 18inch  
+area_inches := width.Multiply(height.Value()) // 432 square inches
+
+complex_calc := 5 + 3i
+print("Width × Height =", area_inches.Value(), "square inches")
+print("Complex calculation:", complex_calc)
+
+print("=== Foot and Inch Relationship ===")
+foot := 1ft
+inches_in_foot := 12inch
+check foot.Equal(inches_in_foot)
+print("1ft == 12inch: ✓")
+
+print("All inch vs imaginary tests passed!")

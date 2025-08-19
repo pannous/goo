@@ -1,0 +1,13 @@
+import "units"
+
+// Test the fixed energy units
+j_val := 1000J
+kj_val := 1kJ
+check j_val == kj_val
+
+// Test with variables 
+energy1 := 2000J
+energy2 := 2kJ
+check energy1 == energy2
+
+println("Energy units working correctly")

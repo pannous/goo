@@ -1,0 +1,7 @@
+import "units"
+
+// Test check with units - should show unit comparison behavior
+check 1m == 1000mm  // This should pass
+check 1m == 2m      // This should fail and show the error message
+
+printf("all checks passed!\n")

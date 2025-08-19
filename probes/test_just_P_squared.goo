@@ -1,0 +1,5 @@
+// Test just P²  
+func main() {
+    P := 5
+    println(P²)
+}

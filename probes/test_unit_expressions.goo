@@ -1,0 +1,24 @@
+// Test individual unit expressions to isolate the error
+import "units"
+
+func main() {
+	// Test basic units - these should work
+	distance := 5m
+	println("5m:", distance.ToString())
+	
+	// Test area units
+	area := 10000m²
+	println("10000m²:", area.ToString())
+	
+	// Test velocity units - this might be problematic
+	velocity := 1m/s
+	println("1m/s:", velocity.ToString())
+	
+	// Test postfix operators - this might be the issue
+	time_val := 5s
+	println("5s:", time_val.ToString())
+	
+	// Test postfix square with units
+	time_squared := time_val²
+	println("time_val²:", time_squared)
+}

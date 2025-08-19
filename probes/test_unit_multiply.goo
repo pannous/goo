@@ -1,0 +1,15 @@
+func main() {
+    // Test both multiplication syntaxes: 2*km and 2·km
+    distance1 := 2 * km    // asterisk  
+    distance2 := 3·km      // middle dot
+    time := 5 * s
+    total := distance1 + distance2 + 1·km  // 6km
+    
+    print("Distance1:", distance1)
+    print("Distance2:", distance2) 
+    print("Time:", time)
+    print("Total:", total)
+    
+    // Test unit registration
+    // RegisterUnit("inch", "m", 0.0254, "distance")  // This would register inches
+}

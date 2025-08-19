@@ -1,0 +1,30 @@
+// Edge case testing for string methods
+
+// Test with empty strings
+printf("=== Empty String Edge Cases ===\n")
+empty := ""
+printf("empty.size() = %d\n", empty.size())
+printf("empty.reverse() = '%s'\n", empty.reverse())
+printf("empty.toUpper() = '%s'\n", empty.toUpper())
+
+// Test with Unicode strings
+printf("\n=== Unicode Edge Cases ===\n") 
+unicode := "你好世界"
+printf("unicode.size() = %d\n", unicode.size())
+printf("unicode.reverse() = '%s'\n", unicode.reverse())
+printf("unicode.toUpper() = '%s'\n", unicode.toUpper())
+printf("unicode.first() = '%s'\n", unicode.first())
+printf("unicode.last() = '%s'\n", unicode.last())
+
+// Test method chaining
+printf("\n=== Method Chaining Edge Cases ===\n")
+chained := "hello world".toUpper().reverse()
+printf("chained result = '%s'\n", chained)
+
+// Test with special characters
+printf("\n=== Special Characters ===\n")
+special := "émojì🎉"
+printf("special.size() = %d\n", special.size())
+printf("special.contains('🎉') = %v\n", special.contains("🎉"))
+
+printf("All string method edge cases completed!\n")

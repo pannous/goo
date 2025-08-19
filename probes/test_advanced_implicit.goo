@@ -1,0 +1,36 @@
+func testMath() {
+    // Mathematical expressions with implicit multiplication
+    x := 2.0
+    y := 3.0
+    z := 4.0
+    
+    // Should parse as: (2 * x) + (3 * y) + (5 * z)
+    polynomial := 2x + 3y + 5z
+    
+    print("x =", x)
+    print("y =", y) 
+    print("z =", z)
+    print("2x + 3y + 5z =", polynomial)
+}
+
+func testVariables() {
+    a := 1
+    b := 2
+    c := 3
+    
+    // Should work with any variable names
+    result1 := 5a    // 5 * a = 5
+    result2 := 10b   // 10 * b = 20
+    result3 := 7c    // 7 * c = 21
+    sum := 2a + 3b + 4c  // 2 + 6 + 12 = 20
+    
+    print("5a =", result1)
+    print("10b =", result2)
+    print("7c =", result3)
+    print("2a + 3b + 4c =", sum)
+}
+
+func main() {
+    testMath()
+    testVariables()
+}

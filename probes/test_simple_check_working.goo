@@ -1,0 +1,14 @@
+// Simple test that should work
+a := 42
+b := 42
+
+printf("Testing check with integers: %d == %d\n", a, b)
+check a == b
+printf("Check passed!\n")
+
+// Test with strings
+s := "hello"
+t := "hello"
+printf("Testing check with strings: %s == %s\n", s, t)
+check s == t
+printf("String check passed!\n")

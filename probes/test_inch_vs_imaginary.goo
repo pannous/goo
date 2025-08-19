@@ -1,0 +1,11 @@
+import "units"
+
+// Test the conflict between inch and imaginary numbers
+print("Testing inch vs imaginary parsing...")
+
+// These should work differently:
+length := 12inch  // Should be 12 * units.Inch
+complex_num := 12i // Should be imaginary number 12i
+
+print("Length value:", length.Value())
+print("Complex number:", complex_num)

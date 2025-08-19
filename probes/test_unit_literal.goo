@@ -1,0 +1,8 @@
+import "units"
+
+func test() {
+    result := 500ms
+    print(result.Value())
+}
+
+test()

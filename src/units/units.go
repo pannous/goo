@@ -1,6 +1,9 @@
 package units
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Unit represents a physical unit with value and metadata
 type Unit struct {
@@ -88,6 +91,9 @@ func (u *Unit) Multiply(scalar any) *Unit {
 		return u.withValue(u.value * float64(v))
 	case float32:
 		return u.withValue(u.value * float64(v))
+	case *Unit:
+		// Unit-by-unit multiplication: combine values and dimensions
+		return u.multiplyUnit(v)
 	default:
 		panic(fmt.Sprintf("Cannot multiply unit by %T", scalar))
 	}
@@ -97,8 +103,113 @@ func (u *Unit) Divide(scalar float64) *Unit {
 	return u.withValue(u.value / scalar)
 }
 
+// multiplyUnit handles unit-by-unit multiplication (e.g., m * m = m²)
+func (u *Unit) multiplyUnit(other *Unit) *Unit {
+	// Multiply the values
+	resultValue := u.value * other.value
+	
+	// Handle dimensional multiplication cases
+	if u.baseUnit == other.baseUnit {
+		// Same base unit multiplication
+		if u.category == other.category {
+			// Same unit: m * m = m²
+			newSymbol := u.symbol + "²"
+			newName := u.name + " squared"
+			
+			return &Unit{
+				name:             newName,
+				symbol:           newSymbol,
+				baseUnit:         u.baseUnit + "²",
+				conversionFactor: u.conversionFactor * other.conversionFactor,
+				category:         u.category + "²", // length², time², etc.
+				value:            resultValue,
+			}
+		} else if (u.category == "length²" || u.category == "area") && 
+		           (other.category == "length") && u.baseUnit == "m²" && other.baseUnit == "m" {
+			// Special case: m² * m = m³ (area * length = volume)
+			return &Unit{
+				name:             "cubic meter",
+				symbol:           "m³",
+				baseUnit:         "m³",
+				conversionFactor: u.conversionFactor * other.conversionFactor,
+				category:         "volume",
+				value:            resultValue,
+			}
+		}
+	}
+	
+	// Handle area * length = volume more generally
+	if (u.category == "length²" || u.category == "area") && other.category == "length" {
+		// Extract base units for matching using rune-based operations
+		if strings.HasSuffix(u.baseUnit, "²") {
+			// Get the base unit without the ² suffix using runes
+			runes := []rune(u.baseUnit)
+			baseUnitWithoutSquare := string(runes[:len(runes)-1])
+			if other.baseUnit == baseUnitWithoutSquare {
+				baseSymbol := other.symbol
+				return &Unit{
+					name:             baseSymbol + " cubed",
+					symbol:           baseSymbol + "³",
+					baseUnit:         other.baseUnit + "³",
+					conversionFactor: u.conversionFactor * other.conversionFactor,
+					category:         "volume",
+					value:            resultValue,
+				}
+			}
+		}
+	}
+	
+	// Different units: create composite unit (e.g., m * s = m⋅s)
+	newSymbol := u.symbol + "⋅" + other.symbol
+	newName := u.name + " times " + other.name
+	newCategory := u.category + "⋅" + other.category
+	
+	return &Unit{
+		name:             newName,
+		symbol:           newSymbol,
+		baseUnit:         u.baseUnit + "⋅" + other.baseUnit,
+		conversionFactor: u.conversionFactor * other.conversionFactor,
+		category:         newCategory,
+		value:            resultValue,
+	}
+}
+
 func (u *Unit) toString() string {
 	return fmt.Sprintf("%.3g%s", u.value, u.symbol)
+}
+
+func (u *Unit) String() string {
+	return u.toString()
+}
+
+// Equals checks if two units are equivalent (same value and dimensions)
+func (u *Unit) Equals(other *Unit) bool {
+	if other == nil {
+		return false
+	}
+	
+	// Check if they have the same dimensional analysis by comparing converted values
+	// Convert both to their base units for comparison
+	thisBaseValue := u.value * u.conversionFactor  
+	otherBaseValue := other.value * other.conversionFactor
+	
+	// Check if base units are compatible and values match (with small tolerance)
+	tolerance := 1e-10
+	if abs(thisBaseValue - otherBaseValue) < tolerance {
+		// Also check if the dimensional categories are compatible
+		return u.category == other.category || 
+			   u.baseUnit == other.baseUnit ||
+			   u.symbol == other.symbol
+	}
+	
+	return false
+}
+
+func abs(x float64) float64 {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
 
 // Exported version for external use
@@ -111,10 +222,24 @@ func (u *Unit) Value() float64 {
 	return u.value
 }
 
+// Debug getters for unit properties
+func (u *Unit) Category() string {
+	return u.category
+}
+
+func (u *Unit) BaseUnit() string {
+	return u.baseUnit
+}
+
+func (u *Unit) Symbol() string {
+	return u.symbol
+}
+
 // Equal checks if two units have the same value in their base units
 func (u *Unit) Equal(other *Unit) bool {
-	if u.category != other.category {
-		return false // Cannot compare different categories
+	// Check if categories are compatible (including dimensional equivalence)
+	if !u.isCompatibleCategory(other.category) {
+		return false // Cannot compare incompatible categories
 	}
 	
 	// Convert both to base units and compare
@@ -124,6 +249,26 @@ func (u *Unit) Equal(other *Unit) bool {
 	// Use small epsilon for floating point comparison
 	epsilon := 1e-9
 	return (thisBase - otherBase) < epsilon && (otherBase - thisBase) < epsilon
+}
+
+// isCompatibleCategory checks if two categories are equivalent for comparison
+func (u *Unit) isCompatibleCategory(otherCategory string) bool {
+	// Direct match
+	if u.category == otherCategory {
+		return true
+	}
+	
+	// Dimensional equivalence: length² ≡ area, length³ ≡ volume, etc.
+	dimensionalEquivalents := map[string]string{
+		"length²": "area",
+		"area": "length²",
+		"length³": "volume", 
+		"volume": "length³",
+		"time⁻¹": "frequency",
+		"frequency": "time⁻¹",
+	}
+	
+	return dimensionalEquivalents[u.category] == otherCategory
 }
 
 // Global unit constants for multiplication syntax like 2*km  

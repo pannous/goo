@@ -1,0 +1,28 @@
+// Debug unit conversion issues
+import "units"
+
+func main() {
+	println("=== Unit Conversion Debug ===")
+	
+	// Test the failing case
+	j_val := 1000J
+	kj_val := 1kJ
+	
+	println("j_val (1000J):", j_val.ToString())
+	println("kj_val (1kJ):", kj_val.ToString())
+	
+	// Test explicit equality
+	isEqual := j_val.Equal(kj_val)
+	println("j_val.Equal(kj_val):", isEqual)
+	
+	// Test their values - they should be equal in base units
+	println("j_val.Value():", j_val.Value())
+	println("kj_val.Value():", kj_val.Value())
+	
+	// Test simple same-unit equality that should work
+	j_val2 := 1000J
+	j_val3 := 1000J
+	println("j_val2.Equal(j_val3):", j_val2.Equal(j_val3))
+	
+	println("Debug completed!")
+}

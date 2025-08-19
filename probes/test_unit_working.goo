@@ -1,0 +1,15 @@
+import "units"
+
+ms := units.Ms
+s := units.S
+
+// Test multiplication
+result1 := 500 * ms
+result2 := ms * 500
+
+// Test addition of unit operations
+result3 := (500 * ms).Add(5 * s)
+
+print(result1.Value())
+print(result2.Value()) 
+print(result3.Value())

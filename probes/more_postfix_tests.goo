@@ -1,0 +1,7 @@
+// More postfix tests
+func main() {
+    check 2³ == 8
+    check 4² == 16
+    check 10² == 100
+    println("All postfix operator tests passed!")
+}

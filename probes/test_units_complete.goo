@@ -1,0 +1,61 @@
+// Complete test of the units system functionality
+import "units"
+
+func main() {
+	println("=== Complete Units System Test ===")
+	
+	// Test 1: Available() function
+	println("\n1. Testing units.Available():")
+	categories := units.Available()
+	println("   Found", len(categories), "unit categories")
+	
+	flatList := units.AvailableFlat()
+	println("   Total units available:", len(flatList))
+	
+	// Test 2: Unit synonyms
+	println("\n2. Testing unit synonyms:")
+	distance := units.Meter(100.0)
+	time := units.Second(10.0)
+	mass := units.Kilogram(5.0)
+	temperature := units.Celsius(20.0)
+	pressure := units.Pascal(101325.0)
+	
+	println("   Distance:", distance.ToString())
+	println("   Time:", time.ToString())
+	println("   Mass:", mass.ToString())
+	println("   Temperature:", temperature.ToString())
+	println("   Pressure:", pressure.ToString())
+	
+	// Test 3: Direct unit access (like units.M == units.Meter)
+	println("\n3. Testing direct unit access:")
+	length1 := units.M.Multiply(10.0)
+	length2 := units.Meter(10.0)
+	println("   units.M.Multiply(10.0):", length1.ToString())
+	println("   units.Meter(10.0):", length2.ToString())
+	println("   Are they equal?", length1.Equal(length2))
+	
+	// Test 4: Unit arithmetic
+	println("\n4. Testing unit arithmetic:")
+	distance1 := units.Meter(50.0)
+	distance2 := units.Meter(25.0)
+	totalDistance := distance1.Add(distance2)
+	difference := distance1.Sub(distance2)
+	println("   50m + 25m =", totalDistance.ToString())
+	println("   50m - 25m =", difference.ToString())
+	
+	// Test 5: Various unit categories
+	println("\n5. Testing different unit categories:")
+	energy := units.Joule(1000.0)
+	power := units.Watt(500.0)
+	voltage := units.Volt(12.0)
+	current := units.Ampere(2.0)
+	angle := units.Degree(90.0)
+	
+	println("   Energy:", energy.ToString())
+	println("   Power:", power.ToString())  
+	println("   Voltage:", voltage.ToString())
+	println("   Current:", current.ToString())
+	println("   Angle:", angle.ToString())
+	
+	println("\n=== All tests completed successfully! ===")
+}

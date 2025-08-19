@@ -1,0 +1,28 @@
+// Test if the check operator now works with unit conversion
+import "units"
+
+func main() {
+	println("=== Testing Unit Check Fix ===")
+	
+	// Test the specific failing case
+	j_val := 1000J
+	kj_val := 1kJ
+	
+	println("j_val:", j_val.ToString())
+	println("kj_val:", kj_val.ToString())
+	println("j_val.Equal(kj_val):", j_val.Equal(kj_val))
+	
+	// This should now work with the check operator
+	check j_val == kj_val
+	
+	// Test a few more similar cases
+	w_val := 1000W
+	kw_val := 1kW
+	check w_val == kw_val
+	
+	m_val := 1000m
+	km_val := 1km  
+	check m_val == km_val
+	
+	println("All unit equality checks passed!")
+}

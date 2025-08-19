@@ -1,0 +1,17 @@
+// Test π (pi) mathematical constant
+x := π
+println("π =", x)
+println("π ≈ 3.14159:", π > 3.14 && π < 3.15)
+println("π squared:", π * π)
+
+// Test π in expressions  
+radius := 5.0
+area := π * radius * radius
+println("Area of circle with radius 5:", area)
+
+circumference := 2 * π * radius  
+println("Circumference of circle with radius 5:", circumference)
+
+// Test π comparison
+println("π > 3:", π > 3)
+println("π < 4:", π < 4)

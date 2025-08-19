@@ -1,0 +1,4 @@
+// Simple postfix test
+func main() {
+    check 3² == 9
+}

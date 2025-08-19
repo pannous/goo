@@ -1,0 +1,16 @@
+import "units"
+
+s := units.S
+ms := units.Ms
+
+// Test all syntax forms - they should all compile and run
+result1 := 500 * ms        // Regular multiplication
+result2 := 500 · ms        // Middle dot operator  
+result3 := 500ms           // Unit literal
+result4 := result1.Add(5s) // Addition with unit literal
+
+print("All syntax works!")
+print(result1.Value())  // 500
+print(result2.Value())  // 500  
+print(result3.Value())  // 500
+print(result4.Value())  // 5500

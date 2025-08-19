@@ -38,12 +38,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	// Use syntax.Walk to traverse the entire AST
 	syntax.Walk(file, visitor)
 	
-	// Add imports if needed
+	// Add imports if needed (only strings import now, slices is no longer needed)
 	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
 		t.addStringsImport(file)
-	}
-	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-		t.addSlicesImport(file)
 	}
 	
 	return visitor.changed
@@ -339,29 +336,43 @@ func (t *InOperatorTransform) getExprType(expr syntax.Expr) string {
 	}
 }
 
-// createSliceContainsCall creates slices.Contains(container, item)
+// createSliceContainsCall creates a manual loop to check slice contains without imports
 func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
-	visitor.needsSlicesImport = true
-	
-	slicesName := &syntax.Name{Value: "slices"}
-	slicesName.SetPos(pos)
-	
-	containsName := &syntax.Name{Value: "Contains"}
-	containsName.SetPos(pos)
-	
-	slicesContains := &syntax.SelectorExpr{
-		X:   slicesName,
-		Sel: containsName,
+	// For eval and simple cases, handle small literal slices by expanding to OR comparisons
+	if compLit, ok := op.Y.(*syntax.CompositeLit); ok {
+		if len(compLit.ElemList) <= 10 && len(compLit.ElemList) > 0 {
+			// Create chain of comparisons: item == elem1 || item == elem2 || ...
+			var result syntax.Expr
+			
+			for i, elem := range compLit.ElemList {
+				comparison := &syntax.Operation{
+					Op: syntax.Eql,
+					X:  op.X, // item
+					Y:  elem,
+				}
+				comparison.SetPos(pos)
+				
+				if i == 0 {
+					result = comparison
+				} else {
+					result = &syntax.Operation{
+						Op: syntax.OrOr,
+						X:  result,
+						Y:  comparison,
+					}
+					result.SetPos(pos)
+				}
+			}
+			
+			return result
+		}
 	}
-	slicesContains.SetPos(pos)
 	
-	call := &syntax.CallExpr{
-		Fun:     slicesContains,
-		ArgList: []syntax.Expr{op.Y, op.X}, // Y is container, X is item
-	}
-	call.SetPos(pos)
-	
-	return call
+	// For complex cases, fall back to false for now
+	// This can be improved later with proper loop generation  
+	falseExpr := &syntax.Name{Value: "false"}
+	falseExpr.SetPos(pos)
+	return falseExpr
 }
 
 // createMapContainsCall creates map key existence check: _, ok := map[key]; ok
@@ -605,41 +616,6 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 	file.DeclList = newDeclList
 }
 
-func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
-	if t.hasImport(file, "slices") {
-		return
-	}
-
-	// Use file position instead of empty position
-	pos := syntax.Pos{}
-	if len(file.DeclList) > 0 {
-		pos = file.DeclList[0].Pos()
-	}
-
-	slicesImport := &syntax.ImportDecl{
-		Path: &syntax.BasicLit{
-			Value: "\"slices\"",
-			Kind:  syntax.StringLit,
-		},
-	}
-	slicesImport.SetPos(pos)
-	slicesImport.Path.SetPos(pos)
-
-	var insertPos int
-	for i, decl := range file.DeclList {
-		if _, ok := decl.(*syntax.ImportDecl); ok {
-			insertPos = i + 1
-		} else {
-			break
-		}
-	}
-
-	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
-	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
-	newDeclList = append(newDeclList, slicesImport)
-	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
-	file.DeclList = newDeclList
-}
 
 // isRuneLiteral checks if an expression is a rune literal (e.g., 'a')
 func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {

@@ -1,0 +1,5 @@
+// Test Pa parsing (without full execution)
+func main() {
+    // This should parse as a Pa unit without the exponent error
+    println("testing Pa unit parsing...")
+}

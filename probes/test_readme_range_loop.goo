@@ -1,0 +1,7 @@
+// Test exact README example: "for i in 0…5"
+
+printf("README example test:\n")
+for i in 0…5 {
+	put(i)
+}
+printf("README range loop working!\n")

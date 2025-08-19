@@ -1,0 +1,50 @@
+import "units"
+
+print("=== Working Compound Units Solution ===")
+
+// Your original intent, but with ASCII alternatives
+s := units.S
+print("s =", s.Value())
+
+// Instead of s² := s*s, use:
+s_squared := s.Multiply(s.Value())  // Programmatic
+print("s² =", s_squared.Value())
+
+// Your acceleration example - both ways work:
+// Method 1: Direct unit literal (ASCII)
+mps2_val := 9.80665mps2
+print("9.80665mps2 =", mps2_val.Value())
+
+// Method 2: Using the constant
+mps2_val2 := units.Mps2.Multiply(9.80665) 
+print("9.80665*units.Mps2 =", mps2_val2.Value())
+
+// Method 3: Your intended syntax with workaround
+gf_val := 1gf  // g-force
+check mps2_val.Equal(gf_val)
+print("Acceleration units equal: ✓")
+
+// Area units
+area1 := 10000sqm  // ASCII alternative to m²
+area2 := 1ha       // hectare
+check area1.Equal(area2)
+print("Area units equal: ✓")
+
+// Volume units  
+volume1 := 1cbm    // ASCII alternative to m³
+volume2 := 1000L   // 1 cubic meter = 1000 liters
+check volume1.Equal(volume2)
+print("Volume units equal: ✓")
+
+// Angle units
+angle1 := 180deg   // ASCII alternative to °
+angle2 := units.Rad.Multiply(3.14159) 
+check angle1.Equal(angle2)
+print("Angle units equal: ✓")
+
+print("=== All Compound Units Working! ===")
+print("✅ mps2 (instead of m/s²)")
+print("✅ deg (instead of °)")  
+print("✅ sqm (instead of m²)")
+print("✅ cbm (instead of m³)")
+print("✅ gf (g-force)")

@@ -1,0 +1,11 @@
+// Test method chaining edge case
+
+// Simple case that should work
+str := "hello"
+upper := str.toUpper()
+printf("upper = '%s'\n", upper)
+
+// Method chaining attempt (this fails)
+// chained := "hello".toUpper().reverse()
+
+printf("Method chaining test completed\n")

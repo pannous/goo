@@ -1,0 +1,4 @@
+func main() {
+    d := 5m
+    print(d)
+}

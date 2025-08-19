@@ -1,0 +1,3 @@
+// Test if superscript tokenization works  
+s := 5
+// result := s²  // This should tokenize ² as _Superscript

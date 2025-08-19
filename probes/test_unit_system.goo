@@ -1,0 +1,33 @@
+import "fmt"
+
+func main() {
+    // Test basic unit creation with scalar multiplication
+    distance1 := 1200*m
+    distance2 := 2*km
+    
+    fmt.Printf("1200*m = %s\n", distance1.toString())
+    fmt.Printf("2*km = %s\n", distance2.toString())
+    
+    // Test unit addition - should work: 1200m + 2km = 3200m = 3.2km
+    total := distance1.add(distance2)
+    fmt.Printf("1200*m + 2*km = %s\n", total.toString())
+    
+    // Test scalar operations
+    doubled := distance1.mul(2.0)
+    fmt.Printf("1200*m * 2 = %s\n", doubled.toString())
+    
+    halved := distance2.div(2.0)
+    fmt.Printf("2*km / 2 = %s\n", halved.toString())
+    
+    // Test time units
+    time1 := 5*s
+    time2 := 100*ms
+    timeTotal := time1.add(time2)
+    fmt.Printf("5*s + 100*ms = %s\n", timeTotal.toString())
+    
+    // Test frequency units
+    freq1 := 1*kHz
+    freq2 := 500*Hz
+    freqTotal := freq1.add(freq2)
+    fmt.Printf("1*kHz + 500*Hz = %s\n", freqTotal.toString())
+}

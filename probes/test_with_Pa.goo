@@ -1,0 +1,7 @@
+// Test with Pa unit 
+func main() {
+    // This should now parse without the "exponent requires hexadecimal mantissa" error
+    // (even though it might fail later due to missing units package)
+    pressure := 100000Pa
+    _ = pressure
+}

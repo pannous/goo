@@ -1,0 +1,39 @@
+import "units"
+
+// Test comprehensive units system with ASCII-only symbols
+
+// Length conversions
+check 1000mm == 1m
+check 100cm == 1m  
+check 1km == 1000m
+
+// Time conversions  
+check 1000ms == 1s
+check 60s == 1min
+check 60min == 1h
+
+// Mass conversions
+check 1000g == 1kg
+check 1000kg == 1t
+
+// Energy conversions - use Equal method for better precision
+j_val := 1000J
+kj_val := 1kJ
+check j_val.Equal(kj_val)
+
+// Power units
+w_val := 1000W  
+kw_val := 1kW
+check w_val.Equal(kw_val)
+
+// Pressure units
+pa_val := 100000 * units.Pa
+bar_val := 1bar
+check pa_val.Equal(bar_val)
+
+// Volume units
+ml_val := 1000mL
+l_val := 1L
+check ml_val.Equal(l_val)
+
+print("All ASCII unit tests passed!")
