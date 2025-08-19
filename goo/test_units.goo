@@ -17,6 +17,10 @@ check 10m * 10m == 100m²
 check 10m * 10m * 10m == 1000m³
 #check 10m ** 3 == 1000m³
 
+check 10m / 2s == 5m/s
+check 10m / 2s == 5·m/s
+
+
 put(units.Available())
 
 print("All unit tests passed successfully!")
