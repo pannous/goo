@@ -2,10 +2,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 func init() {

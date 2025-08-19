@@ -47,6 +47,11 @@ GOROOT=/opt/other/go ../bin/go build -work
 retains logs in 
 WORK=/tmp/go-debug/…
 
+in transform.go toggle:
+const DEBUGGING = false 
+and instead of `fmt.Printf` use existing
+func debug(format string, args ...any);
+
 # Go Compiler
 Project folders:
 root  /opt/other/go/

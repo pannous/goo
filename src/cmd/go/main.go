@@ -26,6 +26,7 @@ import (
 	"cmd/go/internal/clean"
 	"cmd/go/internal/doc"
 	"cmd/go/internal/envcmd"
+	"cmd/go/internal/eval"
 	"cmd/go/internal/fix"
 	"cmd/go/internal/fmtcmd"
 	"cmd/go/internal/generate"
@@ -57,6 +58,7 @@ func init() {
 		clean.CmdClean,
 		doc.CmdDoc,
 		envcmd.CmdEnv,
+		eval.CmdEval,
 		fix.CmdFix,
 		fmtcmd.CmdFmt,
 		generate.CmdGenerate,

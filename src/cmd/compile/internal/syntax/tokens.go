@@ -29,6 +29,7 @@ const (
 	_Star     // *
 	_Lambda   // =>
 	_Superscript // ² ³
+	_Power    // **
 
 	// delimiters
 	_Lparen    // (
@@ -127,6 +128,7 @@ var TokenNames = [...]string{
 	_Lambda:         "=>",
 	_Star:           "*",
 	_Superscript:    "²",
+	_Power:          "**",
 	_Lparen:         "(",
 	_Lbrack:         "[",
 	_Lbrace:         "{",
@@ -239,6 +241,9 @@ const (
 	Shr       // >>
 	IS        // is
 	Range     // …
+	
+	// precPower  
+	Power     // **
 )
 
 // OperatorNames provides string representations for Operator constants, replacing stringer-generated operator_string.go
@@ -273,6 +278,7 @@ var OperatorNames = [...]string{
 	Shr:    ">>",
 	IS:     "is",
 	Range:  "…",
+	Power:  "**",
 }
 
 // String returns the string representation of the Operator.
@@ -292,4 +298,5 @@ const (
 	precCmp
 	precAdd
 	precMul
+	precPower
 )

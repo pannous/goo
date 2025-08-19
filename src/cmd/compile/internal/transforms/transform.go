@@ -29,6 +29,14 @@ type Transformer interface {
 	Priority() int
 }
 
+const DEBUGGING = false // Set to true to enable debug output
+
+func debug(format string, args ...any) {
+	if DEBUGGING {
+		fmt.Printf(format, args...)
+	}
+}
+
 // ApplyTransformations runs all registered transformers on the syntax tree.
 // called bycmd/compile/internal/noder/unified.go
 func ApplyTransformations(files []*syntax.File) {
@@ -49,13 +57,13 @@ func ApplyTransformations(files []*syntax.File) {
 
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
-		fmt.Printf("Transform execution order:\n")
+		debug("Transform execution order:\n")
 		for i, transformer := range TransformRegistry {
-			fmt.Printf("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
+			debug("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
 		}
 		for _, transformer := range TransformRegistry {
 			if transformer.Transform(file, ctx) {
-				fmt.Printf("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+				debug("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			}
 		}
 	}
@@ -87,7 +95,7 @@ func (w *SyntaxWalker) WalkFile(file *syntax.File) {
 		return
 	}
 
-	fmt.Println("Walking file for package:", file.PkgName.Value)
+	debug("Walking file for package:", file.PkgName.Value)
 
 	for i, decl := range file.DeclList {
 		if w.VisitDecl != nil {
@@ -229,7 +237,7 @@ func RegisterTransformer(t Transformer) {
 		}
 	}
 	TransformRegistry = append(TransformRegistry, t)
-	
+
 	// Sort by priority (lower numbers run first)
 	sort.Slice(TransformRegistry, func(i, j int) bool {
 		return TransformRegistry[i].Priority() < TransformRegistry[j].Priority()
@@ -295,7 +303,7 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 				return "[]" + elementType.Value
 			}
 		}
-		
+
 		// Handle object literals without explicit type: {name: "Alice", age: 30}
 		if e.Type == nil && len(e.ElemList) > 0 {
 			return inferMapTypeFromElements(e.ElemList)
@@ -306,7 +314,7 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 			if receiverName, ok := selector.X.(*syntax.Name); ok {
 				receiverType := ctx.Types[receiverName.Value]
 				methodName := selector.Sel.Value
-				
+
 				// Infer return type based on method and receiver type
 				return inferMethodReturnType(receiverType, methodName)
 			}
@@ -319,7 +327,7 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 func inferMethodReturnType(receiverType, methodName string) string {
 	if len(receiverType) >= 2 && receiverType[:2] == "[]" {
 		elementType := receiverType[2:] // e.g., "User" from "[]User"
-		
+
 		switch methodName {
 		case "filter", "where", "chose", "that", "which":
 			// filter returns same type as input: []User -> []User
@@ -440,7 +448,7 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 					ctx.Types[lhs.Value] = "map[" + keyType + "]" + valueType
 				}
 			}
-			
+
 			// Handle method call assignments like: filtered := users.filter(...)
 			inferredType := inferTypeFromExpression(rhsElems[i], ctx)
 			if inferredType != "" {
@@ -455,20 +463,20 @@ func inferMapTypeFromElements(elements []syntax.Expr) string {
 	if len(elements) == 0 {
 		return ""
 	}
-	
+
 	// Analyze the first element to determine key/value types
 	firstElem := elements[0]
-	
+
 	// Check if it's a key-value pair (KeyValueExpr)
 	if kv, ok := firstElem.(*syntax.KeyValueExpr); ok {
 		keyType := inferElementType(kv.Key)
 		valueType := inferElementType(kv.Value)
-		
+
 		if keyType != "" && valueType != "" {
 			return "map[" + keyType + "]" + valueType
 		}
 	}
-	
+
 	return "map[string]any" // Default fallback
 }
 

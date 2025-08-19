@@ -1,4 +1,5 @@
-import "units" 
+import "fmt"
+import "units"
 
 s := units.S
 ms := units.Ms
@@ -10,5 +11,11 @@ m := units.M
 km := units.Km
 check 1200m + 2km == 3.2km
 check 1200*m + 2*km == 3.2*km
+
+put(3^3)
+#check 3**3 == 27
+#check 10m ** 3 == 1000m³
+
+put(units.Available())
 
 print("All unit tests passed successfully!")

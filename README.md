@@ -8,6 +8,7 @@ just like most ugliness in the world appears when you add a five to json(5)
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
 ✅ truthy/falsey if  
+✅ 3 ** 2 = 9
 ✅ try f()  ->   if err := f(); err != nil { return err }  
 ✅ try f()  ->   if err := f(); err != nil { panic(err) }  
 ✅ try val := f()  =>  { val, err := f(); if err != nil { return err } }  
