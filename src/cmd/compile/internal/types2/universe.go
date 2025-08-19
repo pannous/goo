@@ -8,6 +8,7 @@ package types2
 
 import (
 	"go/constant"
+	"go/token"
 	"strings"
 )
 
@@ -154,6 +155,8 @@ var predeclaredConsts = [...]struct {
 	{"true", UntypedBool, constant.MakeBool(true)},
 	{"false", UntypedBool, constant.MakeBool(false)},
 	{"iota", UntypedInt, constant.MakeInt64(0)},
+	{"π", UntypedFloat, constant.MakeFromLiteral("3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679", token.FLOAT, 0)},
+	{"τ", UntypedFloat, constant.MakeFromLiteral("6.2831853071795864769252867665590057683943387987502116419498891846156328125724179972560696506842341359", token.FLOAT, 0)},
 }
 
 func defPredeclaredConsts() {
