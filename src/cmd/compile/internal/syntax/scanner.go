@@ -117,7 +117,7 @@ redo:
 	s.line, s.col = s.pos()
 	s.blank = s.line > startLine || startCol == colbase
 	s.start()
-	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.ch != '·' && s.ch != '²' && s.ch != '³' && s.atIdentChar(true) {
+	if isLetter(s.ch) || s.ch >= utf8.RuneSelf && s.ch != '…' && s.ch != '·' && s.ch != '²' && s.ch != '³' && s.ch != '≈' && s.atIdentChar(true) {
 		s.nextch()
 		s.ident()
 		return
@@ -436,6 +436,24 @@ redo:
 				s.nextch()
 				goto redo
 			}
+		} else if s.ch == 'π' {
+			// Handle π as a mathematical constant
+			s.tok = _Pi
+			s.lit = "π"
+			s.nlsemi = true
+			s.nextch()
+		} else if s.ch == 'τ' {
+			// Handle τ as a mathematical constant
+			s.tok = _Tau
+			s.lit = "τ"
+			s.nlsemi = true
+			s.nextch()
+		} else if s.ch == '≈' {
+			// Handle ≈ as approximate equality operator
+			s.nextch()
+			s.tok = _Operator
+			s.op = Approx
+			s.prec = precCmp
 		} else {
 			s.errorf("invalid character %#U", s.ch)
 			s.nextch()

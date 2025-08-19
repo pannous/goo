@@ -87,6 +87,8 @@ const (
 	_In             // in
 	_IS             // is (type checking operator)
 	_While          // while
+	_Pi             // π (math constant)
+	_Tau            // τ (math constant)
 
 	// empty line comment to exclude it from .String
 	tokenCount //
@@ -177,6 +179,8 @@ var TokenNames = [...]string{
 	_Hash:           "#",
 	_In:             "in",
 	_While:          "while",
+	_Pi:             "π",
+	_Tau:            "τ",
 	_CUSTOM_TOKENS_: "avoid_hash_collision",
 }
 
@@ -222,6 +226,7 @@ const (
 	Leq // <=
 	Gtr // >
 	Geq // >=
+	Approx // ≈
 
 	// precAdd
 	Add // +
@@ -263,6 +268,7 @@ var OperatorNames = [...]string{
 	Leq:    "<=",
 	Gtr:    ">",
 	Geq:    ">=",
+	Approx: "≈",
 	In:     "in",
 	Add:    "+",
 	Sub:    "-",

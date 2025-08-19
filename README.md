@@ -8,12 +8,9 @@ just like most ugliness in the world appears when you add a five to json(5)
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
 ✅ truthy/falsey if  
+✅ enum Status { OK, BAD } with generated .String() method  
 ✅ 3 ** 2 = 9
-✅ try f()  ->   if err := f(); err != nil { return err }  
-✅ try f()  ->   if err := f(); err != nil { panic(err) }  
-✅ try val := f()  =>  { val, err := f(); if err != nil { return err } }  
-✅ try { x } catch e { y } =>  func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :  
-✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?  
+✅ τ - π ≈ 3.14159 
 ✅ # comment and shebang support
 ✅ #if DEBUG put("better than compiler tags!") #end
 ✅ goo file extension  
@@ -26,18 +23,21 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ simple_list := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
 ✅ xs := ['a', 'b', 'c'] ; xs#1 == 'a'  // 1-indexed array access using # operator  
 ✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]   // 🙌 lambdas!
-✅ 1 is int, [1, 2, 3] is []int, "hello" is string, 'a' is rune
-✅ 
-✅ go command default to run => `go test.go` OK  
+✅ type check operator: 1 is int, [1, 2, 3] is []int, "hello" is string, 'a' is rune == True  
+✅ try f()  -->   if err := f(); err != nil { panic(err) or return err }  
+✅ try val := f()  -->  { val, err := f(); if err != nil { return err } }  
+✅ try { x } catch e { y } =>  func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :  
+✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?
+✅ go command `go test.go` --> defaults to `go run test.go`  
+✅ go eval "2**3" => 8
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
-✅ enum Status { OK, BAD } with generated .String() method  
 ✅ {a: 1, b: 2}  => map[string]int{"a": 1, "b": 2} auto-type inference  
 ✅ {a: 1, b: 2} == {"a": 1, "b": 2}   // symbol keys to strings   
 ✅ z := {a: 1, b: 2}; z.a == 1 and z.b == 2  // dot access to map keys  
 ✅ map[active:true age:30 name:Alice]  // read back print("%v") format  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
-✅ test_list_comparison.goo [1,2]==[1,2]  
+✅ [1,2]==[1,2]   test_list_comparison.goo   
 ✅ check "a"+1 == "a1"  
 ✅ check "a" == 'a'  
 ✅ check not x =>  !truthy(x)  
