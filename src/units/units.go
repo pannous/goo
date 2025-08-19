@@ -99,8 +99,20 @@ func (u *Unit) Multiply(scalar any) *Unit {
 	}
 }
 
-func (u *Unit) Divide(scalar float64) *Unit {
-	return u.withValue(u.value / scalar)
+func (u *Unit) Divide(divisor any) *Unit {
+	switch v := divisor.(type) {
+	case float64:
+		return u.withValue(u.value / v)
+	case int:
+		return u.withValue(u.value / float64(v))
+	case float32:
+		return u.withValue(u.value / float64(v))
+	case *Unit:
+		// Unit-by-unit division: create derived units like m/s
+		return u.divideUnit(v)
+	default:
+		panic(fmt.Sprintf("Cannot divide unit by %T", divisor))
+	}
 }
 
 // multiplyUnit handles unit-by-unit multiplication (e.g., m * m = m²)
@@ -169,6 +181,80 @@ func (u *Unit) multiplyUnit(other *Unit) *Unit {
 		symbol:           newSymbol,
 		baseUnit:         u.baseUnit + "⋅" + other.baseUnit,
 		conversionFactor: u.conversionFactor * other.conversionFactor,
+		category:         newCategory,
+		value:            resultValue,
+	}
+}
+
+// divideUnit handles unit-by-unit division (e.g., m / s = m/s)
+func (u *Unit) divideUnit(other *Unit) *Unit {
+	// Divide the values
+	resultValue := u.value / other.value
+	
+	// Check for common velocity cases first
+	if u.category == "length" && other.category == "time" {
+		// Create velocity unit: m/s, km/h, etc.
+		newSymbol := u.symbol + "/" + other.symbol
+		newName := u.name + " per " + other.name
+		newBaseUnit := u.baseUnit + "/" + other.baseUnit
+		newCategory := "velocity"
+		
+		// Calculate conversion factor for velocity
+		conversionFactor := u.conversionFactor / other.conversionFactor
+		
+		return &Unit{
+			name:             newName,
+			symbol:           newSymbol,
+			baseUnit:         newBaseUnit,
+			conversionFactor: conversionFactor,
+			category:         newCategory,
+			value:            resultValue,
+		}
+	}
+	
+	// Handle other common derived units
+	if u.category == "energy" && other.category == "time" {
+		// Power: J/s = W
+		newSymbol := u.symbol + "/" + other.symbol
+		newName := u.name + " per " + other.name
+		newBaseUnit := u.baseUnit + "/" + other.baseUnit
+		newCategory := "power"
+		
+		conversionFactor := u.conversionFactor / other.conversionFactor
+		
+		return &Unit{
+			name:             newName,
+			symbol:           newSymbol,
+			baseUnit:         newBaseUnit,
+			conversionFactor: conversionFactor,
+			category:         newCategory,
+			value:            resultValue,
+		}
+	}
+	
+	if u.category == "length" && other.category == "length" {
+		// Dimensionless ratio: m/m = 1 (scalar)
+		return &Unit{
+			name:             "dimensionless",
+			symbol:           "",
+			baseUnit:         "",
+			conversionFactor: 1.0,
+			category:         "dimensionless",
+			value:            resultValue * (u.conversionFactor / other.conversionFactor),
+		}
+	}
+	
+	// Generic case: create compound unit
+	newSymbol := u.symbol + "/" + other.symbol
+	newName := u.name + " per " + other.name
+	newCategory := u.category + "/" + other.category
+	newBaseUnit := u.baseUnit + "/" + other.baseUnit
+	
+	return &Unit{
+		name:             newName,
+		symbol:           newSymbol,
+		baseUnit:         newBaseUnit,
+		conversionFactor: u.conversionFactor / other.conversionFactor,
 		category:         newCategory,
 		value:            resultValue,
 	}
