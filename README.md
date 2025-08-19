@@ -69,6 +69,7 @@ Universal for-in syntax:
 ✅ while keyword as plain synonym for 'for'
 
 ✅ check 500ms + 5s == 5500ms
+✅ 3**3 == 27
 ✅ for i in 0…5 {put(i)}  // range loops now working!
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
