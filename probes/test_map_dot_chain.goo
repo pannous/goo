@@ -1,0 +1,9 @@
+# Chained map dot-notation should desugar to successive index ops
+
+def getConfig() map[string]map[string]int {
+    return map[string]map[string]int{"a": map[string]int{"b": 123}}
+}
+
+cfg := getConfig()
+check cfg.a.b == 123           # cfg["a"]["b"]
+check getConfig().a.b == 123   # getConfig()["a"]["b"]

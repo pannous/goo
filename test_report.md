@@ -159,6 +159,7 @@ Running all tests in ./goo/ directory...
 ✅ test_inch_vs_imaginary.goo
 ❌ test_just_P_squared.goo
 ❌ test_just_superscript.goo
+✅ test_map_dot_chain.goo
 ✅ test_map_dot.goo
 ✅ test_middle_dot.goo
 ✅ test_Pa_parsing_only.goo
@@ -212,5 +213,5 @@ Running all tests in ./goo/ directory...
 ✅ test_working_syntax.goo
 ✅ unit_syntax_comprehensive.goo
 ========================================
-Summary: 180/211 passed, 31 failed
+Summary: 181/212 passed, 31 failed
 ⚠️  Some tests failed
