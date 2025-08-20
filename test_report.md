@@ -36,9 +36,9 @@ Running all tests in ./goo/ directory...
 ❌ test_in_operator_auto_import.goo
 ❌ test_in_operator_maps.goo
 ✅ test_in_operator_rune_strings.goo
-✅ test_in_operator_slices.goo
+❌ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
-✅ test_interpolation.goo
+❌ test_interpolation.goo
 ✅ test_is_operator.goo
 ✅ test_iterator_for_in.goo
 ✅ test_iterator_membership.goo
@@ -87,14 +87,14 @@ Running all tests in ./goo/ directory...
 ✅ test_string_concat.goo
 ✅ test_string_format_chain.goo
 ✅ test_string_format_simple.goo
-✅ test_string_interpolation.goo
+❌ test_string_interpolation.goo
 ✅ test_string_methods_todo.goo
 ✅ test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
 ✅ test_string_replace.goo
-✅ test_string_reverse.goo
-✅ test_string_var_spacing.goo
+❌ test_string_reverse.goo
+❌ test_string_var_spacing.goo
 ✅ test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
@@ -125,21 +125,23 @@ Running all tests in ./goo/ directory...
 ❌ edge_case_try_catch.goo
 ✅ edge_case_typeof.goo
 ✅ final_units_test.goo
+❌ manual_units_import.goo
 ✅ minimal_energy_test.goo
+❌ minimal_units_test.goo
 ✅ more_postfix_tests.goo
 ❌ postfix_no_check.goo
 ✅ simple_check.goo
 ✅ simple_postfix_test.goo
 ❌ simple_unit_test.goo
 ✅ test_advanced_implicit.goo
-❌ test_approx_equality.goo
+✅ test_approx_equality.goo
 ✅ test_array_index_still_works.goo
 ✅ test_ascii_compound_units.goo
 ✅ test_ascii_degree.goo
 ✅ test_basic_new_units.goo
 ❌ test_bracket_rune_indexing.goo
 ❌ test_character_hash_indexing.goo
-❌ test_check_edge_cases.goo
+✅ test_check_edge_cases.goo
 ✅ test_check_no_printf.goo
 ✅ test_check_syntax.goo
 ✅ test_chinese_var_explicit.goo
@@ -171,7 +173,7 @@ Running all tests in ./goo/ directory...
 ✅ test_power_basic.goo
 ✅ test_readme_range_loop.goo
 ✅ test_simple_approx.goo
-❌ test_simple_check_working.goo
+✅ test_simple_check_working.goo
 ✅ test_simple_degree.goo
 ✅ test_simple_implicit.goo
 ❌ test_simple_Pa.goo
@@ -180,9 +182,9 @@ Running all tests in ./goo/ directory...
 ❌ test_single_unicode.goo
 ✅ test_string_char_access.goo
 ✅ test_string_indexof_overload.goo
-❌ test_superscript_token.goo
+✅ test_superscript_token.goo
 ✅ test_tau_constant.goo
-❌ test_tau_pi_approx.goo
+✅ test_tau_pi_approx.goo
 ✅ test_transforms_enabled.goo
 ✅ test_unit_addition.goo
 ✅ test_unit_check_fix.goo
@@ -195,6 +197,7 @@ Running all tests in ./goo/ directory...
 ❌ test_unit_system.goo
 ✅ test_unit_working.goo
 ✅ test_units_ascii.goo
+❌ test_units_auto_import.goo
 ✅ test_units_available.goo
 ✅ test_units_complete.goo
 ❌ test_units_comprehensive_fixed.goo
@@ -205,6 +208,7 @@ Running all tests in ./goo/ directory...
 ✅ test_units_showcase.goo
 ✅ test_units_synonyms.goo
 ✅ test_units_very_simple.goo
+❌ test_units_without_checks.goo
 ✅ test_units_working.goo
 ✅ test_units.goo
 ✅ test_user_scenario.goo
@@ -213,5 +217,5 @@ Running all tests in ./goo/ directory...
 ✅ test_working_syntax.goo
 ✅ unit_syntax_comprehensive.goo
 ========================================
-Summary: 181/212 passed, 31 failed
+Summary: 181/216 passed, 35 failed
 ⚠️  Some tests failed

@@ -23,10 +23,10 @@ func (t *MapDotTransform) Priority() int {
 
 func (t *MapDotTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	visitor := &mapDotVisitor{ctx: ctx}
-	
+
 	// Use syntax.Walk to traverse the entire AST
 	syntax.Walk(file, visitor)
-	
+
 	return visitor.changed
 }
 
@@ -41,9 +41,9 @@ func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if node == nil {
 		return nil
 	}
-	
-	debug("map_dot: visiting %T\n", node)
-	
+
+	//debug("map_dot: visiting %T\n", node)
+
 	// Transform nodes that contain expressions that might have map dot access
 	switch n := node.(type) {
 	case *syntax.AssignStmt:
@@ -129,7 +129,7 @@ func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
 			}
 		}
 	}
-	
+
 	return v
 }
 
@@ -138,41 +138,41 @@ func (v *mapDotVisitor) transformExpr(expr syntax.Expr) syntax.Expr {
 	if expr == nil {
 		return expr
 	}
-	
-    // Special-case selector: first recurse into base, then attempt transform
-    if sel, ok := expr.(*syntax.SelectorExpr); ok {
-        // Recurse into base first to enable chained transformations
-        sel.X = v.transformExpr(sel.X)
-        if newExpr := v.transformSelector(sel); newExpr != nil {
-            return newExpr
-        }
-        return sel
-    }
-    
-    // Recursively transform other sub-expressions
-    switch e := expr.(type) {
-    case *syntax.CallExpr:
-        // Transform function and arguments
-        e.Fun = v.transformExpr(e.Fun)
-        for i, arg := range e.ArgList {
-            e.ArgList[i] = v.transformExpr(arg)
-        }
-    case *syntax.ParenExpr:
-        e.X = v.transformExpr(e.X)
-    case *syntax.Operation:
-        e.X = v.transformExpr(e.X)
-        if e.Y != nil {
-            e.Y = v.transformExpr(e.Y)
-        }
-    case *syntax.IndexExpr:
-        e.X = v.transformExpr(e.X)
-        e.Index = v.transformExpr(e.Index)
-    case *syntax.ListExpr:
-        for i := range e.ElemList {
-            e.ElemList[i] = v.transformExpr(e.ElemList[i])
-        }
-    }
-	
+
+	// Special-case selector: first recurse into base, then attempt transform
+	if sel, ok := expr.(*syntax.SelectorExpr); ok {
+		// Recurse into base first to enable chained transformations
+		sel.X = v.transformExpr(sel.X)
+		if newExpr := v.transformSelector(sel); newExpr != nil {
+			return newExpr
+		}
+		return sel
+	}
+
+	// Recursively transform other sub-expressions
+	switch e := expr.(type) {
+	case *syntax.CallExpr:
+		// Transform function and arguments
+		e.Fun = v.transformExpr(e.Fun)
+		for i, arg := range e.ArgList {
+			e.ArgList[i] = v.transformExpr(arg)
+		}
+	case *syntax.ParenExpr:
+		e.X = v.transformExpr(e.X)
+	case *syntax.Operation:
+		e.X = v.transformExpr(e.X)
+		if e.Y != nil {
+			e.Y = v.transformExpr(e.Y)
+		}
+	case *syntax.IndexExpr:
+		e.X = v.transformExpr(e.X)
+		e.Index = v.transformExpr(e.Index)
+	case *syntax.ListExpr:
+		for i := range e.ElemList {
+			e.ElemList[i] = v.transformExpr(e.ElemList[i])
+		}
+	}
+
 	return expr
 }
 
@@ -247,14 +247,14 @@ func (v *mapDotVisitor) walkExpr(exprPtr *syntax.Expr) {
 	if exprPtr == nil || *exprPtr == nil {
 		return
 	}
-	
+
 	expr := *exprPtr
-	
+
 	switch e := expr.(type) {
 	case *syntax.SelectorExpr:
 		// First walk the base expression to transform any nested selectors
 		v.walkExpr(&e.X)
-		
+
 		// Then check if this selector should be transformed
 		if newExpr := v.transformSelector(e); newExpr != nil {
 			*exprPtr = newExpr
@@ -312,7 +312,7 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Value: `"` + keyName + `"`,
 			}
 			stringLit.SetPos(sel.Sel.Pos())
-			
+
 			result := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
@@ -323,7 +323,7 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 	}
 
 	// Handle cases where the base is a SelectorExpr that results in a map
-	// e.g., settings.flags.debug -> settings.flags["debug"] 
+	// e.g., settings.flags.debug -> settings.flags["debug"]
 	if selectorExpr, ok := sel.X.(*syntax.SelectorExpr); ok {
 		// Check if this selector expression refers to a map field
 		if v.isMapFieldAccess(selectorExpr) {
@@ -333,7 +333,7 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Value: `"` + keyName + `"`,
 			}
 			stringLit.SetPos(sel.Sel.Pos())
-			
+
 			result := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
@@ -353,7 +353,7 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Value: `"` + keyName + `"`,
 			}
 			stringLit.SetPos(sel.Sel.Pos())
-			
+
 			result := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
@@ -362,7 +362,7 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 			return result
 		}
 	}
-	
+
 	return nil
 }
 
@@ -374,11 +374,11 @@ func (v *mapDotVisitor) looksLikeMapAccess(indexExpr *syntax.IndexExpr) bool {
 			return true
 		}
 	}
-	
+
 	// Could add more heuristics here if needed:
 	// - Check if base variable is known to be a map
 	// - Check patterns in usage context
-	
+
 	return false
 }
 
@@ -386,18 +386,18 @@ func (v *mapDotVisitor) looksLikeMapAccess(indexExpr *syntax.IndexExpr) bool {
 func (v *mapDotVisitor) isMapFieldAccess(selectorExpr *syntax.SelectorExpr) bool {
 	// For cases like settings.flags where flags is a map field
 	// We need to check if the field being accessed is of map type
-	
+
 	// This is a heuristic approach since we don't have full type information
 	// We assume that common map field names are likely maps
 	fieldName := selectorExpr.Sel.Value
 	commonMapFields := []string{"flags", "config", "settings", "options", "params", "data", "meta"}
-	
+
 	for _, mapField := range commonMapFields {
 		if fieldName == mapField {
 			return true
 		}
 	}
-	
+
 	// Could be enhanced with more sophisticated type inference
 	return false
 }
@@ -410,16 +410,16 @@ func (v *mapDotVisitor) isMapReturningFunction(callExpr *syntax.CallExpr) bool {
 		if pkg, ok := selectorExpr.X.(*syntax.Name); ok {
 			pkgName := pkg.Value
 			methodName := selectorExpr.Sel.Value
-			
+
 			// Known map-returning functions
 			if pkgName == "units" && methodName == "Available" {
 				return true
 			}
-			
+
 			// Add more known functions as needed
 		}
 	}
-	
+
 	// Check for direct function calls with common map-returning names
 	if name, ok := callExpr.Fun.(*syntax.Name); ok {
 		functionName := name.Value
@@ -428,14 +428,14 @@ func (v *mapDotVisitor) isMapReturningFunction(callExpr *syntax.CallExpr) bool {
 			"config", "settings", "options", "flags", "params",
 			"Available", "available", "getData", "getMeta", "getProperties",
 		}
-		
+
 		for _, mapFunc := range mapReturningFunctions {
 			if functionName == mapFunc {
 				return true
 			}
 		}
 	}
-	
+
 	return false
 }
 
