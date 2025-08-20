@@ -1,0 +1,217 @@
+# Claude Memory File
+
+## Working Guidelines
+
+never unstage or undo my changes (unless explicitly asked), understand and incorporate them!
+
+This project contains the source code for the go language and it's compiler and its toolchains.
+It is very comprehensive and we need to be careful when searching for a code to not use up all our clout code subscription context window and usage.
+
+Do NOT explore the whole codebase structure and architecture
+
+We are trying to achieve small modifications to the compiler only and nothing else thus we only want to recompile the compiler and not the whole toolchain.
+
+Always start simple and when the simple case works add more complexity. 
+
+Stick to one suggested approach first, NO "Actually, let me take a different approach." until we have tried out the first one.
+If one approach fails, note it in ./probes/TRIED.md and try another approach.
+After one feature is done you can delete this file.
+
+• Quick compiler rebuild:
+/opt/other/go/src/build-compiler.sh !!
+
+• Full rebuild (when is this needed??)
+GOROOT=/opt/other/go ./make.bash 2>&1 | head -10
+
+!! Important! Never do destructive commands like remove, rm, git clean, etc even in YOLO mode: get explicit user confirmation !!
+
+After long tasks with surprising observations, 
+Write down the most essential insights of what you’ve learned into a file starting with that topic ending in -guide.md 
+Then, add a line in CLAUDE.MD noting that this guide can be found under that filename.”
+
+### Style Guidelines
+
+Always replace interface{} with any
+Omit Caveat: in Summaries.
+
+# Compile
+To compile go, use the following command:
+
+```
+cd /opt/other/go/src
+```
+
+# Debugging
+
+GOROOT=/opt/other/go ../bin/go build -work
+retains logs in 
+WORK=/tmp/go-debug/…
+
+in transform.go toggle:
+const DEBUGGING = false 
+and instead of `fmt.Printf` use existing
+func debug(format string, args ...any);
+
+# Go Compiler
+Project folders:
+root  /opt/other/go/
+source ${GOROOT}/src
+tests ${GOROOT}/goo
+debug ${GOROOT}/probe
+
+Main source files:
+go/types/universe.go 
+cmd/compile/internal/syntax/tokens.go
+cmd/compile/internal/noder folder with important files: types.go irgen.go noder.go 
+
+If you're extending Go itself:
+•	cmd/compile/internal/syntax/parser.go AST construction!
+•	make things pass in types2 but  
+•	implement the actual (desugaring) AST transformation in the noder !
+•	Or patch the irgen logic in cmd/compile/internal/noder/irgen.go
+•	by the time things reach writer.go they should be incorrect format, no more hacking here!
+
+`next()` method: main tokenization loop with large switch statement for each character
+
+### Dual Scanner System
+  1. Standard Scanner (go/scanner/scanner.go) Used by go run, go build, and other tools for initial parsing/package analysis
+  2. Internal Syntax Scanner (cmd/compile/internal/syntax/scanner.go) Used by the compiler itself for actual compilation
+Two main scanning modes: normal tokens + comment/directive callbacks
+
+## Key Methods:
+`next()`: main tokenization (big switch ~line 110-355)
+`ident()`: identifier scanning
+`number()`: numeric literal parsing  
+`stdString()`, `rawString()`, `rune()`: string/char literals
+`lineComment()`, `fullComment()`: comment handling
+Error handling via `errorf()`, position tracking
+
+
+## Implementation Order for builtins
+tokens.so
+lexer.go
+parser.go
+transform.go  custom desugaring stage, best place to start
+our custom transformers are in ./src/cmd/compile/internal/transforms/ folder 
+typecheck.go in types2 should only be touched in the rarest cases, e.g. when adding new builtins that require type checking
+
+1. types2 declarations (universe.go)
+2. types2 handling (builtins.go)
+3. IR declarations (node.go)
+4. IR registration (typecheck/universe.go)
+5. IR handling (func.go, typecheck.go)
+
+Register runtime functions at /opt/other/go/src/cmd/compile/internal/typecheck/_builtin/runtime.go Which will code generate declaration lists
+If you change this file you must run "go generate" in cmd/compile/internal/typecheck to update builtin.go.
+Full rebuild needed: src/make.bash
+
+# Testing Guidelines
+ALWAYS RUN tests before doing any changes!
+To check the current status and that everthing is (should be) OK.
+
+NEVER modify existing tests!
+INSTEAD of touching tests in goo, create new tests in the probes folder
+Do not remove tests that are not passing instead leave them there for later fixing.
+
+Do not re-create tests for what is already working, if this is already tested elsewhere.
+
+after performing changes recompile bin/go before testing!
+
+Only report victories if the original complaining test is passing, check again after the changes!
+
+NEVER modify my tests in goo folder! Only add one new test after I've approved the fully functional major feature otherwise leave your tests in probes
+
+# Consolidation
+When failing to make progress don't celebrate (prior progress), 
+Do NOT repeat What Works well from previous progress,
+just be candid and leave the failing tests in the probe directory and summarize the difficulties that have been encountered and possible (alternative) ways forward.
+
+If all newly created tests in ./probes/ succed:
+Create exactly one new file <git_root>/goo/test_{feature}.goo to test cases for the new feature; not src/goo, rather ../goo/ ! Don't try to create a new folder. If the folder does not exist you're trying the wrong folder: it should exist!)
+Only create ONE new test per feature and reuse existing tests for very similar features.
+Before committing quickly run these new tests with the freshly built ../bin/go 
+
+# Test Reporting and Regression
+Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` increases, commit to git!
+Check for regressions with:
+git diff HEAD~4 test-report.md | grep "\-✅"
+
+# Test Writing
+Usually when you create one test there's no more need to modify it unless you really missed something
+USE existing tests instead of writing new ones
+Before declaring a bug/task as fixed run the test again. If it fails report it with ❌
+
+## Editing Guidelines
+never edit token_string.go
+always use ../bin/go 
+NEVER manually touch generated files like op_string.go  token_string.go 
+
+## Enum Stability Practices
+ - Never insert in middle of enums
+ - Always append new operations at end
+ - Use external bootstrap for enum changes (?)
+ - Add validation tests for critical constants
+
+To avoid code duplication do a quick git history search (grep?) to see if there have been related changes
+
+Ignore TODO.md, it's only for myself   add to claudeignore and remove this line
+
+## Build Optimization
+• no need to ./make.bash twice with no changes
+
+## Transformers
+• Add Position information SetPos(pos) In Transformers (pos := old.Pos())
+• Inline nodes often need explicit SetPos(pos) too
+• Never modify tests in the goo folder only in probes.
+
+## System Health
+• do ./run_all_tests.sh before and after work to see if the general system is ok
+
+## Code File Guidelines
+• omit package main and func main in .goo files
+
+## Debugging
+• don't Temporarily disable To test functionality that worked before instead push forward to resolve the issue
+ 
+
+With the visitor pattern, we can only replace nodes in place, so not always applicable? 
+we sometimes still need to use the verbose walker for rare cases where we need to replace a node with a completely different node.
+Or use a hybrid.
+
+
+# Assume mishearings
+I am using speech recognition which might misunderstand some words:
+parcel => parser , fights => files
+
+# automatic imports
+since we moved the import resolver in the pipeline to after the Transformers all the import issues were gone
+If you ever encounter automatic import problems again just look at: 
+goo/test_strings_auto_import.goo                                                                   │
+goo/test_list_methods.goo
+(together with their implementation and maybe their commits)
+
+# Hard extensions
+When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
+
+# Critical Infrastructure Fixes Applied
+## Printer AST Node Support (REQUIRED)
+Added missing printer.go cases for AsCastExpr and LambdaExpr to prevent systematic panics:
+- /opt/other/go/src/cmd/compile/internal/syntax/printer.go lines 736-755
+- Without these cases, any usage of lambda expressions or type casting causes "syntax.Iterate: unexpected node type" panics
+
+## Environment Variable Requirements (REQUIRED) 
+GOO_USE_TRANSFORMERS=1 must be set in:
+- make.bash (line 222) - uncommented for compilation
+- run_all_tests.sh (line 11) - added for test execution
+
+## Transform Priority Conflicts (CRITICAL BUG FIX)
+Fixed list_methods_transform claiming string method calls via isStringReceiver() check:
+- /opt/other/go/src/cmd/compile/internal/transforms/list_methods_transform.go 
+- Added check at line 315 to prevent conflicts with string_methods_transform
+- This resolves method dispatch conflicts that caused incorrect transformations
+
+## Test Results on 195_ok_ish Branch
+- Before fixes: 195/261 tests passing (75%)
+- After fixes: 203/259 tests passing (78%) - improvement of +8 tests
+- These infrastructure fixes are essential foundation for any Go compiler work
+

@@ -1,0 +1,6 @@
+import "units"
+
+// Test map dot notation
+result := units.Available()
+put(result["area"])  // This should work
+put(result.area)     // This should be transformed to result["area"]

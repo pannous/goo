@@ -1,13 +1,15 @@
 import "fmt"
 import "units"
 
-s := units.S
+#s := units.S # shorthand for 1 second:
+s := units.Second(1)
 ms := units.Ms
 check 500*ms + 5*s == 5500*ms
 check 500·ms + 5·s == 5500·ms
 check 500ms + 5s == 5500ms
 
 m := units.M
+#m := units.Meter
 km := units.Km
 check 1200m + 2km == 3.2km
 check 1200*m + 2*km == 3.2*km
@@ -20,7 +22,6 @@ check 10m * 10m * 10m == 1000m³
 check 10m / 2s == 5m/s
 check 10m / 2s == 5·m/s
 
-
-put(units.Available())
-
-print("All unit tests passed successfully!")
+put(units.Available().area)
+put(units.Km)
+put("All unit tests passed successfully!")
