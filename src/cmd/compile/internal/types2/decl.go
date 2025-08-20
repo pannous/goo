@@ -524,9 +524,9 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *syntax.TypeDecl, defi *Typ
 
 			// handle type parameters even if not allowed (Alias type is supported)
 			if tparam0 != nil {
-				check.openScope(tdecl, "type parameters")
-				defer check.closeScope()
-				check.collectTypeParams(&alias.tparams, tdecl.TParamList)
+				checks.openScope(tdecl, "type parameters")
+				defer checks.closeScope()
+				checks.collectTypeParams(&alias.tparams, tdecl.TParamList)
 			}
 
 			rhs = checks.definedType(tdecl.Type, obj)

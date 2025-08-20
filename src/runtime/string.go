@@ -255,7 +255,7 @@ func stringtoslicerune(buf *[tmpStringBufSize]rune, s string) []rune {
 func stringRuneAt(s string, i int) string {
 	runes := stringtoslicerune(nil, s)
 	if i < 0 || i >= len(runes) {
-		panicIndex(i, len(runes))
+		goPanicIndex(i, len(runes))
 	}
 	return string(runes[i])
 }

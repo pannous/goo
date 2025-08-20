@@ -442,9 +442,9 @@ var optab = []Optab{
 	{i: 119, ass: AVERLLVG, a1: C_VREG, a6: C_VREG},
 
 	// VRR-c floating point min/max
-	{i: 128, as: AVFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
-	{i: 128, as: AWFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
-	{i: 128, as: AWFMAXDB, a1: C_SCON, a2: C_FREG, a3: C_FREG, a6: C_FREG},
+	{i: 128, ass: AVFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 128, ass: AWFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 128, ass: AWFMAXDB, a1: C_SCON, a2: C_FREG, a3: C_FREG, a6: C_FREG},
 
 	// VRR-d
 	{i: 120, ass: AVACQ, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG},
