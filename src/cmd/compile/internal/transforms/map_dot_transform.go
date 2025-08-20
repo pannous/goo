@@ -71,6 +71,15 @@ func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
 				}
 			}
 		}
+		// Also transform both sides where applicable
+		if transformed := v.transformExpr(n.Lhs); transformed != n.Lhs {
+			n.Lhs = transformed
+			v.changed = true
+		}
+		if transformed := v.transformExpr(n.Rhs); transformed != n.Rhs {
+			n.Rhs = transformed
+			v.changed = true
+		}
 	case *syntax.VarDecl:
 		if n.Values != nil {
 			if transformed := v.transformExpr(n.Values); transformed != n.Values {
@@ -83,11 +92,39 @@ func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
 			n.X = transformed
 			v.changed = true
 		}
+	case *syntax.ReturnStmt:
+		if n.Results != nil {
+			if transformed := v.transformExpr(n.Results); transformed != n.Results {
+				n.Results = transformed
+				v.changed = true
+			}
+		}
+	case *syntax.IfStmt:
+		if n.Cond != nil {
+			if transformed := v.transformExpr(n.Cond); transformed != n.Cond {
+				n.Cond = transformed
+				v.changed = true
+			}
+		}
+	case *syntax.ForStmt:
+		if n.Cond != nil {
+			if transformed := v.transformExpr(n.Cond); transformed != n.Cond {
+				n.Cond = transformed
+				v.changed = true
+			}
+		}
 	case *syntax.CallExpr:
 		// Transform arguments
 		for i, arg := range n.ArgList {
 			if transformed := v.transformExpr(arg); transformed != arg {
 				n.ArgList[i] = transformed
+				v.changed = true
+			}
+		}
+	case *syntax.CheckStmt:
+		if n.Cond != nil {
+			if transformed := v.transformExpr(n.Cond); transformed != n.Cond {
+				n.Cond = transformed
 				v.changed = true
 			}
 		}
@@ -102,24 +139,39 @@ func (v *mapDotVisitor) transformExpr(expr syntax.Expr) syntax.Expr {
 		return expr
 	}
 	
-	// Check if this is a SelectorExpr that needs transformation
-	if sel, ok := expr.(*syntax.SelectorExpr); ok {
-		if newExpr := v.transformSelector(sel); newExpr != nil {
-			return newExpr
-		}
-	}
-	
-	// Recursively transform sub-expressions
-	switch e := expr.(type) {
-	case *syntax.CallExpr:
-		// Transform function and arguments
-		e.Fun = v.transformExpr(e.Fun)
-		for i, arg := range e.ArgList {
-			e.ArgList[i] = v.transformExpr(arg)
-		}
-	case *syntax.ParenExpr:
-		e.X = v.transformExpr(e.X)
-	}
+    // Special-case selector: first recurse into base, then attempt transform
+    if sel, ok := expr.(*syntax.SelectorExpr); ok {
+        // Recurse into base first to enable chained transformations
+        sel.X = v.transformExpr(sel.X)
+        if newExpr := v.transformSelector(sel); newExpr != nil {
+            return newExpr
+        }
+        return sel
+    }
+    
+    // Recursively transform other sub-expressions
+    switch e := expr.(type) {
+    case *syntax.CallExpr:
+        // Transform function and arguments
+        e.Fun = v.transformExpr(e.Fun)
+        for i, arg := range e.ArgList {
+            e.ArgList[i] = v.transformExpr(arg)
+        }
+    case *syntax.ParenExpr:
+        e.X = v.transformExpr(e.X)
+    case *syntax.Operation:
+        e.X = v.transformExpr(e.X)
+        if e.Y != nil {
+            e.Y = v.transformExpr(e.Y)
+        }
+    case *syntax.IndexExpr:
+        e.X = v.transformExpr(e.X)
+        e.Index = v.transformExpr(e.Index)
+    case *syntax.ListExpr:
+        for i := range e.ElemList {
+            e.ElemList[i] = v.transformExpr(e.ElemList[i])
+        }
+    }
 	
 	return expr
 }
