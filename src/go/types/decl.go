@@ -9,7 +9,6 @@ import (
 	"go/ast"
 	"go/constant"
 	"go/token"
-	"internal/buildcfg"
 	. "internal/types/errors"
 	"slices"
 )
@@ -600,13 +599,9 @@ func (checks *Checker) typeDecl(obj *TypeName, tdecl *ast.TypeSpec, defi *TypeNa
 
 			// handle type parameters even if not allowed (Alias type is supported)
 			if tparam0 != nil {
-				if !versionErr && !buildcfg.Experiment.AliasTypeParams {
-					checks.error(tdecl, UnsupportedFeature, "generic type alias requires GOEXPERIMENT=aliastypeparams")
-					versionErr = true
-				}
-				checks.openScope(tdecl, "type parameters")
-				defer checks.closeScope()
-				checks.collectTypeParams(&alias.tparams, tdecl.TypeParams)
+				check.openScope(tdecl, "type parameters")
+				defer check.closeScope()
+				check.collectTypeParams(&alias.tparams, tdecl.TypeParams)
 			}
 
 			rhs = checks.definedType(tdecl.Type, obj)

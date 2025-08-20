@@ -14,7 +14,6 @@ import (
 	"errors"
 	"fmt"
 	"go/token"
-	"internal/buildcfg"
 	. "internal/types/errors"
 )
 
@@ -133,10 +132,6 @@ func (checks *Checker) instance(pos token.Pos, orig genericType, targs []Type, e
 		res = checks.newNamedInstance(pos, orig, targs, expanding) // substituted lazily
 
 	case *Alias:
-		if !buildcfg.Experiment.AliasTypeParams {
-			assert(expanding == nil) // Alias instances cannot be reached from Named types
-		}
-
 		// verify type parameter count (see go.dev/issue/71198 for a test case)
 		tparams := orig.TypeParams()
 		if !checks.validateTArgLen(pos, orig.obj.Name(), tparams.Len(), len(targs)) {
