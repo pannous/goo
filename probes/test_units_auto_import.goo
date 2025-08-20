@@ -1,0 +1,7 @@
+import "fmt"
+
+func main() {
+	// This should trigger automatic units import
+	distance := 5m
+	fmt.Println("Distance:", distance)
+}

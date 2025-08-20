@@ -598,7 +598,7 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 		for _, decl := range file.DeclList {
 			if importDecl, ok := decl.(*syntax.ImportDecl); ok && importDecl.Path != nil {
 				importPath := strings.Trim(importDecl.Path.Value, `"`)
-				if _, exists := base.Flag.Cfg.PackageFile[importPath]; !exists {
+				if val, exists := base.Flag.Cfg.PackageFile[importPath]; !exists || val == "" {
 					newImports[importPath] = true
 				}
 			}
@@ -615,24 +615,16 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 
 // resolveStandardLibraryPackage finds the compiled package file for a standard library package
 func resolveStandardLibraryPackage(importPath string) string {
-	// Use known cached paths for common standard library packages
-	// These paths are discovered by running manual imports and examining the importcfg
-	switch importPath {
-	case "strings":
-		// Check if the cached strings package exists
-		stringsPath := "/tmp/go-cache/99/9989918dff32360dc9f21f3526badcc4c2bc7d3f4017b341e9272e71fa77db92-d"
-		if _, err := os.Stat(stringsPath); err == nil {
-			return stringsPath
-		}
-	case "slices":
-		// Check if the cached slices package exists
-		slicesPath := "/tmp/go-cache/d6/d672a7f00ef88fa3dc35e6db96728d79205801e9d3d85c2e8469593c06d71df6-d"
-		if _, err := os.Stat(slicesPath); err == nil {
-			return slicesPath
-		}
-	}
-	
-	// TODO: For a more robust solution, we would integrate with the build system
-	// to compile packages on-demand or search the cache dynamically
-	return ""
+    // Attempt to locate stdlib archive in $GOROOT/pkg/$GOOS_$GOARCH/<importPath>.a
+    goroot := os.Getenv("GOROOT")
+    goos := os.Getenv("GOOS")
+    goarch := os.Getenv("GOARCH")
+    if goroot != "" && goos != "" && goarch != "" {
+        pkgDir := goroot + "/pkg/" + goos + "_" + goarch
+        cand := pkgDir + "/" + importPath + ".a"
+        if _, err := os.Stat(cand); err == nil {
+            return cand
+        }
+    }
+    return ""
 }

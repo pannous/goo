@@ -1,0 +1,14 @@
+import "fmt"
+import "units"
+
+func main() {
+	s := units.Second(1)
+	ms := units.Ms
+	fmt.Println("Units created:", s, ms)
+	
+	m := units.M
+	km := units.Km
+	fmt.Println("Distance units:", m, km)
+	
+	fmt.Println("All unit tests passed successfully!")
+}

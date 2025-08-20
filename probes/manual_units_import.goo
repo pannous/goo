@@ -1,0 +1,6 @@
+import "units"
+
+func main() {
+	distance := 5m
+	println(distance)
+}
