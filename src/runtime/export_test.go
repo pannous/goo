@@ -59,9 +59,6 @@ const CrashStackImplemented = crashStackImplemented
 const TracebackInnerFrames = tracebackInnerFrames
 const TracebackOuterFrames = tracebackOuterFrames
 
-var MapKeys = keys
-var MapValues = values
-
 var LockPartialOrder = lockPartialOrder
 
 type TimeTimer = timeTimer
@@ -556,6 +553,8 @@ func GetNextArenaHint() uintptr {
 type G = g
 
 type Sudog = sudog
+
+type XRegPerG = xRegPerG
 
 func Getg() *G {
 	return getg()
