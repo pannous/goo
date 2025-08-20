@@ -1,3 +1,4 @@
+import "fmt"
 import "units"
 
 // Test map dot notation

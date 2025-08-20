@@ -6,7 +6,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 	"strings"
 )
 
@@ -43,10 +42,35 @@ func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
 		return nil
 	}
 	
-	fmt.Printf("DEBUG: Visiting node type: %T\n", node)
+	debug("map_dot: visiting %T\n", node)
 	
 	// Transform nodes that contain expressions that might have map dot access
 	switch n := node.(type) {
+	case *syntax.AssignStmt:
+		// Infer map type from assignments like: x := units.Available()
+		var lhsList []syntax.Expr
+		var rhsList []syntax.Expr
+		if l, ok := n.Lhs.(*syntax.ListExpr); ok {
+			lhsList = l.ElemList
+		} else {
+			lhsList = []syntax.Expr{n.Lhs}
+		}
+		if r, ok := n.Rhs.(*syntax.ListExpr); ok {
+			rhsList = r.ElemList
+		} else {
+			rhsList = []syntax.Expr{n.Rhs}
+		}
+		if len(lhsList) == len(rhsList) {
+			for i := range lhsList {
+				if lhsName, ok := lhsList[i].(*syntax.Name); ok {
+					if call, ok := rhsList[i].(*syntax.CallExpr); ok {
+						if v.isMapReturningFunction(call) {
+							v.ctx.Types[lhsName.Value] = "map[string]any"
+						}
+					}
+				}
+			}
+		}
 	case *syntax.VarDecl:
 		if n.Values != nil {
 			if transformed := v.transformExpr(n.Values); transformed != n.Values {
@@ -207,8 +231,7 @@ func (v *mapDotVisitor) walkExpr(exprPtr *syntax.Expr) {
 }
 
 func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr {
-	fmt.Printf("DEBUG: transformSelector called with %s.%s\n", 
-		v.exprToString(sel.X), sel.Sel.Value)
+	debug("map_dot: transformSelector %s.%s\n", v.exprToString(sel.X), sel.Sel.Value)
 	// Check if the base expression is a variable we know is a map with string keys
 	if name, ok := sel.X.(*syntax.Name); ok {
 		varType, exists := v.ctx.Types[name.Value]

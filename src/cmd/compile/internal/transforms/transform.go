@@ -290,7 +290,7 @@ func collectFromVarDecl(varDecl *syntax.VarDecl, ctx *TransformContext) {
 
 // inferTypeFromExpression attempts to infer the type of an expression
 func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
-	switch e := expr.(type) {
+    switch e := expr.(type) {
 	case *syntax.BasicLit:
 		// Handle string literals like "hello"
 		if e.Kind == syntax.StringLit {
@@ -308,12 +308,16 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 		if e.Type == nil && len(e.ElemList) > 0 {
 			return inferMapTypeFromElements(e.ElemList)
 		}
-	case *syntax.CallExpr:
-		// Handle method calls like users.filter(...)
-		if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
-			if receiverName, ok := selector.X.(*syntax.Name); ok {
-				receiverType := ctx.Types[receiverName.Value]
-				methodName := selector.Sel.Value
+    case *syntax.CallExpr:
+        // Known map-returning functions (e.g., units.Available())
+        if isMapReturningFunctionCallExpr(e) {
+            return "map[string]any"
+        }
+        // Handle method calls like users.filter(...)
+        if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
+            if receiverName, ok := selector.X.(*syntax.Name); ok {
+                receiverType := ctx.Types[receiverName.Value]
+                methodName := selector.Sel.Value
 
 				// Infer return type based on method and receiver type
 				return inferMethodReturnType(receiverType, methodName)
@@ -345,6 +349,20 @@ func inferMethodReturnType(receiverType, methodName string) string {
 		}
 	}
 	return ""
+}
+
+// isMapReturningFunctionCallExpr detects calls that are known to return map[string]...
+func isMapReturningFunctionCallExpr(call *syntax.CallExpr) bool {
+    // Match package-qualified calls like units.Available()
+    if sel, ok := call.Fun.(*syntax.SelectorExpr); ok {
+        if pkg, ok := sel.X.(*syntax.Name); ok {
+            if pkg.Value == "units" && sel.Sel.Value == "Available" {
+                return true
+            }
+        }
+    }
+    // Extend here with more known factories as needed
+    return false
 }
 
 func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
