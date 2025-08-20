@@ -132,7 +132,7 @@ Only create ONE new test per feature and reuse existing tests for very similar f
 Before committing quickly run these new tests with the freshly built ../bin/go 
 
 # Test Reporting and Regression
-Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` increases, commit to git!
+Whenever the number of passing tests in `run_all_tests.sh | tee test_report.md` increases, commit to git! No need to run run_all_tests.sh when checking a single test in goo/ or probes/
 Check for regressions with:
 git diff HEAD~4 test-report.md | grep "\-✅"
 
@@ -199,7 +199,7 @@ Added missing printer.go cases for AsCastExpr and LambdaExpr to prevent systemat
 - /opt/other/go/src/cmd/compile/internal/syntax/printer.go lines 736-755
 - Without these cases, any usage of lambda expressions or type casting causes "syntax.Iterate: unexpected node type" panics
 
-## Environment Variable Requirements (REQUIRED) 
+## Environment Variable Requirements (REQUIRED)
 GOO_USE_TRANSFORMERS=1 must be set in:
 - make.bash (line 222) - uncommented for compilation
 - run_all_tests.sh (line 11) - added for test execution
