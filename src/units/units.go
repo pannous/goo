@@ -5,633 +5,396 @@ import (
 	"strings"
 )
 
-// Unit represents a physical unit with value and metadata
 type Unit struct {
-	name             string
-	symbol           string
-	baseUnit         string
-	conversionFactor float64
-	category         string
-	value            float64
+	Value float64
+	Type  string
+	Scale float64  // conversion factor to base unit
 }
 
-// NewUnit creates a new unit instance
-func NewUnit(name, symbol, baseUnit string, conversionFactor float64, category string) *Unit {
-	return &Unit{
-		name:             name,
-		symbol:           symbol,
-		baseUnit:         baseUnit,
-		conversionFactor: conversionFactor,
-		category:         category,
-		value:            1.0,
-	}
+type UnitRegistry struct {
+	units map[string]*UnitInfo
 }
 
-// withValue creates a copy of the unit with a specific value
-func (u *Unit) withValue(val float64) *Unit {
-	return &Unit{
-		name:             u.name,
-		symbol:           u.symbol,
-		baseUnit:         u.baseUnit,
-		conversionFactor: u.conversionFactor,
-		category:         u.category,
-		value:            val,
-	}
+type UnitInfo struct {
+	BaseUnit string
+	Scale    float64
+	Category string
 }
 
-// Arithmetic operations (lowercase for internal use)
-func (u *Unit) add(other *Unit) *Unit {
-	if u.category != other.category {
-		panic("Cannot add incompatible units: " + u.category + " + " + other.category)
+var DefaultRegistry = NewUnitRegistry()
+
+func NewUnitRegistry() *UnitRegistry {
+	r := &UnitRegistry{
+		units: make(map[string]*UnitInfo),
 	}
 	
-	// Convert both to base units
-	thisBase := u.value * u.conversionFactor
-	otherBase := other.value * other.conversionFactor
+	// Register all unit categories
+	r.registerDistanceUnits()
+	r.registerTimeUnits()
+	r.registerFrequencyUnits()
+	r.registerMassUnits()
+	r.registerTemperatureUnits()
+	r.registerPressureUnits()
+	r.registerEnergyUnits()
+	r.registerPowerUnits()
+	r.registerElectricUnits()
+	r.registerAreaUnits()
+	r.registerVolumeUnits()
+	r.registerVelocityUnits()
+	r.registerAccelerationUnits()
+	r.registerAngleUnits()
+	
+	return r
+}
+
+func (r *UnitRegistry) registerDistanceUnits() {
+	r.Register("m", "m", 1.0, "distance")
+	r.Register("km", "m", 1000.0, "distance")
+	r.Register("cm", "m", 0.01, "distance")
+	r.Register("mm", "m", 0.001, "distance")
+	r.Register("in", "m", 0.0254, "distance")
+	r.Register("ft", "m", 0.3048, "distance")
+	r.Register("mi", "m", 1609.34, "distance")
+}
+
+func (r *UnitRegistry) registerTimeUnits() {
+	r.Register("s", "s", 1.0, "time")
+	r.Register("ms", "s", 0.001, "time")
+	r.Register("us", "s", 0.000001, "time")
+	r.Register("ns", "s", 0.000000001, "time")
+	r.Register("min", "s", 60.0, "time")
+	r.Register("h", "s", 3600.0, "time")
+	r.Register("d", "s", 86400.0, "time")
+}
+
+func (r *UnitRegistry) registerFrequencyUnits() {
+	r.Register("Hz", "Hz", 1.0, "frequency")
+	r.Register("kHz", "Hz", 1000.0, "frequency")
+	r.Register("MHz", "Hz", 1000000.0, "frequency")
+	r.Register("GHz", "Hz", 1000000000.0, "frequency")
+	r.Register("THz", "Hz", 1000000000000.0, "frequency")
+	r.Register("rpm", "Hz", 1.0/60.0, "frequency") // revolutions per minute
+}
+
+func (r *UnitRegistry) registerMassUnits() {
+	r.Register("g", "kg", 0.001, "mass")
+	r.Register("kg", "kg", 1.0, "mass")
+	r.Register("mg", "kg", 0.000001, "mass")
+	r.Register("μg", "kg", 0.000000001, "mass")
+	r.Register("lb", "kg", 0.453592, "mass")
+	r.Register("oz", "kg", 0.0283495, "mass")
+	r.Register("st", "kg", 6.35029, "mass") // stone
+	r.Register("t", "kg", 1000.0, "mass") // metric ton
+	r.Register("u", "kg", 1.66054e-27, "mass") // atomic mass unit
+}
+
+func (r *UnitRegistry) registerTemperatureUnits() {
+	r.Register("K", "K", 1.0, "temperature")
+	r.Register("°C", "K", 1.0, "temperature") // Note: needs offset +273.15
+	r.Register("°F", "K", 5.0/9.0, "temperature") // Note: needs (°F-32)*5/9 + 273.15
+	r.Register("°R", "K", 5.0/9.0, "temperature") // Rankine
+}
+
+func (r *UnitRegistry) registerPressureUnits() {
+	r.Register("Pa", "Pa", 1.0, "pressure")
+	r.Register("kPa", "Pa", 1000.0, "pressure")
+	r.Register("MPa", "Pa", 1000000.0, "pressure")
+	r.Register("bar", "Pa", 100000.0, "pressure")
+	r.Register("atm", "Pa", 101325.0, "pressure")
+	r.Register("psi", "Pa", 6894.76, "pressure")
+	r.Register("mmHg", "Pa", 133.322, "pressure")
+	r.Register("torr", "Pa", 133.322, "pressure")
+}
+
+func (r *UnitRegistry) registerEnergyUnits() {
+	r.Register("J", "J", 1.0, "energy")
+	r.Register("kJ", "J", 1000.0, "energy")
+	r.Register("MJ", "J", 1000000.0, "energy")
+	r.Register("cal", "J", 4.184, "energy")
+	r.Register("kcal", "J", 4184.0, "energy")
+	r.Register("BTU", "J", 1055.06, "energy")
+	r.Register("eV", "J", 1.60218e-19, "energy")
+	r.Register("keV", "J", 1.60218e-16, "energy")
+	r.Register("MeV", "J", 1.60218e-13, "energy")
+	r.Register("kWh", "J", 3600000.0, "energy")
+}
+
+func (r *UnitRegistry) registerPowerUnits() {
+	r.Register("W", "W", 1.0, "power")
+	r.Register("kW", "W", 1000.0, "power")
+	r.Register("MW", "W", 1000000.0, "power")
+	r.Register("GW", "W", 1000000000.0, "power")
+	r.Register("hp", "W", 745.7, "power") // mechanical horsepower
+	r.Register("BTU/h", "W", 0.293071, "power")
+}
+
+func (r *UnitRegistry) registerElectricUnits() {
+	r.Register("A", "A", 1.0, "current")
+	r.Register("V", "V", 1.0, "voltage")
+	r.Register("Ω", "Ω", 1.0, "resistance")
+	r.Register("F", "F", 1.0, "capacitance")
+	r.Register("H", "H", 1.0, "inductance")
+	r.Register("Wb", "Wb", 1.0, "magnetic_flux")
+	r.Register("T", "T", 1.0, "magnetic_field")
+}
+
+func (r *UnitRegistry) registerAreaUnits() {
+	r.Register("m²", "m²", 1.0, "area")
+	r.Register("km²", "m²", 1000000.0, "area")
+	r.Register("cm²", "m²", 0.0001, "area")
+	r.Register("mm²", "m²", 0.000001, "area")
+	r.Register("ha", "m²", 10000.0, "area") // hectare
+	r.Register("ac", "m²", 4046.86, "area") // acre
+	r.Register("ft²", "m²", 0.092903, "area")
+	r.Register("in²", "m²", 0.00064516, "area")
+	// ASCII alternatives
+	r.Register("sqm", "m²", 1.0, "area")
+}
+
+func (r *UnitRegistry) registerVolumeUnits() {
+	r.Register("m³", "m³", 1.0, "volume")
+	r.Register("L", "m³", 0.001, "volume")
+	r.Register("mL", "m³", 0.000001, "volume")
+	r.Register("gal", "m³", 0.00378541, "volume") // US gallon
+	r.Register("qt", "m³", 0.000946353, "volume") // US quart
+	r.Register("pt", "m³", 0.000473176, "volume") // US pint
+	r.Register("cup", "m³", 0.000236588, "volume") // US cup
+	r.Register("fl oz", "m³", 2.95735e-05, "volume") // US fluid ounce
+	r.Register("bbl", "m³", 0.158987, "volume") // barrel
+	// ASCII alternative
+	r.Register("cbm", "m³", 1.0, "volume")
+}
+
+func (r *UnitRegistry) registerVelocityUnits() {
+	r.Register("m/s", "m/s", 1.0, "velocity")
+	r.Register("km/h", "m/s", 1.0/3.6, "velocity")
+	r.Register("mph", "m/s", 0.44704, "velocity")
+	r.Register("kn", "m/s", 0.514444, "velocity") // knot
+	r.Register("ft/s", "m/s", 0.3048, "velocity")
+}
+
+func (r *UnitRegistry) registerAccelerationUnits() {
+	r.Register("m/s²", "m/s²", 1.0, "acceleration")
+	r.Register("mps2", "m/s²", 1.0, "acceleration") // ASCII alternative
+	r.Register("gf", "m/s²", 9.80665, "acceleration") // g-force
+}
+
+func (r *UnitRegistry) registerAngleUnits() {
+	r.Register("rad", "rad", 1.0, "angle")
+	r.Register("°", "rad", 0.0174533, "angle") // degrees to radians
+	r.Register("deg", "rad", 0.0174533, "angle")
+	r.Register("grad", "rad", 0.0157080, "angle") // gradians
+	r.Register("turn", "rad", 6.28319, "angle") // full turn
+}
+
+func (r *UnitRegistry) Register(unitName, baseUnit string, scale float64, category string) {
+	r.units[unitName] = &UnitInfo{
+		BaseUnit: baseUnit,
+		Scale:    scale,
+		Category: category,
+	}
+}
+
+func (r *UnitRegistry) GetUnit(name string) (*UnitInfo, bool) {
+	info, exists := r.units[name]
+	return info, exists
+}
+
+func NewUnit(value float64, unitName string) *Unit {
+	info, exists := DefaultRegistry.GetUnit(unitName)
+	if !exists {
+		panic(fmt.Sprintf("Unknown unit: %s", unitName))
+	}
+	
+	return &Unit{
+		Value: value,
+		Type:  unitName,
+		Scale: info.Scale,
+	}
+}
+
+func (u *Unit) Add(other *Unit) *Unit {
+	if !u.isCompatible(other) {
+		panic(fmt.Sprintf("Cannot add incompatible units: %s + %s", u.Type, other.Type))
+	}
+	
+	// Convert both to base units, add, then convert back to first unit
+	thisBase := u.Value * u.Scale
+	otherBase := other.Value * other.Scale
 	resultBase := thisBase + otherBase
 	
-	// Return result in this unit's type
-	return u.withValue(resultBase / u.conversionFactor)
-}
-
-func (u *Unit) sub(other *Unit) *Unit {
-	if u.category != other.category {
-		panic("Cannot subtract incompatible units: " + u.category + " - " + other.category)
+	return &Unit{
+		Value: resultBase / u.Scale,
+		Type:  u.Type,
+		Scale: u.Scale,
 	}
-	
-	thisBase := u.value * u.conversionFactor
-	otherBase := other.value * other.conversionFactor
-	resultBase := thisBase - otherBase
-	
-	return u.withValue(resultBase / u.conversionFactor)
-}
-
-func (u *Unit) mul(scalar float64) *Unit {
-	return u.withValue(u.value * scalar)
-}
-
-func (u *Unit) div(scalar float64) *Unit {
-	return u.withValue(u.value / scalar)
-}
-
-// Exported methods for transformer use
-func (u *Unit) Add(other *Unit) *Unit {
-	return u.add(other)
 }
 
 func (u *Unit) Sub(other *Unit) *Unit {
-	return u.sub(other)
-}
-
-func (u *Unit) Multiply(scalar any) *Unit {
-	switch v := scalar.(type) {
-	case float64:
-		return u.withValue(u.value * v)
-	case int:
-		return u.withValue(u.value * float64(v))
-	case float32:
-		return u.withValue(u.value * float64(v))
-	case *Unit:
-		// Unit-by-unit multiplication: combine values and dimensions
-		return u.multiplyUnit(v)
-	default:
-		panic(fmt.Sprintf("Cannot multiply unit by %T", scalar))
-	}
-}
-
-func (u *Unit) Divide(divisor any) *Unit {
-	switch v := divisor.(type) {
-	case float64:
-		return u.withValue(u.value / v)
-	case int:
-		return u.withValue(u.value / float64(v))
-	case float32:
-		return u.withValue(u.value / float64(v))
-	case *Unit:
-		// Unit-by-unit division: create derived units like m/s
-		return u.divideUnit(v)
-	default:
-		panic(fmt.Sprintf("Cannot divide unit by %T", divisor))
-	}
-}
-
-// multiplyUnit handles unit-by-unit multiplication (e.g., m * m = m²)
-func (u *Unit) multiplyUnit(other *Unit) *Unit {
-	// Multiply the values
-	resultValue := u.value * other.value
-	
-	// Handle dimensional multiplication cases
-	if u.baseUnit == other.baseUnit {
-		// Same base unit multiplication
-		if u.category == other.category {
-			// Same unit: m * m = m²
-			newSymbol := u.symbol + "²"
-			newName := u.name + " squared"
-			
-			return &Unit{
-				name:             newName,
-				symbol:           newSymbol,
-				baseUnit:         u.baseUnit + "²",
-				conversionFactor: u.conversionFactor * other.conversionFactor,
-				category:         u.category + "²", // length², time², etc.
-				value:            resultValue,
-			}
-		} else if (u.category == "length²" || u.category == "area") && 
-		           (other.category == "length") && u.baseUnit == "m²" && other.baseUnit == "m" {
-			// Special case: m² * m = m³ (area * length = volume)
-			return &Unit{
-				name:             "cubic meter",
-				symbol:           "m³",
-				baseUnit:         "m³",
-				conversionFactor: u.conversionFactor * other.conversionFactor,
-				category:         "volume",
-				value:            resultValue,
-			}
-		}
+	if !u.isCompatible(other) {
+		panic(fmt.Sprintf("Cannot subtract incompatible units: %s - %s", u.Type, other.Type))
 	}
 	
-	// Handle area * length = volume more generally
-	if (u.category == "length²" || u.category == "area") && other.category == "length" {
-		// Extract base units for matching using rune-based operations
-		if strings.HasSuffix(u.baseUnit, "²") {
-			// Get the base unit without the ² suffix using runes
-			runes := []rune(u.baseUnit)
-			baseUnitWithoutSquare := string(runes[:len(runes)-1])
-			if other.baseUnit == baseUnitWithoutSquare {
-				baseSymbol := other.symbol
-				return &Unit{
-					name:             baseSymbol + " cubed",
-					symbol:           baseSymbol + "³",
-					baseUnit:         other.baseUnit + "³",
-					conversionFactor: u.conversionFactor * other.conversionFactor,
-					category:         "volume",
-					value:            resultValue,
-				}
-			}
-		}
-	}
-	
-	// Different units: create composite unit (e.g., m * s = m⋅s)
-	newSymbol := u.symbol + "⋅" + other.symbol
-	newName := u.name + " times " + other.name
-	newCategory := u.category + "⋅" + other.category
+	thisBase := u.Value * u.Scale
+	otherBase := other.Value * other.Scale
+	resultBase := thisBase - otherBase
 	
 	return &Unit{
-		name:             newName,
-		symbol:           newSymbol,
-		baseUnit:         u.baseUnit + "⋅" + other.baseUnit,
-		conversionFactor: u.conversionFactor * other.conversionFactor,
-		category:         newCategory,
-		value:            resultValue,
+		Value: resultBase / u.Scale,
+		Type:  u.Type,
+		Scale: u.Scale,
 	}
 }
 
-// divideUnit handles unit-by-unit division (e.g., m / s = m/s)
-func (u *Unit) divideUnit(other *Unit) *Unit {
-	// Divide the values
-	resultValue := u.value / other.value
-	
-	// Check for common velocity cases first
-	if u.category == "length" && other.category == "time" {
-		// Create velocity unit: m/s, km/h, etc.
-		newSymbol := u.symbol + "/" + other.symbol
-		newName := u.name + " per " + other.name
-		newBaseUnit := u.baseUnit + "/" + other.baseUnit
-		newCategory := "velocity"
-		
-		// Calculate conversion factor for velocity
-		conversionFactor := u.conversionFactor / other.conversionFactor
-		
-		return &Unit{
-			name:             newName,
-			symbol:           newSymbol,
-			baseUnit:         newBaseUnit,
-			conversionFactor: conversionFactor,
-			category:         newCategory,
-			value:            resultValue,
-		}
-	}
-	
-	// Handle other common derived units
-	if u.category == "energy" && other.category == "time" {
-		// Power: J/s = W
-		newSymbol := u.symbol + "/" + other.symbol
-		newName := u.name + " per " + other.name
-		newBaseUnit := u.baseUnit + "/" + other.baseUnit
-		newCategory := "power"
-		
-		conversionFactor := u.conversionFactor / other.conversionFactor
-		
-		return &Unit{
-			name:             newName,
-			symbol:           newSymbol,
-			baseUnit:         newBaseUnit,
-			conversionFactor: conversionFactor,
-			category:         newCategory,
-			value:            resultValue,
-		}
-	}
-	
-	if u.category == "length" && other.category == "length" {
-		// Dimensionless ratio: m/m = 1 (scalar)
-		return &Unit{
-			name:             "dimensionless",
-			symbol:           "",
-			baseUnit:         "",
-			conversionFactor: 1.0,
-			category:         "dimensionless",
-			value:            resultValue * (u.conversionFactor / other.conversionFactor),
-		}
-	}
-	
-	// Generic case: create compound unit
-	newSymbol := u.symbol + "/" + other.symbol
-	newName := u.name + " per " + other.name
-	newCategory := u.category + "/" + other.category
-	newBaseUnit := u.baseUnit + "/" + other.baseUnit
+func (u *Unit) Mul(other *Unit) *Unit {
+	// For multiplication, create compound unit
+	newType := u.Type + "*" + other.Type
+	newScale := u.Scale * other.Scale
 	
 	return &Unit{
-		name:             newName,
-		symbol:           newSymbol,
-		baseUnit:         newBaseUnit,
-		conversionFactor: u.conversionFactor / other.conversionFactor,
-		category:         newCategory,
-		value:            resultValue,
+		Value: u.Value * other.Value,
+		Type:  newType,
+		Scale: newScale,
 	}
 }
 
-func (u *Unit) toString() string {
-	return fmt.Sprintf("%.3g%s", u.value, u.symbol)
+func (u *Unit) Div(other *Unit) *Unit {
+	newType := u.Type + "/" + other.Type
+	newScale := u.Scale / other.Scale
+	
+	return &Unit{
+		Value: u.Value / other.Value,
+		Type:  newType,
+		Scale: newScale,
+	}
 }
 
-func (u *Unit) String() string {
-	return u.toString()
-}
-
-// Equals checks if two units are equivalent (same value and dimensions)
-func (u *Unit) Equals(other *Unit) bool {
-	if other == nil {
+func (u *Unit) isCompatible(other *Unit) bool {
+	uInfo, uExists := DefaultRegistry.GetUnit(u.Type)
+	oInfo, oExists := DefaultRegistry.GetUnit(other.Type)
+	
+	if !uExists || !oExists {
 		return false
 	}
 	
-	// Check if they have the same dimensional analysis by comparing converted values
-	// Convert both to their base units for comparison
-	thisBaseValue := u.value * u.conversionFactor  
-	otherBaseValue := other.value * other.conversionFactor
-	
-	// Check if base units are compatible and values match (with small tolerance)
-	tolerance := 1e-10
-	if abs(thisBaseValue - otherBaseValue) < tolerance {
-		// Also check if the dimensional categories are compatible
-		return u.category == other.category || 
-			   u.baseUnit == other.baseUnit ||
-			   u.symbol == other.symbol
+	return uInfo.Category == oInfo.Category
+}
+
+func (u *Unit) ConvertTo(targetUnit string) *Unit {
+	targetInfo, exists := DefaultRegistry.GetUnit(targetUnit)
+	if !exists {
+		panic(fmt.Sprintf("Unknown target unit: %s", targetUnit))
 	}
 	
-	return false
-}
-
-func abs(x float64) float64 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-// Exported version for external use
-func (u *Unit) ToString() string {
-	return u.toString()
-}
-
-// Getter for the value field
-func (u *Unit) Value() float64 {
-	return u.value
-}
-
-// Debug getters for unit properties
-func (u *Unit) Category() string {
-	return u.category
-}
-
-func (u *Unit) BaseUnit() string {
-	return u.baseUnit
-}
-
-func (u *Unit) Symbol() string {
-	return u.symbol
-}
-
-// Equal checks if two units have the same value in their base units
-func (u *Unit) Equal(other *Unit) bool {
-	// Check if categories are compatible (including dimensional equivalence)
-	if !u.isCompatibleCategory(other.category) {
-		return false // Cannot compare incompatible categories
+	if !u.isCompatibleWith(targetUnit) {
+		panic(fmt.Sprintf("Cannot convert %s to %s", u.Type, targetUnit))
 	}
 	
-	// Convert both to base units and compare
-	thisBase := u.value * u.conversionFactor
-	otherBase := other.value * other.conversionFactor
+	// Convert to base units, then to target
+	baseValue := u.Value * u.Scale
+	targetValue := baseValue / targetInfo.Scale
 	
-	// Use small epsilon for floating point comparison
-	epsilon := 1e-9
-	return (thisBase - otherBase) < epsilon && (otherBase - thisBase) < epsilon
+	return &Unit{
+		Value: targetValue,
+		Type:  targetUnit,
+		Scale: targetInfo.Scale,
+	}
 }
 
-// isCompatibleCategory checks if two categories are equivalent for comparison
-func (u *Unit) isCompatibleCategory(otherCategory string) bool {
-	// Direct match
-	if u.category == otherCategory {
-		return true
+func (u *Unit) isCompatibleWith(unitName string) bool {
+	uInfo, uExists := DefaultRegistry.GetUnit(u.Type)
+	tInfo, tExists := DefaultRegistry.GetUnit(unitName)
+	
+	if !uExists || !tExists {
+		return false
 	}
 	
-	// Dimensional equivalence: length² ≡ area, length³ ≡ volume, etc.
-	dimensionalEquivalents := map[string]string{
-		"length²": "area",
-		"area": "length²",
-		"length³": "volume", 
-		"volume": "length³",
-		"time⁻¹": "frequency",
-		"frequency": "time⁻¹",
-	}
-	
-	return dimensionalEquivalents[u.category] == otherCategory
+	return uInfo.Category == tInfo.Category
 }
 
-// Global unit constants for multiplication syntax like 2*km  
-var (
-	// Length/Distance units (base: meter)
-	M   = NewUnit("meter", "m", "m", 1.0, "length").withValue(1.0) 
-	Km  = NewUnit("kilometer", "km", "m", 1000.0, "length").withValue(1.0)
-	Cm  = NewUnit("centimeter", "cm", "m", 0.01, "length").withValue(1.0)
-	Mm  = NewUnit("millimeter", "mm", "m", 0.001, "length").withValue(1.0)
-	Um  = NewUnit("micrometer", "μm", "m", 1e-6, "length").withValue(1.0)
-	Nm  = NewUnit("nanometer", "nm", "m", 1e-9, "length").withValue(1.0)
-	Pm  = NewUnit("picometer", "pm", "m", 1e-12, "length").withValue(1.0)
-	Fm  = NewUnit("femtometer", "fm", "m", 1e-15, "length").withValue(1.0)
-	
-	// Imperial length units
-	Inch = NewUnit("inch", "in", "m", 0.0254, "length").withValue(1.0)
-	Ft   = NewUnit("foot", "ft", "m", 0.3048, "length").withValue(1.0)
-	Yard = NewUnit("yard", "yd", "m", 0.9144, "length").withValue(1.0)
-	Mile = NewUnit("mile", "mi", "m", 1609.344, "length").withValue(1.0)
-	
-	// Astronomical units
-	NauticalMile = NewUnit("nautical mile", "nmi", "m", 1852.0, "length").withValue(1.0)
-	AU           = NewUnit("astronomical unit", "AU", "m", 1.495978707e11, "length").withValue(1.0)
-	LightYear    = NewUnit("light year", "ly", "m", 9.4607304725808e15, "length").withValue(1.0)
-	Parsec       = NewUnit("parsec", "pc", "m", 3.0856775814913673e16, "length").withValue(1.0)
-	
-	// Time units (base: second)
-	S   = NewUnit("second", "s", "s", 1.0, "time").withValue(1.0)
-	Ms  = NewUnit("millisecond", "ms", "s", 0.001, "time").withValue(1.0) 
-	Us  = NewUnit("microsecond", "μs", "s", 1e-6, "time").withValue(1.0)
-	Ns  = NewUnit("nanosecond", "ns", "s", 1e-9, "time").withValue(1.0)
-	Ps  = NewUnit("picosecond", "ps", "s", 1e-12, "time").withValue(1.0)
-	Min = NewUnit("minute", "min", "s", 60.0, "time").withValue(1.0)
-	H   = NewUnit("hour", "h", "s", 3600.0, "time").withValue(1.0)
-	Day = NewUnit("day", "d", "s", 86400.0, "time").withValue(1.0)
-	Week = NewUnit("week", "wk", "s", 604800.0, "time").withValue(1.0)
-	Month = NewUnit("month", "mo", "s", 2629746.0, "time").withValue(1.0) // average month
-	Year = NewUnit("year", "yr", "s", 31556952.0, "time").withValue(1.0) // average year
-	
-	// Mass units (base: kilogram)
-	Kg = NewUnit("kilogram", "kg", "kg", 1.0, "mass").withValue(1.0)
-	G  = NewUnit("gram", "g", "kg", 0.001, "mass").withValue(1.0)
-	Mg = NewUnit("milligram", "mg", "kg", 1e-6, "mass").withValue(1.0)
-	Ug = NewUnit("microgram", "μg", "kg", 1e-9, "mass").withValue(1.0)
-	Ton = NewUnit("metric ton", "t", "kg", 1000.0, "mass").withValue(1.0)
-	
-	// Imperial mass units
-	Lb = NewUnit("pound", "lb", "kg", 0.45359237, "mass").withValue(1.0)
-	Oz = NewUnit("ounce", "oz", "kg", 0.028349523125, "mass").withValue(1.0)
-	Stone = NewUnit("stone", "st", "kg", 6.35029318, "mass").withValue(1.0)
-	
-	// Scientific mass units
-	Amu = NewUnit("atomic mass unit", "u", "kg", 1.66053906660e-27, "mass").withValue(1.0)
-	
-	// Temperature units (base: kelvin) - Note: these need special conversion handling
-	K = NewUnit("kelvin", "K", "K", 1.0, "temperature").withValue(1.0)
-	C = NewUnit("celsius", "°C", "K", 1.0, "temperature").withValue(1.0) // Special: C = K - 273.15
-	F = NewUnit("fahrenheit", "°F", "K", 5.0/9.0, "temperature").withValue(1.0) // Special: F = (K - 273.15) * 9/5 + 32
-	R = NewUnit("rankine", "°R", "K", 5.0/9.0, "temperature").withValue(1.0) // R = K * 5/9
-	
-	// Energy units (base: joule)
-	J = NewUnit("joule", "J", "J", 1.0, "energy").withValue(1.0)
-	KJ = NewUnit("kilojoule", "kJ", "J", 1000.0, "energy").withValue(1.0)
-	MJ = NewUnit("megajoule", "MJ", "J", 1e6, "energy").withValue(1.0)
-	Cal = NewUnit("calorie", "cal", "J", 4.184, "energy").withValue(1.0)
-	Kcal = NewUnit("kilocalorie", "kcal", "J", 4184.0, "energy").withValue(1.0)
-	BTU = NewUnit("british thermal unit", "BTU", "J", 1055.056, "energy").withValue(1.0)
-	KWh = NewUnit("kilowatt hour", "kWh", "J", 3.6e6, "energy").withValue(1.0)
-	EV = NewUnit("electron volt", "eV", "J", 1.602176634e-19, "energy").withValue(1.0)
-	KeV = NewUnit("kiloelectron volt", "keV", "J", 1.602176634e-16, "energy").withValue(1.0)
-	MeV = NewUnit("megaelectron volt", "MeV", "J", 1.602176634e-13, "energy").withValue(1.0)
-	
-	// Power units (base: watt)
-	W = NewUnit("watt", "W", "W", 1.0, "power").withValue(1.0)
-	KW = NewUnit("kilowatt", "kW", "W", 1000.0, "power").withValue(1.0)
-	MW = NewUnit("megawatt", "MW", "W", 1e6, "power").withValue(1.0)
-	GW = NewUnit("gigawatt", "GW", "W", 1e9, "power").withValue(1.0)
-	HP = NewUnit("horsepower", "hp", "W", 745.7, "power").withValue(1.0)
-	BTUh = NewUnit("BTU per hour", "BTU/h", "W", 0.29307107, "power").withValue(1.0)
-	
-	// Pressure units (base: pascal)
-	Pa = NewUnit("pascal", "Pa", "Pa", 1.0, "pressure").withValue(1.0)
-	KPa = NewUnit("kilopascal", "kPa", "Pa", 1000.0, "pressure").withValue(1.0)
-	MPa = NewUnit("megapascal", "MPa", "Pa", 1e6, "pressure").withValue(1.0)
-	Bar = NewUnit("bar", "bar", "Pa", 1e5, "pressure").withValue(1.0)
-	Atm = NewUnit("atmosphere", "atm", "Pa", 101325.0, "pressure").withValue(1.0)
-	Psi = NewUnit("pounds per square inch", "psi", "Pa", 6894.757, "pressure").withValue(1.0)
-	MmHg = NewUnit("millimeter of mercury", "mmHg", "Pa", 133.322, "pressure").withValue(1.0)
-	Torr = NewUnit("torr", "torr", "Pa", 133.322, "pressure").withValue(1.0)
-	
-	// Electric units (base SI units)
-	A = NewUnit("ampere", "A", "A", 1.0, "current").withValue(1.0)
-	V = NewUnit("volt", "V", "V", 1.0, "voltage").withValue(1.0)
-	Ohm = NewUnit("ohm", "Ω", "Ω", 1.0, "resistance").withValue(1.0)
-	F_unit = NewUnit("farad", "F", "F", 1.0, "capacitance").withValue(1.0)
-	H_unit = NewUnit("henry", "H", "H", 1.0, "inductance").withValue(1.0)
-	Wb = NewUnit("weber", "Wb", "Wb", 1.0, "magnetic_flux").withValue(1.0)
-	T_unit = NewUnit("tesla", "T", "T", 1.0, "magnetic_field").withValue(1.0)
-	
-	// Frequency units (base: hertz)
-	Hz_unit = NewUnit("hertz", "Hz", "Hz", 1.0, "frequency").withValue(1.0)
-	KHz_unit = NewUnit("kilohertz", "kHz", "Hz", 1000.0, "frequency").withValue(1.0)
-	MHz = NewUnit("megahertz", "MHz", "Hz", 1000000.0, "frequency").withValue(1.0)
-	GHz = NewUnit("gigahertz", "GHz", "Hz", 1000000000.0, "frequency").withValue(1.0)
-	THz = NewUnit("terahertz", "THz", "Hz", 1e12, "frequency").withValue(1.0)
-	Rpm = NewUnit("revolutions per minute", "rpm", "Hz", 1.0/60.0, "frequency").withValue(1.0)
-	
-	// Area units (derived from length²)
-	M2 = NewUnit("square meter", "m²", "m²", 1.0, "area").withValue(1.0)
-	Km2 = NewUnit("square kilometer", "km²", "m²", 1e6, "area").withValue(1.0)
-	Cm2 = NewUnit("square centimeter", "cm²", "m²", 1e-4, "area").withValue(1.0)
-	Mm2 = NewUnit("square millimeter", "mm²", "m²", 1e-6, "area").withValue(1.0)
-	Hectare = NewUnit("hectare", "ha", "m²", 1e4, "area").withValue(1.0)
-	Acre = NewUnit("acre", "ac", "m²", 4046.856, "area").withValue(1.0)
-	SqFt = NewUnit("square foot", "ft²", "m²", 0.092903, "area").withValue(1.0)
-	SqIn = NewUnit("square inch", "in²", "m²", 0.00064516, "area").withValue(1.0)
-	
-	// Volume units (derived from length³)
-	M3 = NewUnit("cubic meter", "m³", "m³", 1.0, "volume").withValue(1.0)
-	L = NewUnit("liter", "L", "m³", 0.001, "volume").withValue(1.0)
-	ML = NewUnit("milliliter", "mL", "m³", 1e-6, "volume").withValue(1.0)
-	Gallon = NewUnit("gallon", "gal", "m³", 0.003785412, "volume").withValue(1.0)
-	Quart = NewUnit("quart", "qt", "m³", 0.000946353, "volume").withValue(1.0)
-	Pint = NewUnit("pint", "pt", "m³", 0.000473176, "volume").withValue(1.0)
-	Cup = NewUnit("cup", "cup", "m³", 0.000236588, "volume").withValue(1.0)
-	FlOz = NewUnit("fluid ounce", "fl oz", "m³", 2.95735e-5, "volume").withValue(1.0)
-	Barrel = NewUnit("barrel", "bbl", "m³", 0.158987, "volume").withValue(1.0)
-	
-	// Velocity units (derived: m/s)
-	Mps = NewUnit("meters per second", "m/s", "m/s", 1.0, "velocity").withValue(1.0)
-	Kmh = NewUnit("kilometers per hour", "km/h", "m/s", 1.0/3.6, "velocity").withValue(1.0)
-	Mph = NewUnit("miles per hour", "mph", "m/s", 0.44704, "velocity").withValue(1.0)
-	Knot = NewUnit("knot", "kn", "m/s", 0.514444, "velocity").withValue(1.0)
-	Fps = NewUnit("feet per second", "ft/s", "m/s", 0.3048, "velocity").withValue(1.0)
-	
-	// Acceleration units (derived: m/s²)
-	Mps2 = NewUnit("meters per second squared", "m/s²", "m/s²", 1.0, "acceleration").withValue(1.0)
-	G_force = NewUnit("g-force", "g", "m/s²", 9.80665, "acceleration").withValue(1.0)
-	
-	// Angle units (base: radian)
-	Rad = NewUnit("radian", "rad", "rad", 1.0, "angle").withValue(1.0)
-	Deg = NewUnit("degree", "°", "rad", 0.017453292519943295, "angle").withValue(1.0)
-	Grad = NewUnit("gradian", "grad", "rad", 0.015707963267948967, "angle").withValue(1.0)
-	Turn = NewUnit("turn", "turn", "rad", 6.283185307179586, "angle").withValue(1.0)
-)
+func (u *Unit) String() string {
+	return fmt.Sprintf("%.3g%s", u.Value, u.Type)
+}
 
-// Available returns a map of all supported units organized by category
+// Available returns a list of all supported units organized by category
 func Available() map[string][]string {
 	categories := make(map[string][]string)
 	
-	// Collect all unit categories from the global constants
-	units := []*Unit{
-		// Length units
-		M, Km, Cm, Mm, Um, Nm, Pm, Fm,
-		Inch, Ft, Yard, Mile, NauticalMile, AU, LightYear, Parsec,
-		
-		// Time units
-		S, Ms, Us, Ns, Ps, Min, H, Day, Week, Month, Year,
-		
-		// Mass units
-		Kg, G, Mg, Ug, Ton, Lb, Oz, Stone, Amu,
-		
-		// Temperature units
-		K, C, F, R,
-		
-		// Energy units
-		J, KJ, MJ, Cal, Kcal, BTU, KWh, EV, KeV, MeV,
-		
-		// Power units
-		W, KW, MW, GW, HP, BTUh,
-		
-		// Pressure units
-		Pa, KPa, MPa, Bar, Atm, Psi, MmHg, Torr,
-		
-		// Electric units
-		A, V, Ohm, F_unit, H_unit, Wb, T_unit,
-		
-		// Frequency units
-		Hz_unit, KHz_unit, MHz, GHz, THz, Rpm,
-		
-		// Area units
-		M2, Km2, Cm2, Mm2, Hectare, Acre, SqFt, SqIn,
-		
-		// Volume units
-		M3, L, ML, Gallon, Quart, Pint, Cup, FlOz, Barrel,
-		
-		// Velocity units
-		Mps, Kmh, Mph, Knot, Fps,
-		
-		// Acceleration units
-		Mps2, G_force,
-		
-		// Angle units
-		Rad, Deg, Grad, Turn,
-	}
-	
-	for _, unit := range units {
-		categories[unit.category] = append(categories[unit.category], unit.symbol)
+	for unitName, info := range DefaultRegistry.units {
+		categories[info.Category] = append(categories[info.Category], unitName)
 	}
 	
 	return categories
 }
 
-// AvailableFlat returns a flat list of all supported unit symbols
+// AvailableFlat returns a flat list of all supported unit names
 func AvailableFlat() []string {
-	var symbols []string
-	
-	units := []*Unit{
-		M, Km, Cm, Mm, Um, Nm, Pm, Fm,
-		Inch, Ft, Yard, Mile, NauticalMile, AU, LightYear, Parsec,
-		S, Ms, Us, Ns, Ps, Min, H, Day, Week, Month, Year,
-		Kg, G, Mg, Ug, Ton, Lb, Oz, Stone, Amu,
-		K, C, F, R,
-		J, KJ, MJ, Cal, Kcal, BTU, KWh, EV, KeV, MeV,
-		W, KW, MW, GW, HP, BTUh,
-		Pa, KPa, MPa, Bar, Atm, Psi, MmHg, Torr,
-		A, V, Ohm, F_unit, H_unit, Wb, T_unit,
-		Hz_unit, KHz_unit, MHz, GHz, THz, Rpm,
-		M2, Km2, Cm2, Mm2, Hectare, Acre, SqFt, SqIn,
-		M3, L, ML, Gallon, Quart, Pint, Cup, FlOz, Barrel,
-		Mps, Kmh, Mph, Knot, Fps,
-		Mps2, G_force,
-		Rad, Deg, Grad, Turn,
+	var units []string
+	for unitName := range DefaultRegistry.units {
+		units = append(units, unitName)
 	}
-	
-	for _, unit := range units {
-		symbols = append(symbols, unit.symbol)
-	}
-	
-	return symbols
+	return units
 }
 
 // ListByCategory prints all units organized by category
 func ListByCategory() {
 	categories := Available()
 	for category, units := range categories {
-		fmt.Printf("%s units: %s\n", category, fmt.Sprintf("%v", units))
+		fmt.Printf("%s units: %s\n", strings.Title(category), strings.Join(units, ", "))
 	}
 }
 
-// Unit constructor functions for easier access with values
+// Common unit synonyms for easier access
 var (
-	// Distance synonyms - functions that return units with specified values
-	Meter     = func(value float64) *Unit { return M.withValue(value) }
-	Kilometer = func(value float64) *Unit { return Km.withValue(value) }
+	// Distance synonyms
+	M     = func(value float64) *Unit { return NewUnit(value, "m") }
+	Meter = func(value float64) *Unit { return NewUnit(value, "m") }
+	KM    = func(value float64) *Unit { return NewUnit(value, "km") }
+	CM    = func(value float64) *Unit { return NewUnit(value, "cm") }
+	MM    = func(value float64) *Unit { return NewUnit(value, "mm") }
 	
 	// Time synonyms
-	Second = func(value float64) *Unit { return S.withValue(value) }
-	Minute = func(value float64) *Unit { return Min.withValue(value) }
-	Hour   = func(value float64) *Unit { return H.withValue(value) }
+	S      = func(value float64) *Unit { return NewUnit(value, "s") }
+	Second = func(value float64) *Unit { return NewUnit(value, "s") }
+	MS     = func(value float64) *Unit { return NewUnit(value, "ms") }
+	Min    = func(value float64) *Unit { return NewUnit(value, "min") }
+	Hour   = func(value float64) *Unit { return NewUnit(value, "h") }
 	
 	// Mass synonyms
-	Gram     = func(value float64) *Unit { return G.withValue(value) }
-	Kilogram = func(value float64) *Unit { return Kg.withValue(value) }
+	G    = func(value float64) *Unit { return NewUnit(value, "g") }
+	Gram = func(value float64) *Unit { return NewUnit(value, "g") }
+	KG   = func(value float64) *Unit { return NewUnit(value, "kg") }
 	
 	// Temperature synonyms
-	Kelvin  = func(value float64) *Unit { return K.withValue(value) }
-	Celsius = func(value float64) *Unit { return C.withValue(value) }
+	Kelvin  = func(value float64) *Unit { return NewUnit(value, "K") }
+	Celsius = func(value float64) *Unit { return NewUnit(value, "°C") }
 	
 	// Pressure synonyms
-	Pascal = func(value float64) *Unit { return Pa.withValue(value) }
+	Pascal = func(value float64) *Unit { return NewUnit(value, "Pa") }
+	Bar    = func(value float64) *Unit { return NewUnit(value, "bar") }
+	ATM    = func(value float64) *Unit { return NewUnit(value, "atm") }
 	
 	// Energy synonyms
-	Joule = func(value float64) *Unit { return J.withValue(value) }
+	Joule = func(value float64) *Unit { return NewUnit(value, "J") }
+	Cal   = func(value float64) *Unit { return NewUnit(value, "cal") }
 	
 	// Power synonyms
-	Watt = func(value float64) *Unit { return W.withValue(value) }
+	Watt = func(value float64) *Unit { return NewUnit(value, "W") }
+	HP   = func(value float64) *Unit { return NewUnit(value, "hp") }
 	
 	// Electric synonyms
-	Ampere = func(value float64) *Unit { return A.withValue(value) }
-	Volt   = func(value float64) *Unit { return V.withValue(value) }
+	Amp  = func(value float64) *Unit { return NewUnit(value, "A") }
+	Volt = func(value float64) *Unit { return NewUnit(value, "V") }
+	Ohm  = func(value float64) *Unit { return NewUnit(value, "Ω") }
+	
+	// Area synonyms
+	M2 = func(value float64) *Unit { return NewUnit(value, "m²") }
 	
 	// Volume synonyms
-	Liter = func(value float64) *Unit { return L.withValue(value) }
+	M3    = func(value float64) *Unit { return NewUnit(value, "m³") }
+	Liter = func(value float64) *Unit { return NewUnit(value, "L") }
 	
 	// Angle synonyms
-	Radian = func(value float64) *Unit { return Rad.withValue(value) }
-	Degree = func(value float64) *Unit { return Deg.withValue(value) }
+	Radian = func(value float64) *Unit { return NewUnit(value, "rad") }
+	Degree = func(value float64) *Unit { return NewUnit(value, "°") }
 )
-

@@ -29,7 +29,7 @@ type Transformer interface {
 	Priority() int
 }
 
-const DEBUGGING = false // Set to true to enable debug output
+const DEBUGGING = true // Set to true to enable debug output
 
 func debug(format string, args ...any) {
 	if DEBUGGING {
