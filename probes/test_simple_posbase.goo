@@ -1,0 +1,4 @@
+// Simple test without imports to isolate PosBase issue
+x := "test"
+check "t" in x
+print("Simple test works")

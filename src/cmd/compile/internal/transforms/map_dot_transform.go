@@ -22,6 +22,9 @@ func (t *MapDotTransform) Priority() int {
 }
 
 func (t *MapDotTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// Temporarily disabled to isolate PosBase panic issue
+	return false
+	
 	visitor := &mapDotVisitor{ctx: ctx}
 
 	// Use syntax.Walk to traverse the entire AST
@@ -283,7 +286,7 @@ func (v *mapDotVisitor) walkExpr(exprPtr *syntax.Expr) {
 }
 
 func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr {
-	debug("map_dot: transformSelector %s.%s\n", v.exprToString(sel.X), sel.Sel.Value)
+	// debug("map_dot: transformSelector %s.%s\n", v.exprToString(sel.X), sel.Sel.Value)
 	// Check if the base expression is a variable we know is a map with string keys
 	if name, ok := sel.X.(*syntax.Name); ok {
 		varType, exists := v.ctx.Types[name.Value]
@@ -311,13 +314,17 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Kind:  syntax.StringLit,
 				Value: `"` + keyName + `"`,
 			}
-			stringLit.SetPos(sel.Sel.Pos())
+			if sel.Sel.Pos().IsKnown() {
+				stringLit.SetPos(sel.Sel.Pos())
+			}
 
 			result := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
 			}
-			result.SetPos(sel.Pos())
+			if sel.Pos().IsKnown() {
+				result.SetPos(sel.Pos())
+			}
 			return result
 		}
 	}
@@ -332,13 +339,17 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Kind:  syntax.StringLit,
 				Value: `"` + keyName + `"`,
 			}
-			stringLit.SetPos(sel.Sel.Pos())
+			if sel.Sel.Pos().IsKnown() {
+				stringLit.SetPos(sel.Sel.Pos())
+			}
 
 			result := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
 			}
-			result.SetPos(sel.Pos())
+			if sel.Pos().IsKnown() {
+				result.SetPos(sel.Pos())
+			}
 			return result
 		}
 	}
@@ -352,13 +363,17 @@ func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr 
 				Kind:  syntax.StringLit,
 				Value: `"` + keyName + `"`,
 			}
-			stringLit.SetPos(sel.Sel.Pos())
+			if sel.Sel.Pos().IsKnown() {
+				stringLit.SetPos(sel.Sel.Pos())
+			}
 
 			result := &syntax.IndexExpr{
 				X:     sel.X,
 				Index: stringLit,
 			}
-			result.SetPos(sel.Pos())
+			if sel.Pos().IsKnown() {
+				result.SetPos(sel.Pos())
+			}
 			return result
 		}
 	}

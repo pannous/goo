@@ -24,8 +24,17 @@ func (t *GooImportTransform) Priority() int {
 }
 
 func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	// Temporarily disabled to isolate PosBase panic
+	return false
+	
 	// Get source file directory for relative path resolution
-	sourceDir := filepath.Dir(file.Path.Filename())
+	var sourceDir string
+	if file.Path != nil {
+		sourceDir = filepath.Dir(file.Path.Filename())
+	} else {
+		// Fallback to current working directory
+		sourceDir = "."
+	}
 	
 	changed := false
 
@@ -68,6 +77,10 @@ func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.I
 		newImportDecl := *importDecl
 		newPath := *importDecl.Path
 		newPath.Value = "\"" + newImportPath + "\""
+		// Preserve position information
+		if importDecl.Path.Pos().IsKnown() {
+			newPath.SetPos(importDecl.Path.Pos())
+		}
 		newImportDecl.Path = &newPath
 
 		return &newImportDecl
@@ -82,6 +95,10 @@ func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.I
 		newImportDecl := *importDecl
 		newPath := *importDecl.Path
 		newPath.Value = "\"" + newImportPath + "\""
+		// Preserve position information
+		if importDecl.Path.Pos().IsKnown() {
+			newPath.SetPos(importDecl.Path.Pos())
+		}
 		newImportDecl.Path = &newPath
 
 		return &newImportDecl
