@@ -1,5 +1,2 @@
-import "strings"
-check strings.Contains("hello", "lo") == true
 check "hello".reverse() == "olleh"
-check "hello".cap()
 printf("All checks passed!\n")

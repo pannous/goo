@@ -246,15 +246,21 @@ func RegisterTransformer(t Transformer) {
 
 // collectTypes walks the syntax tree and populates ctx.Types with variable names and their inferred types.
 func collectTypes(file *syntax.File, ctx *TransformContext) {
-	for _, decl := range file.DeclList {
-		if f, ok := decl.(*syntax.FuncDecl); ok {
-			collectFromStmt(f.Body, ctx)
-		}
-		// Also collect from top-level variable declarations
-		if v, ok := decl.(*syntax.VarDecl); ok {
-			collectFromVarDecl(v, ctx)
-		}
-	}
+    for _, decl := range file.DeclList {
+        if f, ok := decl.(*syntax.FuncDecl); ok {
+            collectFromStmt(f.Body, ctx)
+        }
+        // Also collect from top-level variable declarations
+        if v, ok := decl.(*syntax.VarDecl); ok {
+            collectFromVarDecl(v, ctx)
+        }
+    }
+    // Also collect from top-level statements (implicit main)
+    if len(file.TopLevelStmts) > 0 {
+        for _, stmt := range file.TopLevelStmts {
+            collectFromStmt(stmt, ctx)
+        }
+    }
 }
 
 // collectFromVarDecl extracts type information from variable declarations

@@ -33,19 +33,20 @@ func (t *InOperatorTransform) Priority() int {
 }
 
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+    changed := false
     visitor := &inVisitor{transform: t, ctx: ctx, file: file}
-    
     // Use syntax.Walk to traverse the entire AST
     syntax.Walk(file, visitor)
     
     // Add imports if needed (only strings import now, slices is no longer needed)
     if visitor.needsStringsImport && !t.hasImport(file, "strings") {
         t.addStringsImport(file)
+        changed = true
     }
 
     // Second pass: statement-level rewrites for map membership to avoid func lits
     // Walk function bodies and transform AssignStmt/CheckStmt/IfStmt with map 'in'
-    changed := visitor.changed
+    changed = changed || visitor.changed
     for i, decl := range file.DeclList {
         if f, ok := decl.(*syntax.FuncDecl); ok && f.Body != nil {
             if newBody := t.rewriteMapMembershipInBlock(f.Body, ctx); newBody != f.Body {
@@ -53,9 +54,17 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
                 if bs, ok := newBody.(*syntax.BlockStmt); ok {
                     nf.Body = bs
                     file.DeclList[i] = &nf
-                    changed = true
+                    changed = changed || true
                 }
             }
+        }
+    }
+
+    // Also handle top-level statements for implicit main files (map membership only)
+    if len(file.TopLevelStmts) > 0 {
+        if newList, ok := t.rewriteMapMembershipInList(file.TopLevelStmts, ctx); ok {
+            file.TopLevelStmts = newList
+            changed = true
         }
     }
 
@@ -69,21 +78,35 @@ func (v *inVisitor) Visit(node syntax.Node) syntax.Visitor {
 	}
 	
 	// Transform nodes that contain expressions that might have 'in' operations
-	switch n := node.(type) {
-	case *syntax.VarDecl:
+    switch n := node.(type) {
+    case *syntax.VarDecl:
 		if n.Values != nil {
 			if transformed := v.transform.transformExpr(n.Values, v); transformed != n.Values {
 				n.Values = transformed
 				v.changed = true
 			}
 		}
-	case *syntax.AssignStmt:
-		if n.Rhs != nil {
-			if transformed := v.transform.transformExpr(n.Rhs, v); transformed != n.Rhs {
-				n.Rhs = transformed
-				v.changed = true
-			}
-		}
+    case *syntax.AssignStmt:
+        // First, handle map membership rewrite directly into multi-assign
+        if n.Rhs != nil {
+            if op, ok := v.transform.isMapInOperation(n.Rhs, v.ctx); ok {
+                pos := n.Pos()
+                idx := &syntax.IndexExpr{X: op.Y, Index: op.X}
+                if pos.IsKnown() { idx.SetPos(pos) }
+                blank := &syntax.Name{Value: "_"}
+                if pos.IsKnown() { blank.SetPos(pos) }
+                lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{blank, n.Lhs}}
+                if pos.IsKnown() { lhsList.SetPos(pos) }
+                n.Lhs = lhsList
+                n.Rhs = idx
+                v.changed = true
+            } else {
+                if transformed := v.transform.transformExpr(n.Rhs, v); transformed != n.Rhs {
+                    n.Rhs = transformed
+                    v.changed = true
+                }
+            }
+        }
 	case *syntax.CheckStmt:
 		if n.Cond != nil {
 			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
@@ -103,14 +126,22 @@ func (v *inVisitor) Visit(node syntax.Node) syntax.Visitor {
 				v.changed = true
 			}
 		}
-	case *syntax.ForStmt:
-		if n.Cond != nil {
-			if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
-				n.Cond = transformed
-				v.changed = true
-			}
-		}
-	}
+    case *syntax.ForStmt:
+        if n.Cond != nil {
+            if transformed := v.transform.transformExpr(n.Cond, v); transformed != n.Cond {
+                n.Cond = transformed
+                v.changed = true
+            }
+        }
+    case *syntax.BlockStmt:
+        // Rewrite map membership at statement level within this block
+        if newBlock := v.transform.rewriteMapMembershipInBlock(n, v.ctx); newBlock != n {
+            if nb, ok := newBlock.(*syntax.BlockStmt); ok {
+                n.List = nb.List
+                v.changed = true
+            }
+        }
+    }
 	
 	// Continue visiting child nodes
 	return v
@@ -174,19 +205,24 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
 	// Determine the type of operation based on the container (op.Y)
 	containerType := t.inferContainerType(op.Y, visitor.ctx)
 	
-	switch containerType {
-	case "string":
-		return t.createStringContainsCall(op, visitor, pos)
-	case "slice":
-		return t.createSliceContainsCall(op, visitor, pos)
-	case "map":
-		return t.createMapContainsCall(op, visitor, pos)
-	case "iterator":
-		return t.createIteratorContainsCall(op, visitor, pos)
-	default:
-		// Try to determine at runtime or fall back to string
-		return t.createStringContainsCall(op, visitor, pos)
-	}
+    switch containerType {
+    case "string":
+        // Defer to string_methods_transform by emitting receiver.contains(arg)
+        sel := &syntax.SelectorExpr{X: op.Y, Sel: &syntax.Name{Value: "contains"}}
+        call := &syntax.CallExpr{Fun: sel, ArgList: []syntax.Expr{op.X}}
+        return call
+    case "slice":
+        return t.createSliceContainsCall(op, visitor, pos)
+    case "map":
+        // Defer to statement-level rewrite to avoid fragile func-lits here
+        return op
+    case "iterator":
+        // Defer or handle elsewhere; keep unchanged for now
+        return op
+    default:
+        // Try string fallback
+        return t.createStringContainsCall(op, visitor, pos)
+    }
 }
 
 // ---- Statement-level rewrites for map membership ----
@@ -250,7 +286,69 @@ func (t *InOperatorTransform) rewriteMapMembershipInBlock(block *syntax.BlockStm
     return &nb
 }
 
+// rewriteMapMembershipInList applies map-in rewrites to a list of statements.
+func (t *InOperatorTransform) rewriteMapMembershipInList(list []syntax.Stmt, ctx *TransformContext) ([]syntax.Stmt, bool) {
+    changed := false
+    out := make([]syntax.Stmt, 0, len(list))
+    for _, stmt := range list {
+        switch s := stmt.(type) {
+        case *syntax.AssignStmt:
+            if repl, ok := t.rewriteAssignWithMapIn(s, ctx); ok {
+                out = append(out, repl...)
+                changed = true
+                continue
+            }
+            out = append(out, s)
+        case *syntax.CheckStmt:
+            if repl, ok := t.rewriteCheckWithMapIn(s, ctx); ok {
+                out = append(out, repl)
+                changed = true
+                continue
+            }
+            out = append(out, s)
+        case *syntax.IfStmt:
+            if repl, ok := t.rewriteIfWithMapIn(s, ctx); ok {
+                out = append(out, repl)
+                changed = true
+                continue
+            }
+            // Dive into nested
+            if s.Then != nil {
+                if nb := t.rewriteMapMembershipInBlock(s.Then, ctx); nb != s.Then {
+                    ns := *s; ns.Then = nb.(*syntax.BlockStmt); s = &ns; changed = true
+                }
+            }
+            if s.Else != nil {
+                if bs, ok := s.Else.(*syntax.BlockStmt); ok {
+                    if nb := t.rewriteMapMembershipInBlock(bs, ctx); nb != bs {
+                        ns := *s; ns.Else = nb; s = &ns; changed = true
+                    }
+                }
+            }
+            out = append(out, s)
+        case *syntax.BlockStmt:
+            if nb := t.rewriteMapMembershipInBlock(s, ctx); nb != s {
+                out = append(out, nb)
+                changed = true
+            } else {
+                out = append(out, s)
+            }
+        default:
+            out = append(out, s)
+        }
+    }
+    return out, changed
+}
+
 func (t *InOperatorTransform) isMapInOperation(expr syntax.Expr, ctx *TransformContext) (*syntax.Operation, bool) {
+    // Unwrap parentheses
+    for {
+        if p, ok := expr.(*syntax.ParenExpr); ok && p.X != nil {
+            expr = p.X
+        } else {
+            break
+        }
+    }
     op, ok := expr.(*syntax.Operation)
     if !ok || op.Op != syntax.In { return nil, false }
     if t.inferContainerType(op.Y, ctx) == "map" { return op, true }
@@ -267,34 +365,18 @@ func (t *InOperatorTransform) rewriteAssignWithMapIn(as *syntax.AssignStmt, ctx 
     if !ok { return nil, false }
     pos := as.Pos()
 
-    // Build index: m[key]
+    // Transform into a single multi-assign using comma-ok: _, lhs := m[key]
     idx := &syntax.IndexExpr{X: op.Y, Index: op.X}
     idx.SetPos(pos)
     blank := &syntax.Name{Value: "_"}; blank.SetPos(pos)
-    okName := &syntax.Name{Value: "ok"}; okName.SetPos(pos)
-    lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{blank, okName}}
+    // Prepare LHS list: _, <lhs>
+    var lhsVar syntax.Expr = as.Lhs
+    // as.Lhs should be a Name or similar; keep as is
+    lhsList := &syntax.ListExpr{ElemList: []syntax.Expr{blank, lhsVar}}
     lhsList.SetPos(pos)
-    assignOk := &syntax.AssignStmt{Op: syntax.Def, Lhs: lhsList, Rhs: idx}
-    assignOk.SetPos(pos)
-
-    // Final assignment to LHS name
-    var out []syntax.Stmt
-    if as.Op == syntax.Def {
-        // transform: lhs := (in ...)  ->  lhs := ok (after defining ok)
-        // We still need ok first
-        // Define via ok assign, then lhs := ok
-        out = append(out, assignOk)
-        outAssign := &syntax.AssignStmt{Op: syntax.Def, Lhs: as.Lhs, Rhs: okName}
-        outAssign.SetPos(pos)
-        out = append(out, outAssign)
-    } else {
-        // regular assignment: lhs = ok
-        out = append(out, assignOk)
-        outAssign := &syntax.AssignStmt{Op: 0, Lhs: as.Lhs, Rhs: okName}
-        outAssign.SetPos(pos)
-        out = append(out, outAssign)
-    }
-    return out, true
+    newAssign := &syntax.AssignStmt{Op: as.Op, Lhs: lhsList, Rhs: idx}
+    newAssign.SetPos(pos)
+    return []syntax.Stmt{newAssign}, true
 }
 
 // rewriteCheckWithMapIn handles: check (key in m)
@@ -354,6 +436,58 @@ func (t *InOperatorTransform) rewriteIfWithMapIn(is *syntax.IfStmt, ctx *Transfo
     ni.Init = init
     ni.Cond = okName
     return &ni, true
+}
+
+// rewriteCheckWithStringIn handles: check (needle in haystack) for strings without stdlib
+// Rewrites to a small loop computing ok and then: check ok
+func (t *InOperatorTransform) rewriteCheckWithStringIn(cs *syntax.CheckStmt, ctx *TransformContext) (syntax.Stmt, bool) {
+    // Unwrap parentheses
+    cond := cs.Cond
+    for {
+        if p, ok := cond.(*syntax.ParenExpr); ok && p.X != nil {
+            cond = p.X
+        } else { break }
+    }
+    op, ok := cond.(*syntax.Operation)
+    if !ok || op.Op != syntax.In { return nil, false }
+    if t.inferContainerType(op.Y, ctx) != "string" { return nil, false }
+
+    pos := cs.Pos()
+    // ok := false
+    okName := &syntax.Name{Value: "ok"}
+    okAssign := &syntax.AssignStmt{Op: syntax.Def, Lhs: okName, Rhs: &syntax.Name{Value: "false"}}
+    if pos.IsKnown() { okAssign.SetPos(pos) }
+    // h := op.Y; n := op.X (convert rune to string if needed)
+    h := &syntax.Name{Value: "h"}
+    n := &syntax.Name{Value: "n"}
+    hAssign := &syntax.AssignStmt{Op: syntax.Def, Lhs: h, Rhs: op.Y}
+    nRhs := op.X
+    if t.isRuneLiteral(op.X) { nRhs = t.convertRuneToString(op.X, pos) }
+    nAssign := &syntax.AssignStmt{Op: syntax.Def, Lhs: n, Rhs: nRhs}
+    // i loop: for i := 0; i <= len(h)-len(n); i++
+    i := &syntax.Name{Value: "i"}
+    zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+    initI := &syntax.AssignStmt{Op: syntax.Def, Lhs: i, Rhs: zero}
+    lenName := &syntax.Name{Value: "len"}
+    lenH := &syntax.CallExpr{Fun: lenName, ArgList: []syntax.Expr{h}}
+    lenN := &syntax.CallExpr{Fun: lenName, ArgList: []syntax.Expr{n}}
+    limit := &syntax.Operation{Op: syntax.Sub, X: lenH, Y: lenN}
+    condI := &syntax.Operation{Op: syntax.Leq, X: i, Y: limit}
+    one := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+    incI := &syntax.AssignStmt{Op: syntax.Add, Lhs: i, Rhs: one}
+    // if h[i:i+len(n)] == n { ok = true }
+    end := &syntax.Operation{Op: syntax.Add, X: i, Y: lenN}
+    slice := &syntax.SliceExpr{X: h, Index: [3]syntax.Expr{i, end, nil}}
+    eq := &syntax.Operation{Op: syntax.Eql, X: slice, Y: n}
+    setOk := &syntax.AssignStmt{Op: 0, Lhs: okName, Rhs: &syntax.Name{Value: "true"}}
+    ifThen := &syntax.BlockStmt{List: []syntax.Stmt{setOk}}
+    ifStmt := &syntax.IfStmt{Cond: eq, Then: ifThen}
+    loopBody := &syntax.BlockStmt{List: []syntax.Stmt{ifStmt}}
+    forStmt := &syntax.ForStmt{Init: initI, Cond: condI, Post: incI, Body: loopBody}
+    // check ok
+    newCheck := &syntax.CheckStmt{Cond: okName}
+    bs := &syntax.BlockStmt{List: []syntax.Stmt{okAssign, hAssign, nAssign, forStmt, newCheck}}
+    return bs, true
 }
 
 // inferContainerType tries to determine if the container is a string, slice, or map
