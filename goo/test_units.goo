@@ -9,6 +9,7 @@ check 500·ms + 5·s == 5500·ms
 check 500ms + 5s == 5500ms
 
 m := units.M
+put(m)
 #m := units.Meter
 km := units.Km
 check 1200m + 2km == 3.2km
