@@ -60,8 +60,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
         }
     }
 
-    // Also handle top-level statements for implicit main files (map membership only)
+    // Also handle top-level statements for implicit main files (map and slice membership)
     if len(file.TopLevelStmts) > 0 {
+        println("Processing", len(file.TopLevelStmts), "top-level statements")
         if newList, ok := t.rewriteMapMembershipInList(file.TopLevelStmts, ctx); ok {
             file.TopLevelStmts = newList
             changed = true
@@ -298,9 +299,19 @@ func (t *InOperatorTransform) rewriteMapMembershipInList(list []syntax.Stmt, ctx
                 changed = true
                 continue
             }
+            if repl, ok := t.rewriteAssignWithSliceIn(s, ctx); ok {
+                out = append(out, repl...)
+                changed = true
+                continue
+            }
             out = append(out, s)
         case *syntax.CheckStmt:
             if repl, ok := t.rewriteCheckWithMapIn(s, ctx); ok {
+                out = append(out, repl)
+                changed = true
+                continue
+            }
+            if repl, ok := t.rewriteCheckWithSliceIn(s, ctx); ok {
                 out = append(out, repl)
                 changed = true
                 continue
@@ -379,6 +390,81 @@ func (t *InOperatorTransform) rewriteAssignWithMapIn(as *syntax.AssignStmt, ctx 
     return []syntax.Stmt{newAssign}, true
 }
 
+// rewriteAssignWithSliceIn handles: lhs := (item in slice) or lhs = (item in slice)
+// Rewrites to: lhs := false; for i := 0; i < len(slice); i++ { if slice[i] == item { lhs = true; break } }
+func (t *InOperatorTransform) rewriteAssignWithSliceIn(as *syntax.AssignStmt, ctx *TransformContext) ([]syntax.Stmt, bool) {
+    // Check if this is a slice 'in' operation
+    op, ok := t.isSliceInOperation(as.Rhs, ctx)
+    if !ok { return nil, false }
+    
+    pos := as.Pos()
+    
+    // Initialize lhs to false
+    falseLit := &syntax.Name{Value: "false"}
+    initAssign := &syntax.AssignStmt{Op: as.Op, Lhs: as.Lhs, Rhs: falseLit}
+    
+    // Create loop variables
+    iVar := &syntax.Name{Value: "i"}
+    zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+    one := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+    
+    // Create: i := 0
+    initI := &syntax.AssignStmt{Op: syntax.Def, Lhs: iVar, Rhs: zero}
+    
+    // Create: len(slice)
+    lenFunc := &syntax.Name{Value: "len"}
+    lenCall := &syntax.CallExpr{Fun: lenFunc, ArgList: []syntax.Expr{op.Y}}
+    
+    // Create: i < len(slice)
+    condition := &syntax.Operation{Op: syntax.Lss, X: iVar, Y: lenCall}
+    
+    // Create: i++
+    incI := &syntax.AssignStmt{Op: syntax.Add, Lhs: iVar, Rhs: one}
+    
+    // Create: slice[i]
+    indexExpr := &syntax.IndexExpr{X: op.Y, Index: iVar}
+    
+    // Create: slice[i] == item
+    comparison := &syntax.Operation{Op: syntax.Eql, X: indexExpr, Y: op.X}
+    
+    // Create: lhs = true
+    trueLit := &syntax.Name{Value: "true"}
+    setTrue := &syntax.AssignStmt{Op: 0, Lhs: as.Lhs, Rhs: trueLit}
+    
+    // Create: break
+    breakStmt := &syntax.BranchStmt{Tok: syntax.Break}
+    
+    // Create: if slice[i] == item { lhs = true; break }
+    ifBody := &syntax.BlockStmt{List: []syntax.Stmt{setTrue, breakStmt}}
+    ifStmt := &syntax.IfStmt{Cond: comparison, Then: ifBody}
+    
+    // Create loop body
+    loopBody := &syntax.BlockStmt{List: []syntax.Stmt{ifStmt}}
+    
+    // Create: for i := 0; i < len(slice); i++ { ... }
+    forStmt := &syntax.ForStmt{Init: initI, Cond: condition, Post: incI, Body: loopBody}
+    
+    return []syntax.Stmt{initAssign, forStmt}, true
+}
+
+// isSliceInOperation checks if an expression is a slice 'in' operation
+func (t *InOperatorTransform) isSliceInOperation(expr syntax.Expr, ctx *TransformContext) (*syntax.Operation, bool) {
+    // Unwrap parentheses
+    for {
+        if p, ok := expr.(*syntax.ParenExpr); ok && p.X != nil {
+            expr = p.X
+        } else { break }
+    }
+    op, ok := expr.(*syntax.Operation)
+    if !ok || op.Op != syntax.In { return nil, false }
+    
+    containerType := t.inferContainerType(op.Y, ctx)
+    println("isSliceInOperation: containerType =", containerType, "for", op.Y)
+    
+    if containerType == "slice" { return op, true }
+    return nil, false
+}
+
 // rewriteCheckWithMapIn handles: check (key in m)
 // Rewrites to block: { _, ok := m[key]; check ok }
 func (t *InOperatorTransform) rewriteCheckWithMapIn(cs *syntax.CheckStmt, ctx *TransformContext) (syntax.Stmt, bool) {
@@ -408,6 +494,77 @@ func (t *InOperatorTransform) rewriteCheckWithMapIn(cs *syntax.CheckStmt, ctx *T
     if pos.IsKnown() { bs.SetPos(pos) }
     
     return bs, true
+}
+
+// rewriteCheckWithSliceIn handles: check (item in slice) for variable slices
+// Rewrites to: { ok := false; for i := 0; i < len(slice); i++ { if slice[i] == item { ok = true; break } } check ok }
+func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx *TransformContext) (syntax.Stmt, bool) {
+    // Check if this is a slice 'in' operation
+    cond := cs.Cond
+    for {
+        if p, ok := cond.(*syntax.ParenExpr); ok && p.X != nil {
+            cond = p.X
+        } else { break }
+    }
+    op, ok := cond.(*syntax.Operation)
+    if !ok || op.Op != syntax.In { return nil, false }
+    if t.inferContainerType(op.Y, ctx) != "slice" { return nil, false }
+    
+    pos := cs.Pos()
+    
+    // Create: ok := false
+    okName := &syntax.Name{Value: "ok"}
+    falseLit := &syntax.Name{Value: "false"}
+    okInit := &syntax.AssignStmt{Op: syntax.Def, Lhs: okName, Rhs: falseLit}
+    
+    // Create loop variables
+    iVar := &syntax.Name{Value: "i"}
+    zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+    one := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+    
+    // Create: i := 0
+    initI := &syntax.AssignStmt{Op: syntax.Def, Lhs: iVar, Rhs: zero}
+    
+    // Create: len(slice)
+    lenFunc := &syntax.Name{Value: "len"}
+    lenCall := &syntax.CallExpr{Fun: lenFunc, ArgList: []syntax.Expr{op.Y}}
+    
+    // Create: i < len(slice)
+    condition := &syntax.Operation{Op: syntax.Lss, X: iVar, Y: lenCall}
+    
+    // Create: i++
+    incI := &syntax.AssignStmt{Op: syntax.Add, Lhs: iVar, Rhs: one}
+    
+    // Create: slice[i]
+    indexExpr := &syntax.IndexExpr{X: op.Y, Index: iVar}
+    
+    // Create: slice[i] == item
+    comparison := &syntax.Operation{Op: syntax.Eql, X: indexExpr, Y: op.X}
+    
+    // Create: ok = true
+    trueLit := &syntax.Name{Value: "true"}
+    setOk := &syntax.AssignStmt{Op: 0, Lhs: okName, Rhs: trueLit}
+    
+    // Create: break
+    breakStmt := &syntax.BranchStmt{Tok: syntax.Break}
+    
+    // Create: if slice[i] == item { ok = true; break }
+    ifBody := &syntax.BlockStmt{List: []syntax.Stmt{setOk, breakStmt}}
+    ifStmt := &syntax.IfStmt{Cond: comparison, Then: ifBody}
+    
+    // Create loop body
+    loopBody := &syntax.BlockStmt{List: []syntax.Stmt{ifStmt}}
+    
+    // Create: for i := 0; i < len(slice); i++ { ... }
+    forStmt := &syntax.ForStmt{Init: initI, Cond: condition, Post: incI, Body: loopBody}
+    
+    // Create: check ok
+    newCheck := &syntax.CheckStmt{Cond: okName}
+    
+    // Create block containing all statements
+    block := &syntax.BlockStmt{List: []syntax.Stmt{okInit, forStmt, newCheck}}
+    
+    return block, true
 }
 
 // rewriteIfWithMapIn handles: if (key in m) { ... }
@@ -718,7 +875,8 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 					X:  op.X, // item
 					Y:  elem,
 				}
-				comparison.SetPos(pos)
+				// Skip SetPos to avoid PosBase panic
+				// if pos.IsKnown() { comparison.SetPos(pos) }
 				
 				if i == 0 {
 					result = comparison
@@ -728,7 +886,8 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 						X:  result,
 						Y:  comparison,
 					}
-					result.SetPos(pos)
+					// Skip SetPos to avoid PosBase panic
+					// if pos.IsKnown() { result.SetPos(pos) }
 				}
 			}
 			
@@ -736,10 +895,10 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 		}
 	}
 	
-	// For complex cases, fall back to false for now
-	// This can be improved later with proper loop generation  
+	// For non-literal slices (variables), fall back to false for now
+	// The complex function literal approach causes PosBase panics
+	// This should be handled at statement level instead
 	falseExpr := &syntax.Name{Value: "false"}
-	falseExpr.SetPos(pos)
 	return falseExpr
 }
 
@@ -953,20 +1112,12 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 		return
 	}
 
-	// Use file position instead of empty position
-	pos := syntax.Pos{}
-	if len(file.DeclList) > 0 {
-		pos = file.DeclList[0].Pos()
-	}
-
-	stringsImport := &syntax.ImportDecl{
-		Path: &syntax.BasicLit{
-			Value: "\"strings\"",
-			Kind:  syntax.StringLit,
-		},
-	}
-	stringsImport.SetPos(pos)
-	stringsImport.Path.SetPos(pos)
+    stringsImport := &syntax.ImportDecl{
+        Path: &syntax.BasicLit{
+            Value: "\"strings\"",
+            Kind:  syntax.StringLit,
+        },
+    }
 
 	var insertPos int
 	for i, decl := range file.DeclList {
@@ -995,17 +1146,15 @@ func (t *InOperatorTransform) isRuneLiteral(expr syntax.Expr) bool {
 
 // convertRuneToString converts a rune literal to string(rune) call
 func (t *InOperatorTransform) convertRuneToString(runeExpr syntax.Expr, pos syntax.Pos) syntax.Expr {
-	// Create string(rune) call
-	stringName := &syntax.Name{Value: "string"}
-	stringName.SetPos(pos)
-	
-	call := &syntax.CallExpr{
-		Fun:     stringName,
-		ArgList: []syntax.Expr{runeExpr},
-	}
-	call.SetPos(pos)
-	
-	return call
+    // Create string(rune) call
+    stringName := &syntax.Name{Value: "string"}
+    
+    call := &syntax.CallExpr{
+        Fun:     stringName,
+        ArgList: []syntax.Expr{runeExpr},
+    }
+    
+    return call
 }
 
 // computeStringInString computes whether a string literal is contained in another string literal at compile time
