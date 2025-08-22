@@ -38,9 +38,13 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
     // Use syntax.Walk to traverse the entire AST
     syntax.Walk(file, visitor)
     
-    // Add imports if needed (only strings import now, slices is no longer needed)
+    // Add imports if needed
     if visitor.needsStringsImport && !t.hasImport(file, "strings") {
         t.addStringsImport(file)
+        changed = true
+    }
+    if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
+        t.addSlicesImport(file)
         changed = true
     }
 
@@ -62,7 +66,6 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 
     // Also handle top-level statements for implicit main files (map and slice membership)
     if len(file.TopLevelStmts) > 0 {
-        println("Processing", len(file.TopLevelStmts), "top-level statements")
         if newList, ok := t.rewriteMapMembershipInList(file.TopLevelStmts, ctx); ok {
             file.TopLevelStmts = newList
             changed = true
@@ -190,21 +193,9 @@ func (t *InOperatorTransform) transformExpr(expr syntax.Expr, visitor *inVisitor
 
 // convertInOperation converts "item in collection" to appropriate Go code
 func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *inVisitor, file *syntax.File) syntax.Expr {
-	// Use a dummy position to avoid PosBase panic - the calling code should not access Pos()
-	pos := syntax.Pos{}
-	
-	// Don't try to get position information as it might cause panics
-	// pos := op.Pos()
-	// if !pos.IsKnown() {
-	//     if op.X != nil && op.X.Pos().IsKnown() {
-	//         pos = op.X.Pos()
-	//     } else if op.Y != nil && op.Y.Pos().IsKnown() {
-	//         pos = op.Y.Pos()
-	//     }
-	// }
-	
 	// Determine the type of operation based on the container (op.Y)
 	containerType := t.inferContainerType(op.Y, visitor.ctx)
+	println("DEBUG: convertInOperation containerType =", containerType)
 	
     switch containerType {
     case "string":
@@ -213,7 +204,7 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
         call := &syntax.CallExpr{Fun: sel, ArgList: []syntax.Expr{op.X}}
         return call
     case "slice":
-        return t.createSliceContainsCall(op, visitor, pos)
+        return t.createSliceContainsCall(op, visitor)
     case "map":
         // Defer to statement-level rewrite to avoid fragile func-lits here
         return op
@@ -222,7 +213,7 @@ func (t *InOperatorTransform) convertInOperation(op *syntax.Operation, visitor *
         return op
     default:
         // Try string fallback
-        return t.createStringContainsCall(op, visitor, pos)
+        return t.createStringContainsCall(op, visitor, syntax.Pos{})
     }
 }
 
@@ -397,8 +388,6 @@ func (t *InOperatorTransform) rewriteAssignWithSliceIn(as *syntax.AssignStmt, ct
     op, ok := t.isSliceInOperation(as.Rhs, ctx)
     if !ok { return nil, false }
     
-    pos := as.Pos()
-    
     // Initialize lhs to false
     falseLit := &syntax.Name{Value: "false"}
     initAssign := &syntax.AssignStmt{Op: as.Op, Lhs: as.Lhs, Rhs: falseLit}
@@ -459,7 +448,6 @@ func (t *InOperatorTransform) isSliceInOperation(expr syntax.Expr, ctx *Transfor
     if !ok || op.Op != syntax.In { return nil, false }
     
     containerType := t.inferContainerType(op.Y, ctx)
-    println("isSliceInOperation: containerType =", containerType, "for", op.Y)
     
     if containerType == "slice" { return op, true }
     return nil, false
@@ -509,8 +497,6 @@ func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx 
     op, ok := cond.(*syntax.Operation)
     if !ok || op.Op != syntax.In { return nil, false }
     if t.inferContainerType(op.Y, ctx) != "slice" { return nil, false }
-    
-    pos := cs.Pos()
     
     // Create: ok := false
     okName := &syntax.Name{Value: "ok"}
@@ -862,7 +848,7 @@ func (t *InOperatorTransform) getExprType(expr syntax.Expr) string {
 }
 
 // createSliceContainsCall creates a manual loop to check slice contains without imports
-func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
+func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visitor *inVisitor) syntax.Expr {
 	// For eval and simple cases, handle small literal slices by expanding to OR comparisons
 	if compLit, ok := op.Y.(*syntax.CompositeLit); ok {
 		if len(compLit.ElemList) <= 10 && len(compLit.ElemList) > 0 {
@@ -895,11 +881,11 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 		}
 	}
 	
-	// For non-literal slices (variables), fall back to false for now
-	// The complex function literal approach causes PosBase panics
-	// This should be handled at statement level instead
-	falseExpr := &syntax.Name{Value: "false"}
-	return falseExpr
+    // For non-literal slices (variables), use slices.Contains(slice, item)
+    slicesName := &syntax.Name{Value: "slices"}
+    containsName := &syntax.Name{Value: "Contains"}
+    slicesContains := &syntax.SelectorExpr{X: slicesName, Sel: containsName}
+    return &syntax.CallExpr{Fun: slicesContains, ArgList: []syntax.Expr{op.Y, op.X}}
 }
 
 // createMapContainsCall creates map key existence check: _, ok := map[key]; ok
@@ -1131,6 +1117,34 @@ func (t *InOperatorTransform) addStringsImport(file *syntax.File) {
 	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
 	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
 	newDeclList = append(newDeclList, stringsImport)
+	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
+	file.DeclList = newDeclList
+}
+
+func (t *InOperatorTransform) addSlicesImport(file *syntax.File) {
+	if t.hasImport(file, "slices") {
+		return
+	}
+
+    slicesImport := &syntax.ImportDecl{
+        Path: &syntax.BasicLit{
+            Value: "\"slices\"",
+            Kind:  syntax.StringLit,
+        },
+    }
+
+	var insertPos int
+	for i, decl := range file.DeclList {
+		if _, ok := decl.(*syntax.ImportDecl); ok {
+			insertPos = i + 1
+		} else {
+			break
+		}
+	}
+
+	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+1)
+	newDeclList = append(newDeclList, file.DeclList[:insertPos]...)
+	newDeclList = append(newDeclList, slicesImport)
 	newDeclList = append(newDeclList, file.DeclList[insertPos:]...)
 	file.DeclList = newDeclList
 }

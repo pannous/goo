@@ -22,8 +22,6 @@ func (t *MapDotTransform) Priority() int {
 }
 
 func (t *MapDotTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	// Temporarily disabled to isolate PosBase panic issue
-	return false
 	
 	visitor := &mapDotVisitor{ctx: ctx}
 

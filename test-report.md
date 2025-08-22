@@ -111,10 +111,17 @@ Running all tests in ./goo/ directory...
 ✅ test_typeof.goo
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
-❌ test_units.goo
+✅ test_units.goo
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
+✅ test_compare_ast.goo
+❌ test_debug_transforms.goo
+✅ test_literal_slices.goo
+✅ test_manual_slices.goo
+✅ test_map_dot.goo
+✅ test_slice_simple.goo
+✅ test_units_fixed.goo
 ========================================
-Summary: 107/115 passed, 8 failed
+Summary: 114/122 passed, 8 failed
 ⚠️  Some tests failed

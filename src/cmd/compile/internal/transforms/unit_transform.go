@@ -218,24 +218,12 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 			newCall.ArgList = newArgList
 			return &newCall
 		}
-    case *syntax.SelectorExpr:
-        // First transform base
-        newX := t.transformExpr(n.X, unitVars)
-        // Build a selector with possibly updated X
-        sel := *n
-        sel.X = newX
-        // If this selector refers to a units constructor (e.g., units.M),
-        // treat bare usage as units.M(1)
-        if t.isUnitConstant(&sel) {
-            one := &syntax.BasicLit{Kind: syntax.FloatLit, Value: "1"}
-            one.SetPos(n.Pos())
-            call := &syntax.CallExpr{Fun: &sel, ArgList: []syntax.Expr{one}}
-            call.SetPos(n.Pos())
-            return call
-        }
-        if newX != n.X {
-            return &sel
-        }
+	case *syntax.SelectorExpr:
+		if newX := t.transformExpr(n.X, unitVars); newX != n.X {
+			newSel := *n
+			newSel.X = newX
+			return &newSel
+		}
 	case *syntax.IndexExpr:
 		xChanged := false
 		indexChanged := false
@@ -339,17 +327,27 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 	unitsRef.X.SetPos(pos)
 	unitsRef.Sel.SetPos(pos)
 	
-    // Create units.<Unit>(value) call
-    valueLit := &syntax.BasicLit{
-        Value: node.Value,
-        Kind:  syntax.FloatLit,
-    }
-    valueLit.SetPos(pos)
-    
-    call := &syntax.CallExpr{Fun: unitsRef, ArgList: []syntax.Expr{valueLit}}
-    call.SetPos(pos)
-    
-    return call
+	// Create units.Ms.Multiply(value) call
+	methodCall := &syntax.SelectorExpr{
+		X:   unitsRef,
+		Sel: &syntax.Name{Value: "Multiply"},
+	}
+	methodCall.SetPos(pos)
+	methodCall.Sel.SetPos(pos)
+	
+	valueLit := &syntax.BasicLit{
+		Value: node.Value,
+		Kind:  syntax.FloatLit,
+	}
+	valueLit.SetPos(pos)
+	
+	call := &syntax.CallExpr{
+		Fun: methodCall,
+		ArgList: []syntax.Expr{valueLit},
+	}
+	call.SetPos(pos)
+	
+	return call
 }
 
 func (t *UnitTransformer) transformUnitBinaryExpr(node *syntax.Operation) syntax.Expr {
@@ -378,9 +376,9 @@ func (t *UnitTransformer) transformUnitBinaryExpr(node *syntax.Operation) syntax
 	case syntax.Sub:
 		methodName = "Sub"
     case syntax.Mul:
-        methodName = "Mul"
+        methodName = "Multiply"
     case syntax.Div:
-        methodName = "Div"
+        methodName = "Divide"
 	default:
 		return node // unsupported operation
 	}
@@ -421,7 +419,7 @@ func (t *UnitTransformer) isUnitExpression(expr syntax.Expr) bool {
             // Methods on unit values
             methodName := sel.Sel.Value
             return methodName == "Add" || methodName == "Sub" || 
-                   methodName == "Mul" || methodName == "Div" ||
+                   methodName == "Multiply" || methodName == "Divide" ||
                    methodName == "ToString" || methodName == "withValue" ||
                    methodName == "add" || methodName == "sub" ||
                    methodName == "mul" || methodName == "div" || methodName == "toString"
@@ -586,29 +584,24 @@ func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
 }
 
 func (t *UnitTransformer) createScalarMultiplication(unitExpr, numberExpr syntax.Expr, pos syntax.Pos) syntax.Expr {
-    // Two cases:
-    // - units constructor: 2 * units.M     -> units.M(2)
-    // - unit variable:     2 * m (Unit)    -> m.Multiply(2)
-    if sel, ok := unitExpr.(*syntax.SelectorExpr); ok {
-        if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
-            call := &syntax.CallExpr{Fun: unitExpr, ArgList: []syntax.Expr{numberExpr}}
-            call.SetPos(pos)
-            return call
-        }
-    }
-    // Fallback: construct a new unit with the same type as the variable
-    // units.NewUnit(number, <unitVar>.Type)
-    unitsName := &syntax.Name{Value: "units"}
-    unitsName.SetPos(pos)
-    newUnitSel := &syntax.SelectorExpr{X: unitsName, Sel: &syntax.Name{Value: "NewUnit"}}
-    newUnitSel.SetPos(pos)
-    newUnitSel.Sel.SetPos(pos)
-    unitTypeSel := &syntax.SelectorExpr{X: unitExpr, Sel: &syntax.Name{Value: "Type"}}
-    unitTypeSel.SetPos(pos)
-    unitTypeSel.Sel.SetPos(pos)
-    call := &syntax.CallExpr{Fun: newUnitSel, ArgList: []syntax.Expr{numberExpr, unitTypeSel}}
-    call.SetPos(pos)
-    return call
+	// Transform: 2 * units.M -> units.M.Multiply(2.0)
+	// Uses the Go method where units have Multiply() methods
+	
+	// Create unit.Multiply(number)
+	methodCall := &syntax.SelectorExpr{
+		X:   unitExpr,
+		Sel: &syntax.Name{Value: "Multiply"},
+	}
+	methodCall.SetPos(pos)
+	methodCall.Sel.SetPos(pos)
+	
+	result := &syntax.CallExpr{
+		Fun:     methodCall,
+		ArgList: []syntax.Expr{numberExpr}, // use the number directly
+	}
+	result.SetPos(pos)
+	
+	return result
 }
 
 func (t *UnitTransformer) shouldTransform(file *syntax.File) bool {
@@ -724,9 +717,9 @@ func (t *UnitTransformer) transformUnitBinaryExprWithContext(node *syntax.Operat
     case syntax.Sub:
         methodName = "Sub"
     case syntax.Mul:
-        methodName = "Mul"
+        methodName = "Multiply"
     case syntax.Div:
-        methodName = "Div"
+        methodName = "Divide"
     default:
         return node // unsupported operation
     }
@@ -781,7 +774,7 @@ func (t *UnitTransformer) isUnitExpressionWithContext(expr syntax.Expr, unitVars
             }
             methodName := sel.Sel.Value
             return methodName == "Add" || methodName == "Sub" || 
-                   methodName == "Mul" || methodName == "Div" ||
+                   methodName == "Multiply" || methodName == "Divide" ||
                    methodName == "ToString" || methodName == "withValue" ||
                    methodName == "add" || methodName == "sub" ||
                    methodName == "mul" || methodName == "div" || methodName == "toString"
