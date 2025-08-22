@@ -7,7 +7,7 @@ Goo is an up-to-date fork of Go with the following syntactic sugar on top:
 just like most ugliness in the world appears when you add a five to json(5)  
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
-✅ if x {put("truthy")} 
+✅ if x {put("truthy")}   
 ✅ enum Status { OK, BAD } with generated .String() method  
 ✅ 3 ** 2 = 9  
 ✅ τ - π ≈ 3.14159  
