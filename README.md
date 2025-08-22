@@ -1,4 +1,4 @@
-# The Goo Programming Language
+# The Goo Programming Language  
   
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
@@ -7,7 +7,7 @@ Goo is an up-to-date fork of Go with the following modifications:
 just like most ugliness in the world appears when you add a five to json(5)  
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
-✅ if x {put("truthy")} else {put("falsey")}
+✅ if x {put("truthy")} else {put("falsey")}  
 ✅ enum Status { OK, BAD } with generated .String() method  
 ✅ 3 ** 2 = 9  
 ✅ τ - π ≈ 3.14159  
@@ -19,7 +19,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ no Main needed   ☐  implicit package main  
 ✅ printf as synonym for fmt.Println  with fmt as auto-import  
 ✅ typeof(x)  compile-time or runtime reflect.TypeOf(x).String()?  
-✅ check 1>2   check keyword:
+✅ check 1>2   check keyword:  
 ✅ if $condition { panic($condition.text) } else { println("check OK", $condition.text) }  
 ✅ simple_list := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
 ✅ xs := ['a', 'b', 'c'] ; xs#1 == 'a'  // 1-indexed array access using # operator  
@@ -30,7 +30,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ try { x } catch e { y } =>  func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :  
 ✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?  
 ✅ go command `go test.go` --> defaults to `go run test.go`  
-✅ go eval "2 ** 3" => 8   
+✅ go eval "2 ** 3" => 8  
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
 ✅ {a: 1, b: 2}  => map[string]int{"a": 1, "b": 2} auto-type inference  
@@ -57,7 +57,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ 1 in [1,2,3] 'e' in "hello"  // in operator for lists and strings and maps and iterators  
 ✅ Got rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
-✅ Universal for-in syntax:
+✅ Universal for-in syntax:  
 ✅ for item in slice { ... }      // Values  
 ✅ for char in "hello" { ... }    // Characters  
 ✅ for key in myMap { ... }       // Keys  
@@ -108,9 +108,9 @@ There is a mirror of the repository at https://github.com/golang/go.
 Unless otherwise noted, the Go source files are distributed under the  
 BSD-style license found in the LICENSE file.  
   
-### Download and Install
+### Download and Install  
   
-#### Binary Distributions
+#### Binary Distributions  
   
 Official binary distributions are available at https://github.com/pannous/goo/releases.  
   
@@ -127,7 +127,7 @@ export PATH=$PATH:/usr/local/goo/bin
 export GOROOT=/usr/local/goo/  
 ```  
   
-#### Install From Source
+#### Install From Source  
   
 ```  
 git clone --recursive https://github.com/pannous/goo  
@@ -137,7 +137,7 @@ cd goo/src
   
 https://go.dev/doc/install/source for more source installation instructions.  
   
-### Test new features
+### Test new features  
 ```  
 ./bin/go run goo/test.goo  
 ```  
