@@ -1,0 +1,18 @@
+x := 2
+y := [1, 2, 3]
+
+// Test variable in variable
+result1 := x in y
+print("Variable result:", result1)
+
+// Test literal in literal (working case)
+result2 := 2 in [1, 2, 3]
+print("Literal result:", result2)
+
+// Test variable in literal
+result3 := x in [1, 2, 3]
+print("Variable in literal result:", result3)
+
+// Test literal in variable
+result4 := 2 in y
+print("Literal in variable result:", result4)

@@ -63,7 +63,8 @@ src/probes
 /src/cmd/compile/compile
 
 cache
-
-build-compiler.sh compiler-rebuild.sh fix-wiki.sh run_all_tests.sh
-
+run_all_tests.sh
 idea.log
+build-compiler.sh
+compiler-rebuild.sh
+fix-wiki.sh

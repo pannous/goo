@@ -1,0 +1,8 @@
+// Test if map.key -> map["key"] transformation works
+testMap := map[string]string{"area": "test_value", "volume": "another_value"}
+result1 := testMap.area  // Should transform to testMap["area"]
+result2 := testMap["area"]  // Direct access for comparison
+
+print("Map dot access:", result1)
+print("Direct access:", result2)
+check result1 == result2
