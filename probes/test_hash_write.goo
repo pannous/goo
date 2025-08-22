@@ -1,0 +1,12 @@
+// Test if #1 syntax works for assignment/write operations
+def modify!(xs []int) { 
+    print("Before:", xs)
+    xs#1 = 0  // Try to set index 1 to 0
+    print("After:", xs)
+}
+
+// Test the function
+arr := [10, 20, 30]
+print("Original:", arr)
+modify!(arr)
+print("Final:", arr)
