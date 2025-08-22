@@ -1,4 +1,4 @@
-# The Goo Programming Language
+# The Goo Programming Language  
   
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
@@ -9,10 +9,10 @@ so does adding a little o to Go[o] make everything a little more beautiful
 -->  
 ✅ truthy/falsey if  
 ✅ enum Status { OK, BAD } with generated .String() method  
-✅ 3 ** 2 = 9
-✅ τ - π ≈ 3.14159 
-✅ # comment and shebang support
-✅ #if DEBUG put("better than compiler tags!") #end
+✅ 3 ** 2 = 9  
+✅ τ - π ≈ 3.14159  
+✅ # comment and shebang support  
+✅ #if DEBUG put("better than compiler tags!") #end  
 ✅ goo file extension  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
@@ -22,34 +22,34 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check 1>2 // check keyword: if not truthy($condition) { panic($condition.text) } else { println("check OK", $condition.text) }  
 ✅ simple_list := [1,2,3]  // []any{1,2,3} or []int{1,2,3}  
 ✅ xs := ['a', 'b', 'c'] ; xs#1 == 'a'  // 1-indexed array access using # operator  
-✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]   // 🙌 lambdas!
+✅ [1, 2, 3].apply(x=>x*2) == [2, 4, 6]   // 🙌 lambdas!  
 ✅ type check operator: 1 is int, [1, 2, 3] is []int, "hello" is string, 'a' is rune == True  
 ✅ try f()  -->   if err := f(); err != nil { panic(err) or return err }  
 ✅ try val := f()  -->  { val, err := f(); if err != nil { return err } }  
 ✅ try { x } catch e { y } =>  func() {defer func() {if e := recover(); e != nil {y} }() x } // x, y blocks :  
-✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?
+✅ try { panic("X") } catch x { printf("Caught: %v\n",x) }  // Todo catch returned errors?  
 ✅ go command `go test.go` --> defaults to `go run test.go`  
-✅ go eval "2**3" => 8
+✅ go eval "2**3" => 8  
 ✅ def as synonym for func, e.g. def main() { ... }  
 ✅ allow unused imports: as warning!  
 ✅ {a: 1, b: 2}  => map[string]int{"a": 1, "b": 2} auto-type inference  
-✅ {a: 1, b: 2} == {"a": 1, "b": 2}   // symbol keys to strings   
+✅ {a: 1, b: 2} == {"a": 1, "b": 2}   // symbol keys to strings  
 ✅ z := {a: 1, b: 2}; z.a == 1 and z.b == 2  // dot access to map keys  
 ✅ map[active:true age:30 name:Alice]  // read back print("%v") format  
 ✅ x:={a:1,b:2}; put(x) => fmt.Printf("%v\n",x)  
-✅ [1,2]==[1,2]   test_list_comparison.goo   
+✅ [1,2]==[1,2]   test_list_comparison.goo  
 ✅ check "a"+1 == "a1"  
 ✅ check "a" == 'a'  
 ✅ check not x =>  !truthy(x)  
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
-✅ String methods "abc".contains("a")
-✅ 3.14 as string == "3.14"
+✅ String methods "abc".contains("a")  
+✅ 3.14 as string == "3.14"  
 ✅ 3.14 as int … semantic cast conversions  
 ✅ x => x * 2   lambda syntax  
 ✅ class via type struct  
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
-✅ for i in 0…5 {put(i)}  // range syntax
+✅ for i in 0…5 {put(i)}  // range syntax  
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ✅ "你" == '你'  
 ✅ def modify!(xs []int) { for i, x := range xs { xs[i] = x * 2 } } // modify in place enforced by "!" !  
@@ -66,11 +66,11 @@ Universal for-in syntax:
 ✅ for i, v in slice { ... }      // Index-value pairs  
 ✅ for k, v in iterator() { ... } // Iterator pairs  
   
-✅ while keyword as plain synonym for 'for'
-
-✅ check 500ms + 5s == 5500ms
-✅ 3**3 == 27
-✅ for i in 0…5 {put(i)}  // range loops now working!
+✅ while keyword as plain synonym for 'for'  
+  
+✅ check 500ms + 5s == 5500ms  
+✅ 3**3 == 27  
+✅ for i in 0…5 {put(i)}  // range loops now working!  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
@@ -82,7 +82,7 @@ Universal for-in syntax:
     Automatically detect if there is an uppercased public function available, if there is no private function with lowercase name.  
 ☐ silent/implicit error propagation  
 instanceOf(a, reflect.TypeOf((*T)(nil)).Elem()) // or generated static checks  
-
+  
 ☐ plugin.Open() is for loading .so files at runtime  
 𐄂 AAA Game Engine Core? Never  
   
@@ -110,9 +110,9 @@ There is a mirror of the repository at https://github.com/golang/go.
 Unless otherwise noted, the Go source files are distributed under the  
 BSD-style license found in the LICENSE file.  
   
-### Download and Install
+### Download and Install  
   
-#### Binary Distributions
+#### Binary Distributions  
   
 Official binary distributions are available at https://github.com/pannous/goo/releases.  
   
@@ -129,7 +129,7 @@ export PATH=$PATH:/usr/local/goo/bin
 export GOROOT=/usr/local/goo/  
 ```  
   
-#### Install From Source
+#### Install From Source  
   
 ```  
 git clone --recursive https://github.com/pannous/goo  
@@ -139,7 +139,7 @@ cd goo/src
   
 https://go.dev/doc/install/source for more source installation instructions.  
   
-### Test new features
+### Test new features  
 ```  
 ./bin/go run goo/test.goo  
 ```  
@@ -149,6 +149,6 @@ Todo: Web Demo
   
 <!--  
 You can modify CLAUDE.md while the agent is working, it will pick up the changes!! "I see from the updated CLAUDE.md that…"  
--->
-☐ any other pain points you and I might have
+-->  
+☐ any other pain points you and I might have  
 ☐ cross off all done tasks from this list  
