@@ -56,7 +56,6 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ import "helper"  / "helper.goo" // allow local imports (for go run)  
 ✅ 1 in [1,2,3] 'e' in "hello"  // in operator for lists and strings and maps and iterators  
 ✅ Got rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
-✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ✅ Universal for-in syntax:  
 ✅ for item in slice { ... }      // Values  
 ✅ for char in "hello" { ... }    // Characters  
@@ -69,6 +68,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check 500ms + 5s == 5500ms  
 ✅ 3**3 == 27  
 ✅ for i in 0…5 {put(i)}  // range loops now working!  
+✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ check keyword works great, now let it emit debug message, e.g.  check 1>0  "check OK 1>0" via builtin println  
