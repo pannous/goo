@@ -2,19 +2,17 @@
   
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
-Goo is an up-to-date fork of Go with the following modifications:  
+Goo is an up-to-date fork of [Go](https://github.com/golang/go) with the following syntactic sugar on top:  
 <!--  
 just like most ugliness in the world appears when you add a five to json(5)  
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
-✅ if x {put("truthy")} else {put("falsey")}  
+✅ if x {put("truthy")}   
 ✅ enum Status { OK, BAD } with generated .String() method  
 ✅ 3 ** 2 = 9  
 ✅ τ - π ≈ 3.14159  
 ✅ # comment and shebang support  
 ✅ #if DEBUG put("better than compiler tags!") #end  
-✅ goo file extension  
-✅ [Sublime & Jetbrains](https://github.com/pannous/goo-jetbrains-plugin/) Goo IDE plugin (GoLand etc…)  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
 ✅ no Main needed   ☐  implicit package main  
@@ -65,7 +63,10 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ for i, v in slice { ... }      // Index-value pairs  
 ✅ for k, v in iterator() { ... } // Iterator pairs  
 ✅ while keyword as plain synonym for 'for'  
-✅ check 500ms + 5s == 5500ms   // import "units" !  
+✅ check 500ms + 5s == 5500ms  
+✅ 3**3 == 27  
+✅ for i in 0…5 {put(i)}  // range loops now working!  
+✅ goo file extension  
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
