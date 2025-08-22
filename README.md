@@ -13,7 +13,6 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ τ - π ≈ 3.14159  
 ✅ # comment and shebang support  
 ✅ #if DEBUG put("better than compiler tags!") #end  
-✅ goo file extension  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
 ✅ no Main needed   ☐  implicit package main  
@@ -68,6 +67,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check 500ms + 5s == 5500ms  
 ✅ 3**3 == 27  
 ✅ for i in 0…5 {put(i)}  // range loops now working!  
+✅ goo file extension  
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
