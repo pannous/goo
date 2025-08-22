@@ -1,0 +1,7 @@
+import "slices"
+
+x := 2
+y := [1, 2, 3]
+result := slices.Contains(y, x)
+print("Manual slices.Contains result:", result)
+check result

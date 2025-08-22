@@ -1,0 +1,12 @@
+import "slices"
+
+x := 2
+y := [1, 2, 3]
+
+// This works - manual call
+result1 := slices.Contains(y, x)
+print("Manual:", result1)
+
+// This should be equivalent but causes linker panic
+// result2 := x in y  
+// print("Transformed:", result2)
