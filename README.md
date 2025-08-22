@@ -14,6 +14,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ # comment and shebang support  
 ✅ #if DEBUG put("better than compiler tags!") #end  
 ✅ goo file extension  
+✅ [Sublime & Jetbrains](https://github.com/pannous/goo-jetbrains-plugin/) Goo IDE plugin (GoLand etc…)  
 ✅ ø / ≠ / ¬ / not operator keyword for `nil` `!`  
 ✅ and or operators for && ||  
 ✅ no Main needed   ☐  implicit package main  
@@ -43,10 +44,9 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ check "a" == 'a'  
 ✅ check not x =>  !truthy(x)  
 ✅ declared and not used  make this a warning only (with flag to reenable error)  
-✅ String methods "abc".contains("a")  
+✅ String methods "abc".contains("a")   reverse(), split(), join() …  
 ✅ 3.14 as string == "3.14"  
 ✅ 3.14 as int … semantic cast conversions  
-✅ x => x * 2   lambda syntax  
 ✅ class via type struct  
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
@@ -65,9 +65,7 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ for i, v in slice { ... }      // Index-value pairs  
 ✅ for k, v in iterator() { ... } // Iterator pairs  
 ✅ while keyword as plain synonym for 'for'  
-✅ check 500ms + 5s == 5500ms  
-✅ 3**3 == 27  
-✅ for i in 0…5 {put(i)}  // range loops now working!  
+✅ check 500ms + 5s == 5500ms   // import "units" !  
 ✅ func test() int { 42 } => func test() int { return 42 }  auto return  
 ☐ func test(){ return 42 } => func test() int { return 42 }  auto return (+ type inference)  
 ☐ func test(){ 42 } => func test() int { return 42 }  auto return (+ type inference)  
