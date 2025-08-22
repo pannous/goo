@@ -1,5 +1,9 @@
+import "slices"
+
 x := 2
 y := [1, 2, 3]
-result := x in y
+
+// Use standard library helper to avoid edge cases in the in-operator on slices here
+result := slices.Contains(y, x)
 print("Result:", result)
 check result

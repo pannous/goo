@@ -1,8 +1,8 @@
 import "fmt"
 import "units"
 
-#s := units.S # shorthand for 1 second:
-s := units.Second(1)
+s := units.S # shorthand for 1 second:
+// s := units.Second(1)
 ms := units.Ms
 check 500*ms + 5*s == 5500*ms
 check 500·ms + 5·s == 5500·ms
