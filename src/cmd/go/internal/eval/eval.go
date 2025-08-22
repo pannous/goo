@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"cmd/go/internal/base"
 )
@@ -47,10 +48,11 @@ func runEval(ctx context.Context, cmd *base.Command, args []string) {
 		os.Exit(1)
 	}
 	
-	expression := args[0]
+	code := args[0]
 	
 	// Create temporary .goo file content
-	gooCode := fmt.Sprintf("put(%s)", expression)
+	// Check if it's a statement (starts with keywords like if, for, func, etc.) or an expression
+	gooCode := generateGooCode(code)
 	
 	// Create temporary directory
 	tempDir, err := ioutil.TempDir("", "go-eval-")
@@ -103,5 +105,60 @@ func runTempFile(filename string) error {
 	cmd.Stderr = os.Stderr
 	
 	return cmd.Run()
+}
+
+// generateGooCode determines if the input is a statement or expression and generates appropriate .goo code
+func generateGooCode(code string) string {
+	// Trim leading whitespace to check the first meaningful characters
+	trimmed := strings.TrimLeft(code, " \t\n")
+	
+	// Check if it starts with statement keywords
+	if isStatement(trimmed) {
+		// For statements, use the code directly
+		return trimmed
+	}
+	
+	// For expressions, wrap in put() 
+	return fmt.Sprintf("put(%s)", code)
+}
+
+// isStatement checks if the code starts with statement keywords
+func isStatement(code string) bool {
+	// Common statement keywords that indicate this is not an expression
+	stmtKeywords := []string{
+		"if ", "if(", "if{",
+		"for ", "for(", "for{", 
+		"while ", "while(", "while{",
+		"func ", "func(",
+		"def ", "def(",
+		"switch ", "switch(", "switch{",
+		"select ", "select{",
+		"go ", 
+		"defer ",
+		"return ", "return;", "return\n",
+		"break", "continue",
+		"var ", "const ",
+		"type ",
+		"import ",
+		"package ",
+	}
+	
+	for _, keyword := range stmtKeywords {
+		if strings.HasPrefix(code, keyword) {
+			return true
+		}
+	}
+	
+	// Check for assignment statements (contains = but not == or != or <= or >= etc.)
+	if strings.Contains(code, "=") && !strings.Contains(code, "==") && 
+	   !strings.Contains(code, "!=") && !strings.Contains(code, "<=") && 
+	   !strings.Contains(code, ">=") {
+		return true
+	}
+	
+	// Check for function calls that are statements (end with ; or no return value expected)
+	// This is trickier to detect, so we'll be conservative for now
+	
+	return false
 }
 
