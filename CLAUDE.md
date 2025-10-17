@@ -1,1 +1,1 @@
-src/CLAUDE.md
+.claude/CLAUDE.md
