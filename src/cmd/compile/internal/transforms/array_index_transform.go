@@ -4,6 +4,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 	"strings"
 )
 
@@ -40,6 +41,19 @@ func (v *arrayIndexVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 	if indexExpr, ok := node.(*syntax.IndexExpr); ok {
 		if v.transform.isArrayIndex(indexExpr, v.ctx) {
+			switch idx := indexExpr.Index.(type) {
+			case *syntax.Operation:
+				var xVal, yVal string
+				if lit, ok := idx.X.(*syntax.BasicLit); ok {
+					xVal = lit.Value
+				}
+				if lit, ok := idx.Y.(*syntax.BasicLit); ok {
+					yVal = lit.Value
+				}
+				fmt.Printf("index expr op=%v X=%s Y=%s\n", idx.Op, xVal, yVal)
+			default:
+				fmt.Printf("index expr type %T\n", idx)
+			}
 			if v.transform.hasNegativeIndex(indexExpr.Index) {
 				v.transform.convertNegativeArrayIndex(indexExpr, v.ctx)
 				v.changed = true
@@ -56,7 +70,7 @@ func (t *ArrayIndexTransform) isArrayIndex(indexExpr *syntax.IndexExpr, ctx *Tra
 	if lit, ok := indexExpr.X.(*syntax.BasicLit); ok {
 		return lit.Kind != syntax.StringLit
 	}
-	
+
 	// Check variable types - exclude strings
 	if name, ok := indexExpr.X.(*syntax.Name); ok {
 		if ctx != nil && ctx.Types != nil {
@@ -66,7 +80,7 @@ func (t *ArrayIndexTransform) isArrayIndex(indexExpr *syntax.IndexExpr, ctx *Tra
 			}
 		}
 	}
-	
+
 	// Include composite literals (arrays)
 	if comp, ok := indexExpr.X.(*syntax.CompositeLit); ok {
 		// Check if it's an array/slice type (not map)
@@ -80,7 +94,7 @@ func (t *ArrayIndexTransform) isArrayIndex(indexExpr *syntax.IndexExpr, ctx *Tra
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -94,22 +108,22 @@ func (t *ArrayIndexTransform) hasNegativeIndex(index syntax.Expr) bool {
 			}
 		}
 	}
-	
+
 	// Pattern 2: Direct negative: -N
 	if unary, ok := index.(*syntax.Operation); ok && unary.Op == syntax.Sub && unary.Y == nil {
 		return true
 	}
-	
+
 	return false
 }
 
-// convertNegativeArrayIndex converts arr[(-N)-1] to arr[len(arr)-N] 
+// convertNegativeArrayIndex converts arr[(-N)-1] to arr[len(arr)-N]
 func (t *ArrayIndexTransform) convertNegativeArrayIndex(indexExpr *syntax.IndexExpr, ctx *TransformContext) {
 	pos := indexExpr.Pos()
 	index := indexExpr.Index
-	
+
 	var negValue syntax.Expr
-	
+
 	// Extract the negative value N from (-N)-1 or -N
 	if op, ok := index.(*syntax.Operation); ok && op.Op == syntax.Sub {
 		if lit, ok := op.Y.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit && lit.Value == "1" {
@@ -118,26 +132,26 @@ func (t *ArrayIndexTransform) convertNegativeArrayIndex(indexExpr *syntax.IndexE
 				negValue = unary.X
 			}
 		} else if op.Y == nil {
-			// Pattern: -N  
+			// Pattern: -N
 			negValue = op.X
 		}
 	}
-	
+
 	if negValue != nil {
 		// Create len(arr) - N
 		lenCall := &syntax.CallExpr{
-			Fun: &syntax.Name{Value: "len"},
+			Fun:     &syntax.Name{Value: "len"},
 			ArgList: []syntax.Expr{indexExpr.X},
 		}
 		lenCall.SetPos(pos)
-		
+
 		newIndex := &syntax.Operation{
 			Op: syntax.Sub,
 			X:  lenCall,
 			Y:  negValue,
 		}
 		newIndex.SetPos(pos)
-		
+
 		indexExpr.Index = newIndex
 	}
 }
