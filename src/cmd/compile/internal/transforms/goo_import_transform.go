@@ -24,9 +24,6 @@ func (t *GooImportTransform) Priority() int {
 }
 
 func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	// Temporarily disabled to isolate PosBase panic
-	return false
-	
 	// Get source file directory for relative path resolution
 	var sourceDir string
 	if file.Path != nil {
@@ -35,14 +32,14 @@ func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext)
 		// Fallback to current working directory
 		sourceDir = "."
 	}
-	
+
 	changed := false
 
 	// Transform import declarations
-	for i, decl := range file.DeclList {
+	for _, decl := range file.DeclList {
 		if importDecl, ok := decl.(*syntax.ImportDecl); ok {
-			if newImportDecl := t.transformImportDeclWithContext(importDecl, sourceDir); newImportDecl != importDecl {
-				file.DeclList[i] = newImportDecl
+			ensureImportPos(file, importDecl)
+			if t.transformImportDeclWithContext(importDecl, sourceDir) {
 				changed = true
 			}
 		}
@@ -51,9 +48,9 @@ func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext)
 	return changed
 }
 
-func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.ImportDecl, sourceDir string) *syntax.ImportDecl {
+func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.ImportDecl, sourceDir string) bool {
 	if importDecl.Path == nil || importDecl.Path.Kind != syntax.StringLit {
-		return importDecl
+		return false
 	}
 
 	importPath := strings.Trim(importDecl.Path.Value, "\"")
@@ -73,38 +70,20 @@ func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.I
 
 		println("Transformed .goo import to:", newImportPath)
 
-		// Create new import declaration
-		newImportDecl := *importDecl
-		newPath := *importDecl.Path
-		newPath.Value = "\"" + newImportPath + "\""
-		// Preserve position information
-		if importDecl.Path.Pos().IsKnown() {
-			newPath.SetPos(importDecl.Path.Pos())
-		}
-		newImportDecl.Path = &newPath
-
-		return &newImportDecl
+		// Update import path in place
+		importDecl.Path.Value = "\"" + newImportPath + "\""
+		return true
 	}
 
 	// Check if this is a local directory import that should be converted to relative
 	if t.shouldConvertToLocalImport(importPath, sourceDir) {
 		// Convert bare directory name to relative import
 		newImportPath := "./" + importPath
-
-		// Create new import declaration
-		newImportDecl := *importDecl
-		newPath := *importDecl.Path
-		newPath.Value = "\"" + newImportPath + "\""
-		// Preserve position information
-		if importDecl.Path.Pos().IsKnown() {
-			newPath.SetPos(importDecl.Path.Pos())
-		}
-		newImportDecl.Path = &newPath
-
-		return &newImportDecl
+		importDecl.Path.Value = "\"" + newImportPath + "\""
+		return true
 	}
 
-	return importDecl
+	return false
 }
 
 // shouldConvertToLocalImport checks if a bare import should be treated as local directory
@@ -113,23 +92,23 @@ func (t *GooImportTransform) shouldConvertToLocalImport(importPath string, sourc
 	if strings.HasPrefix(importPath, "./") || strings.HasPrefix(importPath, "../") || filepath.IsAbs(importPath) {
 		return false
 	}
-	
-	// Skip standard library packages (simple heuristic: no dots or well-known names)  
+
+	// Skip standard library packages (simple heuristic: no dots or well-known names)
 	if t.isStandardLibrary(importPath) {
 		return false
 	}
-	
+
 	// Skip if it looks like a module path (contains dots/slashes)
 	if strings.Contains(importPath, ".") || strings.Contains(importPath, "/") {
 		return false
 	}
-	
+
 	// Check if local directory exists relative to the source file directory
 	localDir := filepath.Join(sourceDir, importPath)
 	if _, err := os.Stat(localDir); err == nil {
 		return true
 	}
-	
+
 	return false
 }
 

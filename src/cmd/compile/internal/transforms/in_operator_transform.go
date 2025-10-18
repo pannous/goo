@@ -6,7 +6,6 @@ package transforms
 
 import (
     "cmd/compile/internal/syntax"
-    "os"
     "strings"
 )
 
@@ -16,12 +15,10 @@ import (
 type InOperatorTransform struct{}
 
 type inVisitor struct {
-	transform           *InOperatorTransform
-	ctx                 *TransformContext
-	file                *syntax.File
-	changed             bool
-	needsStringsImport  bool
-	needsSlicesImport   bool
+    transform *InOperatorTransform
+    ctx       *TransformContext
+    file      *syntax.File
+    changed   bool
 }
 
 func (t *InOperatorTransform) Name() string {
@@ -37,16 +34,6 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
     visitor := &inVisitor{transform: t, ctx: ctx, file: file}
     // Use syntax.Walk to traverse the entire AST
     syntax.Walk(file, visitor)
-    
-    // Add imports if needed
-    if visitor.needsStringsImport && !t.hasImport(file, "strings") {
-        t.addStringsImport(file)
-        changed = true
-    }
-    if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-        t.addSlicesImport(file)
-        changed = true
-    }
 
     // Second pass: statement-level rewrites for map membership to avoid func lits
     // Walk function bodies and transform AssignStmt/CheckStmt/IfStmt with map 'in'
@@ -686,21 +673,10 @@ func (t *InOperatorTransform) inferContainerType(container syntax.Expr, ctx *Tra
 
 // createStringContainsCall creates strings.Contains(container, item) or inline version for GOPATH mode
 func (t *InOperatorTransform) createStringContainsCall(op *syntax.Operation, visitor *inVisitor, pos syntax.Pos) syntax.Expr {
-    gomod := os.Getenv("GO111MODULE")
-    if gomod == "off" {
-        return t.createInlineStringContains(op, visitor, pos)
+    if !pos.IsKnown() {
+        pos = generatedNodePos(visitor.file)
     }
-    visitor.needsStringsImport = true
-    stringsName := &syntax.Name{Value: "strings"}
-    containsName := &syntax.Name{Value: "Contains"}
-    stringsContains := &syntax.SelectorExpr{X: stringsName, Sel: containsName}
-    item := op.X
-    // Skip rune conversion to avoid position issues for now
-    // if t.isRuneLiteral(op.X) {
-    //     item = t.convertRuneToString(op.X, pos)
-    // }
-    call := &syntax.CallExpr{Fun: stringsContains, ArgList: []syntax.Expr{op.Y, item}}
-    return call
+    return t.createInlineStringContains(op, visitor, pos)
 }
 
 // createInlineStringContains creates inline string containment check for GOPATH mode
@@ -739,7 +715,7 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, v
     // Convert rune needle to string if needed
     item := op.X
     if t.isRuneLiteral(op.X) {
-        item = t.convertRuneToString(op.X, pos)
+        item = t.convertRuneToString(op.X, pos, visitor.file)
     }
 
     hVar := &syntax.Name{Value: "h"}
@@ -752,67 +728,83 @@ func (t *InOperatorTransform) createInlineStringContains(op *syntax.Operation, v
     nAssign := &syntax.AssignStmt{Op: syntax.Def, Lhs: nVar, Rhs: item}
     nAssign.SetPos(pos)
 
-    // len(n)
-    lenName := &syntax.Name{Value: "len"}
-    lenName.SetPos(pos)
-    lenN := &syntax.CallExpr{Fun: lenName, ArgList: []syntax.Expr{nVar}}
-    lenN.SetPos(pos)
-    lenH := &syntax.CallExpr{Fun: lenName, ArgList: []syntax.Expr{hVar}}
-    lenH.SetPos(pos)
-
-    // if len(n) == 0 { return true }
     zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
     zero.SetPos(pos)
-    lenN_eq_zero := &syntax.Operation{Op: syntax.Eql, X: lenN, Y: zero}
-    lenN_eq_zero.SetPos(pos)
-    retTrue := &syntax.ReturnStmt{Results: &syntax.Name{Value: "true"}}
+    one := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+    one.SetPos(pos)
+
+    lenNameH := &syntax.Name{Value: "len"}
+    lenNameH.SetPos(pos)
+    lenH := &syntax.CallExpr{Fun: lenNameH, ArgList: []syntax.Expr{hVar}}
+    lenH.SetPos(pos)
+
+    lenNameN := &syntax.Name{Value: "len"}
+    lenNameN.SetPos(pos)
+    lenN := &syntax.CallExpr{Fun: lenNameN, ArgList: []syntax.Expr{nVar}}
+    lenN.SetPos(pos)
+
+    // if len(n) == 0 { return true }
+    retTrueName := &syntax.Name{Value: "true"}
+    retTrueName.SetPos(pos)
+    retTrue := &syntax.ReturnStmt{Results: retTrueName}
     retTrue.SetPos(pos)
-    retTrue.Results.SetPos(pos)
-    ifEmpty := &syntax.IfStmt{Cond: lenN_eq_zero, Then: &syntax.BlockStmt{List: []syntax.Stmt{retTrue}}}
+    lenEqZero := &syntax.Operation{Op: syntax.Eql, X: lenN, Y: zero}
+    lenEqZero.SetPos(pos)
+    ifEmpty := &syntax.IfStmt{Cond: lenEqZero, Then: &syntax.BlockStmt{List: []syntax.Stmt{retTrue}}}
     ifEmpty.SetPos(pos)
+
+    // if len(n) > len(h) { return false }
+    retFalseName := &syntax.Name{Value: "false"}
+    retFalseName.SetPos(pos)
+    retFalseEarly := &syntax.ReturnStmt{Results: retFalseName}
+    retFalseEarly.SetPos(pos)
+    lenGT := &syntax.Operation{Op: syntax.Gtr, X: lenN, Y: lenH}
+    lenGT.SetPos(pos)
+    ifTooLong := &syntax.IfStmt{Cond: lenGT, Then: &syntax.BlockStmt{List: []syntax.Stmt{retFalseEarly}}}
+    ifTooLong.SetPos(pos)
 
     // for i := 0; i <= len(h)-len(n); i++
     iVar := &syntax.Name{Value: "i"}
     iVar.SetPos(pos)
     initI := &syntax.AssignStmt{Op: syntax.Def, Lhs: iVar, Rhs: zero}
     initI.SetPos(pos)
-    lenH_minus_lenN := &syntax.Operation{Op: syntax.Sub, X: lenH, Y: lenN}
-    lenH_minus_lenN.SetPos(pos)
-    cond := &syntax.Operation{Op: syntax.Leq, X: iVar, Y: lenH_minus_lenN}
+    lenHMinusLenN := &syntax.Operation{Op: syntax.Sub, X: lenH, Y: lenN}
+    lenHMinusLenN.SetPos(pos)
+    cond := &syntax.Operation{Op: syntax.Leq, X: iVar, Y: lenHMinusLenN}
     cond.SetPos(pos)
-    one := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
-    one.SetPos(pos)
     inc := &syntax.AssignStmt{Op: syntax.Add, Lhs: iVar, Rhs: one}
     inc.SetPos(pos)
 
-    // if h[i] == n[0] { return true }  (simple heuristic)
-    hIdx := &syntax.IndexExpr{X: hVar, Index: iVar}
-    hIdx.SetPos(pos)
-    idxZero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
-    idxZero.SetPos(pos)
-    nIdx0 := &syntax.IndexExpr{X: nVar, Index: idxZero}
-    nIdx0.SetPos(pos)
-    eq := &syntax.Operation{Op: syntax.Eql, X: hIdx, Y: nIdx0}
+    end := &syntax.Operation{Op: syntax.Add, X: iVar, Y: lenN}
+    end.SetPos(pos)
+    slice := &syntax.SliceExpr{X: hVar, Index: [3]syntax.Expr{iVar, end, nil}}
+    slice.SetPos(pos)
+    eq := &syntax.Operation{Op: syntax.Eql, X: slice, Y: nVar}
     eq.SetPos(pos)
-    innerIf := &syntax.IfStmt{Cond: eq, Then: &syntax.BlockStmt{List: []syntax.Stmt{retTrue}}}
-    innerIf.SetPos(pos)
-    forBody := &syntax.BlockStmt{List: []syntax.Stmt{innerIf}}
-    forBody.SetPos(pos)
-    loop := &syntax.ForStmt{Init: initI, Cond: cond, Post: inc, Body: forBody}
+    returnTrue := &syntax.ReturnStmt{Results: retTrueName}
+    returnTrue.SetPos(pos)
+    ifMatch := &syntax.IfStmt{Cond: eq, Then: &syntax.BlockStmt{List: []syntax.Stmt{returnTrue}}}
+    ifMatch.SetPos(pos)
+
+    loopBody := &syntax.BlockStmt{List: []syntax.Stmt{ifMatch}}
+    loopBody.SetPos(pos)
+    loop := &syntax.ForStmt{Init: initI, Cond: cond, Post: inc, Body: loopBody}
     loop.SetPos(pos)
 
-    // return false
-    retFalse := &syntax.ReturnStmt{Results: &syntax.Name{Value: "false"}}
+    retFalse := &syntax.ReturnStmt{Results: retFalseName}
     retFalse.SetPos(pos)
-    retFalse.Results.SetPos(pos)
 
-    body := &syntax.BlockStmt{List: []syntax.Stmt{hAssign, nAssign, ifEmpty, loop, retFalse}}
+    body := &syntax.BlockStmt{List: []syntax.Stmt{hAssign, nAssign, ifEmpty, ifTooLong, loop, retFalse}}
     body.SetPos(pos)
+
     boolType := &syntax.Name{Value: "bool"}
     boolType.SetPos(pos)
-    fn := &syntax.FuncLit{Type: &syntax.FuncType{ResultList: []*syntax.Field{{Type: boolType}}}, Body: body}
+    field := &syntax.Field{Type: boolType}
+    field.SetPos(pos)
+    funcType := &syntax.FuncType{ResultList: []*syntax.Field{field}}
+    funcType.SetPos(pos)
+    fn := &syntax.FuncLit{Type: funcType, Body: body}
     fn.SetPos(pos)
-    fn.Type.SetPos(pos)
     call := &syntax.CallExpr{Fun: fn}
     call.SetPos(pos)
     return call

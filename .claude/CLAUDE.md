@@ -73,6 +73,8 @@ Or use a hybrid.
 ## Transformer Architecture
 The new NodeTransformer interface eliminates code duplication by using a centralized visitor pattern. The transformer architecture guide can be found under transformer-architecture-guide.md in the transforms folder. Key principle: Central visitor does ALL traversal, transformers handle only their specific node types (2-3 lines of CanHandle logic instead of 50+ lines of traversal duplication).
 
+For rebuilding the compiler with the full transformer set, see compiler-build-guide.md at the repo root.
+
 
 # Assume mishearings
 I am using speech recognition which might misunderstand some words:

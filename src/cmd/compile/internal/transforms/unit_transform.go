@@ -26,11 +26,10 @@ func (t *UnitTransformer) Transform(file *syntax.File, ctx *TransformContext) bo
 
 	// First pass: scan for unit assignments like m := units.M
 	unitVars := t.findUnitVariableAssignments(file)
-	
+
 	// Second pass: check if units are actually needed
 	hasUnits := t.hasUnitExpressions(file) || len(unitVars) > 0
-	
-	
+
 	if hasUnits {
 		// Add units import when units are actually used
 		t.addUnitsImport(file)
@@ -45,7 +44,7 @@ func (t *UnitTransformer) Transform(file *syntax.File, ctx *TransformContext) bo
 			changed = true
 		}
 	}
-	
+
 	return changed
 }
 
@@ -75,7 +74,7 @@ func (t *UnitTransformer) transformStmt(stmt syntax.Stmt, unitVars map[string]bo
 	if stmt == nil {
 		return stmt
 	}
-	
+
 	switch s := stmt.(type) {
 	case *syntax.BlockStmt:
 		changed := false
@@ -140,7 +139,7 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 	if expr == nil {
 		return expr
 	}
-	
+
 	switch n := expr.(type) {
 	case *syntax.UnitLitExpr:
 		return t.transformUnitLit(n)
@@ -152,13 +151,13 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 				return t.createScalarMultiplication(n.X, n.Y, n.Pos())
 			}
 		}
-		
+
 		// Handle equality comparison between units specially
 		if n.Op == syntax.Eql {
 			// Transform operands first
 			newX := t.transformExpr(n.X, unitVars)
 			newY := t.transformExpr(n.Y, unitVars)
-			
+
 			// Check if this is a unit equality comparison
 			if t.isUnitExpressionWithContext(newX, unitVars) && t.isUnitExpressionWithContext(newY, unitVars) {
 				// Transform: unit1 == unit2 -> unit1.Equal(unit2)
@@ -168,7 +167,7 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 				}
 				methodCall.SetPos(n.Pos())
 				methodCall.Sel.SetPos(n.Pos())
-				
+
 				call := &syntax.CallExpr{
 					Fun:     methodCall,
 					ArgList: []syntax.Expr{newY},
@@ -177,11 +176,11 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 				return call
 			}
 		}
-		
+
 		// For comparison and other operations, transform operands recursively first
 		newX := t.transformExpr(n.X, unitVars)
 		newY := t.transformExpr(n.Y, unitVars)
-		
+
 		// Create new operation node with transformed operands
 		var currentNode *syntax.Operation
 		if newX != n.X || newY != n.Y {
@@ -194,7 +193,7 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 		} else {
 			currentNode = n
 		}
-		
+
 		// Now try to transform the operation itself (e.g., unit addition/subtraction)
 		return t.transformUnitBinaryExprWithContext(currentNode, unitVars)
 	case *syntax.CallExpr:
@@ -253,71 +252,71 @@ func (t *UnitTransformer) transformExpr(expr syntax.Expr, unitVars map[string]bo
 
 func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr {
 	pos := node.Pos()
-	
+
 	// Transform: 500ms -> units.Ms.Multiply(500.0)
 	// Use qualified references to avoid injecting local constants
-	
+
 	// Map unit suffix to qualified units package reference
 	unitMapping := map[string]string{
 		// Length units
 		"m": "M", "km": "Km", "cm": "Cm", "mm": "Mm", "μm": "Um", "nm": "Nm", "pm": "Pm", "fm": "Fm",
 		"inch": "Inch", "in": "Inch", "ft": "Ft", "yd": "Yard", "mi": "Mile", "nmi": "NauticalMile",
 		"AU": "AU", "ly": "LightYear", "pc": "Parsec",
-		
+
 		// Time units
 		"s": "S", "ms": "Ms", "μs": "Us", "ns": "Ns", "ps": "Ps",
 		"min": "Min", "h": "H", "d": "Day", "wk": "Week", "mo": "Month", "yr": "Year",
-		
+
 		// Mass units
 		"kg": "Kg", "g": "G", "mg": "Mg", "μg": "Ug", "t": "Ton",
 		"lb": "Lb", "oz": "Oz", "st": "Stone", "u": "Amu",
-		
+
 		// Temperature units
 		"K": "K", "°C": "C", "°F": "F", "°R": "R",
-		
+
 		// Energy units
 		"J": "J", "kJ": "KJ", "MJ": "MJ", "cal": "Cal", "kcal": "Kcal",
 		"BTU": "BTU", "kWh": "KWh", "eV": "EV", "keV": "KeV", "MeV": "MeV",
-		
+
 		// Power units
 		"W": "W", "kW": "KW", "MW": "MW", "GW": "GW", "hp": "HP", "BTU/h": "BTUh",
-		
+
 		// Pressure units
 		"Pa": "Pa", "kPa": "KPa", "MPa": "MPa", "bar": "Bar", "atm": "Atm",
 		"psi": "Psi", "mmHg": "MmHg", "torr": "Torr",
-		
+
 		// Electric units
 		"A": "A", "V": "V", "Ω": "Ohm", "F": "F_unit", "H": "H_unit", "Wb": "Wb", "T": "T_unit",
-		
+
 		// Frequency units
 		"Hz": "Hz_unit", "kHz": "KHz_unit", "MHz": "MHz", "GHz": "GHz", "THz": "THz", "rpm": "Rpm",
-		
+
 		// Area units
 		"m²": "M2", "km²": "Km2", "cm²": "Cm2", "mm²": "Mm2", "ha": "Hectare", "ac": "Acre",
 		"ft²": "SqFt", "in²": "SqIn",
-		
+
 		// Volume units
 		"m³": "M3", "L": "L", "mL": "ML", "gal": "Gallon", "qt": "Quart", "pt": "Pint",
 		"cup": "Cup", "fl oz": "FlOz", "bbl": "Barrel",
-		
+
 		// Velocity units
 		"m/s": "Mps", "km/h": "Kmh", "mph": "Mph", "kn": "Knot", "ft/s": "Fps",
-		
+
 		// Acceleration units
 		"m/s²": "Mps2", "mps2": "Mps2", "gf": "G_force",
-		
+
 		// Angle units
 		"rad": "Rad", "°": "Deg", "deg": "Deg", "grad": "Grad", "turn": "Turn",
-		
+
 		// ASCII alternatives for compound units
 		"sqm": "M2", "cbm": "M3",
 	}
-	
+
 	unitsConstant, ok := unitMapping[node.Unit]
 	if !ok {
 		panic("Unknown unit: " + node.Unit)
 	}
-	
+
 	// Create units.M reference
 	unitsRef := &syntax.SelectorExpr{
 		X:   &syntax.Name{Value: "units"},
@@ -326,7 +325,7 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 	unitsRef.SetPos(pos)
 	unitsRef.X.SetPos(pos)
 	unitsRef.Sel.SetPos(pos)
-	
+
 	// Create units.Ms.Multiply(value) call
 	methodCall := &syntax.SelectorExpr{
 		X:   unitsRef,
@@ -334,69 +333,69 @@ func (t *UnitTransformer) transformUnitLit(node *syntax.UnitLitExpr) syntax.Expr
 	}
 	methodCall.SetPos(pos)
 	methodCall.Sel.SetPos(pos)
-	
+
 	valueLit := &syntax.BasicLit{
 		Value: node.Value,
 		Kind:  syntax.FloatLit,
 	}
 	valueLit.SetPos(pos)
-	
+
 	call := &syntax.CallExpr{
-		Fun: methodCall,
+		Fun:     methodCall,
 		ArgList: []syntax.Expr{valueLit},
 	}
 	call.SetPos(pos)
-	
+
 	return call
 }
 
 func (t *UnitTransformer) transformUnitBinaryExpr(node *syntax.Operation) syntax.Expr {
 	pos := node.Pos()
-	
-	// Handle number * unit or number · unit multiplication specially  
+
+	// Handle number * unit or number · unit multiplication specially
 	if node.Op == syntax.Mul || node.Op == syntax.MiddleDot {
 		if t.isNumericLiteral(node.X) && t.isUnitConstant(node.Y) {
 			// Transform: 2 * km or 2·km -> km.Mul(NewUnit(2.0, "1"))
 			return t.createScalarMultiplication(node.Y, node.X, pos)
 		}
 		if t.isUnitConstant(node.X) && t.isNumericLiteral(node.Y) {
-			// Transform: km * 2 or km·2 -> km.Mul(NewUnit(2.0, "1"))  
+			// Transform: km * 2 or km·2 -> km.Mul(NewUnit(2.0, "1"))
 			return t.createScalarMultiplication(node.X, node.Y, pos)
 		}
 	}
-	
+
 	if !t.hasUnitOperands(node) {
 		return node
 	}
-	
+
 	var methodName string
 	switch node.Op {
 	case syntax.Add:
-		methodName = "Add"  // Exported method name for Go
+		methodName = "Add" // Exported method name for Go
 	case syntax.Sub:
 		methodName = "Sub"
-    case syntax.Mul:
-        methodName = "Multiply"
-    case syntax.Div:
-        methodName = "Divide"
+	case syntax.Mul:
+		methodName = "Multiply"
+	case syntax.Div:
+		methodName = "Divide"
 	default:
 		return node // unsupported operation
 	}
-	
+
 	// Transform: a + b -> a.Add(b)
 	methodCall := &syntax.SelectorExpr{
-		X: node.X,
+		X:   node.X,
 		Sel: &syntax.Name{Value: methodName},
 	}
 	methodCall.SetPos(pos)
 	methodCall.Sel.SetPos(pos)
-	
+
 	call := &syntax.CallExpr{
-		Fun: methodCall,
+		Fun:     methodCall,
 		ArgList: []syntax.Expr{node.Y},
 	}
 	call.SetPos(pos)
-	
+
 	return call
 }
 
@@ -405,27 +404,27 @@ func (t *UnitTransformer) hasUnitOperands(node *syntax.Operation) bool {
 }
 
 func (t *UnitTransformer) isUnitExpression(expr syntax.Expr) bool {
-    switch e := expr.(type) {
-    case *syntax.UnitLitExpr:
-        return true
-    case *syntax.CallExpr:
-        if sel, ok := e.Fun.(*syntax.SelectorExpr); ok {
-            // Constructors from units package
-            if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
-                if sel.Sel.Value == "NewUnit" || t.isUnitConstant(sel) {
-                    return true
-                }
-            }
-            // Methods on unit values
-            methodName := sel.Sel.Value
-            return methodName == "Add" || methodName == "Sub" || 
-                   methodName == "Multiply" || methodName == "Divide" ||
-                   methodName == "ToString" || methodName == "withValue" ||
-                   methodName == "add" || methodName == "sub" ||
-                   methodName == "mul" || methodName == "div" || methodName == "toString"
-        }
-    }
-    return false
+	switch e := expr.(type) {
+	case *syntax.UnitLitExpr:
+		return true
+	case *syntax.CallExpr:
+		if sel, ok := e.Fun.(*syntax.SelectorExpr); ok {
+			// Constructors from units package
+			if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
+				if sel.Sel.Value == "NewUnit" || t.isUnitConstant(sel) {
+					return true
+				}
+			}
+			// Methods on unit values
+			methodName := sel.Sel.Value
+			return methodName == "Add" || methodName == "Sub" ||
+				methodName == "Multiply" || methodName == "Divide" ||
+				methodName == "ToString" || methodName == "withValue" ||
+				methodName == "add" || methodName == "sub" ||
+				methodName == "mul" || methodName == "div" || methodName == "toString"
+		}
+	}
+	return false
 }
 
 func (t *UnitTransformer) addUnitsImport(file *syntax.File) {
@@ -437,31 +436,28 @@ func (t *UnitTransformer) addUnitsImport(file *syntax.File) {
 			}
 		}
 	}
-	
+
 	// Add units import
-	pathLit := &syntax.BasicLit{
-		Value: `"units"`,
-		Kind:  syntax.StringLit,
-	}
-	pathLit.SetPos(syntax.Pos{}) // Use empty position for imports
-	
 	importDecl := &syntax.ImportDecl{
-		Path: pathLit,
+		Path: &syntax.BasicLit{
+			Value: `"units"`,
+			Kind:  syntax.StringLit,
+		},
 	}
-	importDecl.SetPos(syntax.Pos{})
-	
-	// Insert at the beginning of declarations  
+	ensureImportPos(file, importDecl)
+
+	// Insert at the beginning of declarations
 	file.DeclList = append([]syntax.Decl{importDecl}, file.DeclList...)
 }
 
 func (t *UnitTransformer) addUnitConstants(file *syntax.File) {
 	// Add local constants that reference the units package
 	// Since Go doesn't allow lowercase exports, we inject them as local constants
-	
+
 	// Create variable declarations: var m = units.M, etc.
 	unitMappings := map[string]string{
 		"m":   "units.M",
-		"km":  "units.Km", 
+		"km":  "units.Km",
 		"cm":  "units.Cm",
 		"mm":  "units.Mm",
 		"s":   "units.S",
@@ -469,26 +465,27 @@ func (t *UnitTransformer) addUnitConstants(file *syntax.File) {
 		"h":   "units.H",
 		"min": "units.Min",
 		"Hz":  "units.Hz_unit",
-		"kHz": "units.KHz_unit", 
+		"kHz": "units.KHz_unit",
 		"MHz": "units.MHz",
 		"GHz": "units.GHz",
 	}
-	
+
 	// Create individual var declarations
 	var newDecls []syntax.Decl
+	genPos := generatedNodePos(file)
 	for localName, unitsRef := range unitMappings {
 		// Create: var m = units.M
 		nameNode := &syntax.Name{Value: localName}
-		nameNode.SetPos(syntax.Pos{}) // Use empty position for generated declarations
-		
+		nameNode.SetPos(genPos)
+
 		varDecl := &syntax.VarDecl{
 			NameList: []*syntax.Name{nameNode},
-			Values:   t.createUnitsReference(unitsRef, syntax.Pos{}),
+			Values:   t.createUnitsReference(unitsRef, genPos),
 		}
-		varDecl.SetPos(syntax.Pos{})
+		varDecl.SetPos(genPos)
 		newDecls = append(newDecls, varDecl)
 	}
-	
+
 	// Insert the declarations at the beginning of the file after imports
 	insertIndex := 0
 	for i, decl := range file.DeclList {
@@ -497,7 +494,7 @@ func (t *UnitTransformer) addUnitConstants(file *syntax.File) {
 			break
 		}
 	}
-	
+
 	// Insert at the correct position
 	newDeclList := make([]syntax.Decl, 0, len(file.DeclList)+len(newDecls))
 	newDeclList = append(newDeclList, file.DeclList[:insertIndex]...)
@@ -512,19 +509,19 @@ func (t *UnitTransformer) createUnitsReference(unitsRef string, pos syntax.Pos) 
 	if len(parts) != 2 {
 		panic("Invalid units reference: " + unitsRef)
 	}
-	
+
 	xName := &syntax.Name{Value: parts[0]} // "units"
 	xName.SetPos(pos)
-	
+
 	selName := &syntax.Name{Value: parts[1]} // "M"
 	selName.SetPos(pos)
-	
+
 	selectorExpr := &syntax.SelectorExpr{
 		X:   xName,
 		Sel: selName,
 	}
 	selectorExpr.SetPos(pos)
-	
+
 	return selectorExpr
 }
 
@@ -536,22 +533,22 @@ func (t *UnitTransformer) isNumericLiteral(expr syntax.Expr) bool {
 }
 
 func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
-    // Only treat qualified unit constants (units.*) as unit constants here.
-    // Bare names like "m", "s" are too ambiguous (could be regular vars).
-    // Unit literals like 500ms are represented as *syntax.UnitLitExpr and handled elsewhere.
-    // Check for qualified unit constants: units.M, units.Km, etc.
-    if sel, ok := expr.(*syntax.SelectorExpr); ok {
-        if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
-            units := []string{
-                // Length units
-                "M", "Km", "Cm", "Mm", "Um", "Nm", "Pm", "Fm", "Inch", "Ft", "Yard", "Mile", "NauticalMile", "AU", "LightYear", "Parsec", "Meter",
-                // Time units
-                "S", "Ms", "Us", "Ns", "Ps", "Min", "H", "Day", "Week", "Month", "Year", "Second",
-                // Mass units
-                "Kg", "G", "Mg", "Ug", "Ton", "Lb", "Oz", "Stone", "Amu",
-                // Temperature units
-                "K", "C", "F", "R",
-                // Energy units
+	// Only treat qualified unit constants (units.*) as unit constants here.
+	// Bare names like "m", "s" are too ambiguous (could be regular vars).
+	// Unit literals like 500ms are represented as *syntax.UnitLitExpr and handled elsewhere.
+	// Check for qualified unit constants: units.M, units.Km, etc.
+	if sel, ok := expr.(*syntax.SelectorExpr); ok {
+		if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
+			units := []string{
+				// Length units
+				"M", "Km", "Cm", "Mm", "Um", "Nm", "Pm", "Fm", "Inch", "Ft", "Yard", "Mile", "NauticalMile", "AU", "LightYear", "Parsec", "Meter",
+				// Time units
+				"S", "Ms", "Us", "Ns", "Ps", "Min", "H", "Day", "Week", "Month", "Year", "Second",
+				// Mass units
+				"Kg", "G", "Mg", "Ug", "Ton", "Lb", "Oz", "Stone", "Amu",
+				// Temperature units
+				"K", "C", "F", "R",
+				// Energy units
 				"J", "KJ", "MJ", "Cal", "Kcal", "BTU", "KWh", "EV", "KeV", "MeV",
 				// Power units
 				"W", "KW", "MW", "GW", "HP", "BTUh",
@@ -577,16 +574,16 @@ func (t *UnitTransformer) isUnitConstant(expr syntax.Expr) bool {
 					return true
 				}
 			}
-        }
-    }
-    
-    return false
+		}
+	}
+
+	return false
 }
 
 func (t *UnitTransformer) createScalarMultiplication(unitExpr, numberExpr syntax.Expr, pos syntax.Pos) syntax.Expr {
 	// Transform: 2 * units.M -> units.M.Multiply(2.0)
 	// Uses the Go method where units have Multiply() methods
-	
+
 	// Create unit.Multiply(number)
 	methodCall := &syntax.SelectorExpr{
 		X:   unitExpr,
@@ -594,13 +591,13 @@ func (t *UnitTransformer) createScalarMultiplication(unitExpr, numberExpr syntax
 	}
 	methodCall.SetPos(pos)
 	methodCall.Sel.SetPos(pos)
-	
+
 	result := &syntax.CallExpr{
 		Fun:     methodCall,
 		ArgList: []syntax.Expr{numberExpr}, // use the number directly
 	}
 	result.SetPos(pos)
-	
+
 	return result
 }
 
@@ -611,7 +608,7 @@ func (t *UnitTransformer) shouldTransform(file *syntax.File) bool {
 
 func (t *UnitTransformer) hasUnitExpressions(file *syntax.File) bool {
 	hasUnits := false
-	
+
 	// Check for unit constants usage or unit literals in the file
 	walker := &SyntaxWalker{
 		VisitExpr: func(expr syntax.Expr) syntax.Expr {
@@ -625,20 +622,20 @@ func (t *UnitTransformer) hasUnitExpressions(file *syntax.File) bool {
 		},
 	}
 	walker.WalkFile(file)
-	
+
 	return hasUnits
 }
 
 func (t *UnitTransformer) findUnitVariableAssignments(file *syntax.File) map[string]bool {
 	unitVars := make(map[string]bool)
-	
+
 	// Look for variable assignments like: m := units.M
 	for _, decl := range file.DeclList {
 		// Check function-level assignments
 		if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
 			t.scanBlockForUnitAssignments(funcDecl.Body, unitVars)
 		}
-		
+
 		// Check package-level variable declarations
 		if varDecl, ok := decl.(*syntax.VarDecl); ok {
 			// Check for: ms := units.Ms or j_val := 1000J
@@ -650,7 +647,7 @@ func (t *UnitTransformer) findUnitVariableAssignments(file *syntax.File) map[str
 			}
 		}
 	}
-	
+
 	return unitVars
 }
 
@@ -690,54 +687,53 @@ func (t *UnitTransformer) scanStmtForUnitAssignments(stmt syntax.Stmt, unitVars 
 	}
 }
 
-
 func (t *UnitTransformer) transformUnitBinaryExprWithContext(node *syntax.Operation, unitVars map[string]bool) syntax.Expr {
 	pos := node.Pos()
-	
-	// Handle number * unit or number · unit multiplication specially  
+
+	// Handle number * unit or number · unit multiplication specially
 	if node.Op == syntax.Mul || node.Op == syntax.MiddleDot {
 		if t.isNumericLiteral(node.X) && t.isUnitConstantWithContext(node.Y, unitVars) {
 			// Transform: 2 * m or 2·m -> m.Multiply(2.0)
 			return t.createScalarMultiplication(node.Y, node.X, pos)
 		}
 		if t.isUnitConstantWithContext(node.X, unitVars) && t.isNumericLiteral(node.Y) {
-			// Transform: m * 2 or m·2 -> m.Multiply(2.0)  
+			// Transform: m * 2 or m·2 -> m.Multiply(2.0)
 			return t.createScalarMultiplication(node.X, node.Y, pos)
 		}
 	}
-	
+
 	if !t.hasUnitOperandsWithContext(node, unitVars) {
 		return node
 	}
-	
+
 	var methodName string
-    switch node.Op {
-    case syntax.Add:
-        methodName = "Add"  // Exported method name for Go
-    case syntax.Sub:
-        methodName = "Sub"
-    case syntax.Mul:
-        methodName = "Multiply"
-    case syntax.Div:
-        methodName = "Divide"
-    default:
-        return node // unsupported operation
-    }
-	
+	switch node.Op {
+	case syntax.Add:
+		methodName = "Add" // Exported method name for Go
+	case syntax.Sub:
+		methodName = "Sub"
+	case syntax.Mul:
+		methodName = "Multiply"
+	case syntax.Div:
+		methodName = "Divide"
+	default:
+		return node // unsupported operation
+	}
+
 	// Transform: a + b -> a.Add(b)
 	methodCall := &syntax.SelectorExpr{
-		X: node.X,
+		X:   node.X,
 		Sel: &syntax.Name{Value: methodName},
 	}
 	methodCall.SetPos(pos)
 	methodCall.Sel.SetPos(pos)
-	
+
 	call := &syntax.CallExpr{
-		Fun: methodCall,
+		Fun:     methodCall,
 		ArgList: []syntax.Expr{node.Y},
 	}
 	call.SetPos(pos)
-	
+
 	return call
 }
 
@@ -746,12 +742,12 @@ func (t *UnitTransformer) isUnitConstantWithContext(expr syntax.Expr, unitVars m
 	if t.isUnitConstant(expr) {
 		return true
 	}
-	
+
 	// Check if it's a variable that was assigned from a unit constant
 	if name, ok := expr.(*syntax.Name); ok {
 		return unitVars[name.Value]
 	}
-	
+
 	return false
 }
 
@@ -760,28 +756,28 @@ func (t *UnitTransformer) hasUnitOperandsWithContext(node *syntax.Operation, uni
 }
 
 func (t *UnitTransformer) isUnitExpressionWithContext(expr syntax.Expr, unitVars map[string]bool) bool {
-    switch e := expr.(type) {
-    case *syntax.UnitLitExpr:
-        return true
-    case *syntax.CallExpr:
-        // Check if it's a method call on a unit (has Add, Sub, etc. methods)
-        if sel, ok := e.Fun.(*syntax.SelectorExpr); ok {
-            // Constructors from units package
-            if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
-                if sel.Sel.Value == "NewUnit" || t.isUnitConstant(sel) {
-                    return true
-                }
-            }
-            methodName := sel.Sel.Value
-            return methodName == "Add" || methodName == "Sub" || 
-                   methodName == "Multiply" || methodName == "Divide" ||
-                   methodName == "ToString" || methodName == "withValue" ||
-                   methodName == "add" || methodName == "sub" ||
-                   methodName == "mul" || methodName == "div" || methodName == "toString"
-        }
-    case *syntax.Name:
-        // Check if it's a unit variable
-        return unitVars[e.Value]
-    }
-    return false
+	switch e := expr.(type) {
+	case *syntax.UnitLitExpr:
+		return true
+	case *syntax.CallExpr:
+		// Check if it's a method call on a unit (has Add, Sub, etc. methods)
+		if sel, ok := e.Fun.(*syntax.SelectorExpr); ok {
+			// Constructors from units package
+			if pkg, ok := sel.X.(*syntax.Name); ok && pkg.Value == "units" {
+				if sel.Sel.Value == "NewUnit" || t.isUnitConstant(sel) {
+					return true
+				}
+			}
+			methodName := sel.Sel.Value
+			return methodName == "Add" || methodName == "Sub" ||
+				methodName == "Multiply" || methodName == "Divide" ||
+				methodName == "ToString" || methodName == "withValue" ||
+				methodName == "add" || methodName == "sub" ||
+				methodName == "mul" || methodName == "div" || methodName == "toString"
+		}
+	case *syntax.Name:
+		// Check if it's a unit variable
+		return unitVars[e.Value]
+	}
+	return false
 }

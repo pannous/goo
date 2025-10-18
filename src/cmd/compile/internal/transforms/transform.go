@@ -42,7 +42,7 @@ func debug(format string, args ...any) {
 func ApplyTransformations(files []*syntax.File) {
 	for _, file := range files {
 		var userTransformers = os.Getenv("GOO_USE_TRANSFORMERS") == "1"
-		if strings.Contains(file.Path.Filename(), ".goo") {
+		if file.Path != nil && strings.Contains(file.Path.Filename(), ".goo") {
 			userTransformers = true // Force transformers for .goo files
 		}
 		if !userTransformers {
@@ -55,6 +55,8 @@ func ApplyTransformations(files []*syntax.File) {
 			continue /* Skip toolchain packages */
 		}
 
+		ensureFileNodeBases(file)
+
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
 		debug("Transform execution order:\n")
@@ -64,6 +66,11 @@ func ApplyTransformations(files []*syntax.File) {
 		for _, transformer := range TransformRegistry {
 			if transformer.Transform(file, ctx) {
 				debug("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+			}
+		}
+		for _, decl := range file.DeclList {
+			if imp, ok := decl.(*syntax.ImportDecl); ok && imp.Path != nil {
+				debug("Final import: %s\n", imp.Path.Value)
 			}
 		}
 	}
@@ -246,21 +253,21 @@ func RegisterTransformer(t Transformer) {
 
 // collectTypes walks the syntax tree and populates ctx.Types with variable names and their inferred types.
 func collectTypes(file *syntax.File, ctx *TransformContext) {
-    for _, decl := range file.DeclList {
-        if f, ok := decl.(*syntax.FuncDecl); ok {
-            collectFromStmt(f.Body, ctx)
-        }
-        // Also collect from top-level variable declarations
-        if v, ok := decl.(*syntax.VarDecl); ok {
-            collectFromVarDecl(v, ctx)
-        }
-    }
-    // Also collect from top-level statements (implicit main)
-    if len(file.TopLevelStmts) > 0 {
-        for _, stmt := range file.TopLevelStmts {
-            collectFromStmt(stmt, ctx)
-        }
-    }
+	for _, decl := range file.DeclList {
+		if f, ok := decl.(*syntax.FuncDecl); ok {
+			collectFromStmt(f.Body, ctx)
+		}
+		// Also collect from top-level variable declarations
+		if v, ok := decl.(*syntax.VarDecl); ok {
+			collectFromVarDecl(v, ctx)
+		}
+	}
+	// Also collect from top-level statements (implicit main)
+	if len(file.TopLevelStmts) > 0 {
+		for _, stmt := range file.TopLevelStmts {
+			collectFromStmt(stmt, ctx)
+		}
+	}
 }
 
 // collectFromVarDecl extracts type information from variable declarations
@@ -296,7 +303,7 @@ func collectFromVarDecl(varDecl *syntax.VarDecl, ctx *TransformContext) {
 
 // inferTypeFromExpression attempts to infer the type of an expression
 func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
-    switch e := expr.(type) {
+	switch e := expr.(type) {
 	case *syntax.BasicLit:
 		// Handle string literals like "hello"
 		if e.Kind == syntax.StringLit {
@@ -314,16 +321,16 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 		if e.Type == nil && len(e.ElemList) > 0 {
 			return inferMapTypeFromElements(e.ElemList)
 		}
-    case *syntax.CallExpr:
-        // Known map-returning functions (e.g., units.Available())
-        if isMapReturningFunctionCallExpr(e) {
-            return "map[string]any"
-        }
-        // Handle method calls like users.filter(...)
-        if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
-            if receiverName, ok := selector.X.(*syntax.Name); ok {
-                receiverType := ctx.Types[receiverName.Value]
-                methodName := selector.Sel.Value
+	case *syntax.CallExpr:
+		// Known map-returning functions (e.g., units.Available())
+		if isMapReturningFunctionCallExpr(e) {
+			return "map[string]any"
+		}
+		// Handle method calls like users.filter(...)
+		if selector, ok := e.Fun.(*syntax.SelectorExpr); ok {
+			if receiverName, ok := selector.X.(*syntax.Name); ok {
+				receiverType := ctx.Types[receiverName.Value]
+				methodName := selector.Sel.Value
 
 				// Infer return type based on method and receiver type
 				return inferMethodReturnType(receiverType, methodName)
@@ -359,16 +366,16 @@ func inferMethodReturnType(receiverType, methodName string) string {
 
 // isMapReturningFunctionCallExpr detects calls that are known to return map[string]...
 func isMapReturningFunctionCallExpr(call *syntax.CallExpr) bool {
-    // Match package-qualified calls like units.Available()
-    if sel, ok := call.Fun.(*syntax.SelectorExpr); ok {
-        if pkg, ok := sel.X.(*syntax.Name); ok {
-            if pkg.Value == "units" && sel.Sel.Value == "Available" {
-                return true
-            }
-        }
-    }
-    // Extend here with more known factories as needed
-    return false
+	// Match package-qualified calls like units.Available()
+	if sel, ok := call.Fun.(*syntax.SelectorExpr); ok {
+		if pkg, ok := sel.X.(*syntax.Name); ok {
+			if pkg.Value == "units" && sel.Sel.Value == "Available" {
+				return true
+			}
+		}
+	}
+	// Extend here with more known factories as needed
+	return false
 }
 
 func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
