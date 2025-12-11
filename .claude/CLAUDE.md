@@ -1,5 +1,13 @@
 # Claude Memory File
 
+## ⛔ CRITICAL RULES - NEVER VIOLATE ⛔
+
+**NEVER EDIT OR MODIFY FILES IN goo/ DIRECTORY**
+- goo/ contains user-maintained tests - READ ONLY
+- You may READ goo/ files to run tests or check behavior
+- You may ONLY create/modify test files in probes/ directory
+- Any violation of this rule is unacceptable
+
 ## Working Guidelines
 
 never unstage or undo my changes (unless explicitly asked), understand and incorporate them!
