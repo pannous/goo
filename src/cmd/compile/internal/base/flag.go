@@ -29,6 +29,29 @@ func usage() {
 	Exit(2)
 }
 
+// stripGitHash removes the git hash suffix from a version string.
+// For example, "go1.26.1.abc123" becomes "go1.26.1".
+func stripGitHash(version string) string {
+	// Find the last dot
+	if idx := strings.LastIndex(version, "."); idx > 0 {
+		// Check if what follows looks like a git hash (hex chars)
+		suffix := version[idx+1:]
+		if len(suffix) >= 6 {
+			isHex := true
+			for _, c := range suffix {
+				if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+					isHex = false
+					break
+				}
+			}
+			if isHex {
+				return version[:idx]
+			}
+		}
+	}
+	return version
+}
+
 // Flag holds the parsed command-line flags.
 // See ParseFlag for non-zero defaults.
 var Flag CmdFlags
@@ -303,7 +326,8 @@ func ParseFlags() {
 		usage()
 	}
 
-	if Flag.GoVersion != "" && Flag.GoVersion != runtime.Version() {
+	// Compare versions without git hash suffix to allow incremental builds
+	if Flag.GoVersion != "" && stripGitHash(Flag.GoVersion) != stripGitHash(runtime.Version()) {
 		fmt.Printf("compile: version %q does not match go tool version %q\n", runtime.Version(), Flag.GoVersion)
 		Exit(2)
 	}
