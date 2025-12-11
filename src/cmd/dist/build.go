@@ -406,6 +406,13 @@ func findgoversion() string {
 		// its content if available, which is empty at this point.
 		// Only use the VERSION file if it is non-empty.
 		if b != "" {
+			// Append git hash if in a git repo
+			if isGitRepo() {
+				hash := chomp(run(goroot, CheckExit, "git", "rev-parse", "--short", "HEAD"))
+				if hash != "" {
+					b = b + "." + hash
+				}
+			}
 			return b
 		}
 	}
