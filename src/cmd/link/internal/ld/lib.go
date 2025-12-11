@@ -2259,6 +2259,37 @@ func hostlinkArchArgs(arch *sys.Arch) []string {
 
 var wantHdr = objabi.HeaderString()
 
+// stripGitHashFromHeader removes the git hash suffix from a version in an object header.
+// For example, "go object darwin arm64 go1.26.1.abc123 X:..." becomes
+// "go object darwin arm64 go1.26.1 X:...".
+func stripGitHashFromHeader(header string) string {
+	fields := strings.Fields(header)
+	if len(fields) < 4 {
+		return header
+	}
+	// Version is typically at index 3: "go object <os> <arch> <version> ..."
+	version := fields[3]
+	// Strip git hash: go1.26.1.abc123 -> go1.26.1
+	if idx := strings.LastIndex(version, "."); idx > 0 {
+		// Check if what follows the last dot looks like a git hash (hex chars)
+		suffix := version[idx+1:]
+		if len(suffix) >= 6 && isHexString(suffix) {
+			fields[3] = version[:idx]
+		}
+	}
+	return strings.Join(fields, " ")
+}
+
+// isHexString checks if a string contains only hexadecimal characters.
+func isHexString(s string) bool {
+	for _, c := range s {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+			return false
+		}
+	}
+	return true
+}
+
 // ldobj loads an input object. If it is a host object (an object
 // compiled by a non-Go compiler) it returns the Hostobj pointer. If
 // it is a Go object, it returns nil.
@@ -2371,7 +2402,10 @@ func ldobj(ctxt *Link, f *bio.Reader, lib *sym.Library, length int64, pn string,
 	}
 
 	// First, check that the basic GOOS, GOARCH, and Version match.
-	if line != wantHdr {
+	// Strip git hash from version for comparison (e.g., go1.26.1.abc123 -> go1.26.1)
+	lineNoHash := stripGitHashFromHeader(line)
+	wantNoHash := stripGitHashFromHeader(wantHdr)
+	if lineNoHash != wantNoHash {
 		Errorf("%s: linked object header mismatch:\nhave %q\nwant %q\n", pn, line, wantHdr)
 	}
 
