@@ -17,14 +17,14 @@ import (
 // overflow checks that the constant x is representable by its type.
 // For untyped constants, it checks that the value doesn't become
 // arbitrarily large.
-func (checks *Checker) overflow(x *operand, opPos syntax.Pos) {
+func (check *Checker) overflow(x *operand, opPos syntax.Pos) {
 	assert(x.mode == constant_)
 
 	if x.val.Kind() == constant.Unknown {
 		// TODO(gri) We should report exactly what went wrong. At the
 		//           moment we don't have the (go/constant) API for that.
 		//           See also TODO in go/constant/value.go.
-		checks.error(atPos(opPos), InvalidConstVal, "constant result is not representable")
+		check.error(atPos(opPos), InvalidConstVal, "constant result is not representable")
 		return
 	}
 
@@ -33,7 +33,7 @@ func (checks *Checker) overflow(x *operand, opPos syntax.Pos) {
 	// x.typ cannot be a type parameter (type
 	// parameters cannot be constant types).
 	if isTyped(x.typ) {
-		checks.representable(x, under(x.typ).(*Basic))
+		check.representable(x, under(x.typ).(*Basic))
 		return
 	}
 
@@ -44,7 +44,7 @@ func (checks *Checker) overflow(x *operand, opPos syntax.Pos) {
 		if op != "" {
 			op += " "
 		}
-		checks.errorf(atPos(opPos), InvalidConstVal, "constant %soverflow", op)
+		check.errorf(atPos(opPos), InvalidConstVal, "constant %soverflow", op)
 		x.val = constant.MakeUnknown()
 	}
 }
@@ -234,10 +234,10 @@ func roundFloat64(x constant.Value) constant.Value {
 
 // representable checks that a constant operand is representable in the given
 // basic type.
-func (checks *Checker) representable(x *operand, typ *Basic) {
-	v, code := checks.representation(x, typ)
+func (check *Checker) representable(x *operand, typ *Basic) {
+	v, code := check.representation(x, typ)
 	if code != 0 {
-		checks.invalidConversion(code, x, typ)
+		check.invalidConversion(code, x, typ)
 		x.mode = invalid
 		return
 	}
@@ -249,10 +249,10 @@ func (checks *Checker) representable(x *operand, typ *Basic) {
 // basic type typ.
 //
 // If no such representation is possible, it returns a non-zero error code.
-func (checks *Checker) representation(x *operand, typ *Basic) (constant.Value, Code) {
+func (check *Checker) representation(x *operand, typ *Basic) (constant.Value, Code) {
 	assert(x.mode == constant_)
 	v := x.val
-	if !representableConst(x.val, checks, typ, &v) {
+	if !representableConst(x.val, check, typ, &v) {
 		if isNumeric(x.typ) && isNumeric(typ) {
 			// numeric conversion : error msg
 			//
@@ -272,7 +272,7 @@ func (checks *Checker) representation(x *operand, typ *Basic) (constant.Value, C
 	return v, 0
 }
 
-func (checks *Checker) invalidConversion(code Code, x *operand, target Type) {
+func (check *Checker) invalidConversion(code Code, x *operand, target Type) {
 	msg := "cannot convert %s to type %s"
 	switch code {
 	case TruncatedFloat:
@@ -280,27 +280,27 @@ func (checks *Checker) invalidConversion(code Code, x *operand, target Type) {
 	case NumericOverflow:
 		msg = "%s overflows %s"
 	}
-	checks.errorf(x, code, msg, x, target)
+	check.errorf(x, code, msg, x, target)
 }
 
 // convertUntyped attempts to set the type of an untyped value to the target type.
-func (checks *Checker) convertUntyped(x *operand, target Type) {
-	newType, val, code := checks.implicitTypeAndValue(x, target)
+func (check *Checker) convertUntyped(x *operand, target Type) {
+	newType, val, code := check.implicitTypeAndValue(x, target)
 	if code != 0 {
 		t := target
 		if !isTypeParam(target) {
 			t = safeUnderlying(target)
 		}
-		checks.invalidConversion(code, x, t)
+		check.invalidConversion(code, x, t)
 		x.mode = invalid
 		return
 	}
 	if val != nil {
 		x.val = val
-		checks.updateExprVal(x.expr, val)
+		check.updateExprVal(x.expr, val)
 	}
 	if newType != x.typ {
 		x.typ = newType
-		checks.updateExprType(x.expr, newType, false)
+		check.updateExprType(x.expr, newType, false)
 	}
 }

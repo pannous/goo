@@ -20,7 +20,7 @@ import (
 // variables are assigned to only (=) or whether there is a short variable
 // declaration (:=). If the latter and there are no variables, an error is
 // reported at noNewVarPos.
-func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, noNewVarPos poser, sKey, sValue, sExtra, rangeVar syntax.Expr, isDef bool) {
+func (check *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, noNewVarPos poser, sKey, sValue, sExtra, rangeVar syntax.Expr, isDef bool) {
 	// check expression to iterate over
 	var x operand
 
@@ -31,10 +31,10 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 	// So we have to be careful not to evaluate the arg in the
 	// described situation.
 
-	checks.hasCallOrRecv = false
-	checks.expr(nil, &x, rangeVar)
+	check.hasCallOrRecv = false
+	check.expr(nil, &x, rangeVar)
 
-	if isTypes2 && x.mode != invalid && sValue == nil && !checks.hasCallOrRecv {
+	if isTypes2 && x.mode != invalid && sValue == nil && !check.hasCallOrRecv {
 		if t, ok := arrayPtrDeref(under(x.typ)).(*Array); ok {
 			for {
 				// Put constant info on the thing inside parentheses.
@@ -49,7 +49,7 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 			// Override type of rangeVar to be a constant
 			// (and thus side-effects will not be computed
 			// by the backend).
-			checks.record(&operand{
+			check.record(&operand{
 				mode: constant_,
 				expr: rangeVar,
 				typ:  Typ[Int],
@@ -62,31 +62,31 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 	// determine key/value types
 	var key, val Type
 	if x.mode != invalid {
-		k, v, cause, ok := rangeKeyVal(checks, x.typ, func(v goVersion) bool {
-			return checks.allowVersion(v)
+		k, v, cause, ok := rangeKeyVal(check, x.typ, func(v goVersion) bool {
+			return check.allowVersion(v)
 		})
 		switch {
 		case !ok && cause != "":
-			checks.softErrorf(&x, InvalidRangeExpr, "cannot range over %s: %s", &x, cause)
+			check.softErrorf(&x, InvalidRangeExpr, "cannot range over %s: %s", &x, cause)
 		case !ok:
-			checks.softErrorf(&x, InvalidRangeExpr, "cannot range over %s", &x)
+			check.softErrorf(&x, InvalidRangeExpr, "cannot range over %s", &x)
 		case k == nil && sKey != nil:
-			checks.softErrorf(sKey, InvalidIterVar, "range over %s permits no iteration variables", &x)
+			check.softErrorf(sKey, InvalidIterVar, "range over %s permits no iteration variables", &x)
 		case v == nil && sValue != nil:
-			checks.softErrorf(sValue, InvalidIterVar, "range over %s permits only one iteration variable", &x)
+			check.softErrorf(sValue, InvalidIterVar, "range over %s permits only one iteration variable", &x)
 		case sExtra != nil:
-			checks.softErrorf(sExtra, InvalidIterVar, "range clause permits at most two iteration variables")
+			check.softErrorf(sExtra, InvalidIterVar, "range clause permits at most two iteration variables")
 		}
 		key, val = k, v
 	}
 
 	// Open the for-statement block scope now, after the range clause.
 	// Iteration variables declared with := need to go in this scope (was go.dev/issue/51437).
-	checks.openScope(rangeStmt, "range")
-	defer checks.closeScope()
+	check.openScope(rangeStmt, "range")
+	defer check.closeScope()
 
 	// check assignment to/declaration of iteration variables
-	// (irregular assignment, cannot easily map to existing assignment checks)
+	// (irregular assignment, cannot easily map to existing assignment check)
 
 	// lhs expressions and initialization value (rhs) types
 	lhs := [2]syntax.Expr{sKey, sValue} // sKey, sValue may be nil
@@ -107,15 +107,15 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 			if ident, _ := lhs.(*syntax.Name); ident != nil {
 				// declare new variable
 				name := ident.Value
-				obj = newVar(LocalVar, ident.Pos(), checks.pkg, name, nil)
-				checks.recordDef(ident, obj)
+				obj = newVar(LocalVar, ident.Pos(), check.pkg, name, nil)
+				check.recordDef(ident, obj)
 				// _ variables don't count as new variables
 				if name != "_" {
 					vars = append(vars, obj)
 				}
 			} else {
-				checks.errorf(lhs, InvalidSyntaxTree, "cannot declare %s", lhs)
-				obj = newVar(LocalVar, lhs.Pos(), checks.pkg, "_", nil) // dummy variable
+				check.errorf(lhs, InvalidSyntaxTree, "cannot declare %s", lhs)
+				obj = newVar(LocalVar, lhs.Pos(), check.pkg, "_", nil) // dummy variable
 			}
 			assert(obj.typ == nil)
 
@@ -124,19 +124,19 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 			if typ == nil || typ == Typ[Invalid] {
 				// typ == Typ[Invalid] can happen if allowVersion fails.
 				obj.typ = Typ[Invalid]
-				checks.usedVars[obj] = true // don't complain about unused variable
+				check.usedVars[obj] = true // don't complain about unused variable
 				continue
 			}
 
 			if rangeOverInt {
 				assert(i == 0) // at most one iteration variable (rhs[1] == nil or Typ[Invalid] for rangeOverInt)
-				checks.initVar(obj, &x, "range clause")
+				check.initVar(obj, &x, "range clause")
 			} else {
 				var y operand
 				y.mode = value
 				y.expr = lhs // we don't have a better rhs expression to use here
 				y.typ = typ
-				checks.initVar(obj, &y, "assignment") // error is on variable, use "assignment" not "range clause"
+				check.initVar(obj, &y, "assignment") // error is on variable, use "assignment" not "range clause"
 			}
 			assert(obj.typ != nil)
 		}
@@ -145,10 +145,10 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 		if len(vars) > 0 {
 			scopePos := rangeStmt.Body.Pos()
 			for _, obj := range vars {
-				checks.declare(checks.scope, nil /* recordDef already called */, obj, scopePos)
+				check.declare(check.scope, nil /* recordDef already called */, obj, scopePos)
 			}
 		} else {
-			checks.error(noNewVarPos, NoNewVar, "no new variables on left side of :=")
+			check.error(noNewVarPos, NoNewVar, "no new variables on left side of :=")
 		}
 	} else if sKey != nil /* lhs[0] != nil */ {
 		// ordinary assignment
@@ -165,19 +165,19 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 
 			if rangeOverInt {
 				assert(i == 0) // at most one iteration variable (rhs[1] == nil or Typ[Invalid] for rangeOverInt)
-				checks.assignVar(lhs, nil, &x, "range clause")
+				check.assignVar(lhs, nil, &x, "range clause")
 				// If the assignment succeeded, if x was untyped before, it now
 				// has a type inferred via the assignment. It must be an integer.
 				// (go.dev/issues/67027)
 				if x.mode != invalid && !isInteger(x.typ) {
-					checks.softErrorf(lhs, InvalidRangeExpr, "cannot use iteration variable of type %s", x.typ)
+					check.softErrorf(lhs, InvalidRangeExpr, "cannot use iteration variable of type %s", x.typ)
 				}
 			} else {
 				var y operand
 				y.mode = value
 				y.expr = lhs // we don't have a better rhs expression to use here
 				y.typ = typ
-				checks.assignVar(lhs, nil, &y, "assignment") // error is on variable, use "assignment" not "range clause"
+				check.assignVar(lhs, nil, &y, "assignment") // error is on variable, use "assignment" not "range clause"
 			}
 		}
 	} else if rangeOverInt {
@@ -187,10 +187,10 @@ func (checks *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, n
 		// We do this by checking the assignment _ = x. This ensures
 		// that an untyped x can be converted to a value of its default
 		// type (rune or int).
-		checks.assignment(&x, nil, "range clause")
+		check.assignment(&x, nil, "range clause")
 	}
 
-	checks.stmt(inner, rangeStmt.Body)
+	check.stmt(inner, rangeStmt.Body)
 }
 
 // rangeKeyVal returns the key and value type produced by a range clause

@@ -57,10 +57,10 @@ func NewInterfaceType(methods []*Func, embeddeds []Type) *Interface {
 }
 
 // check may be nil
-func (checks *Checker) newInterface() *Interface {
-	typ := &Interface{checks: checks}
-	if checks != nil {
-		checks.needsCleanup(typ)
+func (check *Checker) newInterface() *Interface {
+	typ := &Interface{checks: check}
+	if check != nil {
+		check.needsCleanup(typ)
 	}
 	return typ
 }
@@ -117,7 +117,7 @@ func (t *Interface) cleanup() {
 	t.embedPos = nil
 }
 
-func (checks *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceType, defi *TypeName) {
+func (check *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceType, defi *TypeName) {
 	addEmbedded := func(pos syntax.Pos, typ Type) {
 		ityp.embeddeds = append(ityp.embeddeds, typ)
 		if ityp.embedPos == nil {
@@ -128,7 +128,7 @@ func (checks *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceTyp
 
 	for _, f := range iface.MethodList {
 		if f.Name == nil {
-			addEmbedded(atPos(f.Type), parseUnion(checks, f.Type))
+			addEmbedded(atPos(f.Type), parseUnion(check, f.Type))
 			continue
 		}
 		// f.Name != nil
@@ -136,15 +136,15 @@ func (checks *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceTyp
 		// We have a method with name f.Name.
 		name := f.Name.Value
 		if name == "_" {
-			checks.error(f.Name, BlankIfaceMethod, "methods must have a unique non-blank name")
+			check.error(f.Name, BlankIfaceMethod, "methods must have a unique non-blank name")
 			continue // ignore
 		}
 
-		typ := checks.typ(f.Type)
+		typ := check.typ(f.Type)
 		sig, _ := typ.(*Signature)
 		if sig == nil {
 			if isValid(typ) {
-				checks.errorf(f.Type, InvalidSyntaxTree, "%s is not a method signature", typ)
+				check.errorf(f.Type, InvalidSyntaxTree, "%s is not a method signature", typ)
 			}
 			continue // ignore
 		}
@@ -156,10 +156,10 @@ func (checks *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceTyp
 				recvTyp = named
 			}
 		}
-		sig.recv = newVar(RecvVar, f.Name.Pos(), checks.pkg, "", recvTyp)
+		sig.recv = newVar(RecvVar, f.Name.Pos(), check.pkg, "", recvTyp)
 
-		m := NewFunc(f.Name.Pos(), checks.pkg, name, sig)
-		checks.recordDef(f.Name, m)
+		m := NewFunc(f.Name.Pos(), check.pkg, name, sig)
+		check.recordDef(f.Name, m)
 		ityp.methods = append(ityp.methods, m)
 	}
 
@@ -180,7 +180,7 @@ func (checks *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceTyp
 	// Compute type set as soon as possible to report any errors.
 	// Subsequent uses of type sets will use this computed type
 	// set and won't need to pass in a *Checker.
-	checks.later(func() {
-		computeInterfaceTypeSet(checks, iface.Pos(), ityp)
+	check.later(func() {
+		computeInterfaceTypeSet(check, iface.Pos(), ityp)
 	}).describef(iface, "compute type set for %s", ityp)
 }
