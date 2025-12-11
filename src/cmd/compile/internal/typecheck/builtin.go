@@ -83,6 +83,7 @@ var runtimeDecls = [...]struct {
 	{"printcomplex64", funcTag, 292},
 	{"printcomplex128", funcTag, 25},
 	{"printstring", funcTag, 27},
+	{"printquoted", funcTag, 27},
 	{"printpointer", funcTag, 28},
 	{"printuintptr", funcTag, 29},
 	{"printiface", funcTag, 28},
@@ -92,6 +93,7 @@ var runtimeDecls = [...]struct {
 	{"printsp", funcTag, 9},
 	{"printlock", funcTag, 9},
 	{"printunlock", funcTag, 9},
+	{"printhexopts", funcTag, 293},
 	{"concatstring2", funcTag, 32},
 	{"concatstring3", funcTag, 33},
 	{"concatstring4", funcTag, 34},
@@ -285,7 +287,7 @@ var runtimeDecls = [...]struct {
 }
 
 func runtimeTypes() []*types.Type {
-	var typs [293]*types.Type
+	var typs [294]*types.Type
 	typs[0] = types.ByteType
 	typs[1] = types.NewPtr(typs[0])
 	typs[2] = types.Types[types.TANY]
@@ -455,6 +457,7 @@ func runtimeTypes() []*types.Type {
 	typs[290] = newSig(params(typs[289]), nil)
 	typs[291] = types.Types[types.TCOMPLEX64]
 	typs[292] = newSig(params(typs[291]), nil)
+	typs[293] = newSig(params(typs[6], typs[13], typs[22]), nil)
 	return typs[:]
 }
 
