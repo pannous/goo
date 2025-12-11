@@ -74,7 +74,7 @@ func (check *Checker) structType(styp *Struct, e *syntax.StructType) {
 	var fields []*Var
 	var tags []string
 
-	// for double-declaration check
+	// for double-declaration checks
 	var fset objset
 
 	// current field typ and tag

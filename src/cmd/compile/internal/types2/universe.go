@@ -8,7 +8,6 @@ package types2
 
 import (
 	"go/constant"
-	"go/token"
 	"strings"
 )
 
@@ -75,10 +74,10 @@ var basicAliases = [...]*Basic{
 
 func defPredeclaredTypes() {
 	for _, t := range Typ {
-		defi(NewTypeName(nopos, nil, t.name, t))
+		def(NewTypeName(nopos, nil, t.name, t))
 	}
 	for _, t := range basicAliases {
-		defi(NewTypeName(nopos, nil, t.name, t))
+		def(NewTypeName(nopos, nil, t.name, t))
 	}
 
 	// type any = interface{}
@@ -99,7 +98,6 @@ func defPredeclaredTypes() {
 	// interface.
 	{
 		universeAnyNoAlias = NewTypeName(nopos, nil, "any", &Interface{complete: true, tset: &topTypeSet})
-		universeAnyNoAlias.setColor(black)
 		// ensure that the any TypeName reports a consistent Parent, after
 		// hijacking Universe.Lookup with gotypesalias=0.
 		universeAnyNoAlias.setParent(Universe)
@@ -108,16 +106,14 @@ func defPredeclaredTypes() {
 		// into the Universe, but we lean toward the future and insert the Alias
 		// representation.
 		universeAnyAlias = NewTypeName(nopos, nil, "any", nil)
-		universeAnyAlias.setColor(black)
 		_ = NewAlias(universeAnyAlias, universeAnyNoAlias.Type().Underlying()) // Link TypeName and Alias
-		defi(universeAnyAlias)
+		def(universeAnyAlias)
 	}
 
 	// type error interface{ Error() string }
 	{
 		obj := NewTypeName(nopos, nil, "error", nil)
-		obj.setColor(black)
-		typ := NewNamed(obj, nil, nil)
+		typ := (*Checker)(nil).newNamed(obj, nil, nil)
 
 		// error.Error() string
 		recv := newVar(RecvVar, nopos, nil, "", typ)
@@ -129,21 +125,22 @@ func defPredeclaredTypes() {
 		ityp := &Interface{methods: []*Func{err}, complete: true}
 		computeInterfaceTypeSet(nil, nopos, ityp) // prevent races due to lazy computation of tset
 
-		typ.SetUnderlying(ityp)
-		defi(obj)
+		typ.fromRHS = ityp
+		typ.Underlying()
+		def(obj)
 	}
 
 	// type comparable interface{} // marked as comparable
 	{
 		obj := NewTypeName(nopos, nil, "comparable", nil)
-		obj.setColor(black)
-		typ := NewNamed(obj, nil, nil)
+		typ := (*Checker)(nil).newNamed(obj, nil, nil)
 
 		// interface{} // marked as comparable
 		ityp := &Interface{complete: true, tset: &_TypeSet{nil, allTermlist, true}}
 
-		typ.SetUnderlying(ityp)
-		defi(obj)
+		typ.fromRHS = ityp
+		typ.Underlying()
+		def(obj)
 	}
 }
 
@@ -155,18 +152,16 @@ var predeclaredConsts = [...]struct {
 	{"true", UntypedBool, constant.MakeBool(true)},
 	{"false", UntypedBool, constant.MakeBool(false)},
 	{"iota", UntypedInt, constant.MakeInt64(0)},
-	{"π", UntypedFloat, constant.MakeFromLiteral("3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679", token.FLOAT, 0)},
-	{"τ", UntypedFloat, constant.MakeFromLiteral("6.2831853071795864769252867665590057683943387987502116419498891846156328125724179972560696506842341359", token.FLOAT, 0)},
 }
 
 func defPredeclaredConsts() {
 	for _, c := range predeclaredConsts {
-		defi(NewConst(nopos, nil, c.name, Typ[c.kind], c.val))
+		def(NewConst(nopos, nil, c.name, Typ[c.kind], c.val))
 	}
 }
 
 func defPredeclaredNil() {
-	defi(&Nil{object{name: "nil", typ: Typ[UntypedNil], color_: black}})
+	def(&Nil{object{name: "nil", typ: Typ[UntypedNil]}})
 }
 
 // A builtinId is the id of a builtin function.
@@ -192,13 +187,6 @@ const (
 	_Println
 	_Real
 	_Recover
-	_Typeof
-	_TypeMatches
-	_Truthy
-	_TruthyAndOp
-	_ListSortDesc
-	_ListPop  
-	_ListShift
 
 	// package unsafe
 	_Add
@@ -238,15 +226,8 @@ var predeclaredFuncs = [...]struct {
 	_Panic:   {"panic", 1, false, statement},
 	_Print:   {"print", 0, true, statement},
 	_Println: {"println", 0, true, statement},
-	_Real:       {"real", 1, false, expression},
-	_Recover:    {"recover", 0, false, statement},
-	_Typeof:     {"typeof", 1, false, expression},
-	_TypeMatches: {"typeMatches", 2, false, expression},
-	_Truthy:      {"truthy", 1, false, expression},
-	_TruthyAndOp: {"truthyAndOp", 2, false, expression},
-	_ListSortDesc: {"listSortDesc", 1, false, expression},
-	_ListPop:     {"listPop", 1, false, expression},
-	_ListShift:   {"listShift", 1, false, expression},
+	_Real:    {"real", 1, false, expression},
+	_Recover: {"recover", 0, false, statement},
 
 	_Add:        {"Add", 2, false, expression},
 	_Alignof:    {"Alignof", 1, false, expression},
@@ -264,10 +245,10 @@ var predeclaredFuncs = [...]struct {
 func defPredeclaredFuncs() {
 	for i := range predeclaredFuncs {
 		id := builtinId(i)
-		if id == _Trace {
+		if id == _Assert || id == _Trace {
 			continue // only define these in testing environment
 		}
-		defi(newBuiltin(id))
+		def(newBuiltin(id))
 	}
 }
 
@@ -278,8 +259,8 @@ func DefPredeclaredTestFuncs() {
 	if Universe.Lookup("assert") != nil {
 		return // already defined
 	}
-	defi(newBuiltin(_Assert))
-	defi(newBuiltin(_Trace))
+	def(newBuiltin(_Assert))
+	def(newBuiltin(_Trace))
 }
 
 func init() {
@@ -303,8 +284,8 @@ func init() {
 // Objects with names containing blanks are internal and not entered into
 // a scope. Objects with exported names are inserted in the unsafe package
 // scope; other objects are inserted in the universe scope.
-func defi(obj Object) {
-	assert(obj.color() == black)
+func def(obj Object) {
+	assert(obj.Type() != nil)
 	name := obj.Name()
 	if strings.Contains(name, " ") {
 		return // nothing to do

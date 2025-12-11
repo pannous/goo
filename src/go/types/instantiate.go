@@ -86,8 +86,8 @@ func Instantiate(ctxt *Context, orig Type, targs []Type, validate bool) (Type, e
 //
 // For Named types the resulting instance may be unexpanded.
 //
-// check may be nil (when not type-checking syntax); pos is used only only if check is non-nil.
-func (checks *Checker) instance(pos token.Pos, orig genericType, targs []Type, expanding *Named, ctxt *Context) (res Type) {
+// check may be nil (when not type-checking syntax); pos is used only if check is non-nil.
+func (check *Checker) instance(pos token.Pos, orig genericType, targs []Type, expanding *Named, ctxt *Context) (res Type) {
 	// The order of the contexts below matters: we always prefer instances in the
 	// expanding instance context in order to preserve reference cycles.
 	//
@@ -129,12 +129,12 @@ func (checks *Checker) instance(pos token.Pos, orig genericType, targs []Type, e
 
 	switch orig := orig.(type) {
 	case *Named:
-		res = checks.newNamedInstance(pos, orig, targs, expanding) // substituted lazily
+		res = check.newNamedInstance(pos, orig, targs, expanding) // substituted lazily
 
 	case *Alias:
 		// verify type parameter count (see go.dev/issue/71198 for a test case)
 		tparams := orig.TypeParams()
-		if !checks.validateTArgLen(pos, orig.obj.Name(), tparams.Len(), len(targs)) {
+		if !check.validateTArgLen(pos, orig.obj.Name(), tparams.Len(), len(targs)) {
 			// TODO(gri) Consider returning a valid alias instance with invalid
 			//           underlying (aliased) type to match behavior of *Named
 			//           types. Then this function will never return an invalid
@@ -145,20 +145,20 @@ func (checks *Checker) instance(pos token.Pos, orig genericType, targs []Type, e
 			return orig // nothing to do (minor optimization)
 		}
 
-		res = checks.newAliasInstance(pos, orig, targs, expanding, ctxt)
+		res = check.newAliasInstance(pos, orig, targs, expanding, ctxt)
 
 	case *Signature:
 		assert(expanding == nil) // function instances cannot be reached from Named types
 
 		tparams := orig.TypeParams()
 		// TODO(gri) investigate if this is needed (type argument and parameter count seem to be correct here)
-		if !checks.validateTArgLen(pos, orig.String(), tparams.Len(), len(targs)) {
+		if !check.validateTArgLen(pos, orig.String(), tparams.Len(), len(targs)) {
 			return Typ[Invalid]
 		}
 		if tparams.Len() == 0 {
 			return orig // nothing to do (minor optimization)
 		}
-		sig := checks.subst(pos, orig, makeSubstMap(tparams.list(), targs), nil, ctxt).(*Signature)
+		sig := check.subst(pos, orig, makeSubstMap(tparams.list(), targs), nil, ctxt).(*Signature)
 		// If the signature doesn't use its type parameters, subst
 		// will not make a copy. In that case, make a copy now (so
 		// we can set tparams to nil w/o causing side-effects).
@@ -183,7 +183,7 @@ func (checks *Checker) instance(pos token.Pos, orig genericType, targs []Type, e
 // validateTArgLen checks that the number of type arguments (got) matches the
 // number of type parameters (want); if they don't match an error is reported.
 // If validation fails and check is nil, validateTArgLen panics.
-func (checks *Checker) validateTArgLen(pos token.Pos, name string, want, got int) bool {
+func (check *Checker) validateTArgLen(pos token.Pos, name string, want, got int) bool {
 	var qual string
 	switch {
 	case got < want:
@@ -194,9 +194,9 @@ func (checks *Checker) validateTArgLen(pos token.Pos, name string, want, got int
 		return true
 	}
 
-	msg := checks.sprintf("%s type arguments for type %s: have %d, want %d", qual, name, got, want)
-	if checks != nil {
-		checks.error(atPos(pos), WrongTypeArgCount, msg)
+	msg := check.sprintf("%s type arguments for type %s: have %d, want %d", qual, name, got, want)
+	if check != nil {
+		check.error(atPos(pos), WrongTypeArgCount, msg)
 		return false
 	}
 
@@ -204,7 +204,7 @@ func (checks *Checker) validateTArgLen(pos token.Pos, name string, want, got int
 }
 
 // check may be nil; pos is used only if check is non-nil.
-func (checks *Checker) verify(pos token.Pos, tparams []*TypeParam, targs []Type, ctxt *Context) (int, error) {
+func (check *Checker) verify(pos token.Pos, tparams []*TypeParam, targs []Type, ctxt *Context) (int, error) {
 	smap := makeSubstMap(tparams, targs)
 	for i, tpar := range tparams {
 		// Ensure that we have a (possibly implicit) interface as type bound (go.dev/issue/51048).
@@ -213,9 +213,9 @@ func (checks *Checker) verify(pos token.Pos, tparams []*TypeParam, targs []Type,
 		// as the instantiated type; before we can use it for bounds checking we
 		// need to instantiate it with the type arguments with which we instantiated
 		// the parameterized type.
-		bound := checks.subst(pos, tpar.bound, smap, nil, ctxt)
+		bound := check.subst(pos, tpar.bound, smap, nil, ctxt)
 		var cause string
-		if !checks.implements(targs[i], bound, true, &cause) {
+		if !check.implements(targs[i], bound, true, &cause) {
 			return i, errors.New(cause)
 		}
 	}
@@ -228,13 +228,13 @@ func (checks *Checker) verify(pos token.Pos, tparams []*TypeParam, targs []Type,
 //
 // If the provided cause is non-nil, it may be set to an error string
 // explaining why V does not implement (or satisfy, for constraints) T.
-func (checks *Checker) implements(V, T Type, constraint bool, cause *string) bool {
-	Vu := under(V)
-	Tu := under(T)
+func (check *Checker) implements(V, T Type, constraint bool, cause *string) bool {
+	Vu := V.Underlying()
+	Tu := T.Underlying()
 	if !isValid(Vu) || !isValid(Tu) {
 		return true // avoid follow-on errors
 	}
-	if p, _ := Vu.(*Pointer); p != nil && !isValid(under(p.base)) {
+	if p, _ := Vu.(*Pointer); p != nil && !isValid(p.base.Underlying()) {
 		return true // avoid follow-on errors (see go.dev/issue/49541 for an example)
 	}
 
@@ -248,11 +248,11 @@ func (checks *Checker) implements(V, T Type, constraint bool, cause *string) boo
 		if cause != nil {
 			var detail string
 			if isInterfacePtr(Tu) {
-				detail = checks.sprintf("type %s is pointer to interface, not interface", T)
+				detail = check.sprintf("type %s is pointer to interface, not interface", T)
 			} else {
-				detail = checks.sprintf("%s is not an interface", T)
+				detail = check.sprintf("%s is not an interface", T)
 			}
-			*cause = checks.sprintf("%s does not %s %s (%s)", V, verb, T, detail)
+			*cause = check.sprintf("%s does not %s %s (%s)", V, verb, T, detail)
 		}
 		return false
 	}
@@ -274,15 +274,15 @@ func (checks *Checker) implements(V, T Type, constraint bool, cause *string) boo
 	// No type with non-empty type set satisfies the empty type set.
 	if Ti.typeSet().IsEmpty() {
 		if cause != nil {
-			*cause = checks.sprintf("cannot %s %s (empty type set)", verb, T)
+			*cause = check.sprintf("cannot %s %s (empty type set)", verb, T)
 		}
 		return false
 	}
 
 	// V must implement T's methods, if any.
-	if !checks.hasAllMethods(V, T, true, Identical, cause) /* !Implements(V, T) */ {
+	if !check.hasAllMethods(V, T, true, Identical, cause) /* !Implements(V, T) */ {
 		if cause != nil {
-			*cause = checks.sprintf("%s does not %s %s %s", V, verb, T, *cause)
+			*cause = check.sprintf("%s does not %s %s %s", V, verb, T, *cause)
 		}
 		return false
 	}
@@ -301,16 +301,16 @@ func (checks *Checker) implements(V, T Type, constraint bool, cause *string) boo
 		// so that ordinary, non-type parameter interfaces implement comparable.
 		if constraint && comparableType(V, true /* spec comparability */, nil) == nil {
 			// V is comparable if we are at Go 1.20 or higher.
-			if checks == nil || checks.allowVersion(go1_20) {
+			if check == nil || check.allowVersion(go1_20) {
 				return true
 			}
 			if cause != nil {
-				*cause = checks.sprintf("%s to %s comparable requires go1.20 or later", V, verb)
+				*cause = check.sprintf("%s to %s comparable requires go1.20 or later", V, verb)
 			}
 			return false
 		}
 		if cause != nil {
-			*cause = checks.sprintf("%s does not %s comparable", V, verb)
+			*cause = check.sprintf("%s does not %s comparable", V, verb)
 		}
 		return false
 	}
@@ -328,7 +328,7 @@ func (checks *Checker) implements(V, T Type, constraint bool, cause *string) boo
 		if !Vi.typeSet().subsetOf(Ti.typeSet()) {
 			// TODO(gri) report which type is missing
 			if cause != nil {
-				*cause = checks.sprintf("%s does not %s %s", V, verb, T)
+				*cause = check.sprintf("%s does not %s %s", V, verb, T)
 			}
 			return false
 		}
@@ -342,7 +342,7 @@ func (checks *Checker) implements(V, T Type, constraint bool, cause *string) boo
 			// If V ∉ t.typ but V ∈ ~t.typ then remember this type
 			// so we can suggest it as an alternative in the error
 			// message.
-			if alt == nil && !t.tilde && Identical(t.typ, under(t.typ)) {
+			if alt == nil && !t.tilde && Identical(t.typ, t.typ.Underlying()) {
 				tt := *t
 				tt.tilde = true
 				if tt.includes(V) {
@@ -357,13 +357,13 @@ func (checks *Checker) implements(V, T Type, constraint bool, cause *string) boo
 			var detail string
 			switch {
 			case alt != nil:
-				detail = checks.sprintf("possibly missing ~ for %s in %s", alt, T)
+				detail = check.sprintf("possibly missing ~ for %s in %s", alt, T)
 			case mentions(Ti, V):
-				detail = checks.sprintf("%s mentions %s, but %s is not in the type set of %s", T, V, V, T)
+				detail = check.sprintf("%s mentions %s, but %s is not in the type set of %s", T, V, V, T)
 			default:
-				detail = checks.sprintf("%s missing in %s", V, Ti.typeSet().terms)
+				detail = check.sprintf("%s missing in %s", V, Ti.typeSet().terms)
 			}
-			*cause = checks.sprintf("%s does not %s %s (%s)", V, verb, T, detail)
+			*cause = check.sprintf("%s does not %s %s (%s)", V, verb, T, detail)
 		}
 		return false
 	}

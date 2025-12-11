@@ -149,7 +149,7 @@ func (s *_TypeSet) is(f func(*term) bool) bool {
 var topTypeSet = _TypeSet{terms: allTermlist}
 
 // computeInterfaceTypeSet may be called with check == nil.
-func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *_TypeSet {
+func computeInterfaceTypeSet(check *Checker, pos syntax.Pos, ityp *Interface) *_TypeSet {
 	if ityp.tset != nil {
 		return ityp.tset
 	}
@@ -168,7 +168,7 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 		return &topTypeSet
 	}
 
-	if checks != nil && checks.conf.Trace {
+	if check != nil && check.conf.Trace {
 		// Types don't generally have position information.
 		// If we don't have a valid pos provided, try to use
 		// one close enough.
@@ -176,11 +176,11 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 			pos = ityp.methods[0].pos
 		}
 
-		checks.trace(pos, "-- type set for %s", ityp)
-		checks.indent++
+		check.trace(pos, "-- type set for %s", ityp)
+		check.indent++
 		defer func() {
-			checks.indent--
-			checks.trace(pos, "=> %s ", ityp.typeSet())
+			check.indent--
+			check.trace(pos, "=> %s ", ityp.typeSet())
 		}()
 	}
 
@@ -192,11 +192,11 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 	ityp.tset = &_TypeSet{terms: allTermlist} // TODO(gri) is this sufficient?
 
 	var unionSets map[*Union]*_TypeSet
-	if checks != nil {
-		if checks.unionTypeSets == nil {
-			checks.unionTypeSets = make(map[*Union]*_TypeSet)
+	if check != nil {
+		if check.unionTypeSets == nil {
+			check.unionTypeSets = make(map[*Union]*_TypeSet)
 		}
-		unionSets = checks.unionTypeSets
+		unionSets = check.unionTypeSets
 	} else {
 		unionSets = make(map[*Union]*_TypeSet)
 	}
@@ -223,8 +223,8 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 			allMethods = append(allMethods, m)
 			mpos[m] = pos
 		case explicit:
-			if checks != nil {
-				err := checks.newError(DuplicateDecl)
+			if check != nil {
+				err := check.newError(DuplicateDecl)
 				err.addf(atPos(pos), "duplicate method %s", m.name)
 				err.addf(atPos(mpos[other.(*Func)]), "other declaration of method %s", m.name)
 				err.report()
@@ -235,10 +235,10 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 			// If we're pre-go1.14 (overlapping embeddings are not permitted), report that
 			// error here as well (even though we could do it eagerly) because it's the same
 			// error message.
-			if checks != nil {
-				checks.later(func() {
-					if pos.IsKnown() && !checks.allowVersion(go1_14) || !Identical(m.typ, other.Type()) {
-						err := checks.newError(DuplicateDecl)
+			if check != nil {
+				check.later(func() {
+					if pos.IsKnown() && !check.allowVersion(go1_14) || !Identical(m.typ, other.Type()) {
+						err := check.newError(DuplicateDecl)
 						err.addf(atPos(pos), "duplicate method %s", m.name)
 						err.addf(atPos(mpos[other.(*Func)]), "other declaration of method %s", m.name)
 						err.report()
@@ -268,9 +268,9 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 		case *Interface:
 			// For now we don't permit type parameters as constraints.
 			assert(!isTypeParam(typ))
-			tset := computeInterfaceTypeSet(checks, pos, u)
+			tset := computeInterfaceTypeSet(check, pos, u)
 			// If typ is local, an error was already reported where typ is specified/defined.
-			if pos.IsKnown() && checks != nil && checks.isImportedConstraint(typ) && !checks.verifyVersionf(atPos(pos), go1_18, "embedding constraint interface %s", typ) {
+			if pos.IsKnown() && check != nil && check.isImportedConstraint(typ) && !check.verifyVersionf(atPos(pos), go1_18, "embedding constraint interface %s", typ) {
 				continue
 			}
 			comparable = tset.comparable
@@ -279,10 +279,10 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 			}
 			terms = tset.terms
 		case *Union:
-			if pos.IsKnown() && checks != nil && !checks.verifyVersionf(atPos(pos), go1_18, "embedding interface element %s", u) {
+			if pos.IsKnown() && check != nil && !check.verifyVersionf(atPos(pos), go1_18, "embedding interface element %s", u) {
 				continue
 			}
-			tset := computeUnionTypeSet(checks, unionSets, pos, u)
+			tset := computeUnionTypeSet(check, unionSets, pos, u)
 			if tset == &invalidTypeSet {
 				continue // ignore invalid unions
 			}
@@ -293,7 +293,7 @@ func computeInterfaceTypeSet(checks *Checker, pos syntax.Pos, ityp *Interface) *
 			if !isValid(u) {
 				continue
 			}
-			if pos.IsKnown() && checks != nil && !checks.verifyVersionf(atPos(pos), go1_18, "embedding non-interface type %s", typ) {
+			if pos.IsKnown() && check != nil && !check.verifyVersionf(atPos(pos), go1_18, "embedding non-interface type %s", typ) {
 				continue
 			}
 			terms = termlist{{false, typ}}
@@ -369,7 +369,7 @@ var invalidTypeSet _TypeSet
 
 // computeUnionTypeSet may be called with check == nil.
 // The result is &invalidTypeSet if the union overflows.
-func computeUnionTypeSet(checks *Checker, unionSets map[*Union]*_TypeSet, pos syntax.Pos, utyp *Union) *_TypeSet {
+func computeUnionTypeSet(check *Checker, unionSets map[*Union]*_TypeSet, pos syntax.Pos, utyp *Union) *_TypeSet {
 	if tset, _ := unionSets[utyp]; tset != nil {
 		return tset
 	}
@@ -384,7 +384,7 @@ func computeUnionTypeSet(checks *Checker, unionSets map[*Union]*_TypeSet, pos sy
 		if ui, _ := u.(*Interface); ui != nil {
 			// For now we don't permit type parameters as constraints.
 			assert(!isTypeParam(t.typ))
-			terms = computeInterfaceTypeSet(checks, pos, ui).terms
+			terms = computeInterfaceTypeSet(check, pos, ui).terms
 		} else if !isValid(u) {
 			continue
 		} else {
@@ -399,8 +399,8 @@ func computeUnionTypeSet(checks *Checker, unionSets map[*Union]*_TypeSet, pos sy
 		// of the type sets of each term.
 		allTerms = allTerms.union(terms)
 		if len(allTerms) > maxTermCount {
-			if checks != nil {
-				checks.errorf(atPos(pos), InvalidUnion, "cannot handle more than %d union terms (implementation limitation)", maxTermCount)
+			if check != nil {
+				check.errorf(atPos(pos), InvalidUnion, "cannot handle more than %d union terms (implementation limitation)", maxTermCount)
 			}
 			unionSets[utyp] = &invalidTypeSet
 			return unionSets[utyp]

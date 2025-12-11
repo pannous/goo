@@ -88,18 +88,18 @@ func sprintf(fset *token.FileSet, qf Qualifier, tpSubscripts bool, format string
 }
 
 // check may be nil.
-func (checks *Checker) sprintf(format string, args ...any) string {
+func (check *Checker) sprintf(format string, args ...any) string {
 	var fset *token.FileSet
 	var qf Qualifier
-	if checks != nil {
-		fset = checks.fset
-		qf = checks.qualifier
+	if check != nil {
+		fset = check.fset
+		qf = check.qualifier
 	}
 	return sprintf(fset, qf, false, format, args...)
 }
 
-func (checks *Checker) trace(pos token.Pos, format string, args ...any) {
-	pos1 := checks.fset.Position(pos)
+func (check *Checker) trace(pos token.Pos, format string, args ...any) {
+	pos1 := check.fset.Position(pos)
 	// Use the width of line and pos values to align the ":" by adding padding before it.
 	// Cap padding at 5: 3 digits for the line, 2 digits for the column number, which is
 	// ok for most cases.
@@ -108,8 +108,8 @@ func (checks *Checker) trace(pos token.Pos, format string, args ...any) {
 	fmt.Printf("%s%s:  %s%s\n",
 		pos1,
 		pad,
-		strings.Repeat(".  ", checks.indent),
-		sprintf(checks.fset, checks.qualifier, true, format, args...),
+		strings.Repeat(".  ", check.indent),
+		sprintf(check.fset, check.qualifier, true, format, args...),
 	)
 }
 
@@ -128,20 +128,20 @@ func ndigits(x int) int {
 }
 
 // dump is only needed for debugging
-func (checks *Checker) dump(format string, args ...any) {
-	fmt.Println(sprintf(checks.fset, checks.qualifier, true, format, args...))
+func (check *Checker) dump(format string, args ...any) {
+	fmt.Println(sprintf(check.fset, check.qualifier, true, format, args...))
 }
 
-func (checks *Checker) qualifier(pkg *Package) string {
+func (check *Checker) qualifier(pkg *Package) string {
 	// Qualify the package unless it's the package being type-checked.
-	if pkg != checks.pkg {
-		if checks.pkgPathMap == nil {
-			checks.pkgPathMap = make(map[string]map[string]bool)
-			checks.seenPkgMap = make(map[*Package]bool)
-			checks.markImports(checks.pkg)
+	if pkg != check.pkg {
+		if check.pkgPathMap == nil {
+			check.pkgPathMap = make(map[string]map[string]bool)
+			check.seenPkgMap = make(map[*Package]bool)
+			check.markImports(check.pkg)
 		}
 		// If the same package name was used by multiple packages, display the full path.
-		if len(checks.pkgPathMap[pkg.name]) > 1 {
+		if len(check.pkgPathMap[pkg.name]) > 1 {
 			return strconv.Quote(pkg.path)
 		}
 		return pkg.name
@@ -151,21 +151,21 @@ func (checks *Checker) qualifier(pkg *Package) string {
 
 // markImports recursively walks pkg and its imports, to record unique import
 // paths in pkgPathMap.
-func (checks *Checker) markImports(pkg *Package) {
-	if checks.seenPkgMap[pkg] {
+func (check *Checker) markImports(pkg *Package) {
+	if check.seenPkgMap[pkg] {
 		return
 	}
-	checks.seenPkgMap[pkg] = true
+	check.seenPkgMap[pkg] = true
 
-	forName, ok := checks.pkgPathMap[pkg.name]
+	forName, ok := check.pkgPathMap[pkg.name]
 	if !ok {
 		forName = make(map[string]bool)
-		checks.pkgPathMap[pkg.name] = forName
+		check.pkgPathMap[pkg.name] = forName
 	}
 	forName[pkg.path] = true
 
 	for _, imp := range pkg.imports {
-		checks.markImports(imp)
+		check.markImports(imp)
 	}
 }
 

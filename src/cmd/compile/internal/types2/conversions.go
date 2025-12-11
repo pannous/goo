@@ -133,9 +133,9 @@ func (check *Checker) conversion(x *operand, T Type) {
 // may be set to the cause for the failure.
 // The check parameter may be nil if convertibleTo is invoked through an
 // exported API call, i.e., when all methods have been type-checked.
-func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
+func (x *operand) convertibleTo(check *Checker, T Type, cause *string) bool {
 	// "x is assignable to T"
-	if ok, _ := x.assignableTo(checks, T, cause); ok {
+	if ok, _ := x.assignableTo(check, T, cause); ok {
 		return true
 	}
 
@@ -200,7 +200,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 		switch a := Tu.(type) {
 		case *Array:
 			if Identical(s.Elem(), a.Elem()) {
-				if checks == nil || checks.allowVersion(go1_20) {
+				if check == nil || check.allowVersion(go1_20) {
 					return true
 				}
 				// check != nil
@@ -213,7 +213,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 		case *Pointer:
 			if a, _ := a.Elem().Underlying().(*Array); a != nil {
 				if Identical(s.Elem(), a.Elem()) {
-					if checks == nil || checks.allowVersion(go1_17) {
+					if check == nil || check.allowVersion(go1_17) {
 						return true
 					}
 					// check != nil
@@ -232,8 +232,8 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 	}
 
 	errorf := func(format string, args ...any) {
-		if checks != nil && cause != nil {
-			msg := checks.sprintf(format, args...)
+		if check != nil && cause != nil {
+			msg := check.sprintf(format, args...)
 			if *cause != "" {
 				msg += "\n\t" + *cause
 			}
@@ -255,7 +255,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 				if T == nil {
 					return false // no specific types
 				}
-				if !x.convertibleTo(checks, T.typ, cause) {
+				if !x.convertibleTo(check, T.typ, cause) {
 					errorf("cannot convert %s (in %s) to type %s (in %s)", V.typ, Vp, T.typ, Tp)
 					return false
 				}
@@ -269,7 +269,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 				return false // no specific types
 			}
 			x.typ = V.typ
-			if !x.convertibleTo(checks, T, cause) {
+			if !x.convertibleTo(check, T, cause) {
 				errorf("cannot convert %s (in %s) to type %s", V.typ, Vp, origT)
 				return false
 			}
@@ -280,7 +280,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 			if T == nil {
 				return false // no specific types
 			}
-			if !x.convertibleTo(checks, T.typ, cause) {
+			if !x.convertibleTo(check, T.typ, cause) {
 				errorf("cannot convert %s to type %s (in %s)", x.typ, T.typ, Tp)
 				return false
 			}

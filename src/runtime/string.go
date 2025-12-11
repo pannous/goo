@@ -270,8 +270,8 @@ func stringRuneAt(s string, i int) string {
 // This function panics if the conversion fails, providing a simple
 // runtime helper for string-to-int casting
 func stringToInt(s string) int {
-	n, ok := strconv.Atoi(s)
-	if !ok {
+	n, err := strconv.Atoi(s)
+	if err != nil {
 		panic("stringToInt: invalid syntax")
 	}
 	return n
@@ -282,8 +282,8 @@ func stringToInt(s string) int {
 func stringToIntBase(s string, base int) int {
 	// TODO: Implement proper base parsing
 	// For now, just use regular Atoi regardless of base
-	n, ok := strconv.Atoi(s)
-	if !ok {
+	n, err := strconv.Atoi(s)
+	if err != nil {
 		panic("stringToIntBase: invalid syntax")
 	}
 	return n

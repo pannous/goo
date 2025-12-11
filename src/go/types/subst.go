@@ -55,7 +55,7 @@ func (m substMap) lookup(tpar *TypeParam) Type {
 //
 // If expanding is non-nil, it is the instance type currently being expanded.
 // One of expanding or ctxt must be non-nil.
-func (checks *Checker) subst(pos token.Pos, typ Type, smap substMap, expanding *Named, ctxt *Context) Type {
+func (check *Checker) subst(pos token.Pos, typ Type, smap substMap, expanding *Named, ctxt *Context) Type {
 	assert(expanding != nil || ctxt != nil)
 
 	if smap.empty() {
@@ -74,7 +74,7 @@ func (checks *Checker) subst(pos token.Pos, typ Type, smap substMap, expanding *
 	subst := subster{
 		pos:       pos,
 		smap:      smap,
-		checks:     checks,
+		check:     check,
 		expanding: expanding,
 		ctxt:      ctxt,
 	}
@@ -84,7 +84,7 @@ func (checks *Checker) subst(pos token.Pos, typ Type, smap substMap, expanding *
 type subster struct {
 	pos       token.Pos
 	smap      substMap
-	checks     *Checker // nil if called via Instantiate
+	check     *Checker // nil if called via Instantiate
 	expanding *Named   // if non-nil, the instance that is being expanded
 	ctxt      *Context
 }
@@ -117,7 +117,7 @@ func (subst *subster) typ(typ Type) Type {
 		// to be substituted; i.e., if it is or contains a type parameter
 		// that has a type argument for it.
 		if targs := substList(t.TypeArgs().list(), subst.typ); targs != nil {
-			return subst.checks.newAliasInstance(subst.pos, t.orig, targs, subst.expanding, subst.ctxt)
+			return subst.check.newAliasInstance(subst.pos, t.orig, targs, subst.expanding, subst.ctxt)
 		}
 
 	case *Array:
@@ -197,7 +197,7 @@ func (subst *subster) typ(typ Type) Type {
 			if embeddeds == nil {
 				embeddeds = t.embeddeds
 			}
-			iface := subst.checks.newInterface()
+			iface := subst.check.newInterface()
 			iface.embeddeds = embeddeds
 			iface.embedPos = t.embedPos
 			iface.implicit = t.implicit
@@ -219,7 +219,7 @@ func (subst *subster) typ(typ Type) Type {
 			iface.methods, _ = replaceRecvType(methods, t, iface)
 
 			// If check != nil, check.newInterface will have saved the interface for later completion.
-			if subst.checks == nil { // golang/go#61561: all newly created interfaces must be completed
+			if subst.check == nil { // golang/go#61561: all newly created interfaces must be completed
 				iface.typeSet()
 			}
 			return iface
@@ -263,7 +263,7 @@ func (subst *subster) typ(typ Type) Type {
 			// recursion. The position used here is irrelevant because validation only
 			// occurs on t (we don't call validType on named), but we use subst.pos to
 			// help with debugging.
-			return subst.checks.instance(subst.pos, orig, targs, subst.expanding, subst.ctxt)
+			return subst.check.instance(subst.pos, orig, targs, subst.expanding, subst.ctxt)
 		}
 
 	case *TypeParam:

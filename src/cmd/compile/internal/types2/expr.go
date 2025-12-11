@@ -20,7 +20,7 @@ Basic algorithm:
 Expressions are checked recursively, top down. Expression checker functions
 are generally of the form:
 
-	func f(x *operand, e *syntax.Expr, ...)
+  func f(x *operand, e *syntax.Expr, ...)
 
 where e is the expression to be checked, and x is the result of the check.
 The check performed by f may fail in which case x.mode == invalid, and
@@ -273,7 +273,7 @@ func (check *Checker) updateExprType(x syntax.Expr, typ Type, final bool) {
 		*syntax.SliceExpr,
 		*syntax.AssertExpr,
 		*syntax.ListExpr,
-	//*syntax.StarExpr,
+		//*syntax.StarExpr,
 		*syntax.KeyValueExpr,
 		*syntax.ArrayType,
 		*syntax.StructType,
@@ -361,7 +361,7 @@ func (check *Checker) updateExprType(x syntax.Expr, typ Type, final bool) {
 	// If the new type is not final and still untyped, just
 	// update the recorded type.
 	if !final && isUntyped(typ) {
-		old.typ = under(typ).(*Basic)
+		old.typ = typ.Underlying().(*Basic)
 		check.untyped[x] = old
 		return
 	}
@@ -431,7 +431,7 @@ func (check *Checker) implicitTypeAndValue(x *operand, target Type) (Type, const
 		return nil, nil, InvalidUntypedConversion
 	}
 
-	switch u := under(target).(type) {
+	switch u := target.Underlying().(type) {
 	case *Basic:
 		if x.mode == constant_ {
 			v, code := check.representation(x, u)
@@ -518,19 +518,6 @@ func (check *Checker) comparison(x, y *operand, op syntax.Operator, switchCase b
 		errOp = y
 		cause = check.sprintf("mismatched types %s and %s", x.typ, y.typ)
 		goto Error
-	}
-
-	// Transform map comparisons to function calls before checking comparability
-	if (op == syntax.Eql || op == syntax.Neq) &&
-		under(x.typ) != nil && under(y.typ) != nil &&
-		!x.isNil() && !y.isNil() {
-		if _, xIsMap := under(x.typ).(*Map); xIsMap {
-			if _, yIsMap := under(y.typ).(*Map); yIsMap {
-				// Transform map comparison to function call
-				check.transformMapComparison(x, y, op)
-				return
-			}
-		}
 	}
 
 	// check if comparison is defined for operands
@@ -629,8 +616,8 @@ Error:
 // incomparableCause returns a more specific cause why typ is not comparable.
 // If there is no more specific cause, the result is "".
 func (check *Checker) incomparableCause(typ Type) string {
-	switch under(typ).(type) {
-	case *Signature, *Map:
+	switch typ.Underlying().(type) {
+	case *Slice, *Signature, *Map:
 		return compositeKind(typ) + " can only be compared to nil"
 	}
 	// see if we can extract a more specific error
@@ -793,9 +780,8 @@ func init() {
 		syntax.Xor:    allInteger,
 		syntax.AndNot: allInteger,
 
-		syntax.AndAnd:    allBoolean,
-		syntax.OrOr:      allBoolean,
-		syntax.TruthyAnd: func(Type) bool { return true }, // Allow any type for truthy and
+		syntax.AndAnd: allBoolean,
+		syntax.OrOr:   allBoolean,
 	}
 }
 
@@ -829,55 +815,6 @@ func (check *Checker) binary(x *operand, e syntax.Expr, lhs, rhs syntax.Expr, op
 	if isComparison(op) {
 		check.comparison(x, &y, op, false)
 		return
-	}
-
-	// Special handling for string + number/boolean concatenation
-	if op == syntax.Add && !Identical(x.typ, y.typ) {
-		if allString(x.typ) && allNumeric(y.typ) {
-			// String + Number: "text" + 123 -> "text123"
-			if x.mode == constant_ && y.mode == constant_ {
-				// Convert numeric constant to string representation
-				numStr := y.val.String()
-				y.val = constant.MakeString(numStr)
-				y.typ = x.typ // Use the same string type as left operand
-			} else {
-				check.convertUntyped(&y, Typ[String])
-			}
-		} else if allNumeric(x.typ) && allString(y.typ) {
-			// Number + String: 123 + "text" -> "123text"  
-			if x.mode == constant_ && y.mode == constant_ {
-				// Convert numeric constant to string representation
-				numStr := x.val.String()
-				x.val = constant.MakeString(numStr)
-				x.typ = y.typ // Use the same string type as right operand
-			} else {
-				check.convertUntyped(x, Typ[String])
-			}
-		} else if allString(x.typ) && allBoolean(y.typ) {
-			// String + Boolean: "prefix" + true -> "prefix✔️"
-			if x.mode == constant_ && y.mode == constant_ {
-				boolStr := "✖️" // false
-				if constant.BoolVal(y.val) {
-					boolStr = "✔️" // true
-				}
-				y.val = constant.MakeString(boolStr)
-				y.typ = x.typ // Use the same string type as left operand
-			} else {
-				check.convertUntyped(&y, Typ[String])
-			}
-		} else if allBoolean(x.typ) && allString(y.typ) {
-			// Boolean + String: true + "suffix" -> "✔️suffix"
-			if x.mode == constant_ && y.mode == constant_ {
-				boolStr := "✖️" // false
-				if constant.BoolVal(x.val) {
-					boolStr = "✔️" // true
-				}
-				x.val = constant.MakeString(boolStr)
-				x.typ = y.typ // Use the same string type as right operand
-			} else {
-				check.convertUntyped(x, Typ[String])
-			}
-		}
 	}
 
 	if !Identical(x.typ, y.typ) {
@@ -934,49 +871,6 @@ func (check *Checker) binary(x *operand, e syntax.Expr, lhs, rhs syntax.Expr, op
 		x.val = constant.BinaryOp(x.val, tok, y.val)
 		x.expr = e
 		check.overflow(x, opPos(x.expr))
-		return
-	}
-
-	x.mode = value
-	// x.typ is unchanged
-}
-
-// postfix handles postfix operators like 3², 2³
-func (check *Checker) postfix(x *operand, e *syntax.PostfixExpr) {
-	check.expr(nil, x, e.X)
-	if x.mode == invalid {
-		return
-	}
-
-	// Check that the base expression is numeric
-	if !allNumeric(x.typ) {
-		check.errorf(x, UndefinedOp, "postfix operator %s not defined on %s", e.Op, x)
-		x.mode = invalid
-		return
-	}
-
-	// Handle specific postfix operators
-	switch e.Op {
-	case "²":
-		// Square operator: x²
-		if x.mode == constant_ {
-			// For constants, compute x * x at compile time
-			x.val = constant.BinaryOp(x.val, token.MUL, x.val)
-		}
-		// x.typ remains unchanged (numeric type)
-
-	case "³":
-		// Cube operator: x³
-		if x.mode == constant_ {
-			// For constants, compute x * x * x at compile time
-			squared := constant.BinaryOp(x.val, token.MUL, x.val)
-			x.val = constant.BinaryOp(squared, token.MUL, x.val)
-		}
-		// x.typ remains unchanged (numeric type)
-
-	default:
-		check.errorf(e, InvalidSyntaxTree, "unknown postfix operator %s", e.Op)
-		x.mode = invalid
 		return
 	}
 
@@ -1069,7 +963,7 @@ type target struct {
 // The result is nil if typ is not a signature.
 func newTarget(typ Type, desc string) *target {
 	if typ != nil {
-		if sig, _ := under(typ).(*Signature); sig != nil {
+		if sig, _ := typ.Underlying().(*Signature); sig != nil {
 			return &target{sig, desc}
 		}
 	}
@@ -1099,6 +993,13 @@ func (check *Checker) rawExpr(T *target, x *operand, e syntax.Expr, hint Type, a
 		check.nonGeneric(T, x)
 	}
 
+	// Here, x is a value, meaning it has a type. If that type is pending, then we have
+	// a cycle. As an example:
+	//
+	//  type T [unsafe.Sizeof(T{})]int
+	//
+	// has a cycle T->T which is deemed valid (by decl.go), but which is in fact invalid.
+	check.pendingType(x)
 	check.record(x)
 
 	return kind
@@ -1133,6 +1034,19 @@ func (check *Checker) nonGeneric(T *target, x *operand) {
 	}
 }
 
+// If x has a pending type (i.e. its declaring object is on the object path), pendingType
+// reports an error and invalidates x.mode and x.typ.
+// Otherwise it leaves x alone.
+func (check *Checker) pendingType(x *operand) {
+	if x.mode == invalid || x.mode == novalue {
+		return
+	}
+	if !check.finiteSize(x.typ) {
+		x.mode = invalid
+		x.typ = Typ[Invalid]
+	}
+}
+
 // exprInternal contains the core of type checking of expressions.
 // Must only be called by rawExpr.
 // (See rawExpr for an explanation of the parameters.)
@@ -1150,7 +1064,7 @@ func (check *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint Ty
 		goto Error // error was reported before
 
 	case *syntax.Name:
-		check.ident(x, e, nil, false)
+		check.ident(x, e, false)
 
 	case *syntax.DotsType:
 		// dots are handled explicitly where they are valid
@@ -1165,12 +1079,6 @@ func (check *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint Ty
 		if x.mode == invalid {
 			goto Error
 		}
-
-	case *syntax.UnitLitExpr:
-		// Unit literals should be handled by transformers before reaching type checker
-		// If we get here, transformation didn't occur - treat as error
-		check.error(e, InvalidSyntaxTree, "unit literal not transformed")
-		goto Error
 
 	case *syntax.FuncLit:
 		check.funcLit(x, e)
@@ -1191,7 +1099,7 @@ func (check *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint Ty
 		return kind
 
 	case *syntax.SelectorExpr:
-		check.selector(x, e, nil, false)
+		check.selector(x, e, false)
 
 	case *syntax.IndexExpr:
 		if check.indexExpr(x, e) {
@@ -1224,7 +1132,7 @@ func (check *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint Ty
 			check.errorf(x, InvalidAssert, invalidOp+"cannot use type assertion on type parameter value %s", x)
 			goto Error
 		}
-		if _, ok := under(x.typ).(*Interface); !ok {
+		if _, ok := x.typ.Underlying().(*Interface); !ok {
 			check.errorf(x, InvalidAssert, invalidOp+"%s is not an interface", x)
 			goto Error
 		}
@@ -1322,13 +1230,6 @@ func (check *Checker) exprInternal(T *target, x *operand, e syntax.Expr, hint Ty
 			goto Error
 		}
 
-	case *syntax.PostfixExpr:
-		// Handle postfix operators like 3², 2³
-		check.postfix(x, e)
-		if x.mode == invalid {
-			goto Error
-		}
-
 	case *syntax.KeyValueExpr:
 		// key:value expressions are handled in composite literals
 		check.error(e, InvalidSyntaxTree, "no key:value expected")
@@ -1366,7 +1267,7 @@ Error:
 // represented as an integer (such as 1.0) it is returned as an integer value.
 // This ensures that constants of different kind but equal value (such as
 // 1.0 + 0i, 1.0, 1) result in the same value.
-func keyVal(x constant.Value) interface{} {
+func keyVal(x constant.Value) any {
 	switch x.Kind() {
 	case constant.Complex:
 		f := constant.ToFloat(x)
@@ -1554,50 +1455,4 @@ var op2tok = [...]token.Token{
 	syntax.AndNot: token.AND_NOT,
 	syntax.Shl:    token.SHL,
 	syntax.Shr:    token.SHR,
-}
-
-// transformMapComparison transforms map == map and map != map comparisons 
-// into function calls that perform element-wise comparison
-func (check *Checker) transformMapComparison(x, y *operand, op syntax.Operator) {
-	// Create a closure that performs the map comparison
-	// For x == y: func() bool { 
-	//   if len(x) != len(y) { return false }
-	//   for k, v := range x { if y[k] != v { return false } }
-	//   return true 
-	// }()
-
-	// For now, create a simple function call expression that will be handled at runtime
-	// This approach is similar to how put() creates fmt.Printf calls
-
-	// Create reflect.DeepEqual(x, y) call
-	reflectName := syntax.NewName(x.expr.Pos(), "reflect")
-	deepEqualName := syntax.NewName(x.expr.Pos(), "DeepEqual")
-	selector := &syntax.SelectorExpr{
-		X:   reflectName,
-		Sel: deepEqualName,
-	}
-	selector.SetPos(x.expr.Pos())
-
-	// Create call expression: reflect.DeepEqual(x, y)
-	call := &syntax.CallExpr{
-		Fun:     selector,
-		ArgList: []syntax.Expr{x.expr, y.expr},
-	}
-	call.SetPos(x.expr.Pos())
-
-	// For != operation, we'll need to negate the result
-	var resultExpr syntax.Expr = call
-	if op == syntax.Neq {
-		// Create !__mapEqual(x, y)
-		resultExpr = &syntax.Operation{
-			Op: syntax.Not,
-			X:  call,
-		}
-		resultExpr.SetPos(x.expr.Pos())
-	}
-
-	// Set the operand to represent the result of this comparison
-	x.mode = value
-	x.typ = Typ[Bool]
-	x.expr = resultExpr
 }

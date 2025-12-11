@@ -77,10 +77,10 @@ var basicAliases = [...]*Basic{
 
 func defPredeclaredTypes() {
 	for _, t := range Typ {
-		defi(NewTypeName(nopos, nil, t.name, t))
+		def(NewTypeName(nopos, nil, t.name, t))
 	}
 	for _, t := range basicAliases {
-		defi(NewTypeName(nopos, nil, t.name, t))
+		def(NewTypeName(nopos, nil, t.name, t))
 	}
 
 	// type any = interface{}
@@ -101,7 +101,6 @@ func defPredeclaredTypes() {
 	// interface.
 	{
 		universeAnyNoAlias = NewTypeName(nopos, nil, "any", &Interface{complete: true, tset: &topTypeSet})
-		universeAnyNoAlias.setColor(black)
 		// ensure that the any TypeName reports a consistent Parent, after
 		// hijacking Universe.Lookup with gotypesalias=0.
 		universeAnyNoAlias.setParent(Universe)
@@ -110,16 +109,14 @@ func defPredeclaredTypes() {
 		// into the Universe, but we lean toward the future and insert the Alias
 		// representation.
 		universeAnyAlias = NewTypeName(nopos, nil, "any", nil)
-		universeAnyAlias.setColor(black)
 		_ = NewAlias(universeAnyAlias, universeAnyNoAlias.Type().Underlying()) // Link TypeName and Alias
-		defi(universeAnyAlias)
+		def(universeAnyAlias)
 	}
 
 	// type error interface{ Error() string }
 	{
 		obj := NewTypeName(nopos, nil, "error", nil)
-		obj.setColor(black)
-		typ := NewNamed(obj, nil, nil)
+		typ := (*Checker)(nil).newNamed(obj, nil, nil)
 
 		// error.Error() string
 		recv := newVar(RecvVar, nopos, nil, "", typ)
@@ -131,21 +128,22 @@ func defPredeclaredTypes() {
 		ityp := &Interface{methods: []*Func{err}, complete: true}
 		computeInterfaceTypeSet(nil, nopos, ityp) // prevent races due to lazy computation of tset
 
-		typ.SetUnderlying(ityp)
-		defi(obj)
+		typ.fromRHS = ityp
+		typ.Underlying()
+		def(obj)
 	}
 
 	// type comparable interface{} // marked as comparable
 	{
 		obj := NewTypeName(nopos, nil, "comparable", nil)
-		obj.setColor(black)
-		typ := NewNamed(obj, nil, nil)
+		typ := (*Checker)(nil).newNamed(obj, nil, nil)
 
 		// interface{} // marked as comparable
 		ityp := &Interface{complete: true, tset: &_TypeSet{nil, allTermlist, true}}
 
-		typ.SetUnderlying(ityp)
-		defi(obj)
+		typ.fromRHS = ityp
+		typ.Underlying()
+		def(obj)
 	}
 }
 
@@ -161,12 +159,12 @@ var predeclaredConsts = [...]struct {
 
 func defPredeclaredConsts() {
 	for _, c := range predeclaredConsts {
-		defi(NewConst(nopos, nil, c.name, Typ[c.kind], c.val))
+		def(NewConst(nopos, nil, c.name, Typ[c.kind], c.val))
 	}
 }
 
 func defPredeclaredNil() {
-	defi(&Nil{object{name: "nil", typ: Typ[UntypedNil], color_: black}})
+	def(&Nil{object{name: "nil", typ: Typ[UntypedNil]}})
 }
 
 // A builtinId is the id of a builtin function.
@@ -253,7 +251,7 @@ func defPredeclaredFuncs() {
 		if id == _Assert || id == _Trace {
 			continue // only define these in testing environment
 		}
-		defi(newBuiltin(id))
+		def(newBuiltin(id))
 	}
 }
 
@@ -264,8 +262,8 @@ func DefPredeclaredTestFuncs() {
 	if Universe.Lookup("assert") != nil {
 		return // already defined
 	}
-	defi(newBuiltin(_Assert))
-	defi(newBuiltin(_Trace))
+	def(newBuiltin(_Assert))
+	def(newBuiltin(_Trace))
 }
 
 func init() {
@@ -289,8 +287,8 @@ func init() {
 // Objects with names containing blanks are internal and not entered into
 // a scope. Objects with exported names are inserted in the unsafe package
 // scope; other objects are inserted in the universe scope.
-func defi(obj Object) {
-	assert(obj.color() == black)
+func def(obj Object) {
+	assert(obj.Type() != nil)
 	name := obj.Name()
 	if strings.Contains(name, " ") {
 		return // nothing to do

@@ -725,100 +725,6 @@ func (check *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) (
 			check.recordBuiltinType(call.Fun, makeSig(x.typ))
 		}
 
-	case _Typeof:
-		// typeof(x) string
-		x.mode = constant_
-		x.typ = Typ[String]
-		x.val = constant.MakeString(args[0].typ.String())
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(Typ[String], args[0].typ))
-		}
-
-	case _TypeMatches:
-		// typeMatches(value, typeName) bool
-		// Second argument must be a string
-		y := args[1]
-		check.assignment(y, Typ[String], "second argument to typeMatches")
-		if y.mode == invalid {
-			return
-		}
-
-		x.mode = value
-		x.typ = Typ[Bool]
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(Typ[Bool], args[0].typ, Typ[String]))
-		}
-
-	case _Truthy:
-		// truthy(value) bool
-		// Takes any type and returns bool
-		x.mode = value
-		x.typ = Typ[Bool]
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(Typ[Bool], args[0].typ))
-		}
-
-	case _TruthyAndOp:
-		// truthyAndOp(left, right) interface{}
-		// Takes any two types and returns appropriate truthy result
-		leftType := args[0].typ
-		rightType := args[1].typ
-
-		x.mode = value
-		x.typ = NewInterfaceType(nil, nil) // Return interface{}
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(NewInterfaceType(nil, nil), leftType, rightType))
-		}
-
-	case _ListSortDesc:
-		// listSortDesc(list) interface{}
-		// Takes any slice/list type and returns the same type
-		x.mode = value
-		x.typ = args[0].typ // Return same type as input
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(args[0].typ, args[0].typ))
-		}
-
-	case _ListPop:
-		// listPop(list) interface{}
-		// Takes any slice/list type and returns element type
-		listType := args[0].typ
-		var elementType Type = Typ[Invalid]
-
-		// Extract element type from slice type
-		if slice, ok := listType.Underlying().(*Slice); ok {
-			elementType = slice.elem
-		} else {
-			// For non-slice types, return interface{}
-			elementType = NewInterfaceType(nil, nil)
-		}
-
-		x.mode = value
-		x.typ = elementType
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(elementType, listType))
-		}
-
-	case _ListShift:
-		// listShift(list) interface{}
-		// Takes any slice/list type and returns element type
-		listType := args[0].typ
-		var elementType Type = Typ[Invalid]
-
-		// Extract element type from slice type
-		if slice, ok := listType.Underlying().(*Slice); ok {
-			elementType = slice.elem
-		} else {
-			// For non-slice types, return interface{}
-			elementType = NewInterfaceType(nil, nil)
-		}
-
-		x.mode = value
-		x.typ = elementType
-		if check.recordTypes() {
-			check.recordBuiltinType(call.Fun, makeSig(elementType, listType))
-		}
-
 	case _Add:
 		// unsafe.Add(ptr unsafe.Pointer, len IntegerType) unsafe.Pointer
 		check.verifyVersionf(call.Fun, go1_17, "unsafe.Add")
@@ -1026,27 +932,22 @@ func (check *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) (
 		}
 
 	case _Assert:
-		// assert(pred) panics at runtime if pred is false.
-		// For compile-time constants, check at compile time.
-		if !isBoolean(x.typ) {
-			check.errorf(x, Test, invalidArg+"%s is not a boolean expression", x)
+		// assert(pred) causes a typechecker error if pred is false.
+		// The result of assert is the value of pred if there is no error.
+		// Note: assert is only available in self-test mode.
+		if x.mode != constant_ || !isBoolean(x.typ) {
+			check.errorf(x, Test, invalidArg+"%s is not a boolean constant", x)
 			return
 		}
-
-		// If it's a compile-time constant, check it now
-		if x.mode == constant_ {
-			if x.val.Kind() != constant.Bool {
-				check.errorf(x, Test, "internal error: value of %s should be a boolean constant", x)
-				return
-			}
-			if !constant.BoolVal(x.val) {
-				check.errorf(call, Test, "%v failed", call)
-				// compile-time assertion failure - safe to continue
-			}
+		if x.val.Kind() != constant.Bool {
+			check.errorf(x, Test, "internal error: value of %s should be a boolean constant", x)
+			return
 		}
-
-		// For runtime expressions, the check will be done by the backend
-		x.mode = novalue
+		if !constant.BoolVal(x.val) {
+			check.errorf(call, Test, "%v failed", call)
+			// compile-time assertion failure - safe to continue
+		}
+		// result is constant - no need to record signature
 
 	case _Trace:
 		// trace(x, y, z, ...) dumps the positions, expressions, and

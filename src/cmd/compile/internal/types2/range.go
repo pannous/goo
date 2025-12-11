@@ -86,7 +86,7 @@ func (check *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, no
 	defer check.closeScope()
 
 	// check assignment to/declaration of iteration variables
-	// (irregular assignment, cannot easily map to existing assignment check)
+	// (irregular assignment, cannot easily map to existing assignment checks)
 
 	// lhs expressions and initialization value (rhs) types
 	lhs := [2]syntax.Expr{sKey, sValue} // sKey, sValue may be nil
@@ -199,7 +199,7 @@ func (check *Checker) rangeStmt(inner stmtContext, rangeStmt *syntax.ForStmt, no
 // If the range clause is not permitted, rangeKeyVal returns ok = false.
 // When ok = false, rangeKeyVal may also return a reason in cause.
 // The check parameter is only used in case of an error; it may be nil.
-func rangeKeyVal(checks *Checker, orig Type, allowVersion func(goVersion) bool) (key, val Type, cause string, ok bool) {
+func rangeKeyVal(check *Checker, orig Type, allowVersion func(goVersion) bool) (key, val Type, cause string, ok bool) {
 	bad := func(cause string) (Type, Type, string, bool) {
 		return Typ[Invalid], Typ[Invalid], cause, false
 	}
@@ -212,7 +212,7 @@ func rangeKeyVal(checks *Checker, orig Type, allowVersion func(goVersion) bool) 
 		return nil
 	})
 	if rtyp == nil {
-		return bad(err.format(checks))
+		return bad(err.format(check))
 	}
 
 	switch typ := arrayPtrDeref(rtyp).(type) {
@@ -253,7 +253,7 @@ func rangeKeyVal(checks *Checker, orig Type, allowVersion func(goVersion) bool) 
 		switch {
 		case cb == nil:
 			if err != nil {
-				return bad(checks.sprintf("func must be func(yield func(...) bool): in yield type, %s", err.format(checks)))
+				return bad(check.sprintf("func must be func(yield func(...) bool): in yield type, %s", err.format(check)))
 			} else {
 				return bad("func must be func(yield func(...) bool): argument is not func")
 			}
