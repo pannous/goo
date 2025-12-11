@@ -551,14 +551,12 @@ func (s *scanner) ident() {
 		}
 	}
 
-	// special case for 'not' operator - treat as function call, not prefix operator
-	// This avoids precedence issues: not x == y should mean not(x == y), not (!x) == y
-	// Users should write: not(condition) or use ! for prefix negation
-	// if string(lit) == "not" {
-	// 	s.op, s.prec = Not, 0
-	// 	s.tok = _Operator
-	// 	return
-	// }
+	// special case for 'not' operator
+	if string(lit) == "not" {
+		s.op, s.prec = Not, 0
+		s.tok = _Operator
+		return
+	}
 
 	// special case for 'ø' as nil
 	if string(lit) == "ø" {

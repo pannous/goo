@@ -1,0 +1,20 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	idx := 2
+	
+	// Test not with space
+	if not (z[idx - 1] == 'b') {
+		print("FAIL")
+	} else {
+		print("PASS: not (expr)")
+	}
+	
+	// Test not without space
+	if not(z[0] == 'a') {
+		print("FAIL")
+	} else {
+		print("PASS: not(expr)")
+	}
+}

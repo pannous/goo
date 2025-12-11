@@ -103,3 +103,5 @@ When creating new tokens or new expression types they need to be registered in t
 For deploying web apps to Netlify, see the complete guide in Netlify-deploy.md which documents the working osascript-based approach and lists all failed methods to avoid.
 
 Subagents, plugins, skills, hooks, mcp scripts+servers, capabilities, connectors, tasks, apps, custom-gpts, ... the space needs some serious consolidation and standardization!
+- keep comments minimal
+- use src/build-compiler.sh for incremental build

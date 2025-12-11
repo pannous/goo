@@ -1,0 +1,13 @@
+package main
+
+func main() {
+	x := true
+	// Try with parentheses
+	if not (false) {
+		print("test1")
+	}
+	// Try without
+	if not false {
+		print("test2")
+	}
+}
