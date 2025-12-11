@@ -12,6 +12,10 @@ import (
 
 // CheckTransform converts check statements to if+panic statements
 // Transforms: check condition -> if !(condition) { panic("Check failed: condition") }
+//
+// ⚠️  KNOWN ISSUE: Generated IfStmt nodes incompatible with certain AST contexts.
+// Works in simplified syntax, fails in explicit func main() with "invalid syntax tree".
+// Workaround: Use regular if statements for tests.
 type CheckTransform struct{}
 
 // checkVisitor implements the visitor pattern for check transformation
