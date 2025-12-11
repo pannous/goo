@@ -4,12 +4,12 @@
 
 GOROOT=/opt/other/go
 GOTMPDIR=/tmp/go-debug
-GOROOT_FINAL=/opt/other/go
+GOROOT_FINAL=/opt/other/goo
 GODEBUG=keepwork=1
 GOCACHE=/tmp/go-cache
 GOOS=darwin
 GOARCH=arm64
-cd /opt/other/go/src/
+cd /opt/other/goo/src/
 
 echo "Incremental build (version will not update - use make.bash for full rebuild)"
 
