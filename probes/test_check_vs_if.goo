@@ -1,0 +1,13 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	
+	// This works
+	if z#1 != 'a' {
+		panic("if test failed")
+	}
+	
+	// Does this work?
+	check z#1 == 'a'
+}
