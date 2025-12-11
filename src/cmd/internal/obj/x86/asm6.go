@@ -2120,19 +2120,6 @@ func span6(ctxt *obj.Link, s *obj.LSym, newprog obj.ProgAlloc) {
 			c0 := c
 			c = pjc.padJump(ctxt, s, p, c)
 
-			if p.As == obj.APCALIGN || p.As == obj.APCALIGNMAX {
-				v := obj.AlignmentPadding(c, p, ctxt, s)
-				if v > 0 {
-					s.Grow(int64(c) + int64(v))
-					fillnop(s.P[c:], int(v))
-				}
-				p.Pc = int64(c)
-				c += int32(v)
-				pPrev = p
-				continue
-
-			}
-
 			if maxLoopPad > 0 && p.Back&branchLoopHead != 0 && c&(loopAlign-1) != 0 {
 				// pad with NOPs
 				v := -c & (loopAlign - 1)
@@ -2163,6 +2150,18 @@ func span6(ctxt *obj.Link, s *obj.LSym, newprog obj.ProgAlloc) {
 				} else {
 					binary.LittleEndian.PutUint32(s.P[q.Pc+int64(q.Isize)-4:], uint32(v))
 				}
+			}
+
+			if p.As == obj.APCALIGN || p.As == obj.APCALIGNMAX {
+				v := obj.AlignmentPadding(c, p, ctxt, s)
+				if v > 0 {
+					s.Grow(int64(c) + int64(v))
+					fillnop(s.P[c:], v)
+				}
+				p.Pc = int64(c)
+				c += int32(v)
+				pPrev = p
+				continue
 			}
 
 			p.Rel = nil
@@ -3278,7 +3277,7 @@ func (ab *AsmBuf) Put(b []byte) {
 // Literal Z cases usually have "Zlit" in their name (Zlit, Zlitr_m, Zlitm_r).
 func (ab *AsmBuf) PutOpBytesLit(offset int, op *opBytes) {
 	for int(op[offset]) != 0 {
-		ab.Put1(byte(op[offset]))
+		ab.Put1(op[offset])
 		offset++
 	}
 }

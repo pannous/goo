@@ -94,7 +94,7 @@ func parseUnion(checks *Checker, uexpr ast.Expr) Type {
 				continue
 			}
 
-			u := under(t.typ)
+			u := t.typ.Underlying()
 			f, _ := u.(*Interface)
 			if t.tilde {
 				if f != nil {

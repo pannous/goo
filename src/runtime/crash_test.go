@@ -97,6 +97,13 @@ func runTestProg(t *testing.T, binary, name string, env ...string) string {
 func runBuiltTestProg(t *testing.T, exe, name string, env ...string) string {
 	t.Helper()
 
+	out, _ := runBuiltTestProgErr(t, exe, name, env...)
+	return out
+}
+
+func runBuiltTestProgErr(t *testing.T, exe, name string, env ...string) (string, error) {
+	t.Helper()
+
 	if *flagQuick {
 		t.Skip("-quick")
 	}
@@ -120,7 +127,7 @@ func runBuiltTestProg(t *testing.T, exe, name string, env ...string) string {
 			t.Fatalf("%v failed to start: %v", cmd, err)
 		}
 	}
-	return string(out)
+	return string(out), err
 }
 
 var serializeBuild = make(chan bool, 2)
@@ -186,6 +193,22 @@ func buildTestProg(t *testing.T, binary string, flags ...string) (string, error)
 		t.Logf("running %v", cmd)
 		cmd.Dir = "testdata/" + binary
 		cmd = testenv.CleanCmdEnv(cmd)
+
+		// If tests need any experimental flags, add them here.
+		//
+		// TODO(vsaioc): Remove `goroutineleakprofile` once the feature is no longer experimental.
+		edited := false
+		for i := range cmd.Env {
+			e := cmd.Env[i]
+			if _, vars, ok := strings.Cut(e, "GOEXPERIMENT="); ok {
+				cmd.Env[i] = "GOEXPERIMENT=" + vars + ",goroutineleakprofile"
+				edited, _ = true, vars
+			}
+		}
+		if !edited {
+			cmd.Env = append(cmd.Env, "GOEXPERIMENT=goroutineleakprofile")
+		}
+
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			target.err = fmt.Errorf("building %s %v: %v\n%s", binary, flags, err, out)
@@ -391,6 +414,15 @@ func TestRepanickedPanicSandwich(t *testing.T) {
 	want := `panic: outer [recovered]
 	panic: inner [recovered]
 	panic: outer
+`
+	if !strings.HasPrefix(output, want) {
+		t.Fatalf("output does not start with %q:\n%s", want, output)
+	}
+}
+
+func TestDoublePanicWithSameValue(t *testing.T) {
+	output := runTestProg(t, "testprog", "DoublePanicWithSameValue")
+	want := `panic: message
 `
 	if !strings.HasPrefix(output, want) {
 		t.Fatalf("output does not start with %q:\n%s", want, output)

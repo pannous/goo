@@ -7,14 +7,12 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"internal/buildcfg"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	rtrace "runtime/trace"
 	"slices"
@@ -26,8 +24,6 @@ import (
 	"cmd/go/internal/clean"
 	"cmd/go/internal/doc"
 	"cmd/go/internal/envcmd"
-	"cmd/go/internal/eval"
-	"cmd/go/internal/fix"
 	"cmd/go/internal/fmtcmd"
 	"cmd/go/internal/generate"
 	"cmd/go/internal/help"
@@ -58,8 +54,7 @@ func init() {
 		clean.CmdClean,
 		doc.CmdDoc,
 		envcmd.CmdEnv,
-		eval.CmdEval,
-		fix.CmdFix,
+		vet.CmdFix,
 		fmtcmd.CmdFmt,
 		generate.CmdGenerate,
 		modget.CmdGet,
@@ -221,14 +216,7 @@ func main() {
 		counter.Inc("go/subcommand:" + strings.ReplaceAll(cfg.CmdName, " ", "-"))
 	}
 	telemetrystats.Increment()
-	// Special case: if used == 0 and cmd is run.CmdRun, we're defaulting to run for a .go file
-	if used == 0 && cmd == run.CmdRun {
-		// Create args as if user typed "go run file.go ..."
-		runArgs := append([]string{"run"}, args...)
-		invoke(cmd, runArgs)
-	} else {
-		invoke(cmd, args[used-1:])
-	}
+	invoke(cmd, args[used-1:])
 	base.Exit()
 }
 
@@ -296,27 +284,10 @@ func lookupCmd(args []string) (cmd *base.Command, used int) {
 		// len(c.Commands) == 0 && !c.Runnable() => help text; stop at "help"
 		break
 	}
-
-	// If no command was found and the first argument ends with .go or .goo, default to run
-	if used == 0 && len(args) > 0 {
-		if strings.HasSuffix(args[0], ".go") || strings.HasSuffix(args[0], ".goo") {
-			cmd = run.CmdRun
-			used = 0 // Keep used as 0 so we pass all args to run
-		}
-	}
-
 	return cmd, used
 }
 
 func invoke(cmd *base.Command, args []string) {
-	if strings.HasSuffix(args[len(args)-1], ".goo") {
-		println("GOO_USE_TRANSFORMERS")
-		os.Setenv("GOO_USE_TRANSFORMERS", "1") // Enable transformers by default for .goo files
-		
-		// Scan for and install dependencies from // go get comments
-		installGooGetDependencies(args[len(args)-1])
-	}
-
 	// 'go env' handles checking the build config
 	if cmd != envcmd.CmdEnv {
 		buildcfg.Check()
@@ -368,47 +339,6 @@ func invoke(cmd *base.Command, args []string) {
 	ctx, span := trace.StartSpan(ctx, fmt.Sprint("Running ", cmd.Name(), " command"))
 	cmd.Run(ctx, cmd, args)
 	span.Done()
-}
-
-// installGooGetDependencies scans a .goo file for // go get comments and installs dependencies
-func installGooGetDependencies(filename string) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return // Silently ignore file open errors
-	}
-	defer file.Close()
-	
-	scanner := bufio.NewScanner(file)
-	var packagesToInstall []string
-	
-	// Scan file line by line looking for // go get comments
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if strings.HasPrefix(line, "// go get ") {
-			packageName := strings.TrimSpace(line[10:]) // Remove "// go get " prefix
-			if packageName != "" {
-				packagesToInstall = append(packagesToInstall, packageName)
-			}
-		}
-	}
-	
-	// Install each dependency
-	for _, packageName := range packagesToInstall {
-		fmt.Printf("Auto-installing dependency: %s\n", packageName)
-		
-		cmd := exec.Command("go", "get", packageName)
-		cmd.Env = os.Environ() // Inherit current environment
-		
-		if output, err := cmd.CombinedOutput(); err != nil {
-			// Only show error if it's not already installed
-			if !strings.Contains(string(output), "no changes") {
-				fmt.Printf("Warning: Failed to install dependency %s: %v\n", packageName, err)
-				if len(output) > 0 {
-					fmt.Printf("Output: %s\n", string(output))
-				}
-			}
-		}
-	}
 }
 
 func init() {

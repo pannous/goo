@@ -104,10 +104,10 @@ Below is the full list of supported metrics, ordered lexicographically.
 
 	/cpu/classes/scavenge/assist:cpu-seconds
 		Estimated total CPU time spent returning unused memory to the
-		underlying platform in response eagerly in response to memory
-		pressure. This metric is an overestimate, and not directly
-		comparable to system CPU time measurements. Compare only with
-		other /cpu/classes metrics.
+		underlying platform in response eagerly to memory pressure. This
+		metric is an overestimate, and not directly comparable to system
+		CPU time measurements. Compare only with other /cpu/classes
+		metrics.
 
 	/cpu/classes/scavenge/background:cpu-seconds
 		Estimated total CPU time spent performing background tasks to
@@ -271,6 +271,11 @@ Below is the full list of supported metrics, ordered lexicographically.
 		package due to a non-default GODEBUG=containermaxprocs=...
 		setting.
 
+	/godebug/non-default-behavior/cryptocustomrand:events
+		The number of non-default behaviors executed by the crypto
+		package due to a non-default GODEBUG=cryptocustomrand=...
+		setting.
+
 	/godebug/non-default-behavior/embedfollowsymlinks:events
 		The number of non-default behaviors executed by the cmd/go
 		package due to a non-default GODEBUG=embedfollowsymlinks=...
@@ -398,6 +403,11 @@ Below is the full list of supported metrics, ordered lexicographically.
 	/godebug/non-default-behavior/updatemaxprocs:events
 		The number of non-default behaviors executed by the runtime
 		package due to a non-default GODEBUG=updatemaxprocs=... setting.
+
+	/godebug/non-default-behavior/urlstrictcolons:events
+		The number of non-default behaviors executed by the net/url
+		package due to a non-default GODEBUG=urlstrictcolons=...
+		setting.
 
 	/godebug/non-default-behavior/winreadlinkvolume:events
 		The number of non-default behaviors executed by the os package

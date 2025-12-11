@@ -8,11 +8,6 @@ package cpu
 
 import _ "unsafe" // for linkname
 
-// DebugOptions is set to true by the runtime if the OS supports reading
-// GODEBUG early in runtime startup.
-// This should not be changed after it is initialized.
-var DebugOptions bool
-
 // CacheLinePad is used to pad structs to avoid false sharing.
 type CacheLinePad struct{ _ [CacheLinePadSize]byte }
 
@@ -30,17 +25,22 @@ var X86 struct {
 	HasAES              bool
 	HasADX              bool
 	HasAVX              bool
+	HasAVXVNNI          bool
 	HasAVX2             bool
 	HasAVX512           bool // Virtual feature: F+CD+BW+DQ+VL
 	HasAVX512F          bool
 	HasAVX512CD         bool
-	HasAVX512BITALG     bool
 	HasAVX512BW         bool
 	HasAVX512DQ         bool
 	HasAVX512VL         bool
-	HasAVX512VPCLMULQDQ bool
+	HasAVX512GFNI       bool
+	HasAVX512VAES       bool
+	HasAVX512VNNI       bool
 	HasAVX512VBMI       bool
 	HasAVX512VBMI2      bool
+	HasAVX512BITALG     bool
+	HasAVX512VPOPCNTDQ  bool
+	HasAVX512VPCLMULQDQ bool
 	HasBMI1             bool
 	HasBMI2             bool
 	HasERMS             bool

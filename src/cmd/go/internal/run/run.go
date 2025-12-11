@@ -8,7 +8,6 @@ package run
 import (
 	"context"
 	"go/build"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -71,55 +70,23 @@ func init() {
 	CmdRun.Flag.Var((*base.StringsFlag)(&work.ExecCmd), "exec", "")
 }
 
-// shouldDisableModulesForGoo checks if we should auto-disable modules for .goo files
-// Only disables modules if:
-// 1. .goo files are present in args AND
-// 2. GO111MODULE is not explicitly set by user
-func shouldDisableModulesForGoo(args []string) bool {
-	// Check if any .goo files are being run
-	hasGooFiles := false
-	for _, arg := range args {
-		if strings.HasSuffix(arg, ".goo") {
-			hasGooFiles = true
-			break
-		}
-	}
-	if !hasGooFiles {
-		return false
-	}
-
-	// Check if GO111MODULE is explicitly set by user
-	if goMod := os.Getenv("GO111MODULE"); goMod != "" {
-		return false // User has explicitly set it, respect their choice
-	}
-
-	// For .goo files with local imports, we always need GOPATH mode
-	// even if there's a go.mod file, because local .goo imports
-	// are fundamentally incompatible with Go modules
-	return true // Disable modules for .goo files
-}
-
 func runRun(ctx context.Context, cmd *base.Command, args []string) {
-	// Smart module detection for .goo files
-	if shouldDisableModulesForGoo(args) {
-		os.Setenv("GO111MODULE", "off")
-		cfg.Getenv("GO111MODULE") // Refresh cfg with new value
-	}
+	moduleLoaderState := modload.NewState()
 	if shouldUseOutsideModuleMode(args) {
 		// Set global module flags for 'go run cmd@version'.
 		// This must be done before modload.Init, but we need to call work.BuildInit
 		// before loading packages, since it affects package locations, e.g.,
 		// for -race and -msan.
-		modload.ForceUseModules = true
-		modload.RootMode = modload.NoRoot
-		modload.AllowMissingModuleImports()
-		modload.Init()
+		moduleLoaderState.ForceUseModules = true
+		moduleLoaderState.RootMode = modload.NoRoot
+		moduleLoaderState.AllowMissingModuleImports()
+		modload.Init(moduleLoaderState)
 	} else {
-		modload.InitWorkfile()
+		moduleLoaderState.InitWorkfile()
 	}
 
-	work.BuildInit()
-	b := work.NewBuilder("")
+	work.BuildInit(moduleLoaderState)
+	b := work.NewBuilder("", moduleLoaderState.VendorDirOrEmpty)
 	defer func() {
 		if err := b.Close(); err != nil {
 			base.Fatal(err)
@@ -127,7 +94,7 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 	}()
 
 	i := 0
-	for i < len(args) && (strings.HasSuffix(args[i], ".go") || strings.HasSuffix(args[i], ".goo")) {
+	for i < len(args) && strings.HasSuffix(args[i], ".go") {
 		i++
 	}
 	pkgOpts := load.PackageOpts{MainOnly: true}
@@ -141,18 +108,18 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 				base.Fatalf("go: cannot run *_test.go files (%s)", file)
 			}
 		}
-		p = load.GoFilesPackage(ctx, pkgOpts, files)
+		p = load.GoFilesPackage(moduleLoaderState, ctx, pkgOpts, files)
 	} else if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 		arg := args[0]
 		var pkgs []*load.Package
 		if strings.Contains(arg, "@") && !build.IsLocalImport(arg) && !filepath.IsAbs(arg) {
 			var err error
-			pkgs, err = load.PackagesAndErrorsOutsideModule(ctx, pkgOpts, args[:1])
+			pkgs, err = load.PackagesAndErrorsOutsideModule(moduleLoaderState, ctx, pkgOpts, args[:1])
 			if err != nil {
 				base.Fatal(err)
 			}
 		} else {
-			pkgs = load.PackagesAndErrors(ctx, pkgOpts, args[:1])
+			pkgs = load.PackagesAndErrors(moduleLoaderState, ctx, pkgOpts, args[:1])
 		}
 
 		if len(pkgs) == 0 {
@@ -174,7 +141,7 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 	load.CheckPackageErrors([]*load.Package{p})
 
 	if cfg.BuildCover {
-		load.PrepareForCoverageBuild([]*load.Package{p})
+		load.PrepareForCoverageBuild(moduleLoaderState, []*load.Package{p})
 	}
 
 	p.Internal.OmitDebug = true
@@ -200,7 +167,7 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 		p.Internal.ExeName = p.DefaultExecName()
 	}
 
-	a1 := b.LinkAction(work.ModeBuild, work.ModeBuild, p)
+	a1 := b.LinkAction(moduleLoaderState, work.ModeBuild, work.ModeBuild, p)
 	a1.CacheExecutable = true
 	a := &work.Action{Mode: "go run", Actor: work.ActorFunc(buildRunProgram), Args: cmdArgs, Deps: []*work.Action{a1}}
 	b.Do(ctx, a)
@@ -221,7 +188,6 @@ func shouldUseOutsideModuleMode(args []string) bool {
 	// NOTE: "@" not allowed in import paths, but it is allowed in non-canonical
 	// versions.
 	return len(args) > 0 &&
-		!strings.HasSuffix(args[0], ".goo") &&
 		!strings.HasSuffix(args[0], ".go") &&
 		!strings.HasPrefix(args[0], "-") &&
 		strings.Contains(args[0], "@") &&

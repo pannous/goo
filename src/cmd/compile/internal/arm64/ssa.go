@@ -1050,6 +1050,27 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		p.From.Offset = int64(condCode)
 		p.To.Type = obj.TYPE_REG
 		p.To.Reg = v.Reg()
+	case ssa.OpARM64CCMP,
+		ssa.OpARM64CCMN,
+		ssa.OpARM64CCMPconst,
+		ssa.OpARM64CCMNconst,
+		ssa.OpARM64CCMPW,
+		ssa.OpARM64CCMNW,
+		ssa.OpARM64CCMPWconst,
+		ssa.OpARM64CCMNWconst:
+		p := s.Prog(v.Op.Asm())
+		p.Reg = v.Args[0].Reg()
+		params := v.AuxArm64ConditionalParams()
+		p.From.Type = obj.TYPE_SPECIAL // assembler encodes conditional bits in Offset
+		p.From.Offset = int64(condBits[params.Cond()])
+		constValue, ok := params.ConstValue()
+		if ok {
+			p.AddRestSourceConst(constValue)
+		} else {
+			p.AddRestSourceReg(v.Args[1].Reg())
+		}
+		p.To.Type = obj.TYPE_CONST
+		p.To.Offset = params.Nzcv()
 	case ssa.OpARM64LoweredZero:
 		ptrReg := v.Args[0].Reg()
 		n := v.AuxInt
@@ -1168,8 +1189,9 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if dstReg == srcReg {
 			break
 		}
-		tmpReg1 := int16(arm64.REG_R24)
-		tmpReg2 := int16(arm64.REG_R25)
+		tmpReg1 := int16(arm64.REG_R25)
+		tmpFReg1 := int16(arm64.REG_F16)
+		tmpFReg2 := int16(arm64.REG_F17)
 		n := v.AuxInt
 		if n < 16 {
 			v.Fatalf("Move too small %d", n)
@@ -1177,10 +1199,17 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 
 		// Generate copying instructions.
 		var off int64
+		for n >= 32 {
+			//  FLDPQ   off(srcReg), (tmpFReg1, tmpFReg2)
+			//  FSTPQ   (tmpFReg1, tmpFReg2), off(dstReg)
+			move32(s, srcReg, dstReg, tmpFReg1, tmpFReg2, off, false)
+			off += 32
+			n -= 32
+		}
 		for n >= 16 {
-			// LDP     off(srcReg), (tmpReg1, tmpReg2)
-			// STP     (tmpReg1, tmpReg2), off(dstReg)
-			move16(s, srcReg, dstReg, tmpReg1, tmpReg2, off, false)
+			//  FMOVQ   off(src), tmpFReg1
+			//  FMOVQ   tmpFReg1, off(dst)
+			move16(s, srcReg, dstReg, tmpFReg1, off, false)
 			off += 16
 			n -= 16
 		}
@@ -1202,9 +1231,10 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if dstReg == srcReg {
 			break
 		}
-		countReg := int16(arm64.REG_R23)
-		tmpReg1 := int16(arm64.REG_R24)
-		tmpReg2 := int16(arm64.REG_R25)
+		countReg := int16(arm64.REG_R24)
+		tmpReg1 := int16(arm64.REG_R25)
+		tmpFReg1 := int16(arm64.REG_F16)
+		tmpFReg2 := int16(arm64.REG_F17)
 		n := v.AuxInt
 		loopSize := int64(64)
 		if n < 3*loopSize {
@@ -1230,10 +1260,10 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 
 		// Move loopSize bytes starting at srcReg to dstReg.
 		// Increment srcReg and destReg by loopSize as a side effect.
-		for range loopSize / 16 {
-			// LDP.P  16(srcReg), (tmpReg1, tmpReg2)
-			// STP.P  (tmpReg1, tmpReg2), 16(dstReg)
-			move16(s, srcReg, dstReg, tmpReg1, tmpReg2, 0, true)
+		for range loopSize / 32 {
+			// FLDPQ.P 32(srcReg), (tmpFReg1, tmpFReg2)
+			// FSTPQ.P (tmpFReg1, tmpFReg2), 32(dstReg)
+			move32(s, srcReg, dstReg, tmpFReg1, tmpFReg2, 0, true)
 		}
 		// Decrement loop count.
 		//   SUB     $1, countReg
@@ -1255,10 +1285,17 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 
 		// Copy any fractional portion.
 		var off int64
+		for n >= 32 {
+			//  FLDPQ   off(srcReg), (tmpFReg1, tmpFReg2)
+			//  FSTPQ   (tmpFReg1, tmpFReg2), off(dstReg)
+			move32(s, srcReg, dstReg, tmpFReg1, tmpFReg2, off, false)
+			off += 32
+			n -= 32
+		}
 		for n >= 16 {
-			//  LDP     off(srcReg), (tmpReg1, tmpReg2)
-			//  STP     (tmpReg1, tmpReg2), off(dstReg)
-			move16(s, srcReg, dstReg, tmpReg1, tmpReg2, off, false)
+			//  FMOVQ   off(src), tmpFReg1
+			//  FMOVQ   tmpFReg1, off(dst)
+			move16(s, srcReg, dstReg, tmpFReg1, off, false)
 			off += 16
 			n -= 16
 		}
@@ -1285,6 +1322,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		p.To.Name = obj.NAME_EXTERN
 		// AuxInt encodes how many buffer entries we need.
 		p.To.Sym = ir.Syms.GCWriteBarrier[v.AuxInt-1]
+	case ssa.OpARM64LoweredMemEq:
+		p := s.Prog(obj.ACALL)
+		p.To.Type = obj.TYPE_MEM
+		p.To.Name = obj.NAME_EXTERN
+		p.To.Sym = ir.Syms.Memequal
 
 	case ssa.OpARM64LoweredPanicBoundsRR, ssa.OpARM64LoweredPanicBoundsRC, ssa.OpARM64LoweredPanicBoundsCR, ssa.OpARM64LoweredPanicBoundsCC:
 		// Compute the constant we put in the PCData entry for this call.
@@ -1319,7 +1361,7 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 			}
 		case ssa.OpARM64LoweredPanicBoundsCR:
 			yIsReg = true
-			yVal := int(v.Args[0].Reg() - arm64.REG_R0)
+			yVal = int(v.Args[0].Reg() - arm64.REG_R0)
 			c := v.Aux.(ssa.PanicBoundsC).C
 			if c >= 0 && c <= abi.BoundsMaxConst {
 				xVal = int(c)
@@ -1678,23 +1720,52 @@ func zero8(s *ssagen.State, reg int16, off int64) {
 	p.To.Offset = off
 }
 
-// move16 copies 16 bytes at src+off to dst+off.
+// move32 copies 32 bytes at src+off to dst+off.
 // Uses registers tmp1 and tmp2.
-// If postInc is true, increment src and dst by 16.
-func move16(s *ssagen.State, src, dst, tmp1, tmp2 int16, off int64, postInc bool) {
-	// LDP     off(src), (tmp1, tmp2)
-	ld := s.Prog(arm64.ALDP)
+// If postInc is true, increment src and dst by 32.
+func move32(s *ssagen.State, src, dst, tmp1, tmp2 int16, off int64, postInc bool) {
+	// FLDPQ   off(src), (tmp1, tmp2)
+	ld := s.Prog(arm64.AFLDPQ)
 	ld.From.Type = obj.TYPE_MEM
 	ld.From.Reg = src
 	ld.From.Offset = off
 	ld.To.Type = obj.TYPE_REGREG
 	ld.To.Reg = tmp1
 	ld.To.Offset = int64(tmp2)
-	// STP     (tmp1, tmp2), off(dst)
-	st := s.Prog(arm64.ASTP)
+	// FSTPQ   (tmp1, tmp2), off(dst)
+	st := s.Prog(arm64.AFSTPQ)
 	st.From.Type = obj.TYPE_REGREG
 	st.From.Reg = tmp1
 	st.From.Offset = int64(tmp2)
+	st.To.Type = obj.TYPE_MEM
+	st.To.Reg = dst
+	st.To.Offset = off
+	if postInc {
+		if off != 0 {
+			panic("can't postinc with non-zero offset")
+		}
+		ld.Scond = arm64.C_XPOST
+		st.Scond = arm64.C_XPOST
+		ld.From.Offset = 32
+		st.To.Offset = 32
+	}
+}
+
+// move16 copies 16 bytes at src+off to dst+off.
+// Uses register tmp1
+// If postInc is true, increment src and dst by 16.
+func move16(s *ssagen.State, src, dst, tmp1 int16, off int64, postInc bool) {
+	// FMOVQ     off(src), tmp1
+	ld := s.Prog(arm64.AFMOVQ)
+	ld.From.Type = obj.TYPE_MEM
+	ld.From.Reg = src
+	ld.From.Offset = off
+	ld.To.Type = obj.TYPE_REG
+	ld.To.Reg = tmp1
+	// FMOVQ     tmp1, off(dst)
+	st := s.Prog(arm64.AFMOVQ)
+	st.From.Type = obj.TYPE_REG
+	st.From.Reg = tmp1
 	st.To.Type = obj.TYPE_MEM
 	st.To.Reg = dst
 	st.To.Offset = off
