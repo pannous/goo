@@ -13,8 +13,10 @@ import (
 // CheckTransform converts check statements to if+panic statements
 // Transforms: check condition -> if !(condition) { panic("Check failed: condition") }
 //
-// ⚠️  KNOWN ISSUE: Generated IfStmt nodes incompatible with certain AST contexts.
-// Works in simplified syntax, fails in explicit func main() with "invalid syntax tree".
+// ⚠️  KNOWN ISSUE: Fails in explicit func main() with "invalid syntax tree: invalid statement"
+// Works in simplified syntax (top-level statements) but not function bodies.
+// Attempted fixes: new() vs literal, direct traversal vs Walk, block modifications.
+// Root cause unclear - types2 sees CheckStmt despite transformation.
 // Workaround: Use regular if statements for tests.
 type CheckTransform struct{}
 
@@ -34,12 +36,21 @@ func (t *CheckTransform) Priority() int {
 }
 
 func (t *CheckTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	visitor := &checkVisitor{transform: t, ctx: ctx}
+	changed := false
 
-	// Walk all nodes looking for CheckStmt
-	syntax.Walk(file, visitor)
+	// Handle top-level statements (simplified syntax)
+	if len(file.TopLevelStmts) > 0 {
+		changed = t.transformTopLevelStmts(file, ctx) || changed
+	}
 
-	return visitor.changed
+	// Handle function bodies (explicit func main)
+	for _, decl := range file.DeclList {
+		if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
+			changed = t.transformBlock(funcDecl.Body, ctx) || changed
+		}
+	}
+
+	return changed
 }
 
 // Visit implements syntax.Visitor
@@ -52,6 +63,7 @@ func (v *checkVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if block, ok := node.(*syntax.BlockStmt); ok {
 		if v.transform.transformBlock(block, v.ctx) {
 			v.changed = true
+			// Return v to continue - block.List already modified in place
 		}
 	}
 
@@ -59,6 +71,7 @@ func (v *checkVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if file, ok := node.(*syntax.File); ok {
 		if v.transform.transformTopLevelStmts(file, v.ctx) {
 			v.changed = true
+			// Return v to continue - TopLevelStmts already modified
 		}
 	}
 
@@ -160,17 +173,15 @@ func (t *CheckTransform) convertCheckToIf(checkStmt *syntax.CheckStmt) *syntax.I
 	}
 	panicStmt.SetPos(pos)
 
-	// Create the if body
-	ifBody := &syntax.BlockStmt{
-		List: []syntax.Stmt{panicStmt},
-	}
+	// Create the if body (use new() like parser does)
+	ifBody := new(syntax.BlockStmt)
+	ifBody.List = []syntax.Stmt{panicStmt}
 	ifBody.SetPos(pos)
 
-	// Create the if statement
-	ifStmt := &syntax.IfStmt{
-		Cond: negatedCond,
-		Then: ifBody,
-	}
+	// Create the if statement (use new() like parser does)
+	ifStmt := new(syntax.IfStmt)
+	ifStmt.Cond = negatedCond
+	ifStmt.Then = ifBody
 	ifStmt.SetPos(pos)
 
 	return ifStmt
