@@ -1,3 +1,6 @@
+import "slices"
+autoimport broken again 2025-12-11
+
 for i in 0…5  
   
 ✅ Tokenization works: Ellipsis … is correctly recognized✅ Parser works: Range expressions parse correctly✅  
@@ -31,7 +34,7 @@ for i in 0…5
   
   
   
-# BAD ADVICE:  
+# BAD ADVICE:
 Put stuff here which might negatively affect claudes capabilities  
 Never randomly disable code  
   

@@ -11,13 +11,13 @@ GOOS=darwin
 GOARCH=arm64
 cd /opt/other/goo/src/
 
-echo "Incremental build (version will not update - use make.bash for full rebuild)"
+# echo "Incremental build (version will not update - use make.bash for full rebuild)"
 
 # Build compiler
 $GOROOT/bin/go build -tags=transforms -o ../bin/compile ./cmd/compile
 cp ../bin/compile ../pkg/tool/darwin_arm64/compile
 
 # Build go command
-$GOROOT/bin/go build -tags=transforms -o ../bin/go ./cmd/go
+# $GOROOT/bin/go build -tags=transforms -o ../bin/go ./cmd/go
 
-echo "Done! Run './bin/go version' to see current version"
+# echo "Done! Run './bin/go version' to see current version"
