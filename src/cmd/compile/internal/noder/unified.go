@@ -203,6 +203,18 @@ func unified(m posMap, noders []*noder) {
 	}
 	transforms.ApplyTransformations(files)
 
+	// Update noders to point to transformed files
+	// (transforms modify the files in-place, but noders need to reference them)
+	fileIdx := 0
+	for _, noder := range noders {
+		if noder.file != nil {
+			fmt.Printf("UPDATING noder.file[%d]: before=%p after=%p\n", fileIdx, noder.file, files[fileIdx])
+			noder.file = files[fileIdx]
+			fileIdx++
+		}
+	}
+	fmt.Printf("Updated %d noders\n", fileIdx)
+
 	// Re-resolve imports that may have been added by transforms
 	updateImportConfigForTransforms(files)
 

@@ -1,4 +1,4 @@
-# The Goo Programming Language  
+# The Goo Programming Language
   
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
@@ -45,14 +45,14 @@ so does adding a little o to Go[o] make everything a little more beautiful
 ✅ String methods "abc".contains("a")   reverse(), split(), join() …  
 ✅ 3.14 as string == "3.14"  
 ✅ 3.14 as int … semantic cast conversions  
-✅ class via type struct  
+✅ class Person {name string, age int}   person := Person{name: "Alice", age: 30}
 ✅ imported and not used only warning  
 ✅ return void, e.g. return print("ok") HARD  
 ✅ for i in 0…5 {put(i)}  // range syntax  
 ✅ "你" == '你'  
 ✅ def modify!(xs []int) { xs#1=0 } // modify in place enforced by "!" !  
 ✅ import "helper"  / "helper.goo" // allow local imports (for go run)  
-✅ 1 in [1,2,3] 'e' in "hello"  // in operator for lists and strings and maps and iterators  
+✅ 1 in [1,2,3]   and  'e' in "hello"  // in operator for lists and strings and maps and iterators  
 ✅ Got rid of generated cancer files like op_string.go  token_string.go by stringer cancer 🤮🦀🤮  
 ✅ Universal for-in syntax:  
 ✅ for item in slice { ... }      // Values  
@@ -107,9 +107,9 @@ There is a mirror of the repository at https://github.com/golang/go.
 Unless otherwise noted, the Go source files are distributed under the  
 BSD-style license found in the LICENSE file.  
   
-### Download and Install  
+### Download and Install
   
-#### Binary Distributions  
+#### Binary Distributions
   
 Official binary distributions are available at https://github.com/pannous/goo/releases.  
   
@@ -126,7 +126,7 @@ export PATH=$PATH:/usr/local/goo/bin
 export GOROOT=/usr/local/goo/  
 ```  
   
-#### Install From Source  
+#### Install From Source
   
 ```  
 git clone --recursive https://github.com/pannous/goo  
@@ -136,7 +136,7 @@ cd goo/src
   
 https://go.dev/doc/install/source for more source installation instructions.  
   
-### Test new features  
+### Test new features
 ```  
 ./bin/go run goo/test.goo  
 ```  
