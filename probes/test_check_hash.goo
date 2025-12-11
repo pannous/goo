@@ -1,0 +1,8 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	check z#1 == 'a'
+	check z#2 == 'b'
+	check z#3 == 'c'
+}

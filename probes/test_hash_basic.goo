@@ -1,0 +1,14 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	if z#1 != 'a' {
+		panic("z#1 is not 'a'")
+	}
+	if z#2 != 'b' {
+		panic("z#2 is not 'b'")
+	}
+	if z#3 != 'c' {
+		panic("z#3 is not 'c'")
+	}
+}
