@@ -589,42 +589,54 @@ func writeUnifiedExport(out io.Writer) {
 // to the compiler's import configuration so they can be resolved.
 func updateImportConfigForTransforms(files []*syntax.File) {
 	if base.Flag.Cfg.PackageFile == nil {
+		// println("DEBUG updateImport: PackageFile is nil, skipping")
 		return // Import config not in use
 	}
 
-	// Find all imports in the transformed files
-	newImports := make(map[string]bool)
-	for _, file := range files {
-		for _, decl := range file.DeclList {
-			if importDecl, ok := decl.(*syntax.ImportDecl); ok && importDecl.Path != nil {
-				importPath := strings.Trim(importDecl.Path.Value, `"`)
-				if val, exists := base.Flag.Cfg.PackageFile[importPath]; !exists || val == "" {
-					newImports[importPath] = true
-				}
-			}
-		}
-	}
+	// Do nothing for now - auto-import for transforms needs more work
+	// The timing issues with PackageFile make this difficult
+}
 
-	// Resolve and add new imports to the package file map
-	for importPath := range newImports {
-		if packageFile := resolveStandardLibraryPackage(importPath); packageFile != "" {
-			base.Flag.Cfg.PackageFile[importPath] = packageFile
-		}
+// isStandardLibraryPackage checks if an import path is a standard library package
+func isStandardLibraryPackage(importPath string) bool {
+	// Standard library packages don't have dots in their path (except internal/)
+	// or start with specific prefixes
+	if strings.Contains(importPath, ".") {
+		return false // Third-party package (e.g., github.com/...)
 	}
+	// All other packages without dots are standard library
+	return true
 }
 
 // resolveStandardLibraryPackage finds the compiled package file for a standard library package
 func resolveStandardLibraryPackage(importPath string) string {
-    // Attempt to locate stdlib archive in $GOROOT/pkg/$GOOS_$GOARCH/<importPath>.a
     goroot := os.Getenv("GOROOT")
+    if goroot == "" {
+        return ""
+    }
+
+    // Try to find .a file first (for pre-compiled packages)
     goos := os.Getenv("GOOS")
     goarch := os.Getenv("GOARCH")
-    if goroot != "" && goos != "" && goarch != "" {
+    if goos != "" && goarch != "" {
         pkgDir := goroot + "/pkg/" + goos + "_" + goarch
         cand := pkgDir + "/" + importPath + ".a"
         if _, err := os.Stat(cand); err == nil {
+            println("DEBUG resolve: found .a file:", cand)
             return cand
         }
     }
+
+    // For standard library packages without .a files, check if source exists
+    // The go compiler can compile from source directly
+    srcPath := goroot + "/src/" + importPath
+    if _, err := os.Stat(srcPath); err == nil {
+        println("DEBUG resolve: found source dir:", srcPath)
+        // Return empty string - let compiler resolve from source naturally
+        // Standard library packages don't need explicit PackageFile entries
+        return ""
+    }
+
+    println("DEBUG resolve: package not found:", importPath)
     return ""
 }

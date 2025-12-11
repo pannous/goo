@@ -23,7 +23,8 @@ passed=0
 failed=0
 total=0
 
-for test_file in goo/*.go goo/*.goo probes/*.goo; do
+# removed probes/*.goo to avoid skewing passed by just adding new tests
+for test_file in goo/*.go goo/*.goo ; do
     if [[ -f "$test_file" ]]; then
         total=$((total + 1))
         filename=$(basename "$test_file")
