@@ -154,7 +154,6 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	case *syntax.Operation:
 		// Look for 'and' operations (new TruthyAnd token for truthy and)
 		if e.Op == syntax.TruthyAnd {
-			println("DEBUG: Transforming TruthyAnd operation")
 			return t.createTruthyAndCall(e.X, e.Y, e.Pos())
 		}
 		
@@ -209,8 +208,6 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 
 // createTruthyAndCall creates a truthy and operation using truthy calls with &&
 func (t *TruthyAndTransform) createTruthyAndCall(left, right syntax.Expr, pos syntax.Pos) syntax.Expr {
-	println("DEBUG: Creating truthy(x) && truthy(y)")
-	
 	// Create truthy(left) call
 	truthyName1 := &syntax.Name{Value: "truthy"}
 	truthyName1.SetPos(pos)

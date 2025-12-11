@@ -972,6 +972,81 @@ func (check *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) (
 		}
 		// trace is only available in test mode - no need to record signature
 
+	// Goo-specific builtins
+	case _Truthy:
+		// truthy(value) bool
+		// Checks truthiness of any value
+		check.assignment(x, nil, "argument to truthy")
+		if x.mode == invalid {
+			return
+		}
+		x.mode = value
+		x.typ = Typ[Bool]
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(Typ[Bool], &emptyInterface))
+		}
+
+	case _TruthyAndOp:
+		// truthyAndOp(left, right) interface{}
+		// Returns first falsy value or last value
+		check.assignment(x, nil, "first argument to truthyAndOp")
+		if x.mode == invalid {
+			return
+		}
+		y := args[1]
+		check.assignment(y, nil, "second argument to truthyAndOp")
+		if y.mode == invalid {
+			return
+		}
+		x.mode = value
+		x.typ = &emptyInterface
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(&emptyInterface, &emptyInterface, &emptyInterface))
+		}
+
+	case _TypeMatches:
+		// typeMatches(value, typeName) bool
+		check.assignment(x, nil, "first argument to typeMatches")
+		if x.mode == invalid {
+			return
+		}
+		y := args[1]
+		check.assignment(y, Typ[String], "second argument to typeMatches")
+		if y.mode == invalid {
+			return
+		}
+		x.mode = value
+		x.typ = Typ[Bool]
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(Typ[Bool], &emptyInterface, Typ[String]))
+		}
+
+	case _TypeOf:
+		// typeof(value) string
+		check.assignment(x, nil, "argument to typeof")
+		if x.mode == invalid {
+			return
+		}
+		x.mode = value
+		x.typ = Typ[String]
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(Typ[String], &emptyInterface))
+		}
+
+	case _ListSortDesc, _ListPop, _ListShift:
+		// listSortDesc(list) interface{}
+		// listPop(list) interface{}
+		// listShift(list) interface{}
+		check.assignment(x, nil, "argument to "+predeclaredFuncs[id].name)
+		if x.mode == invalid {
+			return
+		}
+		x.mode = value
+		x.typ = &emptyInterface
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(&emptyInterface, &emptyInterface))
+		}
+
 	default:
 		panic("unreachable")
 	}
