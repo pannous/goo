@@ -163,7 +163,7 @@ func (v *falseyVisitor) createNotTruthyCall(expr syntax.Expr) syntax.Expr {
 		// For variables, use type information to generate appropriate zero comparison
 		if varType, exists := v.ctx.Types[e.Value]; exists {
 			switch varType {
-			case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+			case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "rune":
 				zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
 				zero.SetPos(expr.Pos())
 				eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: zero}
@@ -248,8 +248,38 @@ func (v *falseyVisitor) createNotTruthyCall(expr syntax.Expr) syntax.Expr {
 			eq.SetPos(expr.Pos())
 			return eq
 		}
+	case *syntax.IndexExpr:
+		// Handle array/slice indexing like z[idx]
+		// Infer element type from container type
+		if containerName, ok := e.X.(*syntax.Name); ok {
+			if containerType, exists := v.ctx.Types[containerName.Value]; exists {
+				// Extract element type from []ElementType
+				if len(containerType) > 2 && containerType[:2] == "[]" {
+					elemType := containerType[2:]
+					switch elemType {
+					case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "rune":
+						zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+						zero.SetPos(expr.Pos())
+						eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: zero}
+						eq.SetPos(expr.Pos())
+						return eq
+					case "string":
+						empty := &syntax.BasicLit{Kind: syntax.StringLit, Value: `""`}
+						empty.SetPos(expr.Pos())
+						eq := &syntax.Operation{Op: syntax.Eql, X: expr, Y: empty}
+						eq.SetPos(expr.Pos())
+						return eq
+					case "bool":
+						// For boolean elements, use regular !
+						notExpr := &syntax.Operation{Op: syntax.Not, X: expr}
+						notExpr.SetPos(expr.Pos())
+						return notExpr
+					}
+				}
+			}
+		}
 	}
-	
+
 	// Fallback: for boolean expressions, use regular !
 	notExpr := &syntax.Operation{
 		Op: syntax.Not,

@@ -1,9 +1,12 @@
 package main
 
-func main() {
-	z := []rune{'a', 'b', 'c'}
-	idx := 2
-	if not z[idx - 1] == 'b' {
-		print("fail")
-	}
+z := []rune{'a', 'b', 'c'}
+idx := 2
+// check (z#idx == 'b') 
+
+if not  (z#idx == 'b')  {
+	panic(" (z#idx == 'b') ")
+}
+if not  z#idx {
+	panic("z#idx falsey!? ")
 }
