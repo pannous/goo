@@ -35,7 +35,7 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 			}
 		}
 	}
-	
+
 	// Handle function declarations
 	for _, decl := range file.DeclList {
 		if funcDecl, ok := decl.(*syntax.FuncDecl); ok && funcDecl.Body != nil {
@@ -44,7 +44,12 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 			}
 		}
 	}
-	
+
+	// NOTE: Auto-import for "slices" is not currently implemented due to timing issues
+	// with the compiler's import resolution system. Users must manually add:
+	//   import "slices"
+	// at the top of files that use slice equality (==, !=) operations.
+
 	return changed
 }
 
@@ -63,47 +68,65 @@ func (t *ListEqualityTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 	if stmt == nil {
 		return nil
 	}
-	
+
 	switch s := stmt.(type) {
 	case *syntax.IfStmt:
-		if newCond := t.transformExpr(s.Cond); newCond != s.Cond {
-			s.Cond = newCond
-		}
+		newCond := t.transformExpr(s.Cond)
+		var newThen *syntax.BlockStmt
 		if s.Then != nil {
 			t.transformBlock(s.Then)
+			newThen = s.Then
 		}
+		var newElse syntax.Stmt
 		if s.Else != nil {
-			t.transformStmt(s.Else)
+			newElse = t.transformStmt(s.Else)
 		}
-		
+		if newCond != s.Cond || newElse != s.Else {
+			newIf := *s
+			newIf.Cond = newCond
+			newIf.Then = newThen
+			newIf.Else = newElse
+			return &newIf
+		}
+
 	case *syntax.BlockStmt:
 		t.transformBlock(s)
-		
+
 	case *syntax.CheckStmt:
-		if newCond := t.transformExpr(s.Cond); newCond != s.Cond {
-			s.Cond = newCond
+		newCond := t.transformExpr(s.Cond)
+		if newCond != s.Cond {
+			newCheck := *s
+			newCheck.Cond = newCond
+			return &newCheck
 		}
-		
+
 	case *syntax.ExprStmt:
-		if newExpr := t.transformExpr(s.X); newExpr != s.X {
-			s.X = newExpr
+		newExpr := t.transformExpr(s.X)
+		if newExpr != s.X {
+			newStmt := *s
+			newStmt.X = newExpr
+			return &newStmt
 		}
-		
+
 	case *syntax.AssignStmt:
-		if newRhs := t.transformExpr(s.Rhs); newRhs != s.Rhs {
-			s.Rhs = newRhs
+		newRhs := t.transformExpr(s.Rhs)
+		if newRhs != s.Rhs {
+			newAssign := *s
+			newAssign.Rhs = newRhs
+			return &newAssign
 		}
-		
+
 	case *syntax.DeclStmt:
 		for _, decl := range s.DeclList {
 			if varDecl, ok := decl.(*syntax.VarDecl); ok && varDecl.Values != nil {
-				if newValues := t.transformExpr(varDecl.Values); newValues != varDecl.Values {
+				newValues := t.transformExpr(varDecl.Values)
+				if newValues != varDecl.Values {
 					varDecl.Values = newValues
 				}
 			}
 		}
 	}
-	
+
 	return stmt
 }
 
