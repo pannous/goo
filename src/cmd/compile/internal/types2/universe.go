@@ -188,6 +188,15 @@ const (
 	_Real
 	_Recover
 
+	// goo-specific builtins
+	_TypeMatches
+	_TypeOf
+	_Truthy
+	_TruthyAndOp
+	_ListSortDesc
+	_ListPop
+	_ListShift
+
 	// package unsafe
 	_Add
 	_Alignof
@@ -228,6 +237,15 @@ var predeclaredFuncs = [...]struct {
 	_Println: {"println", 0, true, statement},
 	_Real:    {"real", 1, false, expression},
 	_Recover: {"recover", 0, false, statement},
+
+	// goo-specific builtins
+	_TypeMatches:  {"typeMatches", 2, false, expression},
+	_TypeOf:       {"typeof", 1, false, expression},
+	_Truthy:       {"truthy", 1, false, expression},
+	_TruthyAndOp:  {"truthyAndOp", 2, false, expression},
+	_ListSortDesc: {"listSortDesc", 1, false, expression},
+	_ListPop:      {"listPop", 1, false, expression},
+	_ListShift:    {"listShift", 1, false, expression},
 
 	_Add:        {"Add", 2, false, expression},
 	_Alignof:    {"Alignof", 1, false, expression},
