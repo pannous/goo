@@ -710,11 +710,6 @@ func (checks *Checker) stmt(ctxt stmtContext, s syntax.Stmt) {
 		}
 		checks.stmt(inner, s.Body)
 
-	case *syntax.CheckStmt:
-		var x operand
-		checks.expr(nil, &x, s.Cond)
-		// Allow any type in check conditions - truthy conversion handled in typecheck
-
 	default:
 		checks.error(s, InvalidSyntaxTree, "invalid statement")
 	}

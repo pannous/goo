@@ -306,7 +306,6 @@ const (
 	OTYPEMATCHES // typeMatches(value, typeName) (runtime type checking)
 
 	// New operations - always add at end to maintain bootstrap compatibility
-	OCHECK       // check Cond
 	OTRUTHY      // truthy(value) (truthiness check)
 	OTRUTHYANDOP // truthyAndOp(left, right) (truthy and operation)
 	OLISTSORTDESC // listSortDesc(list) (sort list descending)

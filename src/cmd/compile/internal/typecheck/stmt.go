@@ -180,20 +180,6 @@ func tcCheckNil(n *ir.UnaryExpr) ir.Node {
 	return n
 }
 
-func tcCheck(n *ir.CheckStmt) ir.Node {
-	// Try to capture more meaningful error message before transformation
-	if n.OrigText == "" {
-		n.OrigText = fmt.Sprintf("%v", n.Cond)
-	}
-	
-	n.Cond = Expr(n.Cond)
-	// Ensure the condition has a type - convert to interface{} if needed
-	if n.Cond.Type() != nil && n.Cond.Type().IsUntyped() {
-		n.Cond = DefaultLit(n.Cond, nil)
-	}
-	return n
-}
-
 // tcFor typechecks an OFOR node.
 func tcFor(n *ir.ForStmt) ir.Node {
 	Stmts(n.Init())

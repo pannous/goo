@@ -23,7 +23,6 @@ const (
 	stmtIncDec
 	stmtBranch
 	stmtCall
-	stmtCheck
 	stmtReturn
 	stmtIf
 	stmtFor
