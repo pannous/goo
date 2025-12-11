@@ -310,8 +310,6 @@ func (s SymKind) String() string {
 		return "STYPELINK"
 	case SITABLINK:
 		return "SITABLINK"
-	case SSYMTAB:
-		return "SSYMTAB"
 	case SPCLNTAB:
 		return "SPCLNTAB"
 	case SFirstWritable:
@@ -376,8 +374,6 @@ func (s SymKind) String() string {
 		return "SMACHOINDIRECTPLT"
 	case SMACHOINDIRECTGOT:
 		return "SMACHOINDIRECTGOT"
-	case SFILEPATH:
-		return "SFILEPATH"
 	case SDYNIMPORT:
 		return "SDYNIMPORT"
 	case SHOSTOBJ:

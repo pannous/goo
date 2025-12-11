@@ -3,6 +3,9 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+if [ -z "$GOROOT" ]; then
+	GOROOT=$(cd .. && pwd)
+fi
 cd $GOROOT/src
 
 # See golang.org/s/go15bootstrap for an overview of the build process.

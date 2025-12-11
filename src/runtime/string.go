@@ -294,7 +294,8 @@ func stringToIntBase(s string, base int) int {
 func stringToFloat(s string) float64 {
 	// TODO: Implement proper float parsing
 	// For now, try to convert via Atoi and cast to float
-	if n, ok := strconv.Atoi(s); ok {
+	n, err := strconv.Atoi(s)
+	if err == nil {
 		return float64(n)
 	}
 	panic("stringToFloat: invalid syntax")
