@@ -14,14 +14,14 @@ import (
 
 // langCompat reports an error if the representation of a numeric
 // literal is not compatible with the current language version.
-func (checks *Checker) langCompat(lit *syntax.BasicLit) {
+func (check *Checker) langCompat(lit *syntax.BasicLit) {
 	s := lit.Value
-	if len(s) <= 2 || checks.allowVersion(go1_13) {
+	if len(s) <= 2 || check.allowVersion(go1_13) {
 		return
 	}
 	// len(s) > 2
 	if strings.Contains(s, "_") {
-		checks.versionErrorf(lit, go1_13, "underscore in numeric literal")
+		check.versionErrorf(lit, go1_13, "underscore in numeric literal")
 		return
 	}
 	if s[0] != '0' {
@@ -29,22 +29,22 @@ func (checks *Checker) langCompat(lit *syntax.BasicLit) {
 	}
 	radix := s[1]
 	if radix == 'b' || radix == 'B' {
-		checks.versionErrorf(lit, go1_13, "binary literal")
+		check.versionErrorf(lit, go1_13, "binary literal")
 		return
 	}
 	if radix == 'o' || radix == 'O' {
-		checks.versionErrorf(lit, go1_13, "0o/0O-style octal literal")
+		check.versionErrorf(lit, go1_13, "0o/0O-style octal literal")
 		return
 	}
 	if lit.Kind != syntax.IntLit && (radix == 'x' || radix == 'X') {
-		checks.versionErrorf(lit, go1_13, "hexadecimal floating-point literal")
+		check.versionErrorf(lit, go1_13, "hexadecimal floating-point literal")
 	}
 }
 
-func (checks *Checker) basicLit(x *operand, e *syntax.BasicLit) {
+func (check *Checker) basicLit(x *operand, e *syntax.BasicLit) {
 	switch e.Kind {
 	case syntax.IntLit, syntax.FloatLit, syntax.ImagLit:
-		checks.langCompat(e)
+		check.langCompat(e)
 		// The max. mantissa precision for untyped numeric values
 		// is 512 bits, or 4048 bits for each of the two integer
 		// parts of a fraction for floating-point numbers that are
@@ -56,7 +56,7 @@ func (checks *Checker) basicLit(x *operand, e *syntax.BasicLit) {
 		// allows for separators between all digits.
 		const limit = 10000
 		if len(e.Value) > limit {
-			checks.errorf(e, InvalidConstVal, "excessively long constant: %s... (%d chars)", e.Value[:10], len(e.Value))
+			check.errorf(e, InvalidConstVal, "excessively long constant: %s... (%d chars)", e.Value[:10], len(e.Value))
 			x.mode = invalid
 			return
 		}
@@ -67,44 +67,44 @@ func (checks *Checker) basicLit(x *operand, e *syntax.BasicLit) {
 		// If we reach here it's because of number under-/overflow.
 		// TODO(gri) setConst (and in turn the go/constant package)
 		// should return an error describing the issue.
-		checks.errorf(e, InvalidConstVal, "malformed constant: %s", e.Value)
+		check.errorf(e, InvalidConstVal, "malformed constant: %s", e.Value)
 		x.mode = invalid
 		return
 	}
 	// Ensure that integer values don't overflow (go.dev/issue/54280).
 	x.expr = e // make sure that check.overflow below has an error position
-	checks.overflow(x, opPos(x.expr))
+	check.overflow(x, opPos(x.expr))
 }
 
-func (checks *Checker) funcLit(x *operand, e *syntax.FuncLit) {
-	if sig, ok := checks.typ(e.Type).(*Signature); ok {
+func (check *Checker) funcLit(x *operand, e *syntax.FuncLit) {
+	if sig, ok := check.typ(e.Type).(*Signature); ok {
 		// Set the Scope's extent to the complete "func (...) {...}"
 		// so that Scope.Innermost works correctly.
 		sig.scope.pos = e.Pos()
 		sig.scope.end = endPos(e)
-		if !checks.conf.IgnoreFuncBodies && e.Body != nil {
+		if !check.conf.IgnoreFuncBodies && e.Body != nil {
 			// Anonymous functions are considered part of the
 			// init expression/func declaration which contains
 			// them: use existing package-level declaration info.
-			decl := checks.decl // capture for use in closure below
-			iota := checks.iota // capture for use in closure below (go.dev/issue/22345)
+			decl := check.decl // capture for use in closure below
+			iota := check.iota // capture for use in closure below (go.dev/issue/22345)
 			// Don't type-check right away because the function may
 			// be part of a type definition to which the function
 			// body refers. Instead, type-check as soon as possible,
 			// but before the enclosing scope contents changes (go.dev/issue/22992).
-			checks.later(func() {
-				checks.funcBody(decl, "<function literal>", sig, e.Body, iota)
+			check.later(func() {
+				check.funcBody(decl, "<function literal>", sig, e.Body, iota)
 			}).describef(e, "func literal")
 		}
 		x.mode = value
 		x.typ = sig
 	} else {
-		checks.errorf(e, InvalidSyntaxTree, "invalid function literal %v", e)
+		check.errorf(e, InvalidSyntaxTree, "invalid function literal %v", e)
 		x.mode = invalid
 	}
 }
 
-func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Type) {
+func (check *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Type) {
 	var typ, base Type
 	var isElem bool // true if composite literal is an element of an enclosing composite literal
 
@@ -117,11 +117,11 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 			// We have an "open" [...]T array type.
 			// Create a new ArrayType with unknown length (-1)
 			// and finish setting it up after analyzing the literal.
-			typ = &Array{len: -1, elem: checks.varType(atyp.Elem)}
+			typ = &Array{len: -1, elem: check.varType(atyp.Elem)}
 			base = typ
 			break
 		}
-		typ = checks.typ(e.Type)
+		typ = check.typ(e.Type)
 		base = typ
 
 	case hint != nil:
@@ -137,7 +137,7 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 
 	default:
 		// TODO(gri) provide better error messages depending on context
-		checks.error(e, UntypedLit, "missing type in composite literal")
+		check.error(e, UntypedLit, "missing type in composite literal")
 		// continue with invalid type so that elements are "used" (go.dev/issue/69092)
 		typ = Typ[Invalid]
 		base = typ
@@ -148,7 +148,7 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 		// Prevent crash if the struct referred to is not yet set up.
 		// See analogous comment for *Array.
 		if utyp.fields == nil {
-			checks.error(e, InvalidTypeCycle, "invalid recursive type")
+			check.error(e, InvalidTypeCycle, "invalid recursive type")
 			x.mode = invalid
 			return
 		}
@@ -165,34 +165,34 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 			for _, e := range e.ElemList {
 				kv, _ := e.(*syntax.KeyValueExpr)
 				if kv == nil {
-					checks.error(e, MixedStructLit, "mixture of field:value and value elements in struct literal")
+					check.error(e, MixedStructLit, "mixture of field:value and value elements in struct literal")
 					continue
 				}
 				key, _ := kv.Key.(*syntax.Name)
-				// do all possible checks early (before exiting due to errors)
+				// do all possible check early (before exiting due to errors)
 				// so we don't drop information on the floor
-				checks.expr(nil, x, kv.Value)
+				check.expr(nil, x, kv.Value)
 				if key == nil {
-					checks.errorf(kv, InvalidLitField, "invalid field name %s in struct literal", kv.Key)
+					check.errorf(kv, InvalidLitField, "invalid field name %s in struct literal", kv.Key)
 					continue
 				}
-				i := fieldIndex(fields, checks.pkg, key.Value, false)
+				i := fieldIndex(fields, check.pkg, key.Value, false)
 				if i < 0 {
 					var alt Object
-					if j := fieldIndex(fields, checks.pkg, key.Value, true); j >= 0 {
+					if j := fieldIndex(fields, check.pkg, key.Value, true); j >= 0 {
 						alt = fields[j]
 					}
-					msg := checks.lookupError(base, key.Value, alt, true)
-					checks.error(kv.Key, MissingLitField, msg)
+					msg := check.lookupError(base, key.Value, alt, true)
+					check.error(kv.Key, MissingLitField, msg)
 					continue
 				}
 				fld := fields[i]
-				checks.recordUse(key, fld)
+				check.recordUse(key, fld)
 				etyp := fld.typ
-				checks.assignment(x, etyp, "struct literal")
+				check.assignment(x, etyp, "struct literal")
 				// 0 <= i < len(fields)
 				if visited[i] {
-					checks.errorf(kv, DuplicateLitField, "duplicate field name %s in struct literal", key.Value)
+					check.errorf(kv, DuplicateLitField, "duplicate field name %s in struct literal", key.Value)
 					continue
 				}
 				visited[i] = true
@@ -201,25 +201,25 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 			// no element must have a key
 			for i, e := range e.ElemList {
 				if kv, _ := e.(*syntax.KeyValueExpr); kv != nil {
-					checks.error(kv, MixedStructLit, "mixture of field:value and value elements in struct literal")
+					check.error(kv, MixedStructLit, "mixture of field:value and value elements in struct literal")
 					continue
 				}
-				checks.expr(nil, x, e)
+				check.expr(nil, x, e)
 				if i >= len(fields) {
-					checks.errorf(x, InvalidStructLit, "too many values in struct literal of type %s", base)
+					check.errorf(x, InvalidStructLit, "too many values in struct literal of type %s", base)
 					break // cannot continue
 				}
 				// i < len(fields)
 				fld := fields[i]
-				if !fld.Exported() && fld.pkg != checks.pkg {
-					checks.errorf(x, UnexportedLitField, "implicit assignment to unexported field %s in struct literal of type %s", fld.name, base)
+				if !fld.Exported() && fld.pkg != check.pkg {
+					check.errorf(x, UnexportedLitField, "implicit assignment to unexported field %s in struct literal of type %s", fld.name, base)
 					continue
 				}
 				etyp := fld.typ
-				checks.assignment(x, etyp, "struct literal")
+				check.assignment(x, etyp, "struct literal")
 			}
 			if len(e.ElemList) < len(fields) {
-				checks.errorf(inNode(e, e.Rbrace), InvalidStructLit, "too few values in struct literal of type %s", base)
+				check.errorf(inNode(e, e.Rbrace), InvalidStructLit, "too few values in struct literal of type %s", base)
 				// ok to continue
 			}
 		}
@@ -229,11 +229,11 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 		// This is a stop-gap solution. Should use Checker.objPath to report entire
 		// path starting with earliest declaration in the source. TODO(gri) fix this.
 		if utyp.elem == nil {
-			checks.error(e, InvalidTypeCycle, "invalid recursive type")
+			check.error(e, InvalidTypeCycle, "invalid recursive type")
 			x.mode = invalid
 			return
 		}
-		n := checks.indexedElts(e.ElemList, utyp.elem, utyp.len)
+		n := check.indexedElts(e.ElemList, utyp.elem, utyp.len)
 		// If we have an array of unknown length (usually [...]T arrays, but also
 		// arrays [n]T where n is invalid) set the length now that we know it and
 		// record the type for the array (usually done by check.typ which is not
@@ -249,7 +249,7 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 			// that case there is nothing to record (there is no type in
 			// the source at that point).
 			if e.Type != nil {
-				checks.recordTypeAndValue(e.Type, typexpr, utyp, nil)
+				check.recordTypeAndValue(e.Type, typexpr, utyp, nil)
 			}
 		}
 
@@ -257,17 +257,17 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 		// Prevent crash if the slice referred to is not yet set up.
 		// See analogous comment for *Array.
 		if utyp.elem == nil {
-			checks.error(e, InvalidTypeCycle, "invalid recursive type")
+			check.error(e, InvalidTypeCycle, "invalid recursive type")
 			x.mode = invalid
 			return
 		}
-		checks.indexedElts(e.ElemList, utyp.elem, -1)
+		check.indexedElts(e.ElemList, utyp.elem, -1)
 
 	case *Map:
 		// Prevent crash if the map referred to is not yet set up.
 		// See analogous comment for *Array.
 		if utyp.key == nil || utyp.elem == nil {
-			checks.error(e, InvalidTypeCycle, "invalid recursive type")
+			check.error(e, InvalidTypeCycle, "invalid recursive type")
 			x.mode = invalid
 			return
 		}
@@ -279,11 +279,11 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 		for _, e := range e.ElemList {
 			kv, _ := e.(*syntax.KeyValueExpr)
 			if kv == nil {
-				checks.error(e, MissingLitKey, "missing key in map literal")
+				check.error(e, MissingLitKey, "missing key in map literal")
 				continue
 			}
-			checks.exprWithHint(x, kv.Key, utyp.key)
-			checks.assignment(x, utyp.key, "map literal")
+			check.exprWithHint(x, kv.Key, utyp.key)
+			check.assignment(x, utyp.key, "map literal")
 			if x.mode == invalid {
 				continue
 			}
@@ -303,12 +303,12 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 					visited[xkey] = nil
 				}
 				if duplicate {
-					checks.errorf(x, DuplicateLitKey, "duplicate key %s in map literal", x.val)
+					check.errorf(x, DuplicateLitKey, "duplicate key %s in map literal", x.val)
 					continue
 				}
 			}
-			checks.exprWithHint(x, kv.Value, utyp.elem)
-			checks.assignment(x, utyp.elem, "map literal")
+			check.exprWithHint(x, kv.Value, utyp.elem)
+			check.assignment(x, utyp.elem, "map literal")
 		}
 
 	default:
@@ -321,7 +321,7 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 				// forward anyway can lead to other errors. Give up instead.
 				e = kv.Value
 			}
-			checks.use(e)
+			check.use(e)
 		}
 		// if utyp is invalid, an error was reported before
 		if isValid(utyp) {
@@ -333,7 +333,7 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 			if utyp == nil {
 				cause = " (no common underlying type)"
 			}
-			checks.errorf(e, InvalidLit, "invalid composite literal%s type %s%s", qualifier, typ, cause)
+			check.errorf(e, InvalidLit, "invalid composite literal%s type %s%s", qualifier, typ, cause)
 			x.mode = invalid
 			return
 		}
@@ -347,7 +347,7 @@ func (checks *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Typ
 // against the literal's element type (typ), and the element indices against
 // the literal length if known (length >= 0). It returns the length of the
 // literal (maximum index value + 1).
-func (checks *Checker) indexedElts(elts []syntax.Expr, typ Type, length int64) int64 {
+func (check *Checker) indexedElts(elts []syntax.Expr, typ Type, length int64) int64 {
 	visited := make(map[int64]bool, len(elts))
 	var index, max int64
 	for _, e := range elts {
@@ -355,17 +355,17 @@ func (checks *Checker) indexedElts(elts []syntax.Expr, typ Type, length int64) i
 		validIndex := false
 		eval := e
 		if kv, _ := e.(*syntax.KeyValueExpr); kv != nil {
-			if typ, i := checks.index(kv.Key, length); isValid(typ) {
+			if typ, i := check.index(kv.Key, length); isValid(typ) {
 				if i >= 0 {
 					index = i
 					validIndex = true
 				} else {
-					checks.errorf(e, InvalidLitIndex, "index %s must be integer constant", kv.Key)
+					check.errorf(e, InvalidLitIndex, "index %s must be integer constant", kv.Key)
 				}
 			}
 			eval = kv.Value
 		} else if length >= 0 && index >= length {
-			checks.errorf(e, OversizeArrayLit, "index %d is out of bounds (>= %d)", index, length)
+			check.errorf(e, OversizeArrayLit, "index %d is out of bounds (>= %d)", index, length)
 		} else {
 			validIndex = true
 		}
@@ -373,7 +373,7 @@ func (checks *Checker) indexedElts(elts []syntax.Expr, typ Type, length int64) i
 		// if we have a valid index, check for duplicate entries
 		if validIndex {
 			if visited[index] {
-				checks.errorf(e, DuplicateLitKey, "duplicate index %d in array or slice literal", index)
+				check.errorf(e, DuplicateLitKey, "duplicate index %d in array or slice literal", index)
 			}
 			visited[index] = true
 		}
@@ -384,8 +384,8 @@ func (checks *Checker) indexedElts(elts []syntax.Expr, typ Type, length int64) i
 
 		// check element against composite literal element type
 		var x operand
-		checks.exprWithHint(&x, eval, typ)
-		checks.assignment(&x, typ, "array or slice literal")
+		check.exprWithHint(&x, eval, typ)
+		check.assignment(&x, typ, "array or slice literal")
 	}
 	return max
 }

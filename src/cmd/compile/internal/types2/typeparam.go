@@ -38,21 +38,21 @@ func NewTypeParam(obj *TypeName, constraint Type) *TypeParam {
 }
 
 // check may be nil
-func (checks *Checker) newTypeParam(obj *TypeName, constraint Type) *TypeParam {
+func (check *Checker) newTypeParam(obj *TypeName, constraint Type) *TypeParam {
 	// Always increment lastID, even if it is not used.
 	id := nextID()
-	if checks != nil {
-		checks.nextID++
-		id = checks.nextID
+	if check != nil {
+		check.nextID++
+		id = check.nextID
 	}
-	typ := &TypeParam{checks: checks, id: id, obj: obj, index: -1, bound: constraint}
+	typ := &TypeParam{checks: check, id: id, obj: obj, index: -1, bound: constraint}
 	if obj.typ == nil {
 		obj.typ = typ
 	}
 	// iface may mutate typ.bound, so we must ensure that iface() is called
 	// at least once before the resulting TypeParam escapes.
-	if checks != nil {
-		checks.needsCleanup(typ)
+	if check != nil {
+		check.needsCleanup(typ)
 	} else if constraint != nil {
 		typ.iface()
 	}
