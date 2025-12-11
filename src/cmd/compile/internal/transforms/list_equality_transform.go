@@ -25,7 +25,7 @@ func (t *ListEqualityTransform) Priority() int {
 
 func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	changed := false
-	
+
 	// Handle top-level statements
 	if len(file.TopLevelStmts) > 0 {
 		for i, stmt := range file.TopLevelStmts {
@@ -125,7 +125,7 @@ func (t *ListEqualityTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 				e.Y = newY
 			}
 		}
-		
+
 		// Then check if this is a slice comparison
 		if (e.Op == syntax.Eql || e.Op == syntax.Neq) && t.looksLikeSliceComparison(e.X, e.Y) {
 			return t.createSlicesEqualCall(e)
@@ -150,7 +150,6 @@ func (t *ListEqualityTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 // looksLikeSliceComparison checks if an expression looks like it might be a slice
 func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr) bool {
 	// Only transform if at least one side is definitely a list/slice literal
-	// This is conservative - we won't catch variables holding slices
 	return t.isListLiteral(x) || t.isListLiteral(y)
 }
 
@@ -159,16 +158,25 @@ func (t *ListEqualityTransform) isListLiteral(expr syntax.Expr) bool {
 	switch e := expr.(type) {
 	case *syntax.CompositeLit:
 		if e.Type != nil {
-			if _, ok := e.Type.(*syntax.IndexExpr); ok {
+			// Try all possible type representations
+			switch e.Type.(type) {
+			case *syntax.IndexExpr:
 				return true
-			}
-			if _, ok := e.Type.(*syntax.ArrayType); ok {
+			case *syntax.ArrayType:
+				return true
+			case *syntax.Operation:
+				// Might be []type represented as an operation
+				return true
+			case *syntax.SliceType:
+				return true
+			default:
+				// Be aggressive - assume composite literals with unknown types are slices
+				// This handles []int{...}, [...]int{...}, etc.
 				return true
 			}
 		}
 		return false
 	case *syntax.ListExpr:
-		// Goo-style list literal [1, 2, 3]
 		return true
 	default:
 		return false
