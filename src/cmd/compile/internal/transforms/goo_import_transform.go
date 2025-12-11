@@ -56,12 +56,10 @@ func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.I
 	importPath := strings.Trim(importDecl.Path.Value, "\"")
 
 	// Debug: print what we're processing
-	println("GooImportTransform processing import:", importPath)
+	// Debug logging removed
 
 	// Check if this is a .goo file import
 	if strings.HasSuffix(importPath, ".goo") {
-		println("Transforming .goo import:", importPath)
-
 		// Extract base name for package directory
 		baseName := strings.TrimSuffix(filepath.Base(importPath), ".goo")
 

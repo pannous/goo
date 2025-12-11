@@ -29,7 +29,7 @@ type Transformer interface {
 	Priority() int
 }
 
-const DEBUGGING = true // Set to true to enable debug output
+const DEBUGGING = false // Set to true to enable debug output
 
 func debug(format string, args ...any) {
 	if DEBUGGING {
@@ -66,11 +66,6 @@ func ApplyTransformations(files []*syntax.File) {
 		for _, transformer := range TransformRegistry {
 			if transformer.Transform(file, ctx) {
 				debug("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
-			}
-		}
-		for _, decl := range file.DeclList {
-			if imp, ok := decl.(*syntax.ImportDecl); ok && imp.Path != nil {
-				debug("Final import: %s\n", imp.Path.Value)
 			}
 		}
 	}

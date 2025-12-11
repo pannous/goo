@@ -1009,7 +1009,6 @@ func (t *StringMethodsTransform) addStringsImport(file *syntax.File) {
 		},
 	}
 	ensureImportPos(file, stringsImport)
-	println("Inserted strings import with path:", stringsImport.Path.Value)
 
 	var insertPos int
 	for i, decl := range file.DeclList {
