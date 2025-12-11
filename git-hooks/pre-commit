@@ -1,0 +1,13 @@
+#!/bin/bash
+# Prevent accidental commits modifying goo/ directory
+
+if git diff --cached --name-only | grep -q "^goo/"; then
+    echo "❌ ERROR: Attempting to commit changes to goo/ directory"
+    echo "   goo/ is user-maintained only - changes blocked"
+    echo ""
+    echo "   Files attempting to modify:"
+    git diff --cached --name-only | grep "^goo/"
+    echo ""
+    echo "   To bypass (if intentional): git commit --no-verify"
+    exit 1
+fi
