@@ -74,22 +74,16 @@ func (t *TruthyAndTransform) transformStmt(stmt syntax.Stmt) syntax.Stmt {
 			return &newBlock
 		}
 	case *syntax.IfStmt:
-		// First transform any 'and' operations in the condition
 		newCond := t.transformExpr(s.Cond)
-
-		// Then wrap the entire condition in truthy() to handle non-boolean types
-		// (numbers, strings, slices, etc.)
-		wrappedCond := t.wrapInTruthy(newCond)
-
 		newThen := t.transformStmt(s.Then)
 		var newElse syntax.Stmt
 		if s.Else != nil {
 			newElse = t.transformStmt(s.Else)
 		}
-
-		if wrappedCond != s.Cond || newThen != s.Then || newElse != s.Else {
+		
+		if newCond != s.Cond || newThen != s.Then || newElse != s.Else {
 			newIf := *s
-			newIf.Cond = wrappedCond
+			newIf.Cond = newCond
 			if thenBlock, ok := newThen.(*syntax.BlockStmt); ok {
 				newIf.Then = thenBlock
 			}
@@ -210,43 +204,6 @@ func (t *TruthyAndTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 	}
 	
 	return expr
-}
-
-// wrapInTruthy wraps an expression in a truthy() call
-// Skip wrapping if it's already a boolean operation
-func (t *TruthyAndTransform) wrapInTruthy(expr syntax.Expr) syntax.Expr {
-	// Check if it's already a boolean operation that doesn't need wrapping
-	if op, ok := expr.(*syntax.Operation); ok {
-		switch op.Op {
-		case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq,
-			syntax.AndAnd, syntax.OrOr:
-			// These already return bool, no need to wrap
-			return expr
-		case syntax.Not:
-			// ! already returns bool
-			return expr
-		}
-	}
-
-	// Check if it's already a truthy call
-	if call, ok := expr.(*syntax.CallExpr); ok {
-		if name, ok := call.Fun.(*syntax.Name); ok && name.Value == "truthy" {
-			// Already wrapped, don't double-wrap
-			return expr
-		}
-	}
-
-	// Wrap in truthy()
-	truthyName := &syntax.Name{Value: "truthy"}
-	truthyName.SetPos(expr.Pos())
-
-	call := &syntax.CallExpr{
-		Fun:     truthyName,
-		ArgList: []syntax.Expr{expr},
-	}
-	call.SetPos(expr.Pos())
-
-	return call
 }
 
 // createTruthyAndCall creates a truthy and operation using truthy calls with &&
