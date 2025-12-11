@@ -4,7 +4,6 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
-	"fmt"
 	"strings"
 )
 
@@ -41,18 +40,11 @@ func (v *arrayIndexVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 	if indexExpr, ok := node.(*syntax.IndexExpr); ok {
 		if v.transform.isArrayIndex(indexExpr, v.ctx) {
-			switch idx := indexExpr.Index.(type) {
-			case *syntax.Operation:
-				var xVal, yVal string
-				if lit, ok := idx.X.(*syntax.BasicLit); ok {
-					xVal = lit.Value
+			if op, ok := indexExpr.Index.(*syntax.Operation); ok {
+				if lit, ok := op.Y.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit && lit.Value == "1" && op.Op == syntax.Sub {
+					indexExpr.Index = op.X
+					v.changed = true
 				}
-				if lit, ok := idx.Y.(*syntax.BasicLit); ok {
-					yVal = lit.Value
-				}
-				fmt.Printf("index expr op=%v X=%s Y=%s\n", idx.Op, xVal, yVal)
-			default:
-				fmt.Printf("index expr type %T\n", idx)
 			}
 			if v.transform.hasNegativeIndex(indexExpr.Index) {
 				v.transform.convertNegativeArrayIndex(indexExpr, v.ctx)

@@ -73,16 +73,18 @@ func (f *posBaseFixer) Visit(node syntax.Node) syntax.Visitor {
 		return nil
 	}
 	pos := node.Pos()
+	line := pos.Line()
+	if line == 0 {
+		line = 1
+	}
+	col := pos.Col()
+	if col == 0 {
+		col = 1
+	}
 	if pos.Base() == nil {
-		line := pos.Line()
-		if line == 0 {
-			line = 1
-		}
-		col := pos.Col()
-		if col == 0 {
-			col = 1
-		}
 		node.SetPos(syntax.MakePos(f.base, line, col))
+	} else if line != pos.Line() || col != pos.Col() {
+		node.SetPos(syntax.MakePos(pos.Base(), line, col))
 	}
 	return f
 }
