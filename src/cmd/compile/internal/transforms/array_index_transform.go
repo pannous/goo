@@ -40,12 +40,7 @@ func (v *arrayIndexVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 	if indexExpr, ok := node.(*syntax.IndexExpr); ok {
 		if v.transform.isArrayIndex(indexExpr, v.ctx) {
-			if op, ok := indexExpr.Index.(*syntax.Operation); ok {
-				if lit, ok := op.Y.(*syntax.BasicLit); ok && lit.Kind == syntax.IntLit && lit.Value == "1" && op.Op == syntax.Sub {
-					indexExpr.Index = op.X
-					v.changed = true
-				}
-			}
+			// Handle negative indexing (e.g., arr#-1 -> arr[len(arr)-1])
 			if v.transform.hasNegativeIndex(indexExpr.Index) {
 				v.transform.convertNegativeArrayIndex(indexExpr, v.ctx)
 				v.changed = true

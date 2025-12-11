@@ -1,0 +1,15 @@
+package main
+
+import "fmt"
+
+func main() {
+	// Test check keyword alone
+	x := 5
+	check x > 0
+	fmt.Println("Check passed")
+
+	// Test as keyword alone
+	var y interface{} = 42
+	z := y as int
+	fmt.Println("As cast result:", z)
+}

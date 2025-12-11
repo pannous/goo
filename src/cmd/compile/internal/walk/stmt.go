@@ -5,13 +5,8 @@
 package walk
 
 import (
-	"fmt"
-
 	"cmd/compile/internal/base"
 	"cmd/compile/internal/ir"
-	"cmd/compile/internal/typecheck"
-	"cmd/compile/internal/types"
-	"go/constant"
 )
 
 // The result of walkStmt MUST be assigned back to n, e.g.

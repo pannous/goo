@@ -9,7 +9,6 @@ import (
 	"cmd/compile/internal/ir"
 	"cmd/compile/internal/types"
 	"cmd/internal/src"
-	"fmt"
 	"internal/types/errors"
 )
 
