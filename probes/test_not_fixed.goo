@@ -1,0 +1,11 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	idx := 2
+	if !(z[idx - 1] == 'b') {
+		print("fail")
+	} else {
+		print("pass")
+	}
+}

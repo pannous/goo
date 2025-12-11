@@ -1,0 +1,7 @@
+package main
+
+func main() {
+	var x any = 5
+	y := x as int
+	print(y)
+}

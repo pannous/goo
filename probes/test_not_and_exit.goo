@@ -1,0 +1,19 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	
+	// Test not with parentheses
+	if not (z#1 == 'a') {
+		print("FAIL: not (z#1 == 'a')")
+		exit()
+	}
+	
+	// Test not with comparison
+	if not (z#2 == 'b') {
+		print("FAIL: not (z#2 == 'b')")
+		exit()
+	}
+	
+	print("All tests passed!")
+}

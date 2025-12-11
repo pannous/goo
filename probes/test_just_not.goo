@@ -1,0 +1,10 @@
+package main
+
+func main() {
+	x := true
+	if not (x) {
+		print("fail")
+	} else {
+		print("not works!")
+	}
+}
