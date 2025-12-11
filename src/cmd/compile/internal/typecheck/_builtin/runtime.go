@@ -75,7 +75,10 @@ func printint(int64)
 func printhex(uint64)
 func printuint(uint64)
 func printcomplex(complex128)
+func printcomplex64(complex64)
+func printcomplex128(complex128)
 func printstring(string)
+func printquoted(string)
 func printpointer(any)
 func printuintptr(uintptr)
 func printiface(any)
@@ -85,6 +88,7 @@ func printnl()
 func printsp()
 func printlock()
 func printunlock()
+func printhexopts(bool, int, uint64)
 
 func concatstring2(*[32]byte, string, string) string
 func concatstring3(*[32]byte, string, string, string) string

@@ -74,12 +74,14 @@ var runtimeDecls = [...]struct {
 	{"panicSliceConvert", funcTag, 14},
 	{"printbool", funcTag, 17},
 	{"printfloat", funcTag, 19},
-	{"printfloat32", funcTag, 18},
+	{"printfloat32", funcTag, 290},
 	{"printfloat64", funcTag, 19},
 	{"printint", funcTag, 21},
 	{"printhex", funcTag, 23},
 	{"printuint", funcTag, 23},
 	{"printcomplex", funcTag, 25},
+	{"printcomplex64", funcTag, 292},
+	{"printcomplex128", funcTag, 25},
 	{"printstring", funcTag, 27},
 	{"printpointer", funcTag, 28},
 	{"printuintptr", funcTag, 29},
@@ -283,7 +285,7 @@ var runtimeDecls = [...]struct {
 }
 
 func runtimeTypes() []*types.Type {
-	var typs [165]*types.Type
+	var typs [293]*types.Type
 	typs[0] = types.ByteType
 	typs[1] = types.NewPtr(typs[0])
 	typs[2] = types.Types[types.TANY]
@@ -449,6 +451,10 @@ func runtimeTypes() []*types.Type {
 	typs[162] = newSig(params(typs[26], typs[26], typs[15]), nil)
 	typs[163] = types.NewArray(typs[0], 16)
 	typs[164] = newSig(params(typs[7], typs[66], typs[163], typs[26], typs[13], typs[70], typs[70]), params(typs[66]))
+	typs[289] = types.Types[types.TFLOAT32]
+	typs[290] = newSig(params(typs[289]), nil)
+	typs[291] = types.Types[types.TCOMPLEX64]
+	typs[292] = newSig(params(typs[291]), nil)
 	return typs[:]
 }
 
