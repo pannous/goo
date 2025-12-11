@@ -52,9 +52,11 @@ func ApplyTransformations(files []*syntax.File) {
 			continue /* Skip non-main packages */
 		}
 		if isToolchainPath(file) {
+			fmt.Printf("SKIPPING TOOLCHAIN PATH: pkg=%s, path=%v\n", file.PkgName.Value, file.Path)
 			continue /* Skip toolchain packages */
 		}
 
+		fmt.Printf("APPLYING TRANSFORMS TO: pkg=%s\n", file.PkgName.Value)
 		ensureFileNodeBases(file)
 
 		ctx := &TransformContext{Types: make(map[string]string)}
@@ -72,6 +74,11 @@ func ApplyTransformations(files []*syntax.File) {
 }
 
 func isToolchainPath(file *syntax.File) bool {
+	// Don't skip .goo files even if they're command-line-arguments
+	if file.Path != nil && strings.Contains(file.Path.Filename(), ".goo") {
+		return false
+	}
+
 	toolchainPaths := []string{
 		"bufio", "bytes", "cmp", "command-line-arguments", "context", "crypto", "embed", "encoding", "errors", "expvar", "flag", "fmt", "hash", "html", "image", "io", "iter", "log", "maps", "math", "mime", "net", "os", "path", "plugin", "reflect", "regexp", "runtime", "slices", "sort", "strconv", "strings", "structs", "sync", "syscall", "testing", "time", "unicode", "unique", "weak",
 	}
