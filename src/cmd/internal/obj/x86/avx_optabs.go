@@ -929,1466 +929,1466 @@ var _yvzeroall = []ytab{
 }
 
 var avxOptab = [...]Optab{
-	{ass: AANDNL, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: AANDNL, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW0, 0xF2,
 	}},
-	{ass: AANDNQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: AANDNQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW1, 0xF2,
 	}},
-	{ass: ABEXTRL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ABEXTRL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW0, 0xF7,
 	}},
-	{ass: ABEXTRQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ABEXTRQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW1, 0xF7,
 	}},
-	{ass: ABLSIL, ytab: _yblsil, prefix: Pavx, op: opBytes{
+	{as: ABLSIL, ytab: _yblsil, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW0, 0xF3, 03,
 	}},
-	{ass: ABLSIQ, ytab: _yblsil, prefix: Pavx, op: opBytes{
+	{as: ABLSIQ, ytab: _yblsil, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW1, 0xF3, 03,
 	}},
-	{ass: ABLSMSKL, ytab: _yblsil, prefix: Pavx, op: opBytes{
+	{as: ABLSMSKL, ytab: _yblsil, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW0, 0xF3, 02,
 	}},
-	{ass: ABLSMSKQ, ytab: _yblsil, prefix: Pavx, op: opBytes{
+	{as: ABLSMSKQ, ytab: _yblsil, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW1, 0xF3, 02,
 	}},
-	{ass: ABLSRL, ytab: _yblsil, prefix: Pavx, op: opBytes{
+	{as: ABLSRL, ytab: _yblsil, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW0, 0xF3, 01,
 	}},
-	{ass: ABLSRQ, ytab: _yblsil, prefix: Pavx, op: opBytes{
+	{as: ABLSRQ, ytab: _yblsil, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW1, 0xF3, 01,
 	}},
-	{ass: ABZHIL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ABZHIL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW0, 0xF5,
 	}},
-	{ass: ABZHIQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ABZHIQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F38 | vexW1, 0xF5,
 	}},
-	{ass: AKADDB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKADDB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x4A,
 	}},
-	{ass: AKADDD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKADDD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW1, 0x4A,
 	}},
-	{ass: AKADDQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKADDQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x4A,
 	}},
-	{ass: AKADDW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKADDW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x4A,
 	}},
-	{ass: AKANDB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x41,
 	}},
-	{ass: AKANDD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW1, 0x41,
 	}},
-	{ass: AKANDNB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDNB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x42,
 	}},
-	{ass: AKANDND, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDND, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW1, 0x42,
 	}},
-	{ass: AKANDNQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDNQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x42,
 	}},
-	{ass: AKANDNW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDNW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x42,
 	}},
-	{ass: AKANDQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x41,
 	}},
-	{ass: AKANDW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKANDW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x41,
 	}},
-	{ass: AKMOVB, ytab: _ykmovb, prefix: Pavx, op: opBytes{
+	{as: AKMOVB, ytab: _ykmovb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x91,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x93,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x90,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x92,
 	}},
-	{ass: AKMOVD, ytab: _ykmovb, prefix: Pavx, op: opBytes{
+	{as: AKMOVD, ytab: _ykmovb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x91,
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x93,
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x90,
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x92,
 	}},
-	{ass: AKMOVQ, ytab: _ykmovb, prefix: Pavx, op: opBytes{
+	{as: AKMOVQ, ytab: _ykmovb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW1, 0x91,
 		avxEscape | vex128 | vexF2 | vex0F | vexW1, 0x93,
 		avxEscape | vex128 | vex0F | vexW1, 0x90,
 		avxEscape | vex128 | vexF2 | vex0F | vexW1, 0x92,
 	}},
-	{ass: AKMOVW, ytab: _ykmovb, prefix: Pavx, op: opBytes{
+	{as: AKMOVW, ytab: _ykmovb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x91,
 		avxEscape | vex128 | vex0F | vexW0, 0x93,
 		avxEscape | vex128 | vex0F | vexW0, 0x90,
 		avxEscape | vex128 | vex0F | vexW0, 0x92,
 	}},
-	{ass: AKNOTB, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKNOTB, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x44,
 	}},
-	{ass: AKNOTD, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKNOTD, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x44,
 	}},
-	{ass: AKNOTQ, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKNOTQ, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW1, 0x44,
 	}},
-	{ass: AKNOTW, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKNOTW, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x44,
 	}},
-	{ass: AKORB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKORB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x45,
 	}},
-	{ass: AKORD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKORD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW1, 0x45,
 	}},
-	{ass: AKORQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKORQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x45,
 	}},
-	{ass: AKORTESTB, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKORTESTB, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x98,
 	}},
-	{ass: AKORTESTD, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKORTESTD, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x98,
 	}},
-	{ass: AKORTESTQ, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKORTESTQ, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW1, 0x98,
 	}},
-	{ass: AKORTESTW, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKORTESTW, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x98,
 	}},
-	{ass: AKORW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKORW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x45,
 	}},
-	{ass: AKSHIFTLB, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTLB, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x32,
 	}},
-	{ass: AKSHIFTLD, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTLD, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x33,
 	}},
-	{ass: AKSHIFTLQ, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTLQ, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0x33,
 	}},
-	{ass: AKSHIFTLW, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTLW, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0x32,
 	}},
-	{ass: AKSHIFTRB, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTRB, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x30,
 	}},
-	{ass: AKSHIFTRD, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTRD, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x31,
 	}},
-	{ass: AKSHIFTRQ, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTRQ, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0x31,
 	}},
-	{ass: AKSHIFTRW, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
+	{as: AKSHIFTRW, ytab: _ykshiftlb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0x30,
 	}},
-	{ass: AKTESTB, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKTESTB, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x99,
 	}},
-	{ass: AKTESTD, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKTESTD, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x99,
 	}},
-	{ass: AKTESTQ, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKTESTQ, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW1, 0x99,
 	}},
-	{ass: AKTESTW, ytab: _yknotb, prefix: Pavx, op: opBytes{
+	{as: AKTESTW, ytab: _yknotb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x99,
 	}},
-	{ass: AKUNPCKBW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKUNPCKBW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x4B,
 	}},
-	{ass: AKUNPCKDQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKUNPCKDQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x4B,
 	}},
-	{ass: AKUNPCKWD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKUNPCKWD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x4B,
 	}},
-	{ass: AKXNORB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXNORB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x46,
 	}},
-	{ass: AKXNORD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXNORD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW1, 0x46,
 	}},
-	{ass: AKXNORQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXNORQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x46,
 	}},
-	{ass: AKXNORW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXNORW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x46,
 	}},
-	{ass: AKXORB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXORB, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x47,
 	}},
-	{ass: AKXORD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXORD, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW1, 0x47,
 	}},
-	{ass: AKXORQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXORQ, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW1, 0x47,
 	}},
-	{ass: AKXORW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
+	{as: AKXORW, ytab: _ykaddb, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x47,
 	}},
-	{ass: AMULXL, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: AMULXL, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F38 | vexW0, 0xF6,
 	}},
-	{ass: AMULXQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: AMULXQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F38 | vexW1, 0xF6,
 	}},
-	{ass: APDEPL, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: APDEPL, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F38 | vexW0, 0xF5,
 	}},
-	{ass: APDEPQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: APDEPQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F38 | vexW1, 0xF5,
 	}},
-	{ass: APEXTL, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: APEXTL, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F38 | vexW0, 0xF5,
 	}},
-	{ass: APEXTQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
+	{as: APEXTQ, ytab: _yandnl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F38 | vexW1, 0xF5,
 	}},
-	{ass: ARORXL, ytab: _yrorxl, prefix: Pavx, op: opBytes{
+	{as: ARORXL, ytab: _yrorxl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F3A | vexW0, 0xF0,
 	}},
-	{ass: ARORXQ, ytab: _yrorxl, prefix: Pavx, op: opBytes{
+	{as: ARORXQ, ytab: _yrorxl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F3A | vexW1, 0xF0,
 	}},
-	{ass: ASARXL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ASARXL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F38 | vexW0, 0xF7,
 	}},
-	{ass: ASARXQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ASARXQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F38 | vexW1, 0xF7,
 	}},
-	{ass: ASHLXL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ASHLXL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xF7,
 	}},
-	{ass: ASHLXQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ASHLXQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xF7,
 	}},
-	{ass: ASHRXL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ASHRXL, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F38 | vexW0, 0xF7,
 	}},
-	{ass: ASHRXQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
+	{as: ASHRXQ, ytab: _ybextrl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F38 | vexW1, 0xF7,
 	}},
-	{ass: AV4FMADDPS, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
+	{as: AV4FMADDPS, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x9A,
 	}},
-	{ass: AV4FMADDSS, ytab: _yv4fmaddss, prefix: Pavx, op: opBytes{
+	{as: AV4FMADDSS, ytab: _yv4fmaddss, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x9B,
 	}},
-	{ass: AV4FNMADDPS, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
+	{as: AV4FNMADDPS, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0xAA,
 	}},
-	{ass: AV4FNMADDSS, ytab: _yv4fmaddss, prefix: Pavx, op: opBytes{
+	{as: AV4FNMADDSS, ytab: _yv4fmaddss, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0xAB,
 	}},
-	{ass: AVADDPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVADDPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x58,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x58,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x58,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x58,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x58,
 	}},
-	{ass: AVADDPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVADDPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x58,
 		avxEscape | vex256 | vex0F | vexW0, 0x58,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x58,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x58,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x58,
 	}},
-	{ass: AVADDSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVADDSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x58,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x58,
 	}},
-	{ass: AVADDSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVADDSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x58,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x58,
 	}},
-	{ass: AVADDSUBPD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVADDSUBPD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD0,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xD0,
 	}},
-	{ass: AVADDSUBPS, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVADDSUBPS, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0xD0,
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0xD0,
 	}},
-	{ass: AVAESDEC, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
+	{as: AVAESDEC, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xDE,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xDE,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0xDE,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0xDE,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0xDE,
 	}},
-	{ass: AVAESDECLAST, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
+	{as: AVAESDECLAST, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xDF,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xDF,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0xDF,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0xDF,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0xDF,
 	}},
-	{ass: AVAESENC, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
+	{as: AVAESENC, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xDC,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xDC,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0xDC,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0xDC,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0xDC,
 	}},
-	{ass: AVAESENCLAST, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
+	{as: AVAESENCLAST, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xDD,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xDD,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0xDD,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0xDD,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0xDD,
 	}},
-	{ass: AVAESIMC, ytab: _yvaesimc, prefix: Pavx, op: opBytes{
+	{as: AVAESIMC, ytab: _yvaesimc, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xDB,
 	}},
-	{ass: AVAESKEYGENASSIST, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
+	{as: AVAESKEYGENASSIST, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0xDF,
 	}},
-	{ass: AVALIGND, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVALIGND, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x03,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x03,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x03,
 	}},
-	{ass: AVALIGNQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVALIGNQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x03,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x03,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x03,
 	}},
-	{ass: AVANDNPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVANDNPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x55,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x55,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x55,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x55,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x55,
 	}},
-	{ass: AVANDNPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVANDNPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x55,
 		avxEscape | vex256 | vex0F | vexW0, 0x55,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x55,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x55,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x55,
 	}},
-	{ass: AVANDPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVANDPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x54,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x54,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x54,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x54,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x54,
 	}},
-	{ass: AVANDPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVANDPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x54,
 		avxEscape | vex256 | vex0F | vexW0, 0x54,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x54,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x54,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x54,
 	}},
-	{ass: AVBLENDMPD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVBLENDMPD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x65,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x65,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x65,
 	}},
-	{ass: AVBLENDMPS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVBLENDMPS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x65,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x65,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x65,
 	}},
-	{ass: AVBLENDPD, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
+	{as: AVBLENDPD, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x0D,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x0D,
 	}},
-	{ass: AVBLENDPS, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
+	{as: AVBLENDPS, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x0C,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x0C,
 	}},
-	{ass: AVBLENDVPD, ytab: _yvblendvpd, prefix: Pavx, op: opBytes{
+	{as: AVBLENDVPD, ytab: _yvblendvpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x4B,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x4B,
 	}},
-	{ass: AVBLENDVPS, ytab: _yvblendvpd, prefix: Pavx, op: opBytes{
+	{as: AVBLENDVPS, ytab: _yvblendvpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x4A,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x4A,
 	}},
-	{ass: AVBROADCASTF128, ytab: _yvbroadcastf128, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTF128, ytab: _yvbroadcastf128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x1A,
 	}},
-	{ass: AVBROADCASTF32X2, ytab: _yvbroadcastf32x2, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTF32X2, ytab: _yvbroadcastf32x2, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x19,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x19,
 	}},
-	{ass: AVBROADCASTF32X4, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTF32X4, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x1A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x1A,
 	}},
-	{ass: AVBROADCASTF32X8, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTF32X8, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x1B,
 	}},
-	{ass: AVBROADCASTF64X2, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTF64X2, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x1A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x1A,
 	}},
-	{ass: AVBROADCASTF64X4, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTF64X4, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x1B,
 	}},
-	{ass: AVBROADCASTI128, ytab: _yvbroadcastf128, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTI128, ytab: _yvbroadcastf128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x5A,
 	}},
-	{ass: AVBROADCASTI32X2, ytab: _yvbroadcasti32x2, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTI32X2, ytab: _yvbroadcasti32x2, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x59,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x59,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x59,
 	}},
-	{ass: AVBROADCASTI32X4, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTI32X4, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x5A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVBROADCASTI32X8, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTI32X8, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVBROADCASTI64X2, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTI64X2, ytab: _yvbroadcastf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x5A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVBROADCASTI64X4, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTI64X4, ytab: _yvbroadcastf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVBROADCASTSD, ytab: _yvbroadcastsd, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTSD, ytab: _yvbroadcastsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x19,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x19,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x19,
 	}},
-	{ass: AVBROADCASTSS, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVBROADCASTSS, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x18,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x18,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x18,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x18,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x18,
 	}},
-	{ass: AVCMPPD, ytab: _yvcmppd, prefix: Pavx, op: opBytes{
+	{as: AVCMPPD, ytab: _yvcmppd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xC2,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xC2,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled, 0xC2,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8, 0xC2,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8, 0xC2,
 	}},
-	{ass: AVCMPPS, ytab: _yvcmppd, prefix: Pavx, op: opBytes{
+	{as: AVCMPPS, ytab: _yvcmppd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0xC2,
 		avxEscape | vex256 | vex0F | vexW0, 0xC2,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled, 0xC2,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4, 0xC2,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4, 0xC2,
 	}},
-	{ass: AVCMPSD, ytab: _yvcmpsd, prefix: Pavx, op: opBytes{
+	{as: AVCMPSD, ytab: _yvcmpsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0xC2,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexSaeEnabled, 0xC2,
 	}},
-	{ass: AVCMPSS, ytab: _yvcmpsd, prefix: Pavx, op: opBytes{
+	{as: AVCMPSS, ytab: _yvcmpsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0xC2,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexSaeEnabled, 0xC2,
 	}},
-	{ass: AVCOMISD, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
+	{as: AVCOMISD, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x2F,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8 | evexSaeEnabled, 0x2F,
 	}},
-	{ass: AVCOMISS, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
+	{as: AVCOMISS, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x2F,
 		avxEscape | evex128 | evex0F | evexW0, evexN4 | evexSaeEnabled, 0x2F,
 	}},
-	{ass: AVCOMPRESSPD, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
+	{as: AVCOMPRESSPD, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x8A,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x8A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x8A,
 	}},
-	{ass: AVCOMPRESSPS, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
+	{as: AVCOMPRESSPS, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x8A,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x8A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x8A,
 	}},
-	{ass: AVCVTDQ2PD, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVCVTDQ2PD, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0xE6,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0xE6,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0xE6,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xE6,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTDQ2PS, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
+	{as: AVCVTDQ2PS, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x5B,
 		avxEscape | vex256 | vex0F | vexW0, 0x5B,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x5B,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5B,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVCVTPD2DQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2DQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTPD2DQX, ytab: _yvcvtpd2dqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2DQX, ytab: _yvcvtpd2dqx, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0xE6,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTPD2DQY, ytab: _yvcvtpd2dqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2DQY, ytab: _yvcvtpd2dqy, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0xE6,
 		avxEscape | evex256 | evexF2 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTPD2PS, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2PS, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVCVTPD2PSX, ytab: _yvcvtpd2dqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2PSX, ytab: _yvcvtpd2dqx, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x5A,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVCVTPD2PSY, ytab: _yvcvtpd2dqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2PSY, ytab: _yvcvtpd2dqy, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x5A,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVCVTPD2QQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2QQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x7B,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x7B,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x7B,
 	}},
-	{ass: AVCVTPD2UDQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2UDQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVCVTPD2UDQX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2UDQX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVCVTPD2UDQY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2UDQY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVCVTPD2UQQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPD2UQQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x79,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x79,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVCVTPH2PS, ytab: _yvcvtph2ps, prefix: Pavx, op: opBytes{
+	{as: AVCVTPH2PS, ytab: _yvcvtph2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x13,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x13,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexSaeEnabled | evexZeroingEnabled, 0x13,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x13,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x13,
 	}},
-	{ass: AVCVTPS2DQ, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
+	{as: AVCVTPS2DQ, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x5B,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x5B,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x5B,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5B,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVCVTPS2PD, ytab: _yvcvtph2ps, prefix: Pavx, op: opBytes{
+	{as: AVCVTPS2PD, ytab: _yvcvtph2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x5A,
 		avxEscape | vex256 | vex0F | vexW0, 0x5A,
 		avxEscape | evex512 | evex0F | evexW0, evexN32 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x5A,
 		avxEscape | evex128 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0x5A,
 		avxEscape | evex256 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVCVTPS2PH, ytab: _yvcvtps2ph, prefix: Pavx, op: opBytes{
+	{as: AVCVTPS2PH, ytab: _yvcvtps2ph, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x1D,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x1D,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN32 | evexSaeEnabled | evexZeroingEnabled, 0x1D,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN8 | evexZeroingEnabled, 0x1D,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x1D,
 	}},
-	{ass: AVCVTPS2QQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPS2QQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x7B,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0x7B,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x7B,
 	}},
-	{ass: AVCVTPS2UDQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPS2UDQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x79,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x79,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVCVTPS2UQQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTPS2UQQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x79,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0x79,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVCVTQQ2PD, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTQQ2PD, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF3 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xE6,
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xE6,
 		avxEscape | evex256 | evexF3 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTQQ2PS, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTQQ2PS, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVCVTQQ2PSX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTQQ2PSX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVCVTQQ2PSY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTQQ2PSY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVCVTSD2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTSD2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x2D,
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN8 | evexRoundingEnabled, 0x2D,
 	}},
-	{ass: AVCVTSD2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTSD2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW1, 0x2D,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled, 0x2D,
 	}},
-	{ass: AVCVTSD2SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVCVTSD2SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x5A,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVCVTSD2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTSD2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN8 | evexRoundingEnabled, 0x79,
 	}},
-	{ass: AVCVTSD2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTSD2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled, 0x79,
 	}},
-	{ass: AVCVTSI2SDL, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTSI2SDL, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x2A,
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN4, 0x2A,
 	}},
-	{ass: AVCVTSI2SDQ, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTSI2SDQ, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW1, 0x2A,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled, 0x2A,
 	}},
-	{ass: AVCVTSI2SSL, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTSI2SSL, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x2A,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled, 0x2A,
 	}},
-	{ass: AVCVTSI2SSQ, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTSI2SSQ, ytab: _yvcvtsi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW1, 0x2A,
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN8 | evexRoundingEnabled, 0x2A,
 	}},
-	{ass: AVCVTSS2SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVCVTSS2SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x5A,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x5A,
 	}},
-	{ass: AVCVTSS2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTSS2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x2D,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled, 0x2D,
 	}},
-	{ass: AVCVTSS2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTSS2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW1, 0x2D,
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN4 | evexRoundingEnabled, 0x2D,
 	}},
-	{ass: AVCVTSS2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTSS2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled, 0x79,
 	}},
-	{ass: AVCVTSS2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTSS2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN4 | evexRoundingEnabled, 0x79,
 	}},
-	{ass: AVCVTTPD2DQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2DQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTTPD2DQX, ytab: _yvcvtpd2dqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2DQX, ytab: _yvcvtpd2dqx, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE6,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTTPD2DQY, ytab: _yvcvtpd2dqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2DQY, ytab: _yvcvtpd2dqy, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE6,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xE6,
 	}},
-	{ass: AVCVTTPD2QQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2QQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x7A,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x7A,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTTPD2UDQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2UDQ, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVCVTTPD2UDQX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2UDQX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVCVTTPD2UDQY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2UDQY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVCVTTPD2UQQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPD2UQQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x78,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x78,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVCVTTPS2DQ, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPS2DQ, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x5B,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0x5B,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x5B,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5B,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5B,
 	}},
-	{ass: AVCVTTPS2QQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPS2QQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x7A,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTTPS2UDQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPS2UDQ, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x78,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x78,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVCVTTPS2UQQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTTPS2UQQ, ytab: _yvcvtps2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x78,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0x78,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVCVTTSD2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSD2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x2C,
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN8 | evexSaeEnabled, 0x2C,
 	}},
-	{ass: AVCVTTSD2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSD2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW1, 0x2C,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexSaeEnabled, 0x2C,
 	}},
-	{ass: AVCVTTSD2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSD2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN8 | evexSaeEnabled, 0x78,
 	}},
-	{ass: AVCVTTSD2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSD2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexSaeEnabled, 0x78,
 	}},
-	{ass: AVCVTTSS2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSS2SI, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x2C,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexSaeEnabled, 0x2C,
 	}},
-	{ass: AVCVTTSS2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSS2SIQ, ytab: _yvcvtsd2si, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW1, 0x2C,
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN4 | evexSaeEnabled, 0x2C,
 	}},
-	{ass: AVCVTTSS2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSS2USIL, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexSaeEnabled, 0x78,
 	}},
-	{ass: AVCVTTSS2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
+	{as: AVCVTTSS2USIQ, ytab: _yvcvtsd2usil, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN4 | evexSaeEnabled, 0x78,
 	}},
-	{ass: AVCVTUDQ2PD, ytab: _yvcvtudq2pd, prefix: Pavx, op: opBytes{
+	{as: AVCVTUDQ2PD, ytab: _yvcvtudq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN8 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTUDQ2PS, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTUDQ2PS, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x7A,
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 		avxEscape | evex256 | evexF2 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTUQQ2PD, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVCVTUQQ2PD, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF3 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x7A,
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x7A,
 		avxEscape | evex256 | evexF3 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTUQQ2PS, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
+	{as: AVCVTUQQ2PS, ytab: _yvcvtpd2dq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTUQQ2PSX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
+	{as: AVCVTUQQ2PSX, ytab: _yvcvtpd2udqx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTUQQ2PSY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
+	{as: AVCVTUQQ2PSY, ytab: _yvcvtpd2udqy, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evexF2 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x7A,
 	}},
-	{ass: AVCVTUSI2SDL, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTUSI2SDL, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN4, 0x7B,
 	}},
-	{ass: AVCVTUSI2SDQ, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTUSI2SDQ, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled, 0x7B,
 	}},
-	{ass: AVCVTUSI2SSL, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTUSI2SSL, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled, 0x7B,
 	}},
-	{ass: AVCVTUSI2SSQ, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
+	{as: AVCVTUSI2SSQ, ytab: _yvcvtusi2sdl, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN8 | evexRoundingEnabled, 0x7B,
 	}},
-	{ass: AVDBPSADBW, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVDBPSADBW, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x42,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexZeroingEnabled, 0x42,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexZeroingEnabled, 0x42,
 	}},
-	{ass: AVDIVPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVDIVPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x5E,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x5E,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5E,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x5E,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x5E,
 	}},
-	{ass: AVDIVPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVDIVPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x5E,
 		avxEscape | vex256 | vex0F | vexW0, 0x5E,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x5E,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5E,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5E,
 	}},
-	{ass: AVDIVSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVDIVSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x5E,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5E,
 	}},
-	{ass: AVDIVSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVDIVSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x5E,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x5E,
 	}},
-	{ass: AVDPPD, ytab: _yvdppd, prefix: Pavx, op: opBytes{
+	{as: AVDPPD, ytab: _yvdppd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x41,
 	}},
-	{ass: AVDPPS, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
+	{as: AVDPPS, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x40,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x40,
 	}},
-	{ass: AVEXP2PD, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
+	{as: AVEXP2PD, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0xC8,
 	}},
-	{ass: AVEXP2PS, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
+	{as: AVEXP2PS, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0xC8,
 	}},
-	{ass: AVEXPANDPD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVEXPANDPD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x88,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x88,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x88,
 	}},
-	{ass: AVEXPANDPS, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVEXPANDPS, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x88,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x88,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x88,
 	}},
-	{ass: AVEXTRACTF128, ytab: _yvextractf128, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTF128, ytab: _yvextractf128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x19,
 	}},
-	{ass: AVEXTRACTF32X4, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTF32X4, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x19,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x19,
 	}},
-	{ass: AVEXTRACTF32X8, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTF32X8, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN32 | evexZeroingEnabled, 0x1B,
 	}},
-	{ass: AVEXTRACTF64X2, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTF64X2, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x19,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x19,
 	}},
-	{ass: AVEXTRACTF64X4, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTF64X4, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN32 | evexZeroingEnabled, 0x1B,
 	}},
-	{ass: AVEXTRACTI128, ytab: _yvextractf128, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTI128, ytab: _yvextractf128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x39,
 	}},
-	{ass: AVEXTRACTI32X4, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTI32X4, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x39,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x39,
 	}},
-	{ass: AVEXTRACTI32X8, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTI32X8, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN32 | evexZeroingEnabled, 0x3B,
 	}},
-	{ass: AVEXTRACTI64X2, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTI64X2, ytab: _yvextractf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x39,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x39,
 	}},
-	{ass: AVEXTRACTI64X4, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTI64X4, ytab: _yvextractf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN32 | evexZeroingEnabled, 0x3B,
 	}},
-	{ass: AVEXTRACTPS, ytab: _yvextractps, prefix: Pavx, op: opBytes{
+	{as: AVEXTRACTPS, ytab: _yvextractps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x17,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4, 0x17,
 	}},
-	{ass: AVFIXUPIMMPD, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
+	{as: AVFIXUPIMMPD, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x54,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x54,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x54,
 	}},
-	{ass: AVFIXUPIMMPS, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
+	{as: AVFIXUPIMMPS, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x54,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x54,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x54,
 	}},
-	{ass: AVFIXUPIMMSD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVFIXUPIMMSD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x55,
 	}},
-	{ass: AVFIXUPIMMSS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVFIXUPIMMSS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x55,
 	}},
-	{ass: AVFMADD132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x98,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x98,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x98,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x98,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x98,
 	}},
-	{ass: AVFMADD132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x98,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x98,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x98,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x98,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x98,
 	}},
-	{ass: AVFMADD132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x99,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x99,
 	}},
-	{ass: AVFMADD132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x99,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x99,
 	}},
-	{ass: AVFMADD213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xA8,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xA8,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xA8,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xA8,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xA8,
 	}},
-	{ass: AVFMADD213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xA8,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xA8,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xA8,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xA8,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xA8,
 	}},
-	{ass: AVFMADD213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xA9,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xA9,
 	}},
-	{ass: AVFMADD213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xA9,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xA9,
 	}},
-	{ass: AVFMADD231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xB8,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xB8,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xB8,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xB8,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xB8,
 	}},
-	{ass: AVFMADD231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xB8,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xB8,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xB8,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xB8,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xB8,
 	}},
-	{ass: AVFMADD231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xB9,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xB9,
 	}},
-	{ass: AVFMADD231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMADD231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xB9,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xB9,
 	}},
-	{ass: AVFMADDSUB132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADDSUB132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x96,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x96,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x96,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x96,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x96,
 	}},
-	{ass: AVFMADDSUB132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADDSUB132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x96,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x96,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x96,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x96,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x96,
 	}},
-	{ass: AVFMADDSUB213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADDSUB213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xA6,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xA6,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xA6,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xA6,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xA6,
 	}},
-	{ass: AVFMADDSUB213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADDSUB213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xA6,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xA6,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xA6,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xA6,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xA6,
 	}},
-	{ass: AVFMADDSUB231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADDSUB231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xB6,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xB6,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xB6,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xB6,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xB6,
 	}},
-	{ass: AVFMADDSUB231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMADDSUB231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xB6,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xB6,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xB6,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xB6,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xB6,
 	}},
-	{ass: AVFMSUB132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x9A,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x9A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x9A,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x9A,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x9A,
 	}},
-	{ass: AVFMSUB132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x9A,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x9A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x9A,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x9A,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x9A,
 	}},
-	{ass: AVFMSUB132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x9B,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x9B,
 	}},
-	{ass: AVFMSUB132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x9B,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x9B,
 	}},
-	{ass: AVFMSUB213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xAA,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xAA,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xAA,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xAA,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xAA,
 	}},
-	{ass: AVFMSUB213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xAA,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xAA,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xAA,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xAA,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xAA,
 	}},
-	{ass: AVFMSUB213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xAB,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xAB,
 	}},
-	{ass: AVFMSUB213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xAB,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xAB,
 	}},
-	{ass: AVFMSUB231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xBA,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xBA,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xBA,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xBA,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xBA,
 	}},
-	{ass: AVFMSUB231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xBA,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xBA,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xBA,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xBA,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xBA,
 	}},
-	{ass: AVFMSUB231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xBB,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xBB,
 	}},
-	{ass: AVFMSUB231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUB231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xBB,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xBB,
 	}},
-	{ass: AVFMSUBADD132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUBADD132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x97,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x97,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x97,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x97,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x97,
 	}},
-	{ass: AVFMSUBADD132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUBADD132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x97,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x97,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x97,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x97,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x97,
 	}},
-	{ass: AVFMSUBADD213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUBADD213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xA7,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xA7,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xA7,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xA7,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xA7,
 	}},
-	{ass: AVFMSUBADD213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUBADD213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xA7,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xA7,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xA7,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xA7,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xA7,
 	}},
-	{ass: AVFMSUBADD231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUBADD231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xB7,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xB7,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xB7,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xB7,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xB7,
 	}},
-	{ass: AVFMSUBADD231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFMSUBADD231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xB7,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xB7,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xB7,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xB7,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xB7,
 	}},
-	{ass: AVFNMADD132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x9C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x9C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x9C,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x9C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x9C,
 	}},
-	{ass: AVFNMADD132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x9C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x9C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x9C,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x9C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x9C,
 	}},
-	{ass: AVFNMADD132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x9D,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x9D,
 	}},
-	{ass: AVFNMADD132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x9D,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x9D,
 	}},
-	{ass: AVFNMADD213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xAC,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xAC,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xAC,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xAC,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xAC,
 	}},
-	{ass: AVFNMADD213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xAC,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xAC,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xAC,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xAC,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xAC,
 	}},
-	{ass: AVFNMADD213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xAD,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xAD,
 	}},
-	{ass: AVFNMADD213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xAD,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xAD,
 	}},
-	{ass: AVFNMADD231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xBC,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xBC,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xBC,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xBC,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xBC,
 	}},
-	{ass: AVFNMADD231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xBC,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xBC,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xBC,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xBC,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xBC,
 	}},
-	{ass: AVFNMADD231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xBD,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xBD,
 	}},
-	{ass: AVFNMADD231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMADD231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xBD,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xBD,
 	}},
-	{ass: AVFNMSUB132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB132PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x9E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x9E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x9E,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x9E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x9E,
 	}},
-	{ass: AVFNMSUB132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB132PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x9E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x9E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x9E,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x9E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x9E,
 	}},
-	{ass: AVFNMSUB132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB132SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x9F,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x9F,
 	}},
-	{ass: AVFNMSUB132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB132SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x9F,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x9F,
 	}},
-	{ass: AVFNMSUB213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB213PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xAE,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xAE,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xAE,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xAE,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xAE,
 	}},
-	{ass: AVFNMSUB213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB213PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xAE,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xAE,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xAE,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xAE,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xAE,
 	}},
-	{ass: AVFNMSUB213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB213SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xAF,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xAF,
 	}},
-	{ass: AVFNMSUB213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB213SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xAF,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xAF,
 	}},
-	{ass: AVFNMSUB231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB231PD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xBE,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0xBE,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0xBE,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xBE,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xBE,
 	}},
-	{ass: AVFNMSUB231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB231PS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xBE,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xBE,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0xBE,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xBE,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xBE,
 	}},
-	{ass: AVFNMSUB231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB231SD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0xBF,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0xBF,
 	}},
-	{ass: AVFNMSUB231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVFNMSUB231SS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xBF,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0xBF,
 	}},
-	{ass: AVFPCLASSPDX, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSPDX, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8, 0x66,
 	}},
-	{ass: AVFPCLASSPDY, ytab: _yvfpclasspdy, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSPDY, ytab: _yvfpclasspdy, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8, 0x66,
 	}},
-	{ass: AVFPCLASSPDZ, ytab: _yvfpclasspdz, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSPDZ, ytab: _yvfpclasspdz, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8, 0x66,
 	}},
-	{ass: AVFPCLASSPSX, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSPSX, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4, 0x66,
 	}},
-	{ass: AVFPCLASSPSY, ytab: _yvfpclasspdy, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSPSY, ytab: _yvfpclasspdy, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4, 0x66,
 	}},
-	{ass: AVFPCLASSPSZ, ytab: _yvfpclasspdz, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSPSZ, ytab: _yvfpclasspdz, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4, 0x66,
 	}},
-	{ass: AVFPCLASSSD, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSSD, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8, 0x67,
 	}},
-	{ass: AVFPCLASSSS, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
+	{as: AVFPCLASSSS, ytab: _yvfpclasspdx, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4, 0x67,
 	}},
-	{ass: AVGATHERDPD, ytab: _yvgatherdpd, prefix: Pavx, op: opBytes{
+	{as: AVGATHERDPD, ytab: _yvgatherdpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x92,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x92,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0x92,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0x92,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0x92,
 	}},
-	{ass: AVGATHERDPS, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERDPS, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x92,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x92,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0x92,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0x92,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0x92,
 	}},
-	{ass: AVGATHERPF0DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF0DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC6, 01,
 	}},
-	{ass: AVGATHERPF0DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF0DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC6, 01,
 	}},
-	{ass: AVGATHERPF0QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF0QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC7, 01,
 	}},
-	{ass: AVGATHERPF0QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF0QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC7, 01,
 	}},
-	{ass: AVGATHERPF1DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF1DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC6, 02,
 	}},
-	{ass: AVGATHERPF1DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF1DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC6, 02,
 	}},
-	{ass: AVGATHERPF1QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF1QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC7, 02,
 	}},
-	{ass: AVGATHERPF1QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERPF1QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC7, 02,
 	}},
-	{ass: AVGATHERQPD, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERQPD, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x93,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x93,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0x93,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0x93,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0x93,
 	}},
-	{ass: AVGATHERQPS, ytab: _yvgatherqps, prefix: Pavx, op: opBytes{
+	{as: AVGATHERQPS, ytab: _yvgatherqps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x93,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x93,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0x93,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0x93,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0x93,
 	}},
-	{ass: AVGETEXPPD, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVGETEXPPD, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x42,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x42,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x42,
 	}},
-	{ass: AVGETEXPPS, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
+	{as: AVGETEXPPS, ytab: _yvcvtpd2qq, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x42,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x42,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x42,
 	}},
-	{ass: AVGETEXPSD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVGETEXPSD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x43,
 	}},
-	{ass: AVGETEXPSS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVGETEXPSS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x43,
 	}},
-	{ass: AVGETMANTPD, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
+	{as: AVGETMANTPD, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x26,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x26,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x26,
 	}},
-	{ass: AVGETMANTPS, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
+	{as: AVGETMANTPS, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x26,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x26,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x26,
 	}},
-	{ass: AVGETMANTSD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVGETMANTSD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x27,
 	}},
-	{ass: AVGETMANTSS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVGETMANTSS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x27,
 	}},
-	{ass: AVGF2P8AFFINEINVQB, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
+	{as: AVGF2P8AFFINEINVQB, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0xCF,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW1, 0xCF,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xCF,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xCF,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xCF,
 	}},
-	{ass: AVGF2P8AFFINEQB, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
+	{as: AVGF2P8AFFINEQB, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0xCE,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW1, 0xCE,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xCE,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xCE,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xCE,
 	}},
-	{ass: AVGF2P8MULB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVGF2P8MULB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0xCF,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0xCF,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0xCF,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0xCF,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0xCF,
 	}},
-	{ass: AVHADDPD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVHADDPD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x7C,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x7C,
 	}},
-	{ass: AVHADDPS, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVHADDPS, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x7C,
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0x7C,
 	}},
-	{ass: AVHSUBPD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVHSUBPD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x7D,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x7D,
 	}},
-	{ass: AVHSUBPS, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVHSUBPS, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x7D,
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0x7D,
 	}},
-	{ass: AVINSERTF128, ytab: _yvinsertf128, prefix: Pavx, op: opBytes{
+	{as: AVINSERTF128, ytab: _yvinsertf128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x18,
 	}},
-	{ass: AVINSERTF32X4, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
+	{as: AVINSERTF32X4, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x18,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x18,
 	}},
-	{ass: AVINSERTF32X8, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
+	{as: AVINSERTF32X8, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN32 | evexZeroingEnabled, 0x1A,
 	}},
-	{ass: AVINSERTF64X2, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
+	{as: AVINSERTF64X2, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x18,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x18,
 	}},
-	{ass: AVINSERTF64X4, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
+	{as: AVINSERTF64X4, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN32 | evexZeroingEnabled, 0x1A,
 	}},
-	{ass: AVINSERTI128, ytab: _yvinsertf128, prefix: Pavx, op: opBytes{
+	{as: AVINSERTI128, ytab: _yvinsertf128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x38,
 	}},
-	{ass: AVINSERTI32X4, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
+	{as: AVINSERTI32X4, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x38,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x38,
 	}},
-	{ass: AVINSERTI32X8, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
+	{as: AVINSERTI32X8, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN32 | evexZeroingEnabled, 0x3A,
 	}},
-	{ass: AVINSERTI64X2, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
+	{as: AVINSERTI64X2, ytab: _yvinsertf32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x38,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x38,
 	}},
-	{ass: AVINSERTI64X4, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
+	{as: AVINSERTI64X4, ytab: _yvinsertf32x8, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN32 | evexZeroingEnabled, 0x3A,
 	}},
-	{ass: AVINSERTPS, ytab: _yvinsertps, prefix: Pavx, op: opBytes{
+	{as: AVINSERTPS, ytab: _yvinsertps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x21,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4, 0x21,
 	}},
-	{ass: AVLDDQU, ytab: _yvlddqu, prefix: Pavx, op: opBytes{
+	{as: AVLDDQU, ytab: _yvlddqu, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0xF0,
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0xF0,
 	}},
-	{ass: AVLDMXCSR, ytab: _yvldmxcsr, prefix: Pavx, op: opBytes{
+	{as: AVLDMXCSR, ytab: _yvldmxcsr, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0xAE, 02,
 	}},
-	{ass: AVMASKMOVDQU, ytab: _yvmaskmovdqu, prefix: Pavx, op: opBytes{
+	{as: AVMASKMOVDQU, ytab: _yvmaskmovdqu, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF7,
 	}},
-	{ass: AVMASKMOVPD, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
+	{as: AVMASKMOVPD, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x2F,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x2F,
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x2D,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x2D,
 	}},
-	{ass: AVMASKMOVPS, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
+	{as: AVMASKMOVPS, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x2E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x2E,
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x2C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x2C,
 	}},
-	{ass: AVMAXPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVMAXPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x5F,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x5F,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x5F,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x5F,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x5F,
 	}},
-	{ass: AVMAXPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVMAXPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x5F,
 		avxEscape | vex256 | vex0F | vexW0, 0x5F,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x5F,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5F,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5F,
 	}},
-	{ass: AVMAXSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVMAXSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x5F,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x5F,
 	}},
-	{ass: AVMAXSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVMAXSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x5F,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x5F,
 	}},
-	{ass: AVMINPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVMINPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x5D,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x5D,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x5D,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x5D,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x5D,
 	}},
-	{ass: AVMINPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVMINPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x5D,
 		avxEscape | vex256 | vex0F | vexW0, 0x5D,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x5D,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5D,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5D,
 	}},
-	{ass: AVMINSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVMINSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x5D,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x5D,
 	}},
-	{ass: AVMINSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVMINSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x5D,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x5D,
 	}},
-	{ass: AVMOVAPD, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
+	{as: AVMOVAPD, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x29,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x29,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x28,
@@ -2400,7 +2400,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x28,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x28,
 	}},
-	{ass: AVMOVAPS, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
+	{as: AVMOVAPS, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x29,
 		avxEscape | vex256 | vex0F | vexW0, 0x29,
 		avxEscape | vex128 | vex0F | vexW0, 0x28,
@@ -2412,26 +2412,26 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x28,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x28,
 	}},
-	{ass: AVMOVD, ytab: _yvmovd, prefix: Pavx, op: opBytes{
+	{as: AVMOVD, ytab: _yvmovd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x7E,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x6E,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN4, 0x7E,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN4, 0x6E,
 	}},
-	{ass: AVMOVDDUP, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
+	{as: AVMOVDDUP, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x12,
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0x12,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexZeroingEnabled, 0x12,
 		avxEscape | evex256 | evexF2 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x12,
 		avxEscape | evex512 | evexF2 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x12,
 	}},
-	{ass: AVMOVDQA, ytab: _yvmovdqa, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQA, ytab: _yvmovdqa, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x7F,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x7F,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x6F,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x6F,
 	}},
-	{ass: AVMOVDQA32, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQA32, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x7F,
@@ -2439,7 +2439,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x6F,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x6F,
 	}},
-	{ass: AVMOVDQA64, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQA64, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x7F,
@@ -2447,13 +2447,13 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x6F,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x6F,
 	}},
-	{ass: AVMOVDQU, ytab: _yvmovdqa, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQU, ytab: _yvmovdqa, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x7F,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0x7F,
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x6F,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0x6F,
 	}},
-	{ass: AVMOVDQU16, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQU16, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evexF2 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evexF2 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x7F,
@@ -2461,7 +2461,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evexF2 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x6F,
 		avxEscape | evex512 | evexF2 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x6F,
 	}},
-	{ass: AVMOVDQU32, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQU32, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x7F,
@@ -2469,7 +2469,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x6F,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x6F,
 	}},
-	{ass: AVMOVDQU64, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQU64, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evexF3 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evexF3 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x7F,
@@ -2477,7 +2477,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evexF3 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x6F,
 		avxEscape | evex512 | evexF3 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x6F,
 	}},
-	{ass: AVMOVDQU8, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
+	{as: AVMOVDQU8, ytab: _yvmovdqa32, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evexF2 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evexF2 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x7F,
@@ -2485,75 +2485,75 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evexF2 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x6F,
 		avxEscape | evex512 | evexF2 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x6F,
 	}},
-	{ass: AVMOVHLPS, ytab: _yvmovhlps, prefix: Pavx, op: opBytes{
+	{as: AVMOVHLPS, ytab: _yvmovhlps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x12,
 		avxEscape | evex128 | evex0F | evexW0, 0, 0x12,
 	}},
-	{ass: AVMOVHPD, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
+	{as: AVMOVHPD, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x17,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x16,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8, 0x17,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8, 0x16,
 	}},
-	{ass: AVMOVHPS, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
+	{as: AVMOVHPS, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x17,
 		avxEscape | vex128 | vex0F | vexW0, 0x16,
 		avxEscape | evex128 | evex0F | evexW0, evexN8, 0x17,
 		avxEscape | evex128 | evex0F | evexW0, evexN8, 0x16,
 	}},
-	{ass: AVMOVLHPS, ytab: _yvmovhlps, prefix: Pavx, op: opBytes{
+	{as: AVMOVLHPS, ytab: _yvmovhlps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x16,
 		avxEscape | evex128 | evex0F | evexW0, 0, 0x16,
 	}},
-	{ass: AVMOVLPD, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
+	{as: AVMOVLPD, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x13,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x12,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8, 0x13,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8, 0x12,
 	}},
-	{ass: AVMOVLPS, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
+	{as: AVMOVLPS, ytab: _yvmovhpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x13,
 		avxEscape | vex128 | vex0F | vexW0, 0x12,
 		avxEscape | evex128 | evex0F | evexW0, evexN8, 0x13,
 		avxEscape | evex128 | evex0F | evexW0, evexN8, 0x12,
 	}},
-	{ass: AVMOVMSKPD, ytab: _yvmovmskpd, prefix: Pavx, op: opBytes{
+	{as: AVMOVMSKPD, ytab: _yvmovmskpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x50,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x50,
 	}},
-	{ass: AVMOVMSKPS, ytab: _yvmovmskpd, prefix: Pavx, op: opBytes{
+	{as: AVMOVMSKPS, ytab: _yvmovmskpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x50,
 		avxEscape | vex256 | vex0F | vexW0, 0x50,
 	}},
-	{ass: AVMOVNTDQ, ytab: _yvmovntdq, prefix: Pavx, op: opBytes{
+	{as: AVMOVNTDQ, ytab: _yvmovntdq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE7,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE7,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0xE7,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0xE7,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0xE7,
 	}},
-	{ass: AVMOVNTDQA, ytab: _yvmovntdqa, prefix: Pavx, op: opBytes{
+	{as: AVMOVNTDQA, ytab: _yvmovntdqa, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x2A,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x2A,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0x2A,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0x2A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0x2A,
 	}},
-	{ass: AVMOVNTPD, ytab: _yvmovntdq, prefix: Pavx, op: opBytes{
+	{as: AVMOVNTPD, ytab: _yvmovntdq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x2B,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x2B,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16, 0x2B,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32, 0x2B,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64, 0x2B,
 	}},
-	{ass: AVMOVNTPS, ytab: _yvmovntdq, prefix: Pavx, op: opBytes{
+	{as: AVMOVNTPS, ytab: _yvmovntdq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x2B,
 		avxEscape | vex256 | vex0F | vexW0, 0x2B,
 		avxEscape | evex128 | evex0F | evexW0, evexN16, 0x2B,
 		avxEscape | evex256 | evex0F | evexW0, evexN32, 0x2B,
 		avxEscape | evex512 | evex0F | evexW0, evexN64, 0x2B,
 	}},
-	{ass: AVMOVQ, ytab: _yvmovq, prefix: Pavx, op: opBytes{
+	{as: AVMOVQ, ytab: _yvmovq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x7E,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD6,
 		avxEscape | vex128 | vex66 | vex0F | vexW1, 0x6E,
@@ -2563,7 +2563,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8, 0x6E,
 		avxEscape | evex128 | evexF3 | evex0F | evexW1, evexN8, 0x7E,
 	}},
-	{ass: AVMOVSD, ytab: _yvmovsd, prefix: Pavx, op: opBytes{
+	{as: AVMOVSD, ytab: _yvmovsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x11,
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x11,
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x10,
@@ -2573,21 +2573,21 @@ var avxOptab = [...]Optab{
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexZeroingEnabled, 0x10,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexZeroingEnabled, 0x10,
 	}},
-	{ass: AVMOVSHDUP, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
+	{as: AVMOVSHDUP, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x16,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0x16,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x16,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x16,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x16,
 	}},
-	{ass: AVMOVSLDUP, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
+	{as: AVMOVSLDUP, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x12,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0x12,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x12,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x12,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x12,
 	}},
-	{ass: AVMOVSS, ytab: _yvmovsd, prefix: Pavx, op: opBytes{
+	{as: AVMOVSS, ytab: _yvmovsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x11,
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x11,
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x10,
@@ -2597,7 +2597,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexZeroingEnabled, 0x10,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexZeroingEnabled, 0x10,
 	}},
-	{ass: AVMOVUPD, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
+	{as: AVMOVUPD, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x11,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x11,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x10,
@@ -2609,7 +2609,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexZeroingEnabled, 0x10,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexZeroingEnabled, 0x10,
 	}},
-	{ass: AVMOVUPS, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
+	{as: AVMOVUPS, ytab: _yvmovapd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x11,
 		avxEscape | vex256 | vex0F | vexW0, 0x11,
 		avxEscape | vex128 | vex0F | vexW0, 0x10,
@@ -2621,244 +2621,244 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x10,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x10,
 	}},
-	{ass: AVMPSADBW, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
+	{as: AVMPSADBW, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x42,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x42,
 	}},
-	{ass: AVMULPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVMULPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x59,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x59,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x59,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x59,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x59,
 	}},
-	{ass: AVMULPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVMULPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x59,
 		avxEscape | vex256 | vex0F | vexW0, 0x59,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x59,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x59,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x59,
 	}},
-	{ass: AVMULSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVMULSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x59,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x59,
 	}},
-	{ass: AVMULSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVMULSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x59,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x59,
 	}},
-	{ass: AVORPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVORPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x56,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x56,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x56,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x56,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x56,
 	}},
-	{ass: AVORPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVORPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x56,
 		avxEscape | vex256 | vex0F | vexW0, 0x56,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x56,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x56,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x56,
 	}},
-	{ass: AVP4DPWSSD, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
+	{as: AVP4DPWSSD, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x52,
 	}},
-	{ass: AVP4DPWSSDS, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
+	{as: AVP4DPWSSDS, ytab: _yv4fmaddps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evexF2 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x53,
 	}},
-	{ass: AVPABSB, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
+	{as: AVPABSB, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x1C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x1C,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x1C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x1C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x1C,
 	}},
-	{ass: AVPABSD, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
+	{as: AVPABSD, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x1E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x1E,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x1E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x1E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x1E,
 	}},
-	{ass: AVPABSQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPABSQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x1F,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x1F,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x1F,
 	}},
-	{ass: AVPABSW, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
+	{as: AVPABSW, ytab: _yvmovddup, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x1D,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x1D,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x1D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x1D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x1D,
 	}},
-	{ass: AVPACKSSDW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPACKSSDW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x6B,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x6B,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x6B,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x6B,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x6B,
 	}},
-	{ass: AVPACKSSWB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPACKSSWB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x63,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x63,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x63,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x63,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x63,
 	}},
-	{ass: AVPACKUSDW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPACKUSDW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x2B,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x2B,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x2B,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x2B,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x2B,
 	}},
-	{ass: AVPACKUSWB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPACKUSWB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x67,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x67,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x67,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x67,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x67,
 	}},
-	{ass: AVPADDB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xFC,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xFC,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xFC,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xFC,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xFC,
 	}},
-	{ass: AVPADDD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xFE,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xFE,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xFE,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xFE,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xFE,
 	}},
-	{ass: AVPADDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD4,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xD4,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xD4,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xD4,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xD4,
 	}},
-	{ass: AVPADDSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xEC,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xEC,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xEC,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xEC,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xEC,
 	}},
-	{ass: AVPADDSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xED,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xED,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xED,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xED,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xED,
 	}},
-	{ass: AVPADDUSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDUSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xDC,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xDC,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xDC,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xDC,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xDC,
 	}},
-	{ass: AVPADDUSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDUSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xDD,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xDD,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xDD,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xDD,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xDD,
 	}},
-	{ass: AVPADDW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPADDW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xFD,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xFD,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xFD,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xFD,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xFD,
 	}},
-	{ass: AVPALIGNR, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
+	{as: AVPALIGNR, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x0F,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x0F,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexZeroingEnabled, 0x0F,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexZeroingEnabled, 0x0F,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexZeroingEnabled, 0x0F,
 	}},
-	{ass: AVPAND, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPAND, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xDB,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xDB,
 	}},
-	{ass: AVPANDD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPANDD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xDB,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xDB,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xDB,
 	}},
-	{ass: AVPANDN, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPANDN, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xDF,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xDF,
 	}},
-	{ass: AVPANDND, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPANDND, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xDF,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xDF,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xDF,
 	}},
-	{ass: AVPANDNQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPANDNQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xDF,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xDF,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xDF,
 	}},
-	{ass: AVPANDQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPANDQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xDB,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xDB,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xDB,
 	}},
-	{ass: AVPAVGB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPAVGB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE0,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE0,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE0,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xE0,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xE0,
 	}},
-	{ass: AVPAVGW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPAVGW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE3,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE3,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE3,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xE3,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xE3,
 	}},
-	{ass: AVPBLENDD, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDD, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x02,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x02,
 	}},
-	{ass: AVPBLENDMB, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDMB, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x66,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x66,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x66,
 	}},
-	{ass: AVPBLENDMD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDMD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x64,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x64,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x64,
 	}},
-	{ass: AVPBLENDMQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDMQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x64,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x64,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x64,
 	}},
-	{ass: AVPBLENDMW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDMW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x66,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x66,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x66,
 	}},
-	{ass: AVPBLENDVB, ytab: _yvblendvpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDVB, ytab: _yvblendvpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x4C,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x4C,
 	}},
-	{ass: AVPBLENDW, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
+	{as: AVPBLENDW, ytab: _yvblendpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x0E,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x0E,
 	}},
-	{ass: AVPBROADCASTB, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
+	{as: AVPBROADCASTB, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x78,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x78,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexZeroingEnabled, 0x7A,
@@ -2868,7 +2868,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x78,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x78,
 	}},
-	{ass: AVPBROADCASTD, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
+	{as: AVPBROADCASTD, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x58,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x58,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexZeroingEnabled, 0x7C,
@@ -2878,17 +2878,17 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x58,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x58,
 	}},
-	{ass: AVPBROADCASTMB2Q, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
+	{as: AVPBROADCASTMB2Q, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, 0, 0x2A,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, 0, 0x2A,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, 0, 0x2A,
 	}},
-	{ass: AVPBROADCASTMW2D, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
+	{as: AVPBROADCASTMW2D, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, 0, 0x3A,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, 0, 0x3A,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, 0, 0x3A,
 	}},
-	{ass: AVPBROADCASTQ, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
+	{as: AVPBROADCASTQ, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x59,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x59,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexZeroingEnabled, 0x7C,
@@ -2898,7 +2898,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x59,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x59,
 	}},
-	{ass: AVPBROADCASTW, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
+	{as: AVPBROADCASTW, ytab: _yvpbroadcastb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x79,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x79,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexZeroingEnabled, 0x7B,
@@ -2908,218 +2908,218 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x79,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x79,
 	}},
-	{ass: AVPCLMULQDQ, ytab: _yvpclmulqdq, prefix: Pavx, op: opBytes{
+	{as: AVPCLMULQDQ, ytab: _yvpclmulqdq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x44,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x44,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16, 0x44,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32, 0x44,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64, 0x44,
 	}},
-	{ass: AVPCMPB, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPB, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16, 0x3F,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32, 0x3F,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64, 0x3F,
 	}},
-	{ass: AVPCMPD, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPD, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4, 0x1F,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4, 0x1F,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4, 0x1F,
 	}},
-	{ass: AVPCMPEQB, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPEQB, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x74,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x74,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0x74,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0x74,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0x74,
 	}},
-	{ass: AVPCMPEQD, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPEQD, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x76,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x76,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4, 0x76,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4, 0x76,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4, 0x76,
 	}},
-	{ass: AVPCMPEQQ, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPEQQ, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x29,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x29,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8, 0x29,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8, 0x29,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8, 0x29,
 	}},
-	{ass: AVPCMPEQW, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPEQW, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x75,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x75,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0x75,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0x75,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0x75,
 	}},
-	{ass: AVPCMPESTRI, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
+	{as: AVPCMPESTRI, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexWIG, 0x61,
 	}},
-	{ass: AVPCMPESTRM, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
+	{as: AVPCMPESTRM, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexWIG, 0x60,
 	}},
-	{ass: AVPCMPGTB, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPGTB, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x64,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x64,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0x64,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0x64,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0x64,
 	}},
-	{ass: AVPCMPGTD, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPGTD, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x66,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x66,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4, 0x66,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4, 0x66,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4, 0x66,
 	}},
-	{ass: AVPCMPGTQ, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPGTQ, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x37,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x37,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8, 0x37,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8, 0x37,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8, 0x37,
 	}},
-	{ass: AVPCMPGTW, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPGTW, ytab: _yvpcmpeqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x65,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x65,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0x65,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0x65,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0x65,
 	}},
-	{ass: AVPCMPISTRI, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
+	{as: AVPCMPISTRI, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexWIG, 0x63,
 	}},
-	{ass: AVPCMPISTRM, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
+	{as: AVPCMPISTRM, ytab: _yvaeskeygenassist, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x62,
 	}},
-	{ass: AVPCMPQ, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPQ, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8, 0x1F,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8, 0x1F,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8, 0x1F,
 	}},
-	{ass: AVPCMPUB, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPUB, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16, 0x3E,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32, 0x3E,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64, 0x3E,
 	}},
-	{ass: AVPCMPUD, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPUD, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4, 0x1E,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4, 0x1E,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4, 0x1E,
 	}},
-	{ass: AVPCMPUQ, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPUQ, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8, 0x1E,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8, 0x1E,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8, 0x1E,
 	}},
-	{ass: AVPCMPUW, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPUW, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16, 0x3E,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32, 0x3E,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64, 0x3E,
 	}},
-	{ass: AVPCMPW, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
+	{as: AVPCMPW, ytab: _yvpcmpb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16, 0x3F,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32, 0x3F,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64, 0x3F,
 	}},
-	{ass: AVPCOMPRESSB, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
+	{as: AVPCOMPRESSB, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x63,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x63,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x63,
 	}},
-	{ass: AVPCOMPRESSD, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
+	{as: AVPCOMPRESSD, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x8B,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x8B,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x8B,
 	}},
-	{ass: AVPCOMPRESSQ, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
+	{as: AVPCOMPRESSQ, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x8B,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x8B,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x8B,
 	}},
-	{ass: AVPCOMPRESSW, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
+	{as: AVPCOMPRESSW, ytab: _yvcompresspd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN2 | evexZeroingEnabled, 0x63,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN2 | evexZeroingEnabled, 0x63,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN2 | evexZeroingEnabled, 0x63,
 	}},
-	{ass: AVPCONFLICTD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPCONFLICTD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xC4,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xC4,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xC4,
 	}},
-	{ass: AVPCONFLICTQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPCONFLICTQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xC4,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xC4,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xC4,
 	}},
-	{ass: AVPDPBUSD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPDPBUSD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x50,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x50,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x50,
 	}},
-	{ass: AVPDPBUSDS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPDPBUSDS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x51,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x51,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVPDPWSSD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPDPWSSD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x52,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x52,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x52,
 	}},
-	{ass: AVPDPWSSDS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPDPWSSDS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x53,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x53,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x53,
 	}},
-	{ass: AVPERM2F128, ytab: _yvperm2f128, prefix: Pavx, op: opBytes{
+	{as: AVPERM2F128, ytab: _yvperm2f128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x06,
 	}},
-	{ass: AVPERM2I128, ytab: _yvperm2f128, prefix: Pavx, op: opBytes{
+	{as: AVPERM2I128, ytab: _yvperm2f128, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x46,
 	}},
-	{ass: AVPERMB, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMB, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x8D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x8D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x8D,
 	}},
-	{ass: AVPERMD, ytab: _yvpermd, prefix: Pavx, op: opBytes{
+	{as: AVPERMD, ytab: _yvpermd, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x36,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x36,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x36,
 	}},
-	{ass: AVPERMI2B, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMI2B, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x75,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x75,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x75,
 	}},
-	{ass: AVPERMI2D, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMI2D, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x76,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x76,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x76,
 	}},
-	{ass: AVPERMI2PD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMI2PD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x77,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x77,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x77,
 	}},
-	{ass: AVPERMI2PS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMI2PS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x77,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x77,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x77,
 	}},
-	{ass: AVPERMI2Q, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMI2Q, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x76,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x76,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x76,
 	}},
-	{ass: AVPERMI2W, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMI2W, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x75,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x75,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x75,
 	}},
-	{ass: AVPERMILPD, ytab: _yvpermilpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMILPD, ytab: _yvpermilpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x05,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x05,
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x0D,
@@ -3131,7 +3131,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x0D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x0D,
 	}},
-	{ass: AVPERMILPS, ytab: _yvpermilpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMILPS, ytab: _yvpermilpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x04,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x04,
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x0C,
@@ -3143,803 +3143,803 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x0C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x0C,
 	}},
-	{ass: AVPERMPD, ytab: _yvpermq, prefix: Pavx, op: opBytes{
+	{as: AVPERMPD, ytab: _yvpermq, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW1, 0x01,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x01,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x01,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x16,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x16,
 	}},
-	{ass: AVPERMPS, ytab: _yvpermd, prefix: Pavx, op: opBytes{
+	{as: AVPERMPS, ytab: _yvpermd, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x16,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x16,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x16,
 	}},
-	{ass: AVPERMQ, ytab: _yvpermq, prefix: Pavx, op: opBytes{
+	{as: AVPERMQ, ytab: _yvpermq, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex66 | vex0F3A | vexW1, 0x00,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x00,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x00,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x36,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x36,
 	}},
-	{ass: AVPERMT2B, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMT2B, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x7D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x7D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x7D,
 	}},
-	{ass: AVPERMT2D, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMT2D, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x7E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x7E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x7E,
 	}},
-	{ass: AVPERMT2PD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMT2PD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x7F,
 	}},
-	{ass: AVPERMT2PS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMT2PS, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x7F,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x7F,
 	}},
-	{ass: AVPERMT2Q, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMT2Q, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x7E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x7E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x7E,
 	}},
-	{ass: AVPERMT2W, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMT2W, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x7D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x7D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x7D,
 	}},
-	{ass: AVPERMW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPERMW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x8D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x8D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x8D,
 	}},
-	{ass: AVPEXPANDB, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPEXPANDB, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x62,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x62,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN1 | evexZeroingEnabled, 0x62,
 	}},
-	{ass: AVPEXPANDD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPEXPANDD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x89,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x89,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x89,
 	}},
-	{ass: AVPEXPANDQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPEXPANDQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x89,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x89,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x89,
 	}},
-	{ass: AVPEXPANDW, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPEXPANDW, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN2 | evexZeroingEnabled, 0x62,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN2 | evexZeroingEnabled, 0x62,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN2 | evexZeroingEnabled, 0x62,
 	}},
-	{ass: AVPEXTRB, ytab: _yvextractps, prefix: Pavx, op: opBytes{
+	{as: AVPEXTRB, ytab: _yvextractps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x14,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN1, 0x14,
 	}},
-	{ass: AVPEXTRD, ytab: _yvextractps, prefix: Pavx, op: opBytes{
+	{as: AVPEXTRD, ytab: _yvextractps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x16,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4, 0x16,
 	}},
-	{ass: AVPEXTRQ, ytab: _yvextractps, prefix: Pavx, op: opBytes{
+	{as: AVPEXTRQ, ytab: _yvextractps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0x16,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8, 0x16,
 	}},
-	{ass: AVPEXTRW, ytab: _yvpextrw, prefix: Pavx, op: opBytes{
+	{as: AVPEXTRW, ytab: _yvpextrw, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x15,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xC5,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN2, 0x15,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, 0, 0xC5,
 	}},
-	{ass: AVPGATHERDD, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
+	{as: AVPGATHERDD, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x90,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x90,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0x90,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0x90,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0x90,
 	}},
-	{ass: AVPGATHERDQ, ytab: _yvgatherdpd, prefix: Pavx, op: opBytes{
+	{as: AVPGATHERDQ, ytab: _yvgatherdpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x90,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x90,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0x90,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0x90,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0x90,
 	}},
-	{ass: AVPGATHERQD, ytab: _yvgatherqps, prefix: Pavx, op: opBytes{
+	{as: AVPGATHERQD, ytab: _yvgatherqps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x91,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x91,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0x91,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0x91,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0x91,
 	}},
-	{ass: AVPGATHERQQ, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
+	{as: AVPGATHERQQ, ytab: _yvgatherdps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x91,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x91,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0x91,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0x91,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0x91,
 	}},
-	{ass: AVPHADDD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPHADDD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x02,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x02,
 	}},
-	{ass: AVPHADDSW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPHADDSW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x03,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x03,
 	}},
-	{ass: AVPHADDW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPHADDW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x01,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x01,
 	}},
-	{ass: AVPHMINPOSUW, ytab: _yvaesimc, prefix: Pavx, op: opBytes{
+	{as: AVPHMINPOSUW, ytab: _yvaesimc, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x41,
 	}},
-	{ass: AVPHSUBD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPHSUBD, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x06,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x06,
 	}},
-	{ass: AVPHSUBSW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPHSUBSW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x07,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x07,
 	}},
-	{ass: AVPHSUBW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPHSUBW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x05,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x05,
 	}},
-	{ass: AVPINSRB, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
+	{as: AVPINSRB, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x20,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN1, 0x20,
 	}},
-	{ass: AVPINSRD, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
+	{as: AVPINSRD, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x22,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4, 0x22,
 	}},
-	{ass: AVPINSRQ, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
+	{as: AVPINSRQ, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW1, 0x22,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8, 0x22,
 	}},
-	{ass: AVPINSRW, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
+	{as: AVPINSRW, ytab: _yvpinsrb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xC4,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN2, 0xC4,
 	}},
-	{ass: AVPLZCNTD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPLZCNTD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x44,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x44,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x44,
 	}},
-	{ass: AVPLZCNTQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPLZCNTQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x44,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x44,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x44,
 	}},
-	{ass: AVPMADD52HUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMADD52HUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xB5,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xB5,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xB5,
 	}},
-	{ass: AVPMADD52LUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMADD52LUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xB4,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xB4,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xB4,
 	}},
-	{ass: AVPMADDUBSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMADDUBSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x04,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x04,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x04,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x04,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x04,
 	}},
-	{ass: AVPMADDWD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMADDWD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF5,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xF5,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF5,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xF5,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xF5,
 	}},
-	{ass: AVPMASKMOVD, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
+	{as: AVPMASKMOVD, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x8E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x8E,
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x8C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x8C,
 	}},
-	{ass: AVPMASKMOVQ, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
+	{as: AVPMASKMOVQ, ytab: _yvmaskmovpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x8E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x8E,
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x8C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x8C,
 	}},
-	{ass: AVPMAXSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x3C,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x3C,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x3C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x3C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x3C,
 	}},
-	{ass: AVPMAXSD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXSD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x3D,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x3D,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x3D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x3D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x3D,
 	}},
-	{ass: AVPMAXSQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXSQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x3D,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x3D,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x3D,
 	}},
-	{ass: AVPMAXSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xEE,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xEE,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xEE,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xEE,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xEE,
 	}},
-	{ass: AVPMAXUB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXUB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xDE,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xDE,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xDE,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xDE,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xDE,
 	}},
-	{ass: AVPMAXUD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXUD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x3F,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x3F,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x3F,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x3F,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x3F,
 	}},
-	{ass: AVPMAXUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x3F,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x3F,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x3F,
 	}},
-	{ass: AVPMAXUW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMAXUW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x3E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x3E,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x3E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x3E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x3E,
 	}},
-	{ass: AVPMINSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x38,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x38,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x38,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x38,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x38,
 	}},
-	{ass: AVPMINSD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINSD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x39,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x39,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x39,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x39,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x39,
 	}},
-	{ass: AVPMINSQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINSQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x39,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x39,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x39,
 	}},
-	{ass: AVPMINSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xEA,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xEA,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xEA,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xEA,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xEA,
 	}},
-	{ass: AVPMINUB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINUB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xDA,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xDA,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xDA,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xDA,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xDA,
 	}},
-	{ass: AVPMINUD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINUD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x3B,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x3B,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x3B,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x3B,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x3B,
 	}},
-	{ass: AVPMINUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINUQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x3B,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x3B,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x3B,
 	}},
-	{ass: AVPMINUW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMINUW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x3A,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x3A,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x3A,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x3A,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x3A,
 	}},
-	{ass: AVPMOVB2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
+	{as: AVPMOVB2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, 0, 0x29,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, 0, 0x29,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, 0, 0x29,
 	}},
-	{ass: AVPMOVD2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
+	{as: AVPMOVD2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, 0, 0x39,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, 0, 0x39,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, 0, 0x39,
 	}},
-	{ass: AVPMOVDB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVDB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x31,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x31,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x31,
 	}},
-	{ass: AVPMOVDW, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVDW, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x33,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x33,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x33,
 	}},
-	{ass: AVPMOVM2B, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
+	{as: AVPMOVM2B, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, 0, 0x28,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, 0, 0x28,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, 0, 0x28,
 	}},
-	{ass: AVPMOVM2D, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
+	{as: AVPMOVM2D, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, 0, 0x38,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, 0, 0x38,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, 0, 0x38,
 	}},
-	{ass: AVPMOVM2Q, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
+	{as: AVPMOVM2Q, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, 0, 0x38,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, 0, 0x38,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, 0, 0x38,
 	}},
-	{ass: AVPMOVM2W, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
+	{as: AVPMOVM2W, ytab: _yvpbroadcastmb2q, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, 0, 0x28,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, 0, 0x28,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, 0, 0x28,
 	}},
-	{ass: AVPMOVMSKB, ytab: _yvmovmskpd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVMSKB, ytab: _yvmovmskpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD7,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xD7,
 	}},
-	{ass: AVPMOVQ2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
+	{as: AVPMOVQ2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, 0, 0x39,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, 0, 0x39,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, 0, 0x39,
 	}},
-	{ass: AVPMOVQB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVQB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x32,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x32,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x32,
 	}},
-	{ass: AVPMOVQD, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVQD, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x35,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x35,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x35,
 	}},
-	{ass: AVPMOVQW, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVQW, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x34,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x34,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x34,
 	}},
-	{ass: AVPMOVSDB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSDB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x21,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x21,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x21,
 	}},
-	{ass: AVPMOVSDW, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSDW, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x23,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x23,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x23,
 	}},
-	{ass: AVPMOVSQB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSQB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x22,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x22,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x22,
 	}},
-	{ass: AVPMOVSQD, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSQD, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x25,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x25,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x25,
 	}},
-	{ass: AVPMOVSQW, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSQW, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x24,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x24,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x24,
 	}},
-	{ass: AVPMOVSWB, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSWB, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x20,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x20,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x20,
 	}},
-	{ass: AVPMOVSXBD, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSXBD, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x21,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x21,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x21,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x21,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x21,
 	}},
-	{ass: AVPMOVSXBQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSXBQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x22,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x22,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x22,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x22,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x22,
 	}},
-	{ass: AVPMOVSXBW, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSXBW, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x20,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x20,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x20,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x20,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x20,
 	}},
-	{ass: AVPMOVSXDQ, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSXDQ, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x25,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x25,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x25,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x25,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x25,
 	}},
-	{ass: AVPMOVSXWD, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSXWD, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x23,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x23,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x23,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x23,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x23,
 	}},
-	{ass: AVPMOVSXWQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVPMOVSXWQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x24,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x24,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x24,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x24,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x24,
 	}},
-	{ass: AVPMOVUSDB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVUSDB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x11,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x11,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x11,
 	}},
-	{ass: AVPMOVUSDW, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVUSDW, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x13,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x13,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x13,
 	}},
-	{ass: AVPMOVUSQB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVUSQB, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x12,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x12,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x12,
 	}},
-	{ass: AVPMOVUSQD, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVUSQD, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x15,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x15,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x15,
 	}},
-	{ass: AVPMOVUSQW, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
+	{as: AVPMOVUSQW, ytab: _yvpmovdb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x14,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x14,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x14,
 	}},
-	{ass: AVPMOVUSWB, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVUSWB, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x10,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x10,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x10,
 	}},
-	{ass: AVPMOVW2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
+	{as: AVPMOVW2M, ytab: _yvpmovb2m, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, 0, 0x29,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, 0, 0x29,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, 0, 0x29,
 	}},
-	{ass: AVPMOVWB, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
+	{as: AVPMOVWB, ytab: _yvpmovdw, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x30,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x30,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x30,
 	}},
-	{ass: AVPMOVZXBD, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVPMOVZXBD, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x31,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x31,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x31,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x31,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x31,
 	}},
-	{ass: AVPMOVZXBQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVPMOVZXBQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x32,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x32,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN2 | evexZeroingEnabled, 0x32,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x32,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x32,
 	}},
-	{ass: AVPMOVZXBW, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVZXBW, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x30,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x30,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x30,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x30,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x30,
 	}},
-	{ass: AVPMOVZXDQ, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVZXDQ, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x35,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x35,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x35,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x35,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x35,
 	}},
-	{ass: AVPMOVZXWD, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
+	{as: AVPMOVZXWD, ytab: _yvcvtdq2pd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x33,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x33,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x33,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x33,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x33,
 	}},
-	{ass: AVPMOVZXWQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
+	{as: AVPMOVZXWQ, ytab: _yvbroadcastss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x34,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x34,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x34,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN8 | evexZeroingEnabled, 0x34,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x34,
 	}},
-	{ass: AVPMULDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x28,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x28,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x28,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x28,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x28,
 	}},
-	{ass: AVPMULHRSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULHRSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x0B,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x0B,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x0B,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x0B,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x0B,
 	}},
-	{ass: AVPMULHUW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULHUW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE4,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE4,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE4,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xE4,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xE4,
 	}},
-	{ass: AVPMULHW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULHW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE5,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE5,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE5,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xE5,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xE5,
 	}},
-	{ass: AVPMULLD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULLD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x40,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x40,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x40,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x40,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x40,
 	}},
-	{ass: AVPMULLQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULLQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x40,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x40,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x40,
 	}},
-	{ass: AVPMULLW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULLW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD5,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xD5,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD5,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xD5,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xD5,
 	}},
-	{ass: AVPMULTISHIFTQB, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULTISHIFTQB, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x83,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x83,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x83,
 	}},
-	{ass: AVPMULUDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPMULUDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF4,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xF4,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xF4,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xF4,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xF4,
 	}},
-	{ass: AVPOPCNTB, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPOPCNTB, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x54,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x54,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x54,
 	}},
-	{ass: AVPOPCNTD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPOPCNTD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x55,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x55,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x55,
 	}},
-	{ass: AVPOPCNTQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPOPCNTQ, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x55,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x55,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x55,
 	}},
-	{ass: AVPOPCNTW, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVPOPCNTW, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x54,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x54,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x54,
 	}},
-	{ass: AVPOR, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPOR, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xEB,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xEB,
 	}},
-	{ass: AVPORD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPORD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xEB,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xEB,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xEB,
 	}},
-	{ass: AVPORQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPORQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xEB,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xEB,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xEB,
 	}},
-	{ass: AVPROLD, ytab: _yvprold, prefix: Pavx, op: opBytes{
+	{as: AVPROLD, ytab: _yvprold, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x72, 01,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x72, 01,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x72, 01,
 	}},
-	{ass: AVPROLQ, ytab: _yvprold, prefix: Pavx, op: opBytes{
+	{as: AVPROLQ, ytab: _yvprold, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x72, 01,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x72, 01,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x72, 01,
 	}},
-	{ass: AVPROLVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPROLVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x15,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x15,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x15,
 	}},
-	{ass: AVPROLVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPROLVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x15,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x15,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x15,
 	}},
-	{ass: AVPRORD, ytab: _yvprold, prefix: Pavx, op: opBytes{
+	{as: AVPRORD, ytab: _yvprold, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x72, 00,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x72, 00,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x72, 00,
 	}},
-	{ass: AVPRORQ, ytab: _yvprold, prefix: Pavx, op: opBytes{
+	{as: AVPRORQ, ytab: _yvprold, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x72, 00,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x72, 00,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x72, 00,
 	}},
-	{ass: AVPRORVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPRORVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x14,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x14,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x14,
 	}},
-	{ass: AVPRORVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPRORVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x14,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x14,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x14,
 	}},
-	{ass: AVPSADBW, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
+	{as: AVPSADBW, ytab: _yvaesdec, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF6,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xF6,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0xF6,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0xF6,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0xF6,
 	}},
-	{ass: AVPSCATTERDD, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
+	{as: AVPSCATTERDD, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0xA0,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0xA0,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xA0,
 	}},
-	{ass: AVPSCATTERDQ, ytab: _yvpscatterdq, prefix: Pavx, op: opBytes{
+	{as: AVPSCATTERDQ, ytab: _yvpscatterdq, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0xA0,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0xA0,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xA0,
 	}},
-	{ass: AVPSCATTERQD, ytab: _yvpscatterqd, prefix: Pavx, op: opBytes{
+	{as: AVPSCATTERQD, ytab: _yvpscatterqd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0xA1,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0xA1,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xA1,
 	}},
-	{ass: AVPSCATTERQQ, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
+	{as: AVPSCATTERQQ, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0xA1,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0xA1,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xA1,
 	}},
-	{ass: AVPSHLDD, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPSHLDD, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x71,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x71,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x71,
 	}},
-	{ass: AVPSHLDQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPSHLDQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x71,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x71,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x71,
 	}},
-	{ass: AVPSHLDVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHLDVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x71,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x71,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x71,
 	}},
-	{ass: AVPSHLDVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHLDVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x71,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x71,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x71,
 	}},
-	{ass: AVPSHLDVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHLDVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x70,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x70,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x70,
 	}},
-	{ass: AVPSHLDW, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPSHLDW, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x70,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexZeroingEnabled, 0x70,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexZeroingEnabled, 0x70,
 	}},
-	{ass: AVPSHRDD, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPSHRDD, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x73,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x73,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x73,
 	}},
-	{ass: AVPSHRDQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPSHRDQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x73,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x73,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x73,
 	}},
-	{ass: AVPSHRDVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHRDVD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x73,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x73,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x73,
 	}},
-	{ass: AVPSHRDVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHRDVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x73,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x73,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x73,
 	}},
-	{ass: AVPSHRDVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHRDVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x72,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x72,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x72,
 	}},
-	{ass: AVPSHRDW, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPSHRDW, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexZeroingEnabled, 0x72,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexZeroingEnabled, 0x72,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexZeroingEnabled, 0x72,
 	}},
-	{ass: AVPSHUFB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSHUFB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x00,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x00,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexZeroingEnabled, 0x00,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexZeroingEnabled, 0x00,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexZeroingEnabled, 0x00,
 	}},
-	{ass: AVPSHUFBITQMB, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPSHUFBITQMB, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0x8F,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0x8F,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0x8F,
 	}},
-	{ass: AVPSHUFD, ytab: _yvpshufd, prefix: Pavx, op: opBytes{
+	{as: AVPSHUFD, ytab: _yvpshufd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x70,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x70,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x70,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x70,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x70,
 	}},
-	{ass: AVPSHUFHW, ytab: _yvpshufd, prefix: Pavx, op: opBytes{
+	{as: AVPSHUFHW, ytab: _yvpshufd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x70,
 		avxEscape | vex256 | vexF3 | vex0F | vexW0, 0x70,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x70,
 		avxEscape | evex256 | evexF3 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x70,
 		avxEscape | evex512 | evexF3 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x70,
 	}},
-	{ass: AVPSHUFLW, ytab: _yvpshufd, prefix: Pavx, op: opBytes{
+	{as: AVPSHUFLW, ytab: _yvpshufd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x70,
 		avxEscape | vex256 | vexF2 | vex0F | vexW0, 0x70,
 		avxEscape | evex128 | evexF2 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x70,
 		avxEscape | evex256 | evexF2 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x70,
 		avxEscape | evex512 | evexF2 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x70,
 	}},
-	{ass: AVPSIGNB, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPSIGNB, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x08,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x08,
 	}},
-	{ass: AVPSIGND, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPSIGND, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x0A,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x0A,
 	}},
-	{ass: AVPSIGNW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPSIGNW, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x09,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x09,
 	}},
-	{ass: AVPSLLD, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSLLD, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x72, 06,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x72, 06,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF2,
@@ -3951,14 +3951,14 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF2,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF2,
 	}},
-	{ass: AVPSLLDQ, ytab: _yvpslldq, prefix: Pavx, op: opBytes{
+	{as: AVPSLLDQ, ytab: _yvpslldq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x73, 07,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x73, 07,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0x73, 07,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0x73, 07,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0x73, 07,
 	}},
-	{ass: AVPSLLQ, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSLLQ, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x73, 06,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x73, 06,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF3,
@@ -3970,26 +3970,26 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0xF3,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0xF3,
 	}},
-	{ass: AVPSLLVD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSLLVD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x47,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x47,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x47,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x47,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x47,
 	}},
-	{ass: AVPSLLVQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSLLVQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x47,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x47,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x47,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x47,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x47,
 	}},
-	{ass: AVPSLLVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSLLVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x12,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x12,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x12,
 	}},
-	{ass: AVPSLLW, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSLLW, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x71, 06,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x71, 06,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF1,
@@ -4001,7 +4001,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF1,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF1,
 	}},
-	{ass: AVPSRAD, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSRAD, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x72, 04,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x72, 04,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE2,
@@ -4013,7 +4013,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE2,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE2,
 	}},
-	{ass: AVPSRAQ, ytab: _yvpsraq, prefix: Pavx, op: opBytes{
+	{as: AVPSRAQ, ytab: _yvpsraq, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x72, 04,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x72, 04,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x72, 04,
@@ -4021,24 +4021,24 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0xE2,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0xE2,
 	}},
-	{ass: AVPSRAVD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSRAVD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x46,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x46,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x46,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x46,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x46,
 	}},
-	{ass: AVPSRAVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSRAVQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x46,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x46,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x46,
 	}},
-	{ass: AVPSRAVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSRAVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x11,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x11,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x11,
 	}},
-	{ass: AVPSRAW, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSRAW, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x71, 04,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x71, 04,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE1,
@@ -4050,7 +4050,7 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE1,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE1,
 	}},
-	{ass: AVPSRLD, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSRLD, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x72, 02,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x72, 02,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD2,
@@ -4062,14 +4062,14 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD2,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD2,
 	}},
-	{ass: AVPSRLDQ, ytab: _yvpslldq, prefix: Pavx, op: opBytes{
+	{as: AVPSRLDQ, ytab: _yvpslldq, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x73, 03,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x73, 03,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16, 0x73, 03,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32, 0x73, 03,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64, 0x73, 03,
 	}},
-	{ass: AVPSRLQ, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSRLQ, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x73, 02,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x73, 02,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD3,
@@ -4081,26 +4081,26 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0xD3,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN16 | evexZeroingEnabled, 0xD3,
 	}},
-	{ass: AVPSRLVD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSRLVD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x45,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x45,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x45,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x45,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x45,
 	}},
-	{ass: AVPSRLVQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSRLVQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW1, 0x45,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW1, 0x45,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x45,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x45,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x45,
 	}},
-	{ass: AVPSRLVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPSRLVW, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexZeroingEnabled, 0x10,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexZeroingEnabled, 0x10,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexZeroingEnabled, 0x10,
 	}},
-	{ass: AVPSRLW, ytab: _yvpslld, prefix: Pavx, op: opBytes{
+	{as: AVPSRLW, ytab: _yvpslld, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x71, 02,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x71, 02,
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD1,
@@ -4112,517 +4112,517 @@ var avxOptab = [...]Optab{
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD1,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD1,
 	}},
-	{ass: AVPSUBB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF8,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xF8,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF8,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xF8,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xF8,
 	}},
-	{ass: AVPSUBD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xFA,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xFA,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xFA,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xFA,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xFA,
 	}},
-	{ass: AVPSUBQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xFB,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xFB,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xFB,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xFB,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xFB,
 	}},
-	{ass: AVPSUBSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE8,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE8,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE8,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xE8,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xE8,
 	}},
-	{ass: AVPSUBSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xE9,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xE9,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xE9,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xE9,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xE9,
 	}},
-	{ass: AVPSUBUSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBUSB, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD8,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xD8,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD8,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xD8,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xD8,
 	}},
-	{ass: AVPSUBUSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBUSW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xD9,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xD9,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xD9,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xD9,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xD9,
 	}},
-	{ass: AVPSUBW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPSUBW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xF9,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xF9,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0xF9,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0xF9,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0xF9,
 	}},
-	{ass: AVPTERNLOGD, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPTERNLOGD, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x25,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x25,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x25,
 	}},
-	{ass: AVPTERNLOGQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
+	{as: AVPTERNLOGQ, ytab: _yvalignd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x25,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x25,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x25,
 	}},
-	{ass: AVPTEST, ytab: _yvptest, prefix: Pavx, op: opBytes{
+	{as: AVPTEST, ytab: _yvptest, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x17,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x17,
 	}},
-	{ass: AVPTESTMB, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTMB, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16, 0x26,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32, 0x26,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64, 0x26,
 	}},
-	{ass: AVPTESTMD, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTMD, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4, 0x27,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4, 0x27,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4, 0x27,
 	}},
-	{ass: AVPTESTMQ, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTMQ, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8, 0x27,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8, 0x27,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8, 0x27,
 	}},
-	{ass: AVPTESTMW, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTMW, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16, 0x26,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32, 0x26,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64, 0x26,
 	}},
-	{ass: AVPTESTNMB, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTNMB, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN16, 0x26,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN32, 0x26,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN64, 0x26,
 	}},
-	{ass: AVPTESTNMD, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTNMD, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW0, evexN16 | evexBcstN4, 0x27,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW0, evexN32 | evexBcstN4, 0x27,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW0, evexN64 | evexBcstN4, 0x27,
 	}},
-	{ass: AVPTESTNMQ, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTNMQ, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, evexN16 | evexBcstN8, 0x27,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, evexN32 | evexBcstN8, 0x27,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, evexN64 | evexBcstN8, 0x27,
 	}},
-	{ass: AVPTESTNMW, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
+	{as: AVPTESTNMW, ytab: _yvpshufbitqmb, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evexF3 | evex0F38 | evexW1, evexN16, 0x26,
 		avxEscape | evex256 | evexF3 | evex0F38 | evexW1, evexN32, 0x26,
 		avxEscape | evex512 | evexF3 | evex0F38 | evexW1, evexN64, 0x26,
 	}},
-	{ass: AVPUNPCKHBW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKHBW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x68,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x68,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x68,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x68,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x68,
 	}},
-	{ass: AVPUNPCKHDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKHDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x6A,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x6A,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x6A,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x6A,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x6A,
 	}},
-	{ass: AVPUNPCKHQDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKHQDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x6D,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x6D,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x6D,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x6D,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x6D,
 	}},
-	{ass: AVPUNPCKHWD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKHWD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x69,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x69,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x69,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x69,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x69,
 	}},
-	{ass: AVPUNPCKLBW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKLBW, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x60,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x60,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x60,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x60,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x60,
 	}},
-	{ass: AVPUNPCKLDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKLDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x62,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x62,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x62,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x62,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x62,
 	}},
-	{ass: AVPUNPCKLQDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKLQDQ, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x6C,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x6C,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x6C,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x6C,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x6C,
 	}},
-	{ass: AVPUNPCKLWD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVPUNPCKLWD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x61,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x61,
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexZeroingEnabled, 0x61,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexZeroingEnabled, 0x61,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexZeroingEnabled, 0x61,
 	}},
-	{ass: AVPXOR, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
+	{as: AVPXOR, ytab: _yvaddsubpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xEF,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xEF,
 	}},
-	{ass: AVPXORD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPXORD, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xEF,
 		avxEscape | evex256 | evex66 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xEF,
 		avxEscape | evex512 | evex66 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xEF,
 	}},
-	{ass: AVPXORQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
+	{as: AVPXORQ, ytab: _yvblendmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xEF,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xEF,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xEF,
 	}},
-	{ass: AVRANGEPD, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
+	{as: AVRANGEPD, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x50,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x50,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x50,
 	}},
-	{ass: AVRANGEPS, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
+	{as: AVRANGEPS, ytab: _yvfixupimmpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x50,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x50,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x50,
 	}},
-	{ass: AVRANGESD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVRANGESD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVRANGESS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVRANGESS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVRCP14PD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVRCP14PD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x4C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x4C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x4C,
 	}},
-	{ass: AVRCP14PS, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVRCP14PS, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x4C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x4C,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x4C,
 	}},
-	{ass: AVRCP14SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRCP14SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x4D,
 	}},
-	{ass: AVRCP14SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRCP14SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x4D,
 	}},
-	{ass: AVRCP28PD, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
+	{as: AVRCP28PD, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0xCA,
 	}},
-	{ass: AVRCP28PS, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
+	{as: AVRCP28PS, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0xCA,
 	}},
-	{ass: AVRCP28SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRCP28SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0xCB,
 	}},
-	{ass: AVRCP28SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRCP28SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0xCB,
 	}},
-	{ass: AVRCPPS, ytab: _yvptest, prefix: Pavx, op: opBytes{
+	{as: AVRCPPS, ytab: _yvptest, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x53,
 		avxEscape | vex256 | vex0F | vexW0, 0x53,
 	}},
-	{ass: AVRCPSS, ytab: _yvrcpss, prefix: Pavx, op: opBytes{
+	{as: AVRCPSS, ytab: _yvrcpss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x53,
 	}},
-	{ass: AVREDUCEPD, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
+	{as: AVREDUCEPD, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x56,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x56,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x56,
 	}},
-	{ass: AVREDUCEPS, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
+	{as: AVREDUCEPS, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x56,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x56,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x56,
 	}},
-	{ass: AVREDUCESD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVREDUCESD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x57,
 	}},
-	{ass: AVREDUCESS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVREDUCESS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x57,
 	}},
-	{ass: AVRNDSCALEPD, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
+	{as: AVRNDSCALEPD, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0x09,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x09,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x09,
 	}},
-	{ass: AVRNDSCALEPS, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
+	{as: AVRNDSCALEPS, ytab: _yvgetmantpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0x08,
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x08,
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x08,
 	}},
-	{ass: AVRNDSCALESD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVRNDSCALESD, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0x0B,
 	}},
-	{ass: AVRNDSCALESS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
+	{as: AVRNDSCALESS, ytab: _yvfixupimmsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F3A | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0x0A,
 	}},
-	{ass: AVROUNDPD, ytab: _yvroundpd, prefix: Pavx, op: opBytes{
+	{as: AVROUNDPD, ytab: _yvroundpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x09,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x09,
 	}},
-	{ass: AVROUNDPS, ytab: _yvroundpd, prefix: Pavx, op: opBytes{
+	{as: AVROUNDPS, ytab: _yvroundpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x08,
 		avxEscape | vex256 | vex66 | vex0F3A | vexW0, 0x08,
 	}},
-	{ass: AVROUNDSD, ytab: _yvdppd, prefix: Pavx, op: opBytes{
+	{as: AVROUNDSD, ytab: _yvdppd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x0B,
 	}},
-	{ass: AVROUNDSS, ytab: _yvdppd, prefix: Pavx, op: opBytes{
+	{as: AVROUNDSS, ytab: _yvdppd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F3A | vexW0, 0x0A,
 	}},
-	{ass: AVRSQRT14PD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT14PD, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x4E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x4E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x4E,
 	}},
-	{ass: AVRSQRT14PS, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT14PS, ytab: _yvexpandpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x4E,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x4E,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x4E,
 	}},
-	{ass: AVRSQRT14SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT14SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexZeroingEnabled, 0x4F,
 	}},
-	{ass: AVRSQRT14SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT14SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexZeroingEnabled, 0x4F,
 	}},
-	{ass: AVRSQRT28PD, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT28PD, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexSaeEnabled | evexZeroingEnabled, 0xCC,
 	}},
-	{ass: AVRSQRT28PS, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT28PS, ytab: _yvexp2pd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexSaeEnabled | evexZeroingEnabled, 0xCC,
 	}},
-	{ass: AVRSQRT28SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT28SD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexSaeEnabled | evexZeroingEnabled, 0xCD,
 	}},
-	{ass: AVRSQRT28SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVRSQRT28SS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexSaeEnabled | evexZeroingEnabled, 0xCD,
 	}},
-	{ass: AVRSQRTPS, ytab: _yvptest, prefix: Pavx, op: opBytes{
+	{as: AVRSQRTPS, ytab: _yvptest, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x52,
 		avxEscape | vex256 | vex0F | vexW0, 0x52,
 	}},
-	{ass: AVRSQRTSS, ytab: _yvrcpss, prefix: Pavx, op: opBytes{
+	{as: AVRSQRTSS, ytab: _yvrcpss, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x52,
 	}},
-	{ass: AVSCALEFPD, ytab: _yvscalefpd, prefix: Pavx, op: opBytes{
+	{as: AVSCALEFPD, ytab: _yvscalefpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x2C,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x2C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x2C,
 	}},
-	{ass: AVSCALEFPS, ytab: _yvscalefpd, prefix: Pavx, op: opBytes{
+	{as: AVSCALEFPS, ytab: _yvscalefpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x2C,
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x2C,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x2C,
 	}},
-	{ass: AVSCALEFSD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVSCALEFSD, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x2D,
 	}},
-	{ass: AVSCALEFSS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
+	{as: AVSCALEFSS, ytab: _yvgetexpsd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x2D,
 	}},
-	{ass: AVSCATTERDPD, ytab: _yvpscatterdq, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERDPD, ytab: _yvpscatterdq, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0xA2,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0xA2,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xA2,
 	}},
-	{ass: AVSCATTERDPS, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERDPS, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0xA2,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0xA2,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xA2,
 	}},
-	{ass: AVSCATTERPF0DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF0DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC6, 05,
 	}},
-	{ass: AVSCATTERPF0DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF0DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC6, 05,
 	}},
-	{ass: AVSCATTERPF0QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF0QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC7, 05,
 	}},
-	{ass: AVSCATTERPF0QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF0QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC7, 05,
 	}},
-	{ass: AVSCATTERPF1DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF1DPD, ytab: _yvgatherpf0dpd, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC6, 06,
 	}},
-	{ass: AVSCATTERPF1DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF1DPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC6, 06,
 	}},
-	{ass: AVSCATTERPF1QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF1QPD, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xC7, 06,
 	}},
-	{ass: AVSCATTERPF1QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERPF1QPS, ytab: _yvgatherpf0dps, prefix: Pavx, op: opBytes{
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xC7, 06,
 	}},
-	{ass: AVSCATTERQPD, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERQPD, ytab: _yvpscatterdd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW1, evexN8, 0xA3,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW1, evexN8, 0xA3,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW1, evexN8, 0xA3,
 	}},
-	{ass: AVSCATTERQPS, ytab: _yvpscatterqd, prefix: Pavx, op: opBytes{
+	{as: AVSCATTERQPS, ytab: _yvpscatterqd, prefix: Pavx, op: opBytes{
 		avxEscape | evex128 | evex66 | evex0F38 | evexW0, evexN4, 0xA3,
 		avxEscape | evex256 | evex66 | evex0F38 | evexW0, evexN4, 0xA3,
 		avxEscape | evex512 | evex66 | evex0F38 | evexW0, evexN4, 0xA3,
 	}},
-	{ass: AVSHUFF32X4, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
+	{as: AVSHUFF32X4, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x23,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x23,
 	}},
-	{ass: AVSHUFF64X2, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
+	{as: AVSHUFF64X2, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x23,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x23,
 	}},
-	{ass: AVSHUFI32X4, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
+	{as: AVSHUFI32X4, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x43,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x43,
 	}},
-	{ass: AVSHUFI64X2, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
+	{as: AVSHUFI64X2, ytab: _yvshuff32x4, prefix: Pavx, op: opBytes{
 		avxEscape | evex256 | evex66 | evex0F3A | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x43,
 		avxEscape | evex512 | evex66 | evex0F3A | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x43,
 	}},
-	{ass: AVSHUFPD, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
+	{as: AVSHUFPD, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0xC6,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0xC6,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0xC6,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0xC6,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0xC6,
 	}},
-	{ass: AVSHUFPS, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
+	{as: AVSHUFPS, ytab: _yvgf2p8affineinvqb, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0xC6,
 		avxEscape | vex256 | vex0F | vexW0, 0xC6,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0xC6,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0xC6,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0xC6,
 	}},
-	{ass: AVSQRTPD, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
+	{as: AVSQRTPD, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x51,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x51,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x51,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x51,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVSQRTPS, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
+	{as: AVSQRTPS, ytab: _yvcvtdq2ps, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x51,
 		avxEscape | vex256 | vex0F | vexW0, 0x51,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x51,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x51,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVSQRTSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVSQRTSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x51,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVSQRTSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVSQRTSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x51,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x51,
 	}},
-	{ass: AVSTMXCSR, ytab: _yvldmxcsr, prefix: Pavx, op: opBytes{
+	{as: AVSTMXCSR, ytab: _yvldmxcsr, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0xAE, 03,
 	}},
-	{ass: AVSUBPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVSUBPD, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x5C,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x5C,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5C,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x5C,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x5C,
 	}},
-	{ass: AVSUBPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
+	{as: AVSUBPS, ytab: _yvaddpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x5C,
 		avxEscape | vex256 | vex0F | vexW0, 0x5C,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexRoundingEnabled | evexZeroingEnabled, 0x5C,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x5C,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x5C,
 	}},
-	{ass: AVSUBSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVSUBSD, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF2 | vex0F | vexW0, 0x5C,
 		avxEscape | evex128 | evexF2 | evex0F | evexW1, evexN8 | evexRoundingEnabled | evexZeroingEnabled, 0x5C,
 	}},
-	{ass: AVSUBSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
+	{as: AVSUBSS, ytab: _yvaddsd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vexF3 | vex0F | vexW0, 0x5C,
 		avxEscape | evex128 | evexF3 | evex0F | evexW0, evexN4 | evexRoundingEnabled | evexZeroingEnabled, 0x5C,
 	}},
-	{ass: AVTESTPD, ytab: _yvptest, prefix: Pavx, op: opBytes{
+	{as: AVTESTPD, ytab: _yvptest, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x0F,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x0F,
 	}},
-	{ass: AVTESTPS, ytab: _yvptest, prefix: Pavx, op: opBytes{
+	{as: AVTESTPS, ytab: _yvptest, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F38 | vexW0, 0x0E,
 		avxEscape | vex256 | vex66 | vex0F38 | vexW0, 0x0E,
 	}},
-	{ass: AVUCOMISD, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
+	{as: AVUCOMISD, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x2E,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN8 | evexSaeEnabled, 0x2E,
 	}},
-	{ass: AVUCOMISS, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
+	{as: AVUCOMISS, ytab: _yvcomisd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x2E,
 		avxEscape | evex128 | evex0F | evexW0, evexN4 | evexSaeEnabled, 0x2E,
 	}},
-	{ass: AVUNPCKHPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVUNPCKHPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x15,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x15,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x15,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x15,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x15,
 	}},
-	{ass: AVUNPCKHPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVUNPCKHPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x15,
 		avxEscape | vex256 | vex0F | vexW0, 0x15,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x15,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x15,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x15,
 	}},
-	{ass: AVUNPCKLPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVUNPCKLPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x14,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x14,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x14,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x14,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x14,
 	}},
-	{ass: AVUNPCKLPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVUNPCKLPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x14,
 		avxEscape | vex256 | vex0F | vexW0, 0x14,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x14,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x14,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x14,
 	}},
-	{ass: AVXORPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVXORPD, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex66 | vex0F | vexW0, 0x57,
 		avxEscape | vex256 | vex66 | vex0F | vexW0, 0x57,
 		avxEscape | evex128 | evex66 | evex0F | evexW1, evexN16 | evexBcstN8 | evexZeroingEnabled, 0x57,
 		avxEscape | evex256 | evex66 | evex0F | evexW1, evexN32 | evexBcstN8 | evexZeroingEnabled, 0x57,
 		avxEscape | evex512 | evex66 | evex0F | evexW1, evexN64 | evexBcstN8 | evexZeroingEnabled, 0x57,
 	}},
-	{ass: AVXORPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
+	{as: AVXORPS, ytab: _yvandnpd, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x57,
 		avxEscape | vex256 | vex0F | vexW0, 0x57,
 		avxEscape | evex128 | evex0F | evexW0, evexN16 | evexBcstN4 | evexZeroingEnabled, 0x57,
 		avxEscape | evex256 | evex0F | evexW0, evexN32 | evexBcstN4 | evexZeroingEnabled, 0x57,
 		avxEscape | evex512 | evex0F | evexW0, evexN64 | evexBcstN4 | evexZeroingEnabled, 0x57,
 	}},
-	{ass: AVZEROALL, ytab: _yvzeroall, prefix: Pavx, op: opBytes{
+	{as: AVZEROALL, ytab: _yvzeroall, prefix: Pavx, op: opBytes{
 		avxEscape | vex256 | vex0F | vexW0, 0x77,
 	}},
-	{ass: AVZEROUPPER, ytab: _yvzeroall, prefix: Pavx, op: opBytes{
+	{as: AVZEROUPPER, ytab: _yvzeroall, prefix: Pavx, op: opBytes{
 		avxEscape | vex128 | vex0F | vexW0, 0x77,
 	}},
 }

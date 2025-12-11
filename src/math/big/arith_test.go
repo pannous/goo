@@ -326,7 +326,7 @@ func testVVU(t *testing.T, name string, fn, ref func(z, x, y []Word, s uint) (c 
 	}
 }
 
-func testVVWW(t *testing.T, name string, fn, ref func(z, x, y []Word, m, a Word) (c Word), ms, ass []Word) {
+func testVVWW(t *testing.T, name string, fn, ref func(z, x, y []Word, m, a Word) (c Word), ms, as []Word) {
 	for size := range 100 {
 		zz := make([]Word, 1+size+1)
 		xx := make([]Word, 1+size+1)
@@ -341,7 +341,7 @@ func testVVWW(t *testing.T, name string, fn, ref func(z, x, y []Word, m, a Word)
 		for x := range nats(words, size) {
 			for y := range nats(words, size) {
 				for _, m := range ms {
-					for _, a := range ass {
+					for _, a := range as {
 						wantZ := make([]Word, size)
 						wantC := ref(wantZ, x, y, m, a)
 

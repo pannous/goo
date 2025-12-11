@@ -1052,11 +1052,11 @@ func TestIgnoreDNSForgeries(t *testing.T) {
 	}
 
 	p.SkipAllQuestions()
-	ass, err := p.AllAnswers()
+	as, err := p.AllAnswers()
 	if err != nil {
 		t.Fatal("AllAnswers failed:", err)
 	}
-	if got := ass[0].Body.(*dnsmessage.AResource).A; got != TestAddr {
+	if got := as[0].Body.(*dnsmessage.AResource).A; got != TestAddr {
 		t.Errorf("got address %v, want %v", got, TestAddr)
 	}
 }

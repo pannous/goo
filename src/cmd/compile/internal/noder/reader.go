@@ -1699,9 +1699,9 @@ func (r *reader) stmt1(tag codeStmt, out *ir.Nodes) ir.Node {
 
 		if len(rhs) == 0 {
 			for _, name := range names {
-				ass := ir.NewAssignStmt(pos, name, nil)
-				ass.PtrInit().Append(ir.NewDecl(pos, ir.ODCL, name))
-				out.Append(typecheck.Stmt(ass))
+				as := ir.NewAssignStmt(pos, name, nil)
+				as.PtrInit().Append(ir.NewDecl(pos, ir.ODCL, name))
+				out.Append(typecheck.Stmt(as))
 			}
 			return nil
 		}
@@ -1781,7 +1781,6 @@ func (r *reader) stmt1(tag codeStmt, out *ir.Nodes) ir.Node {
 		ch := r.expr()
 		value := r.expr()
 		return ir.NewSendStmt(pos, ch, value)
-
 
 	case stmtSwitch:
 		return r.switchStmt(label)
@@ -1943,8 +1942,8 @@ func (r *reader) selectStmt(label *types.Sym) ir.Node {
 		// implicit conversion and relies on it being reinserted later,
 		// but that would lose any explicit RTTI operands too. To preserve
 		// RTTI, we rewrite this as "case tmp := <-c: i = tmp; ...".
-		if ass, ok := comm.(*ir.AssignStmt); ok && ass.Op() == ir.OAS && !ass.Def {
-			if conv, ok := ass.Y.(*ir.ConvExpr); ok && conv.Op() == ir.OCONVIFACE {
+		if as, ok := comm.(*ir.AssignStmt); ok && as.Op() == ir.OAS && !as.Def {
+			if conv, ok := as.Y.(*ir.ConvExpr); ok && conv.Op() == ir.OCONVIFACE {
 				base.AssertfAt(conv.Implicit(), conv.Pos(), "expected implicit conversion: %v", conv)
 
 				recv := conv.X
@@ -1960,7 +1959,7 @@ func (r *reader) selectStmt(label *types.Sym) ir.Node {
 
 				// Change original assignment to `i = tmp`, and prepend to body.
 				conv.X = tmp
-				body = append([]ir.Node{ass}, body...)
+				body = append([]ir.Node{as}, body...)
 			}
 		}
 
@@ -2949,12 +2948,12 @@ func (r *reader) multiExpr() []ir.Node {
 		expr := r.expr()
 
 		results := make([]ir.Node, r.Len())
-		ass := ir.NewAssignListStmt(pos, ir.OAS2, nil, []ir.Node{expr})
-		ass.Def = true
+		as := ir.NewAssignListStmt(pos, ir.OAS2, nil, []ir.Node{expr})
+		as.Def = true
 		for i := range results {
 			tmp := r.temp(pos, r.typ())
-			ass.PtrInit().Append(ir.NewDecl(pos, ir.ODCL, tmp))
-			ass.Lhs.Append(tmp)
+			as.PtrInit().Append(ir.NewDecl(pos, ir.ODCL, tmp))
+			as.Lhs.Append(tmp)
 
 			res := ir.Node(tmp)
 			if r.Bool() {
@@ -2967,7 +2966,7 @@ func (r *reader) multiExpr() []ir.Node {
 		}
 
 		// TODO(mdempsky): Could use ir.InlinedCallExpr instead?
-		results[0] = ir.InitExpr([]ir.Node{typecheck.Stmt(ass)}, results[0])
+		results[0] = ir.InitExpr([]ir.Node{typecheck.Stmt(as)}, results[0])
 		return results
 	}
 
@@ -3309,18 +3308,18 @@ func (r *reader) pkgInitOrder(target *ir.Package) {
 		rhs := r.expr()
 		pos := lhs[0].Pos()
 
-		var ass ir.Node
+		var as ir.Node
 		if len(lhs) == 1 {
-			ass = typecheck.Stmt(ir.NewAssignStmt(pos, lhs[0], rhs))
+			as = typecheck.Stmt(ir.NewAssignStmt(pos, lhs[0], rhs))
 		} else {
-			ass = typecheck.Stmt(ir.NewAssignListStmt(pos, ir.OAS2, lhs, []ir.Node{rhs}))
+			as = typecheck.Stmt(ir.NewAssignListStmt(pos, ir.OAS2, lhs, []ir.Node{rhs}))
 		}
 
 		for _, v := range lhs {
-			v.(*ir.Name).Defn = ass
+			v.(*ir.Name).Defn = as
 		}
 
-		initOrder[i] = ass
+		initOrder[i] = as
 	}
 
 	fn.Body = initOrder

@@ -97,11 +97,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if x == y {
 			return
 		}
-		ass := mips.AMOVV
+		as := mips.AMOVV
 		if isFPreg(x) && isFPreg(y) {
-			ass = mips.AMOVD
+			as = mips.AMOVD
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = x
 		p.To.Type = obj.TYPE_REG
@@ -596,42 +596,42 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		p.To.Sym = ir.Syms.PanicBounds
 
 	case ssa.OpMIPS64LoweredAtomicLoad8, ssa.OpMIPS64LoweredAtomicLoad32, ssa.OpMIPS64LoweredAtomicLoad64:
-		ass := mips.AMOVV
+		as := mips.AMOVV
 		switch v.Op {
 		case ssa.OpMIPS64LoweredAtomicLoad8:
-			ass = mips.AMOVB
+			as = mips.AMOVB
 		case ssa.OpMIPS64LoweredAtomicLoad32:
-			ass = mips.AMOVW
+			as = mips.AMOVW
 		}
 		s.Prog(mips.ASYNC)
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_MEM
 		p.From.Reg = v.Args[0].Reg()
 		p.To.Type = obj.TYPE_REG
 		p.To.Reg = v.Reg0()
 		s.Prog(mips.ASYNC)
 	case ssa.OpMIPS64LoweredAtomicStore8, ssa.OpMIPS64LoweredAtomicStore32, ssa.OpMIPS64LoweredAtomicStore64:
-		ass := mips.AMOVV
+		as := mips.AMOVV
 		switch v.Op {
 		case ssa.OpMIPS64LoweredAtomicStore8:
-			ass = mips.AMOVB
+			as = mips.AMOVB
 		case ssa.OpMIPS64LoweredAtomicStore32:
-			ass = mips.AMOVW
+			as = mips.AMOVW
 		}
 		s.Prog(mips.ASYNC)
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = v.Args[1].Reg()
 		p.To.Type = obj.TYPE_MEM
 		p.To.Reg = v.Args[0].Reg()
 		s.Prog(mips.ASYNC)
 	case ssa.OpMIPS64LoweredAtomicStorezero32, ssa.OpMIPS64LoweredAtomicStorezero64:
-		ass := mips.AMOVV
+		as := mips.AMOVV
 		if v.Op == ssa.OpMIPS64LoweredAtomicStorezero32 {
-			ass = mips.AMOVW
+			as = mips.AMOVW
 		}
 		s.Prog(mips.ASYNC)
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = mips.REGZERO
 		p.To.Type = obj.TYPE_MEM

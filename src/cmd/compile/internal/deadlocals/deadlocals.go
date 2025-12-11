@@ -32,17 +32,17 @@ func Funcs(fns []*ir.Func) {
 
 		for _, k := range v.defsKeys {
 			assigns := v.defs[k]
-			for _, ass := range assigns {
+			for _, as := range assigns {
 				// Kludge for "missing func info" linker panic.
 				// See also closureInitLSym in inline/inl.go.
-				if clo, ok := (*ass.rhs).(*ir.ClosureExpr); ok && clo.Op() == ir.OCLOSURE {
+				if clo, ok := (*as.rhs).(*ir.ClosureExpr); ok && clo.Op() == ir.OCLOSURE {
 					if clo.Func.IsClosure() {
 						ir.InitLSym(clo.Func, true)
 					}
 				}
 
-				*ass.lhs = ir.BlankNode
-				*ass.rhs = zero
+				*as.lhs = ir.BlankNode
+				*as.rhs = zero
 			}
 		}
 	}
@@ -103,9 +103,9 @@ func (v *visitor) node(n ir.Node) {
 				v.defsKeys = append(v.defsKeys, n)
 			}
 			v.defs[n] = nil
-			for _, ass := range s {
+			for _, as := range s {
 				// do the visit that was skipped in v.assign when as was appended to v.defs[n]
-				v.node(*ass.rhs)
+				v.node(*as.rhs)
 			}
 		}
 

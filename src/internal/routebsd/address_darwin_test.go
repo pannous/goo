@@ -14,7 +14,7 @@ import (
 type parseAddrsOnDarwinTest struct {
 	attrs uint
 	b     []byte
-	ass   []Addr
+	as    []Addr
 }
 
 var parseAddrsOnDarwinLittleEndianTests = []parseAddrsOnDarwinTest{
@@ -152,13 +152,13 @@ func TestParseAddrsOnDarwin(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		ass, err := parseAddrs(tt.attrs, tt.b)
+		as, err := parseAddrs(tt.attrs, tt.b)
 		if err != nil {
 			t.Error(i, err)
 			continue
 		}
-		if !reflect.DeepEqual(ass, tt.ass) {
-			t.Errorf("#%d: got %+v; want %+v", i, ass, tt.ass)
+		if !reflect.DeepEqual(as, tt.as) {
+			t.Errorf("#%d: got %+v; want %+v", i, as, tt.as)
 			continue
 		}
 	}

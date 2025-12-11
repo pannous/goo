@@ -6301,9 +6301,9 @@ func (s *State) FuncInfo() *obj.FuncInfo {
 }
 
 // Prog appends a new Prog.
-func (s *State) Prog(ass obj.As) *obj.Prog {
-	p := s.pp.Prog(ass)
-	if objw.LosesStmtMark(ass) {
+func (s *State) Prog(as obj.As) *obj.Prog {
+	p := s.pp.Prog(as)
+	if objw.LosesStmtMark(as) {
 		return p
 	}
 	// Float a statement start to the beginning of any same-line run.

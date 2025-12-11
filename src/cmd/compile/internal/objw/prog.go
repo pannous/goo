@@ -123,7 +123,7 @@ func (pp *Progs) Free() {
 }
 
 // Prog adds a Prog with instruction As to pp.
-func (pp *Progs) Prog(ass obj.As) *obj.Prog {
+func (pp *Progs) Prog(as obj.As) *obj.Prog {
 	if pp.NextLive != StackMapDontCare && pp.NextLive != pp.PrevLive {
 		// Emit stack map index change.
 		idx := pp.NextLive
@@ -153,11 +153,11 @@ func (pp *Progs) Prog(ass obj.As) *obj.Prog {
 		base.Warn("prog: unknown position (line 0)")
 	}
 
-	p.As = ass
+	p.As = as
 	p.Pos = pp.Pos
 	if pp.Pos.IsStmt() == src.PosIsStmt {
 		// Clear IsStmt for later Progs at this pos provided that as can be marked as a stmt
-		if LosesStmtMark(ass) {
+		if LosesStmtMark(as) {
 			return p
 		}
 		pp.Pos = pp.Pos.WithNotStmt()
@@ -172,10 +172,10 @@ func (pp *Progs) Clear(p *obj.Prog) {
 	pp.PC++
 }
 
-func (pp *Progs) Append(p *obj.Prog, ass obj.As, ftype obj.AddrType, freg int16, foffset int64, ttype obj.AddrType, treg int16, toffset int64) *obj.Prog {
+func (pp *Progs) Append(p *obj.Prog, as obj.As, ftype obj.AddrType, freg int16, foffset int64, ttype obj.AddrType, treg int16, toffset int64) *obj.Prog {
 	q := pp.NewProg()
 	pp.Clear(q)
-	q.As = ass
+	q.As = as
 	q.Pos = p.Pos
 	q.From.Type = ftype
 	q.From.Reg = freg
@@ -205,7 +205,7 @@ func (pp *Progs) SetText(fn *ir.Func) {
 // The attributes from some opcodes are lost in translation.
 // TODO: this is an artifact of how funcpctab combines information for instructions at a single PC.
 // Should try to fix it there.
-func LosesStmtMark(ass obj.As) bool {
+func LosesStmtMark(as obj.As) bool {
 	// is_stmt does not work for these; it DOES for ANOP even though that generates no code.
-	return ass == obj.APCDATA || ass == obj.AFUNCDATA
+	return as == obj.APCDATA || as == obj.AFUNCDATA
 }

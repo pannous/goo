@@ -198,17 +198,17 @@ type Source struct {
 // to implement LogValuer because it would be resolved before
 // the ReplaceAttr function was called.
 func (s *Source) group() Value {
-	var ass []Attr
+	var as []Attr
 	if s.Function != "" {
-		ass = append(ass, String("function", s.Function))
+		as = append(as, String("function", s.Function))
 	}
 	if s.File != "" {
-		ass = append(ass, String("file", s.File))
+		as = append(as, String("file", s.File))
 	}
 	if s.Line != 0 {
-		ass = append(ass, Int("line", s.Line))
+		as = append(as, Int("line", s.Line))
 	}
-	return GroupValue(ass...)
+	return GroupValue(as...)
 }
 
 // isEmpty returns whether the Source struct is nil or only contains zero fields.

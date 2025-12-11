@@ -429,7 +429,7 @@ func (r *resolver) Visit(node ast.Node) ast.Visitor {
 				// during the parsing pass here, as it uses the position of the RANGE
 				// token for the RHS OpPos. That information is not contained within
 				// the AST.
-				ass := &ast.AssignStmt{
+				as := &ast.AssignStmt{
 					Lhs:    lhs,
 					Tok:    token.DEFINE,
 					TokPos: n.TokPos,
@@ -439,7 +439,7 @@ func (r *resolver) Visit(node ast.Node) ast.Visitor {
 				// is it necessary? By comparison, for a normal AssignStmt we don't
 				// walk the LHS in case there is an invalid identifier list.
 				r.walkLHS(lhs)
-				r.shortVarDecl(ass)
+				r.shortVarDecl(as)
 			} else {
 				r.walkExprs(lhs)
 			}

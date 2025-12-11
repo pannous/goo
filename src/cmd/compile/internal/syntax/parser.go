@@ -44,31 +44,31 @@ type parser struct {
 	pragma    Pragma   // pragmas
 	goVersion string   // Go version from //go:build line
 
-	top    bool   // in top of file (before package clause)
-	fnest  int    // function nesting level (for error handling)
-	xnest  int    // expression nesting level (for complit ambiguity resolution)
-	inForLoop bool // parsing expressions in for-loop context (stop at 'in' operator)
-	indent []byte // tracing support
+	top       bool   // in top of file (before package clause)
+	fnest     int    // function nesting level (for error handling)
+	xnest     int    // expression nesting level (for complit ambiguity resolution)
+	inForLoop bool   // parsing expressions in for-loop context (stop at 'in' operator)
+	indent    []byte // tracing support
 }
 
 // getBuildTags extracts build tags from environment and compiler context
 func getBuildTags() []string {
 	var tags []string
-	
+
 	// Check environment variables
 	if os.Getenv("DEBUG") != "" {
 		tags = append(tags, "DEBUG")
 	}
-	
+
 	if os.Getenv("RELEASE") != "" {
 		tags = append(tags, "RELEASE")
 	}
-	
+
 	// Add more build tags as needed
 	if os.Getenv("TESTING") != "" {
 		tags = append(tags, "TESTING")
 	}
-	
+
 	return tags
 }
 
@@ -78,7 +78,7 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 	p.errh = errh
 	p.mode = mode
 	p.pragh = pragh
-	
+
 	// Apply conditional preprocessor for .goo files
 	var sourceReader io.Reader = r
 	if file != nil && strings.HasSuffix(file.Filename(), ".goo") {
@@ -86,7 +86,7 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 		buildTags := getBuildTags()
 		sourceReader = NewConditionalPreprocessor(r, buildTags)
 	}
-	
+
 	p.scanner.init(
 		sourceReader,
 		// Error and directive handler for scanner.
@@ -99,7 +99,7 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 				p.errorAt(p.posAt(line, col), msg)
 				return
 			}
-			
+
 			// Hash comments don't support directives, just ignore them
 			if msg[0] == '#' {
 				return
@@ -191,7 +191,6 @@ func (p *parser) transformsEnabled() bool {
 	filename := p.file.Filename()
 	return strings.HasSuffix(filename, ".goo")
 }
-
 
 // updateBase sets the current position base to a new line base at pos.
 // The base's filename, line, and column values are extracted from text
@@ -1458,7 +1457,7 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 		if p.inForLoop && p.tok == _Operator && p.op == In {
 			break
 		}
-		
+
 		t := new(Operation)
 		t.pos = p.pos()
 		t.Op = p.op
@@ -1727,7 +1726,7 @@ func (p *parser) operand(keep_parens bool) Expr {
 		// Empty brackets [] - could be empty list literal or slice type
 		if p.tok == _Rbrack {
 			p.next()
-			
+
 			// Check if this looks like a slice type []T or empty list literal []
 			// If next token is a type starter, treat as slice type
 			// Otherwise, treat as empty list literal
@@ -1894,7 +1893,7 @@ loop:
 					break
 				}
 			}
-			// if we reach here and i is nil, it means we have x[:...] 
+			// if we reach here and i is nil, it means we have x[:...]
 			// i will be nil which is correct for slice expressions
 
 			// x[i:...
@@ -2308,7 +2307,7 @@ func (p *parser) isExprStart() bool {
 
 func (p *parser) isTypeStart() bool {
 	switch p.tok {
-	case _Name, _Lparen, _Func, _Map, _Lbrack, 
+	case _Name, _Lparen, _Func, _Map, _Lbrack,
 		_Chan, _Struct, _Interface, _Star, _Arrow:
 		return true
 	default:
@@ -2887,7 +2886,7 @@ func (p *parser) oliteral_expr() Expr {
 			lit := p.lit
 			pos := p.pos()
 			p.next()
-			
+
 			// Find where the unit part starts (first letter)
 			var valueEnd int
 			for i, r := range lit {
@@ -2896,12 +2895,12 @@ func (p *parser) oliteral_expr() Expr {
 					break
 				}
 			}
-			
+
 			if valueEnd == 0 {
 				// No numeric part found
 				return &BasicLit{Value: lit, Kind: StringLit, Bad: true, expr: expr{node: node{pos: pos}}}
 			}
-			
+
 			u := &UnitLitExpr{
 				Value: lit[:valueEnd],
 				Unit:  lit[valueEnd:],
@@ -3653,9 +3652,9 @@ done:
 		// a more explicit error message in that case to prevent
 		// further confusion.
 		var str string
-		if ass, ok := s.(*AssignStmt); ok && ass.Op == 0 {
+		if as, ok := s.(*AssignStmt); ok && as.Op == 0 {
 			// Emphasize complex Lhs and Rhs of assignment with parentheses to highlight '='.
-			str = "assignment " + emphasize(ass.Lhs) + " = " + emphasize(ass.Rhs)
+			str = "assignment " + emphasize(as.Lhs) + " = " + emphasize(as.Rhs)
 		} else {
 			str = String(s)
 		}
@@ -4089,10 +4088,10 @@ func (p *parser) stmtOrNil() Stmt {
 		s.pos = p.pos()
 		p.next()
 		s.Cond = p.expr()
-		
+
 		// Capture original source text for error messages using syntax printer
 		s.OrigText = String(s.Cond)
-		
+
 		return s
 	}
 
@@ -4233,7 +4232,6 @@ func (p *parser) exprList() Expr {
 	}
 	return x
 }
-
 
 // typeList parses a non-empty, comma-separated list of types,
 // optionally followed by a comma. If strict is set to false,

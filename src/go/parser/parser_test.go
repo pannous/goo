@@ -166,14 +166,14 @@ func TestColonEqualsScope(t *testing.T) {
 	}
 
 	// RHS refers to undefined globals; LHS does not.
-	ass := f.Decls[0].(*ast.FuncDecl).Body.List[0].(*ast.AssignStmt)
-	for _, v := range ass.Rhs {
+	as := f.Decls[0].(*ast.FuncDecl).Body.List[0].(*ast.AssignStmt)
+	for _, v := range as.Rhs {
 		id := v.(*ast.Ident)
 		if id.Obj != nil {
 			t.Errorf("rhs %s has Obj, should not", id.Name)
 		}
 	}
-	for _, v := range ass.Lhs {
+	for _, v := range as.Lhs {
 		id := v.(*ast.Ident)
 		if id.Obj == nil {
 			t.Errorf("lhs %s does not have Obj, should", id.Name)
@@ -188,14 +188,14 @@ func TestVarScope(t *testing.T) {
 	}
 
 	// RHS refers to undefined globals; LHS does not.
-	ass := f.Decls[0].(*ast.FuncDecl).Body.List[0].(*ast.DeclStmt).Decl.(*ast.GenDecl).Specs[0].(*ast.ValueSpec)
-	for _, v := range ass.Values {
+	as := f.Decls[0].(*ast.FuncDecl).Body.List[0].(*ast.DeclStmt).Decl.(*ast.GenDecl).Specs[0].(*ast.ValueSpec)
+	for _, v := range as.Values {
 		id := v.(*ast.Ident)
 		if id.Obj != nil {
 			t.Errorf("rhs %s has Obj, should not", id.Name)
 		}
 	}
-	for _, id := range ass.Names {
+	for _, id := range as.Names {
 		if id.Obj == nil {
 			t.Errorf("lhs %s does not have Obj, should", id.Name)
 		}

@@ -20,7 +20,7 @@ type EI interface{}
 
 type S struct{}
 
-func (S) M(ass interface{ I }) {}
+func (S) M(as interface{ I }) {}
 
 func f() interface{ EI } {
 	return &S1{}

@@ -108,8 +108,8 @@ func (e *escape) assignList(dsts, srcs []ir.Node, why string, where ir.Node) {
 // reassigned, unless the location represents a variable declared and
 // assigned exactly once by where.
 func (e *escape) reassigned(ks []hole, where ir.Node) {
-	if ass, ok := where.(*ir.AssignStmt); ok && ass.Op() == ir.OAS && ass.Y == nil {
-		if dst, ok := ass.X.(*ir.Name); ok && dst.Op() == ir.ONAME && dst.Defn == nil {
+	if as, ok := where.(*ir.AssignStmt); ok && as.Op() == ir.OAS && as.Y == nil {
+		if dst, ok := as.X.(*ir.Name); ok && dst.Op() == ir.ONAME && dst.Defn == nil {
 			// Zero-value assignment for variable declared without an
 			// explicit initial value. Assume this is its initialization
 			// statement.

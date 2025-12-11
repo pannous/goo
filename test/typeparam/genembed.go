@@ -45,8 +45,8 @@ func main() {
 		panic(fmt.Sprintf("got %v, want %v", got, want))
 	}
 
-	ass := A[string]{B: B[string]{"abc"}}
-	if got, want := doGet2[string](&ass), "abc"; got != want {
+	as := A[string]{B: B[string]{"abc"}}
+	if got, want := doGet2[string](&as), "abc"; got != want {
 		panic(fmt.Sprintf("got %v, want %v", got, want))
 	}
 }

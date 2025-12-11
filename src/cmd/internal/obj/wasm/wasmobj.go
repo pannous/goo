@@ -154,19 +154,19 @@ func instinit(ctxt *obj.Link) {
 }
 
 func preprocess(ctxt *obj.Link, s *obj.LSym, newprog obj.ProgAlloc) {
-	appendp := func(p *obj.Prog, ass obj.As, args ...obj.Addr) *obj.Prog {
+	appendp := func(p *obj.Prog, as obj.As, args ...obj.Addr) *obj.Prog {
 		if p.As != obj.ANOP {
 			p2 := obj.Appendp(p, newprog)
 			p2.Pc = p.Pc
 			p = p2
 		}
-		p.As = ass
+		p.As = as
 		switch len(args) {
 		case 0:
 			p.From = obj.Addr{}
 			p.To = obj.Addr{}
 		case 1:
-			if unaryDst[ass] {
+			if unaryDst[as] {
 				p.From = obj.Addr{}
 				p.To = args[0]
 			} else {
@@ -586,7 +586,7 @@ func preprocess(ctxt *obj.Link, s *obj.LSym, newprog obj.ProgAlloc) {
 
 		case AI32Load, AI64Load, AF32Load, AF64Load, AI32Load8S, AI32Load8U, AI32Load16S, AI32Load16U, AI64Load8S, AI64Load8U, AI64Load16S, AI64Load16U, AI64Load32S, AI64Load32U:
 			if p.From.Type == obj.TYPE_MEM {
-				ass := p.As
+				as := p.As
 				from := p.From
 
 				p.As = AGet
@@ -596,7 +596,7 @@ func preprocess(ctxt *obj.Link, s *obj.LSym, newprog obj.ProgAlloc) {
 					p = appendp(p, AI32WrapI64)
 				}
 
-				p = appendp(p, ass, constAddr(from.Offset))
+				p = appendp(p, as, constAddr(from.Offset))
 			}
 
 		case AMOVB, AMOVH, AMOVW, AMOVD:
@@ -748,7 +748,7 @@ func preprocess(ctxt *obj.Link, s *obj.LSym, newprog obj.ProgAlloc) {
 }
 
 // Generate function body for wasmimport wrapper function.
-func genWasmImportWrapper(s *obj.LSym, appendp func(p *obj.Prog, ass obj.As, args ...obj.Addr) *obj.Prog) {
+func genWasmImportWrapper(s *obj.LSym, appendp func(p *obj.Prog, as obj.As, args ...obj.Addr) *obj.Prog) {
 	wi := s.Func().WasmImport
 	wi.CreateAuxSym()
 	p := s.Func().Text
@@ -875,7 +875,7 @@ func genWasmImportWrapper(s *obj.LSym, appendp func(p *obj.Prog, ass obj.As, arg
 }
 
 // Generate function body for wasmexport wrapper function.
-func genWasmExportWrapper(s *obj.LSym, appendp func(p *obj.Prog, ass obj.As, args ...obj.Addr) *obj.Prog) {
+func genWasmExportWrapper(s *obj.LSym, appendp func(p *obj.Prog, as obj.As, args ...obj.Addr) *obj.Prog) {
 	we := s.Func().WasmExport
 	we.CreateAuxSym()
 	p := s.Func().Text
@@ -1359,25 +1359,25 @@ func updateLocalSP(w *bytes.Buffer) {
 	writeUleb128(w, 1) // local SP
 }
 
-func writeOpcode(w *bytes.Buffer, ass obj.As) {
+func writeOpcode(w *bytes.Buffer, as obj.As) {
 	switch {
-	case ass < AUnreachable:
-		panic(fmt.Sprintf("unexpected assembler op: %s", ass))
-	case ass < AEnd:
-		w.WriteByte(byte(ass - AUnreachable + 0x00))
-	case ass < ADrop:
-		w.WriteByte(byte(ass - AEnd + 0x0B))
-	case ass < ALocalGet:
-		w.WriteByte(byte(ass - ADrop + 0x1A))
-	case ass < AI32Load:
-		w.WriteByte(byte(ass - ALocalGet + 0x20))
-	case ass < AI32TruncSatF32S:
-		w.WriteByte(byte(ass - AI32Load + 0x28))
-	case ass < ALast:
+	case as < AUnreachable:
+		panic(fmt.Sprintf("unexpected assembler op: %s", as))
+	case as < AEnd:
+		w.WriteByte(byte(as - AUnreachable + 0x00))
+	case as < ADrop:
+		w.WriteByte(byte(as - AEnd + 0x0B))
+	case as < ALocalGet:
+		w.WriteByte(byte(as - ADrop + 0x1A))
+	case as < AI32Load:
+		w.WriteByte(byte(as - ALocalGet + 0x20))
+	case as < AI32TruncSatF32S:
+		w.WriteByte(byte(as - AI32Load + 0x28))
+	case as < ALast:
 		w.WriteByte(0xFC)
-		w.WriteByte(byte(ass - AI32TruncSatF32S + 0x00))
+		w.WriteByte(byte(as - AI32TruncSatF32S + 0x00))
 	default:
-		panic(fmt.Sprintf("unexpected assembler op: %s", ass))
+		panic(fmt.Sprintf("unexpected assembler op: %s", as))
 	}
 }
 
@@ -1405,8 +1405,8 @@ func regType(reg int16) valueType {
 	}
 }
 
-func align(ass obj.As) uint64 {
-	switch ass {
+func align(as obj.As) uint64 {
+	switch as {
 	case AI32Load8S, AI32Load8U, AI64Load8S, AI64Load8U, AI32Store8, AI64Store8:
 		return 0
 	case AI32Load16S, AI32Load16U, AI64Load16S, AI64Load16U, AI32Store16, AI64Store16:

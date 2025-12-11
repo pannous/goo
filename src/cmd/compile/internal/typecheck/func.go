@@ -330,7 +330,7 @@ func tcAppend(n *ir.CallExpr) ir.Node {
 			return n
 		}
 
-		// AssignConv is of args[1] not required here, ass the
+		// AssignConv is of args[1] not required here, as the
 		// types of args[0] and args[1] don't need to match
 		// (They will both have an underlying type which are
 		// slices of identical base types, or be []byte and string.)
@@ -338,13 +338,13 @@ func tcAppend(n *ir.CallExpr) ir.Node {
 		return n
 	}
 
-	ass := args[1:]
-	for i, n := range ass {
+	as := args[1:]
+	for i, n := range as {
 		if n.Type() == nil {
 			continue
 		}
-		ass[i] = AssignConv(n, t.Elem(), "append")
-		types.CheckSize(ass[i].Type()) // ensure width is calculated for backend
+		as[i] = AssignConv(n, t.Elem(), "append")
+		types.CheckSize(as[i].Type()) // ensure width is calculated for backend
 	}
 	return n
 }
@@ -726,24 +726,24 @@ func tcTypeof(n *ir.UnaryExpr) ir.Node {
 func tcTypeMatches(n *ir.BinaryExpr) ir.Node {
 	n.X = Expr(n.X)
 	n.Y = Expr(n.Y)
-	
+
 	if n.X.Type() == nil || n.Y.Type() == nil {
 		n.SetType(nil)
 		return n
 	}
-	
+
 	// Second argument must be a string
 	if !n.Y.Type().IsString() {
 		base.Errorf("second argument to typeMatches must be string, not %v", n.Y.Type())
 		n.SetType(nil)
 		return n
 	}
-	
+
 	// Create runtime call: runtime.typeMatches(value, typeName)
-	// Convert first argument to interface{} 
+	// Convert first argument to interface{}
 	arg1 := Conv(n.X, types.Types[types.TINTER])
 	arg2 := n.Y
-	
+
 	// Create call to runtime.typeMatches
 	fn := LookupRuntime("typeMatches")
 	call := Call(n.Pos(), fn, []ir.Node{arg1, arg2}, false)

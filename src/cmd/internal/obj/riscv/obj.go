@@ -362,8 +362,8 @@ func markRelocs(p *obj.Prog) {
 }
 
 // InvertBranch inverts the condition of a conditional branch.
-func InvertBranch(ass obj.As) obj.As {
-	switch ass {
+func InvertBranch(as obj.As) obj.As {
+	switch as {
 	case ABEQ:
 		return ABNE
 	case ABEQZ:
@@ -1105,9 +1105,9 @@ func immIFits(x int64, nbits uint) error {
 }
 
 // immI extracts the signed integer of the specified size from an immediate.
-func immI(ass obj.As, imm int64, nbits uint) uint32 {
+func immI(as obj.As, imm int64, nbits uint) uint32 {
 	if err := immIFits(imm, nbits); err != nil {
-		panic(fmt.Sprintf("%v: %v", ass, err))
+		panic(fmt.Sprintf("%v: %v", as, err))
 	}
 	return uint32(imm) & ((1 << nbits) - 1)
 }
@@ -1125,9 +1125,9 @@ func immUFits(x int64, nbits uint) error {
 }
 
 // immU extracts the unsigned integer of the specified size from an immediate.
-func immU(ass obj.As, imm int64, nbits uint) uint32 {
+func immU(as obj.As, imm int64, nbits uint) uint32 {
 	if err := immUFits(imm, nbits); err != nil {
-		panic(fmt.Sprintf("%v: %v", ass, err))
+		panic(fmt.Sprintf("%v: %v", as, err))
 	}
 	return uint32(imm) & ((1 << nbits) - 1)
 }
@@ -1435,7 +1435,7 @@ func validateRaw(ctxt *obj.Link, ins *instruction) {
 	// Treat the raw value specially as a 32-bit unsigned integer.
 	// Nobody wants to enter negative machine code.
 	if ins.imm < 0 || 1<<32 <= ins.imm {
-		ctxt.Diag("%v: immediate %d in raw position cannot be larger than 32 bits", ins.ass, ins.imm)
+		ctxt.Diag("%v: immediate %d in raw position cannot be larger than 32 bits", ins.as, ins.imm)
 	}
 }
 
@@ -1446,8 +1446,8 @@ func extractBitAndShift(imm uint32, bit, pos int) uint32 {
 }
 
 // encodeR encodes an R-type RISC-V instruction.
-func encodeR(ass obj.As, rs1, rs2, rd, funct3, funct7 uint32) uint32 {
-	enc := encode(ass)
+func encodeR(as obj.As, rs1, rs2, rd, funct3, funct7 uint32) uint32 {
+	enc := encode(as)
 	if enc == nil {
 		panic("encodeR: could not encode instruction")
 	}
@@ -1465,8 +1465,8 @@ func encodeR(ass obj.As, rs1, rs2, rd, funct3, funct7 uint32) uint32 {
 }
 
 // encodeR4 encodes an R4-type RISC-V instruction.
-func encodeR4(ass obj.As, rs1, rs2, rs3, rd, funct3, funct2 uint32) uint32 {
-	enc := encode(ass)
+func encodeR4(as obj.As, rs1, rs2, rs3, rd, funct3, funct2 uint32) uint32 {
+	enc := encode(as)
 	if enc == nil {
 		panic("encodeR4: could not encode instruction")
 	}
@@ -1481,80 +1481,80 @@ func encodeR4(ass obj.As, rs1, rs2, rs3, rd, funct3, funct2 uint32) uint32 {
 }
 
 func encodeRII(ins *instruction) uint32 {
-	return encodeR(ins.ass, regI(ins.rs1), 0, regI(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regI(ins.rs1), 0, regI(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRIII(ins *instruction) uint32 {
-	return encodeR(ins.ass, regI(ins.rs1), regI(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regI(ins.rs1), regI(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRFFF(ins *instruction) uint32 {
-	return encodeR(ins.ass, regF(ins.rs1), regF(ins.rs2), regF(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regF(ins.rs1), regF(ins.rs2), regF(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRFFFF(ins *instruction) uint32 {
-	return encodeR4(ins.ass, regF(ins.rs1), regF(ins.rs2), regF(ins.rs3), regF(ins.rd), ins.funct3, ins.funct7)
+	return encodeR4(ins.as, regF(ins.rs1), regF(ins.rs2), regF(ins.rs3), regF(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRFFI(ins *instruction) uint32 {
-	return encodeR(ins.ass, regF(ins.rs1), regF(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regF(ins.rs1), regF(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRFI(ins *instruction) uint32 {
-	return encodeR(ins.ass, regF(ins.rs2), 0, regI(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regF(ins.rs2), 0, regI(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRFF(ins *instruction) uint32 {
-	return encodeR(ins.ass, regF(ins.rs2), 0, regF(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regF(ins.rs2), 0, regF(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRFV(ins *instruction) uint32 {
-	return encodeR(ins.ass, regF(ins.rs2), 0, regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regF(ins.rs2), 0, regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRIF(ins *instruction) uint32 {
-	return encodeR(ins.ass, regI(ins.rs2), 0, regF(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regI(ins.rs2), 0, regF(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRIV(ins *instruction) uint32 {
-	return encodeR(ins.ass, regI(ins.rs2), 0, regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regI(ins.rs2), 0, regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVF(ins *instruction) uint32 {
-	return encodeR(ins.ass, 0, regV(ins.rs2), regF(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, 0, regV(ins.rs2), regF(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVFV(ins *instruction) uint32 {
-	return encodeR(ins.ass, regF(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regF(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVI(ins *instruction) uint32 {
-	return encodeR(ins.ass, 0, regV(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, 0, regV(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVIV(ins *instruction) uint32 {
-	return encodeR(ins.ass, regI(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regI(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVV(ins *instruction) uint32 {
-	return encodeR(ins.ass, 0, regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, 0, regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVVi(ins *instruction) uint32 {
-	return encodeR(ins.ass, immI(ins.ass, ins.imm, 5), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, immI(ins.as, ins.imm, 5), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVVu(ins *instruction) uint32 {
-	return encodeR(ins.ass, immU(ins.ass, ins.imm, 5), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, immU(ins.as, ins.imm, 5), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 func encodeRVVV(ins *instruction) uint32 {
-	return encodeR(ins.ass, regV(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
+	return encodeR(ins.as, regV(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct3, ins.funct7)
 }
 
 // encodeI encodes an I-type RISC-V instruction.
-func encodeI(ass obj.As, rs1, rd, imm, funct7 uint32) uint32 {
-	enc := encode(ass)
+func encodeI(as obj.As, rs1, rd, imm, funct7 uint32) uint32 {
+	enc := encode(as)
 	if enc == nil {
 		panic("encodeI: could not encode instruction")
 	}
@@ -1563,28 +1563,28 @@ func encodeI(ass obj.As, rs1, rd, imm, funct7 uint32) uint32 {
 }
 
 func encodeIII(ins *instruction) uint32 {
-	return encodeI(ins.ass, regI(ins.rs1), regI(ins.rd), uint32(ins.imm), 0)
+	return encodeI(ins.as, regI(ins.rs1), regI(ins.rd), uint32(ins.imm), 0)
 }
 
 func encodeIF(ins *instruction) uint32 {
-	return encodeI(ins.ass, regI(ins.rs1), regF(ins.rd), uint32(ins.imm), 0)
+	return encodeI(ins.as, regI(ins.rs1), regF(ins.rd), uint32(ins.imm), 0)
 }
 
 func encodeIV(ins *instruction) uint32 {
-	return encodeI(ins.ass, regI(ins.rs1), regV(ins.rd), uint32(ins.imm), ins.funct7)
+	return encodeI(ins.as, regI(ins.rs1), regV(ins.rd), uint32(ins.imm), ins.funct7)
 }
 
 func encodeIIIV(ins *instruction) uint32 {
-	return encodeI(ins.ass, regI(ins.rs1), regV(ins.rd), regI(ins.rs2), ins.funct7)
+	return encodeI(ins.as, regI(ins.rs1), regV(ins.rd), regI(ins.rs2), ins.funct7)
 }
 
 func encodeIVIV(ins *instruction) uint32 {
-	return encodeI(ins.ass, regI(ins.rs1), regV(ins.rd), regV(ins.rs2), ins.funct7)
+	return encodeI(ins.as, regI(ins.rs1), regV(ins.rd), regV(ins.rs2), ins.funct7)
 }
 
 // encodeS encodes an S-type RISC-V instruction.
-func encodeS(ass obj.As, rs1, rs2, imm, funct7 uint32) uint32 {
-	enc := encode(ass)
+func encodeS(as obj.As, rs1, rs2, imm, funct7 uint32) uint32 {
+	enc := encode(as)
 	if enc == nil {
 		panic("encodeS: could not encode instruction")
 	}
@@ -1597,23 +1597,23 @@ func encodeS(ass obj.As, rs1, rs2, imm, funct7 uint32) uint32 {
 }
 
 func encodeSI(ins *instruction) uint32 {
-	return encodeS(ins.ass, regI(ins.rd), regI(ins.rs1), uint32(ins.imm), 0)
+	return encodeS(ins.as, regI(ins.rd), regI(ins.rs1), uint32(ins.imm), 0)
 }
 
 func encodeSF(ins *instruction) uint32 {
-	return encodeS(ins.ass, regI(ins.rd), regF(ins.rs1), uint32(ins.imm), 0)
+	return encodeS(ins.as, regI(ins.rd), regF(ins.rs1), uint32(ins.imm), 0)
 }
 
 func encodeSV(ins *instruction) uint32 {
-	return encodeS(ins.ass, regI(ins.rd), 0, regV(ins.rs1), ins.funct7)
+	return encodeS(ins.as, regI(ins.rd), 0, regV(ins.rs1), ins.funct7)
 }
 
 func encodeSVII(ins *instruction) uint32 {
-	return encodeS(ins.ass, regI(ins.rs1), regI(ins.rs2), regV(ins.rd), ins.funct7)
+	return encodeS(ins.as, regI(ins.rs1), regI(ins.rs2), regV(ins.rd), ins.funct7)
 }
 
 func encodeSVIV(ins *instruction) uint32 {
-	return encodeS(ins.ass, regI(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct7)
+	return encodeS(ins.as, regI(ins.rs1), regV(ins.rs2), regV(ins.rd), ins.funct7)
 }
 
 // encodeBImmediate encodes an immediate for a B-type RISC-V instruction.
@@ -1623,10 +1623,10 @@ func encodeBImmediate(imm uint32) uint32 {
 
 // encodeB encodes a B-type RISC-V instruction.
 func encodeB(ins *instruction) uint32 {
-	imm := immI(ins.ass, ins.imm, 13)
+	imm := immI(ins.as, ins.imm, 13)
 	rs2 := regI(ins.rs1)
 	rs1 := regI(ins.rs2)
-	enc := encode(ins.ass)
+	enc := encode(ins.as)
 	if enc == nil {
 		panic("encodeB: could not encode instruction")
 	}
@@ -1639,9 +1639,9 @@ func encodeU(ins *instruction) uint32 {
 	// Rather than have the user/compiler generate a 32 bit constant, the
 	// bottommost bits of which must all be zero, instead accept just the
 	// top bits.
-	imm := immI(ins.ass, ins.imm, 20)
+	imm := immI(ins.as, ins.imm, 20)
 	rd := regI(ins.rd)
-	enc := encode(ins.ass)
+	enc := encode(ins.as)
 	if enc == nil {
 		panic("encodeU: could not encode instruction")
 	}
@@ -1655,9 +1655,9 @@ func encodeJImmediate(imm uint32) uint32 {
 
 // encodeJ encodes a J-type RISC-V instruction.
 func encodeJ(ins *instruction) uint32 {
-	imm := immI(ins.ass, ins.imm, 21)
+	imm := immI(ins.as, ins.imm, 21)
 	rd := regI(ins.rd)
-	enc := encode(ins.ass)
+	enc := encode(ins.as)
 	if enc == nil {
 		panic("encodeJ: could not encode instruction")
 	}
@@ -1695,8 +1695,8 @@ func encodeCJImmediate(imm uint32) uint32 {
 	return bits << 2
 }
 
-func encodeVset(ass obj.As, rs1, rs2, rd uint32) uint32 {
-	enc := encode(ass)
+func encodeVset(as obj.As, rs1, rs2, rd uint32) uint32 {
+	enc := encode(as)
 	if enc == nil {
 		panic("encodeVset: could not encode instruction")
 	}
@@ -1704,18 +1704,18 @@ func encodeVset(ass obj.As, rs1, rs2, rd uint32) uint32 {
 }
 
 func encodeVsetvli(ins *instruction) uint32 {
-	vtype := immU(ins.ass, ins.imm, 11)
-	return encodeVset(ins.ass, regI(ins.rs1), vtype, regI(ins.rd))
+	vtype := immU(ins.as, ins.imm, 11)
+	return encodeVset(ins.as, regI(ins.rs1), vtype, regI(ins.rd))
 }
 
 func encodeVsetivli(ins *instruction) uint32 {
-	vtype := immU(ins.ass, ins.imm, 10)
-	avl := immU(ins.ass, int64(ins.rs1), 5)
-	return encodeVset(ins.ass, avl, vtype, regI(ins.rd))
+	vtype := immU(ins.as, ins.imm, 10)
+	avl := immU(ins.as, int64(ins.rs1), 5)
+	return encodeVset(ins.as, avl, vtype, regI(ins.rd))
 }
 
 func encodeVsetvl(ins *instruction) uint32 {
-	return encodeVset(ins.ass, regI(ins.rs1), regI(ins.rs2), regI(ins.rd))
+	return encodeVset(ins.as, regI(ins.rs1), regI(ins.rs2), regI(ins.rd))
 }
 
 func encodeRawIns(ins *instruction) uint32 {
@@ -2640,25 +2640,25 @@ var instructions = [ALAST & obj.AMask]instructionData{
 }
 
 // instructionDataForAs returns the instruction data for an obj.As.
-func instructionDataForAs(ass obj.As) (*instructionData, error) {
-	if base := ass &^ obj.AMask; base != obj.ABaseRISCV && base != 0 {
-		return nil, fmt.Errorf("%v is not a RISC-V instruction", ass)
+func instructionDataForAs(as obj.As) (*instructionData, error) {
+	if base := as &^ obj.AMask; base != obj.ABaseRISCV && base != 0 {
+		return nil, fmt.Errorf("%v is not a RISC-V instruction", as)
 	}
-	asi := ass & obj.AMask
+	asi := as & obj.AMask
 	if int(asi) >= len(instructions) {
-		return nil, fmt.Errorf("bad RISC-V instruction %v", ass)
+		return nil, fmt.Errorf("bad RISC-V instruction %v", as)
 	}
 	return &instructions[asi], nil
 }
 
 // encodingForAs returns the encoding for an obj.As.
-func encodingForAs(ass obj.As) (*encoding, error) {
-	insData, err := instructionDataForAs(ass)
+func encodingForAs(as obj.As) (*encoding, error) {
+	insData, err := instructionDataForAs(as)
 	if err != nil {
 		return &badEncoding, err
 	}
 	if insData.enc.validate == nil {
-		return &badEncoding, fmt.Errorf("no encoding for instruction %s", ass)
+		return &badEncoding, fmt.Errorf("no encoding for instruction %s", as)
 	}
 	return &insData.enc, nil
 }
@@ -2696,7 +2696,7 @@ func isShiftConst(v int64) bool {
 
 type instruction struct {
 	p      *obj.Prog // Prog that instruction is for
-	ass    obj.As    // Assembler opcode
+	as     obj.As    // Assembler opcode
 	rd     uint32    // Destination register
 	rs1    uint32    // Source register 1
 	rs2    uint32    // Source register 2
@@ -2708,28 +2708,28 @@ type instruction struct {
 
 func (ins *instruction) String() string {
 	if ins.p == nil {
-		return ins.ass.String()
+		return ins.as.String()
 	}
 	var suffix string
-	if ins.p.As != ins.ass {
-		suffix = fmt.Sprintf(" (%v)", ins.ass)
+	if ins.p.As != ins.as {
+		suffix = fmt.Sprintf(" (%v)", ins.as)
 	}
 	return fmt.Sprintf("%v%v", ins.p, suffix)
 }
 
 func (ins *instruction) encode() (uint32, error) {
-	enc, err := encodingForAs(ins.ass)
+	enc, err := encodingForAs(ins.as)
 	if err != nil {
 		return 0, err
 	}
 	if enc.length <= 0 {
-		return 0, fmt.Errorf("%v: encoding called for a pseudo instruction", ins.ass)
+		return 0, fmt.Errorf("%v: encoding called for a pseudo instruction", ins.as)
 	}
 	return enc.encode(ins), nil
 }
 
 func (ins *instruction) length() int {
-	enc, err := encodingForAs(ins.ass)
+	enc, err := encodingForAs(ins.as)
 	if err != nil {
 		return 0
 	}
@@ -2737,7 +2737,7 @@ func (ins *instruction) length() int {
 }
 
 func (ins *instruction) validate(ctxt *obj.Link) {
-	enc, err := encodingForAs(ins.ass)
+	enc, err := encodingForAs(ins.as)
 	if err != nil {
 		ctxt.Diag(err.Error())
 		return
@@ -2752,7 +2752,7 @@ func (ins *instruction) usesRegTmp() bool {
 // instructionForProg returns the default *obj.Prog to instruction mapping.
 func instructionForProg(p *obj.Prog) *instruction {
 	ins := &instruction{
-		ass: p.As,
+		as:  p.As,
 		rd:  uint32(p.To.Reg),
 		rs1: uint32(p.Reg),
 		rs2: uint32(p.From.Reg),
@@ -2767,10 +2767,10 @@ func instructionForProg(p *obj.Prog) *instruction {
 // instructionsForOpImmediate returns the machine instructions for an immediate
 // operand. The instruction is specified by as and the source register is
 // specified by rs, instead of the obj.Prog.
-func instructionsForOpImmediate(p *obj.Prog, ass obj.As, rs int16) []*instruction {
+func instructionsForOpImmediate(p *obj.Prog, as obj.As, rs int16) []*instruction {
 	// <opi> $imm, REG, TO
 	ins := instructionForProg(p)
-	ins.ass, ins.rs1, ins.rs2 = ass, uint32(rs), obj.REG_NONE
+	ins.as, ins.rs1, ins.rs2 = as, uint32(rs), obj.REG_NONE
 
 	low, high, err := Split32BitImmediate(ins.imm)
 	if err != nil {
@@ -2783,31 +2783,31 @@ func instructionsForOpImmediate(p *obj.Prog, ass obj.As, rs int16) []*instructio
 
 	// Split into two additions, if possible.
 	// Do not split SP-writing instructions, as otherwise the recorded SP delta may be wrong.
-	if p.Spadj == 0 && ins.ass == AADDI && ins.imm >= -(1<<12) && ins.imm < 1<<12-1 {
+	if p.Spadj == 0 && ins.as == AADDI && ins.imm >= -(1<<12) && ins.imm < 1<<12-1 {
 		imm0 := ins.imm / 2
 		imm1 := ins.imm - imm0
 
 		// ADDI $(imm/2), REG, TO
 		// ADDI $(imm-imm/2), TO, TO
 		ins.imm = imm0
-		insADDI := &instruction{ass: AADDI, rd: ins.rd, rs1: ins.rd, imm: imm1}
+		insADDI := &instruction{as: AADDI, rd: ins.rd, rs1: ins.rd, imm: imm1}
 		return []*instruction{ins, insADDI}
 	}
 
 	// LUI $high, TMP
 	// ADDIW $low, TMP, TMP
 	// <op> TMP, REG, TO
-	insLUI := &instruction{ass: ALUI, rd: REG_TMP, imm: high}
-	insADDIW := &instruction{ass: AADDIW, rd: REG_TMP, rs1: REG_TMP, imm: low}
-	switch ins.ass {
+	insLUI := &instruction{as: ALUI, rd: REG_TMP, imm: high}
+	insADDIW := &instruction{as: AADDIW, rd: REG_TMP, rs1: REG_TMP, imm: low}
+	switch ins.as {
 	case AADDI:
-		ins.ass = AADD
+		ins.as = AADD
 	case AANDI:
-		ins.ass = AAND
+		ins.as = AAND
 	case AORI:
-		ins.ass = AOR
+		ins.as = AOR
 	case AXORI:
-		ins.ass = AXOR
+		ins.as = AXOR
 	default:
 		p.Ctxt.Diag("unsupported immediate instruction %v for splitting", p)
 		return nil
@@ -2822,22 +2822,22 @@ func instructionsForOpImmediate(p *obj.Prog, ass obj.As, rs int16) []*instructio
 // instructionsForLoad returns the machine instructions for a load. The load
 // instruction is specified by as and the base/source register is specified
 // by rs, instead of the obj.Prog.
-func instructionsForLoad(p *obj.Prog, ass obj.As, rs int16) []*instruction {
+func instructionsForLoad(p *obj.Prog, as obj.As, rs int16) []*instruction {
 	if p.From.Type != obj.TYPE_MEM {
 		p.Ctxt.Diag("%v requires memory for source", p)
 		return nil
 	}
 
-	switch ass {
+	switch as {
 	case ALD, ALB, ALH, ALW, ALBU, ALHU, ALWU, AFLW, AFLD:
 	default:
-		p.Ctxt.Diag("%v: unknown load instruction %v", p, ass)
+		p.Ctxt.Diag("%v: unknown load instruction %v", p, as)
 		return nil
 	}
 
 	// <load> $imm, REG, TO (load $imm+(REG), TO)
 	ins := instructionForProg(p)
-	ins.ass, ins.rs1, ins.rs2 = ass, uint32(rs), obj.REG_NONE
+	ins.as, ins.rs1, ins.rs2 = as, uint32(rs), obj.REG_NONE
 	ins.imm = p.From.Offset
 
 	low, high, err := Split32BitImmediate(ins.imm)
@@ -2852,8 +2852,8 @@ func instructionsForLoad(p *obj.Prog, ass obj.As, rs int16) []*instruction {
 	// LUI $high, TMP
 	// ADD TMP, REG, TMP
 	// <load> $low, TMP, TO
-	insLUI := &instruction{ass: ALUI, rd: REG_TMP, imm: high}
-	insADD := &instruction{ass: AADD, rd: REG_TMP, rs1: REG_TMP, rs2: ins.rs1}
+	insLUI := &instruction{as: ALUI, rd: REG_TMP, imm: high}
+	insADD := &instruction{as: AADD, rd: REG_TMP, rs1: REG_TMP, rs2: ins.rs1}
 	ins.rs1, ins.imm = REG_TMP, low
 
 	return []*instruction{insLUI, insADD, ins}
@@ -2862,22 +2862,22 @@ func instructionsForLoad(p *obj.Prog, ass obj.As, rs int16) []*instruction {
 // instructionsForStore returns the machine instructions for a store. The store
 // instruction is specified by as and the target/source register is specified
 // by rd, instead of the obj.Prog.
-func instructionsForStore(p *obj.Prog, ass obj.As, rd int16) []*instruction {
+func instructionsForStore(p *obj.Prog, as obj.As, rd int16) []*instruction {
 	if p.To.Type != obj.TYPE_MEM {
 		p.Ctxt.Diag("%v requires memory for destination", p)
 		return nil
 	}
 
-	switch ass {
+	switch as {
 	case ASW, ASH, ASB, ASD, AFSW, AFSD:
 	default:
-		p.Ctxt.Diag("%v: unknown store instruction %v", p, ass)
+		p.Ctxt.Diag("%v: unknown store instruction %v", p, as)
 		return nil
 	}
 
 	// <store> $imm, REG, TO (store $imm+(TO), REG)
 	ins := instructionForProg(p)
-	ins.ass, ins.rd, ins.rs1, ins.rs2 = ass, uint32(rd), uint32(p.From.Reg), obj.REG_NONE
+	ins.as, ins.rd, ins.rs1, ins.rs2 = as, uint32(rd), uint32(p.From.Reg), obj.REG_NONE
 	ins.imm = p.To.Offset
 
 	low, high, err := Split32BitImmediate(ins.imm)
@@ -2892,22 +2892,22 @@ func instructionsForStore(p *obj.Prog, ass obj.As, rd int16) []*instruction {
 	// LUI $high, TMP
 	// ADD TMP, TO, TMP
 	// <store> $low, REG, TMP
-	insLUI := &instruction{ass: ALUI, rd: REG_TMP, imm: high}
-	insADD := &instruction{ass: AADD, rd: REG_TMP, rs1: REG_TMP, rs2: ins.rd}
+	insLUI := &instruction{as: ALUI, rd: REG_TMP, imm: high}
+	insADD := &instruction{as: AADD, rd: REG_TMP, rs1: REG_TMP, rs2: ins.rd}
 	ins.rd, ins.imm = REG_TMP, low
 
 	return []*instruction{insLUI, insADD, ins}
 }
 
 func instructionsForTLS(p *obj.Prog, ins *instruction) []*instruction {
-	insAddTP := &instruction{ass: AADD, rd: REG_TMP, rs1: REG_TMP, rs2: REG_TP}
+	insAddTP := &instruction{as: AADD, rd: REG_TMP, rs1: REG_TMP, rs2: REG_TP}
 
 	var inss []*instruction
 	if p.Ctxt.Flag_shared {
 		// TLS initial-exec mode - load TLS offset from GOT, add the thread pointer
 		// register, then load from or store to the resulting memory location.
-		insAUIPC := &instruction{ass: AAUIPC, rd: REG_TMP}
-		insLoadTLSOffset := &instruction{ass: ALD, rd: REG_TMP, rs1: REG_TMP}
+		insAUIPC := &instruction{as: AAUIPC, rd: REG_TMP}
+		insLoadTLSOffset := &instruction{as: ALD, rd: REG_TMP, rs1: REG_TMP}
 		inss = []*instruction{insAUIPC, insLoadTLSOffset, insAddTP, ins}
 	} else {
 		// TLS local-exec mode - load upper TLS offset, add the lower TLS offset,
@@ -2915,8 +2915,8 @@ func instructionsForTLS(p *obj.Prog, ins *instruction) []*instruction {
 		// memory location. Note that this differs from the suggested three
 		// instruction sequence, as the Go linker does not currently have an
 		// easy way to handle relocation across 12 bytes of machine code.
-		insLUI := &instruction{ass: ALUI, rd: REG_TMP}
-		insADDIW := &instruction{ass: AADDIW, rd: REG_TMP, rs1: REG_TMP}
+		insLUI := &instruction{as: ALUI, rd: REG_TMP}
+		insADDIW := &instruction{as: AADDIW, rd: REG_TMP, rs1: REG_TMP}
 		inss = []*instruction{insLUI, insADDIW, insAddTP, ins}
 	}
 	return inss
@@ -2929,7 +2929,7 @@ func instructionsForTLSLoad(p *obj.Prog) []*instruction {
 	}
 
 	ins := instructionForProg(p)
-	ins.ass, ins.rs1, ins.rs2, ins.imm = movToLoad(p.As), REG_TMP, obj.REG_NONE, 0
+	ins.as, ins.rs1, ins.rs2, ins.imm = movToLoad(p.As), REG_TMP, obj.REG_NONE, 0
 
 	return instructionsForTLS(p, ins)
 }
@@ -2941,7 +2941,7 @@ func instructionsForTLSStore(p *obj.Prog) []*instruction {
 	}
 
 	ins := instructionForProg(p)
-	ins.ass, ins.rd, ins.rs1, ins.rs2, ins.imm = movToStore(p.As), REG_TMP, uint32(p.From.Reg), obj.REG_NONE, 0
+	ins.as, ins.rd, ins.rs1, ins.rs2, ins.imm = movToStore(p.As), REG_TMP, uint32(p.From.Reg), obj.REG_NONE, 0
 
 	return instructionsForTLS(p, ins)
 }
@@ -2991,10 +2991,10 @@ func instructionsForMOV(p *obj.Prog) []*instruction {
 			if c, lsh, rsh, ok := splitShiftConst(ins.imm); ok {
 				ins.imm = c
 				if lsh > 0 {
-					insSLLI = &instruction{ass: ASLLI, rd: ins.rd, rs1: ins.rd, imm: int64(lsh)}
+					insSLLI = &instruction{as: ASLLI, rd: ins.rd, rs1: ins.rd, imm: int64(lsh)}
 				}
 				if rsh > 0 {
-					insSRLI = &instruction{ass: ASRLI, rd: ins.rd, rs1: ins.rd, imm: int64(rsh)}
+					insSRLI = &instruction{as: ASRLI, rd: ins.rd, rs1: ins.rd, imm: int64(rsh)}
 				}
 			}
 		}
@@ -3006,16 +3006,16 @@ func instructionsForMOV(p *obj.Prog) []*instruction {
 		}
 
 		// MOV $c, R -> ADD $c, ZERO, R
-		ins.ass, ins.rs1, ins.rs2, ins.imm = AADDI, REG_ZERO, obj.REG_NONE, low
+		ins.as, ins.rs1, ins.rs2, ins.imm = AADDI, REG_ZERO, obj.REG_NONE, low
 
 		// LUI is only necessary if the constant does not fit in 12 bits.
 		if high != 0 {
 			// LUI top20bits(c), R
 			// ADD bottom12bits(c), R, R
-			insLUI := &instruction{ass: ALUI, rd: ins.rd, imm: high}
+			insLUI := &instruction{as: ALUI, rd: ins.rd, imm: high}
 			inss = []*instruction{insLUI}
 			if low != 0 {
-				ins.ass, ins.rs1 = AADDIW, ins.rd
+				ins.as, ins.rs1 = AADDIW, ins.rd
 				inss = append(inss, ins)
 			}
 		}
@@ -3034,49 +3034,49 @@ func instructionsForMOV(p *obj.Prog) []*instruction {
 		// Handle register to register moves.
 		switch p.As {
 		case AMOV: // MOV Ra, Rb -> ADDI $0, Ra, Rb
-			ins.ass, ins.rs1, ins.rs2, ins.imm = AADDI, uint32(p.From.Reg), obj.REG_NONE, 0
+			ins.as, ins.rs1, ins.rs2, ins.imm = AADDI, uint32(p.From.Reg), obj.REG_NONE, 0
 		case AMOVW: // MOVW Ra, Rb -> ADDIW $0, Ra, Rb
-			ins.ass, ins.rs1, ins.rs2, ins.imm = AADDIW, uint32(p.From.Reg), obj.REG_NONE, 0
+			ins.as, ins.rs1, ins.rs2, ins.imm = AADDIW, uint32(p.From.Reg), obj.REG_NONE, 0
 		case AMOVBU: // MOVBU Ra, Rb -> ANDI $255, Ra, Rb
-			ins.ass, ins.rs1, ins.rs2, ins.imm = AANDI, uint32(p.From.Reg), obj.REG_NONE, 255
+			ins.as, ins.rs1, ins.rs2, ins.imm = AANDI, uint32(p.From.Reg), obj.REG_NONE, 255
 		case AMOVF: // MOVF Ra, Rb -> FSGNJS Ra, Ra, Rb
-			ins.ass, ins.rs1 = AFSGNJS, uint32(p.From.Reg)
+			ins.as, ins.rs1 = AFSGNJS, uint32(p.From.Reg)
 		case AMOVD: // MOVD Ra, Rb -> FSGNJD Ra, Ra, Rb
-			ins.ass, ins.rs1 = AFSGNJD, uint32(p.From.Reg)
+			ins.as, ins.rs1 = AFSGNJD, uint32(p.From.Reg)
 		case AMOVB, AMOVH:
 			if buildcfg.GORISCV64 >= 22 {
 				// Use SEXTB or SEXTH to extend.
-				ins.ass, ins.rs1, ins.rs2 = ASEXTB, uint32(p.From.Reg), obj.REG_NONE
+				ins.as, ins.rs1, ins.rs2 = ASEXTB, uint32(p.From.Reg), obj.REG_NONE
 				if p.As == AMOVH {
-					ins.ass = ASEXTH
+					ins.as = ASEXTH
 				}
 			} else {
 				// Use SLLI/SRAI sequence to extend.
-				ins.ass, ins.rs1, ins.rs2 = ASLLI, uint32(p.From.Reg), obj.REG_NONE
+				ins.as, ins.rs1, ins.rs2 = ASLLI, uint32(p.From.Reg), obj.REG_NONE
 				if p.As == AMOVB {
 					ins.imm = 56
 				} else if p.As == AMOVH {
 					ins.imm = 48
 				}
-				ins2 := &instruction{ass: ASRAI, rd: ins.rd, rs1: ins.rd, imm: ins.imm}
+				ins2 := &instruction{as: ASRAI, rd: ins.rd, rs1: ins.rd, imm: ins.imm}
 				inss = append(inss, ins2)
 			}
 		case AMOVHU, AMOVWU:
 			if buildcfg.GORISCV64 >= 22 {
 				// Use ZEXTH or ADDUW to extend.
-				ins.ass, ins.rs1, ins.rs2, ins.imm = AZEXTH, uint32(p.From.Reg), obj.REG_NONE, 0
+				ins.as, ins.rs1, ins.rs2, ins.imm = AZEXTH, uint32(p.From.Reg), obj.REG_NONE, 0
 				if p.As == AMOVWU {
-					ins.ass, ins.rs2 = AADDUW, REG_ZERO
+					ins.as, ins.rs2 = AADDUW, REG_ZERO
 				}
 			} else {
 				// Use SLLI/SRLI sequence to extend.
-				ins.ass, ins.rs1, ins.rs2 = ASLLI, uint32(p.From.Reg), obj.REG_NONE
+				ins.as, ins.rs1, ins.rs2 = ASLLI, uint32(p.From.Reg), obj.REG_NONE
 				if p.As == AMOVHU {
 					ins.imm = 48
 				} else if p.As == AMOVWU {
 					ins.imm = 32
 				}
-				ins2 := &instruction{ass: ASRLI, rd: ins.rd, rs1: ins.rd, imm: ins.imm}
+				ins2 := &instruction{as: ASRLI, rd: ins.rd, rs1: ins.rd, imm: ins.imm}
 				inss = append(inss, ins2)
 			}
 		}
@@ -3105,8 +3105,8 @@ func instructionsForMOV(p *obj.Prog) []*instruction {
 			if addrReg < REG_X0 || addrReg > REG_X31 {
 				addrReg = REG_TMP
 			}
-			insAUIPC := &instruction{ass: AAUIPC, rd: addrReg}
-			ins.ass, ins.rs1, ins.rs2, ins.imm = movToLoad(p.As), addrReg, obj.REG_NONE, 0
+			insAUIPC := &instruction{as: AAUIPC, rd: addrReg}
+			ins.as, ins.rs1, ins.rs2, ins.imm = movToLoad(p.As), addrReg, obj.REG_NONE, 0
 			inss = []*instruction{insAUIPC, ins}
 
 		default:
@@ -3136,8 +3136,8 @@ func instructionsForMOV(p *obj.Prog) []*instruction {
 			//
 			// AUIPC $off_hi, Rtmp
 			// S $off_lo, Rtmp, Rd
-			insAUIPC := &instruction{ass: AAUIPC, rd: REG_TMP}
-			ins.ass, ins.rd, ins.rs1, ins.rs2, ins.imm = movToStore(p.As), REG_TMP, uint32(p.From.Reg), obj.REG_NONE, 0
+			insAUIPC := &instruction{as: AAUIPC, rd: REG_TMP}
+			ins.as, ins.rd, ins.rs1, ins.rs2, ins.imm = movToStore(p.As), REG_TMP, uint32(p.From.Reg), obj.REG_NONE, 0
 			inss = []*instruction{insAUIPC, ins}
 
 		default:
@@ -3161,8 +3161,8 @@ func instructionsForMOV(p *obj.Prog) []*instruction {
 			//
 			// AUIPC $off_hi, R
 			// ADDI $off_lo, R
-			insAUIPC := &instruction{ass: AAUIPC, rd: ins.rd}
-			ins.ass, ins.rs1, ins.rs2, ins.imm = AADDI, ins.rd, obj.REG_NONE, 0
+			insAUIPC := &instruction{as: AAUIPC, rd: ins.rd}
+			ins.as, ins.rs1, ins.rs2, ins.imm = AADDI, ins.rd, obj.REG_NONE, 0
 			inss = []*instruction{insAUIPC, ins}
 
 		default:
@@ -3189,37 +3189,37 @@ func instructionsForRotate(p *obj.Prog, ins *instruction) []*instruction {
 		return []*instruction{ins}
 	}
 
-	switch ins.ass {
+	switch ins.as {
 	case AROL, AROLW, AROR, ARORW:
 		// ROL -> OR (SLL x y) (SRL x (NEG y))
 		// ROR -> OR (SRL x y) (SLL x (NEG y))
 		sllOp, srlOp := ASLL, ASRL
-		if ins.ass == AROLW || ins.ass == ARORW {
+		if ins.as == AROLW || ins.as == ARORW {
 			sllOp, srlOp = ASLLW, ASRLW
 		}
 		shift1, shift2 := sllOp, srlOp
-		if ins.ass == AROR || ins.ass == ARORW {
+		if ins.as == AROR || ins.as == ARORW {
 			shift1, shift2 = shift2, shift1
 		}
 		return []*instruction{
-			&instruction{ass: ASUB, rs1: REG_ZERO, rs2: ins.rs2, rd: REG_TMP},
-			&instruction{ass: shift2, rs1: ins.rs1, rs2: REG_TMP, rd: REG_TMP},
-			&instruction{ass: shift1, rs1: ins.rs1, rs2: ins.rs2, rd: ins.rd},
-			&instruction{ass: AOR, rs1: REG_TMP, rs2: ins.rd, rd: ins.rd},
+			&instruction{as: ASUB, rs1: REG_ZERO, rs2: ins.rs2, rd: REG_TMP},
+			&instruction{as: shift2, rs1: ins.rs1, rs2: REG_TMP, rd: REG_TMP},
+			&instruction{as: shift1, rs1: ins.rs1, rs2: ins.rs2, rd: ins.rd},
+			&instruction{as: AOR, rs1: REG_TMP, rs2: ins.rd, rd: ins.rd},
 		}
 
 	case ARORI, ARORIW:
 		// ROR -> OR (SLLI -x y) (SRLI x y)
 		sllOp, srlOp := ASLLI, ASRLI
 		sllImm := int64(int8(-ins.imm) & 63)
-		if ins.ass == ARORIW {
+		if ins.as == ARORIW {
 			sllOp, srlOp = ASLLIW, ASRLIW
 			sllImm = int64(int8(-ins.imm) & 31)
 		}
 		return []*instruction{
-			&instruction{ass: srlOp, rs1: ins.rs1, rd: REG_TMP, imm: ins.imm},
-			&instruction{ass: sllOp, rs1: ins.rs1, rd: ins.rd, imm: sllImm},
-			&instruction{ass: AOR, rs1: REG_TMP, rs2: ins.rd, rd: ins.rd},
+			&instruction{as: srlOp, rs1: ins.rs1, rd: REG_TMP, imm: ins.imm},
+			&instruction{as: sllOp, rs1: ins.rs1, rd: ins.rd, imm: sllImm},
+			&instruction{as: AOR, rs1: REG_TMP, rs2: ins.rd, rd: ins.rd},
 		}
 
 	default:
@@ -3237,7 +3237,7 @@ func instructionsForMinMax(p *obj.Prog, ins *instruction) []*instruction {
 
 	// Generate a move for identical inputs.
 	if ins.rs1 == ins.rs2 {
-		ins.ass, ins.rs2, ins.imm = AADDI, obj.REG_NONE, 0
+		ins.as, ins.rs2, ins.imm = AADDI, obj.REG_NONE, 0
 		return []*instruction{ins}
 	}
 
@@ -3250,22 +3250,22 @@ func instructionsForMinMax(p *obj.Prog, ins *instruction) []*instruction {
 
 	// MIN -> SLT/SUB/XOR/AND/XOR
 	// MAX -> SLT/SUB/XOR/AND/XOR with swapped inputs to SLT
-	switch ins.ass {
+	switch ins.as {
 	case AMIN:
-		ins.ass = ASLT
+		ins.as = ASLT
 	case AMAX:
-		ins.ass, sltReg1, sltReg2 = ASLT, sltReg2, sltReg1
+		ins.as, sltReg1, sltReg2 = ASLT, sltReg2, sltReg1
 	case AMINU:
-		ins.ass = ASLTU
+		ins.as = ASLTU
 	case AMAXU:
-		ins.ass, sltReg1, sltReg2 = ASLTU, sltReg2, sltReg1
+		ins.as, sltReg1, sltReg2 = ASLTU, sltReg2, sltReg1
 	}
 	return []*instruction{
-		&instruction{ass: ins.ass, rs1: sltReg1, rs2: sltReg2, rd: REG_TMP},
-		&instruction{ass: ASUB, rs1: REG_ZERO, rs2: REG_TMP, rd: REG_TMP},
-		&instruction{ass: AXOR, rs1: ins.rs1, rs2: ins.rs2, rd: ins.rd},
-		&instruction{ass: AAND, rs1: REG_TMP, rs2: ins.rd, rd: ins.rd},
-		&instruction{ass: AXOR, rs1: ins.rs1, rs2: ins.rd, rd: ins.rd},
+		&instruction{as: ins.as, rs1: sltReg1, rs2: sltReg2, rd: REG_TMP},
+		&instruction{as: ASUB, rs1: REG_ZERO, rs2: REG_TMP, rd: REG_TMP},
+		&instruction{as: AXOR, rs1: ins.rs1, rs2: ins.rs2, rd: ins.rd},
+		&instruction{as: AAND, rs1: REG_TMP, rs2: ins.rd, rd: ins.rd},
+		&instruction{as: AXOR, rs1: ins.rs1, rs2: ins.rd, rd: ins.rd},
 	}
 }
 
@@ -3274,7 +3274,7 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 	ins := instructionForProg(p)
 	inss := []*instruction{ins}
 
-	if ins.ass == AVSETVLI || ins.ass == AVSETIVLI {
+	if ins.as == AVSETVLI || ins.as == AVSETIVLI {
 		if len(p.RestArgs) != 4 {
 			p.Ctxt.Diag("incorrect number of arguments for instruction")
 			return nil
@@ -3284,33 +3284,33 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		return nil
 	}
 
-	switch ins.ass {
+	switch ins.as {
 	case AJAL, AJALR:
 		ins.rd, ins.rs1, ins.rs2 = uint32(p.From.Reg), uint32(p.To.Reg), obj.REG_NONE
 		ins.imm = p.To.Offset
 
 	case ABEQ, ABEQZ, ABGE, ABGEU, ABGEZ, ABGT, ABGTU, ABGTZ, ABLE, ABLEU, ABLEZ, ABLT, ABLTU, ABLTZ, ABNE, ABNEZ:
-		switch ins.ass {
+		switch ins.as {
 		case ABEQZ:
-			ins.ass, ins.rs1, ins.rs2 = ABEQ, REG_ZERO, uint32(p.From.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABEQ, REG_ZERO, uint32(p.From.Reg)
 		case ABGEZ:
-			ins.ass, ins.rs1, ins.rs2 = ABGE, REG_ZERO, uint32(p.From.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABGE, REG_ZERO, uint32(p.From.Reg)
 		case ABGT:
-			ins.ass, ins.rs1, ins.rs2 = ABLT, uint32(p.From.Reg), uint32(p.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABLT, uint32(p.From.Reg), uint32(p.Reg)
 		case ABGTU:
-			ins.ass, ins.rs1, ins.rs2 = ABLTU, uint32(p.From.Reg), uint32(p.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABLTU, uint32(p.From.Reg), uint32(p.Reg)
 		case ABGTZ:
-			ins.ass, ins.rs1, ins.rs2 = ABLT, uint32(p.From.Reg), REG_ZERO
+			ins.as, ins.rs1, ins.rs2 = ABLT, uint32(p.From.Reg), REG_ZERO
 		case ABLE:
-			ins.ass, ins.rs1, ins.rs2 = ABGE, uint32(p.From.Reg), uint32(p.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABGE, uint32(p.From.Reg), uint32(p.Reg)
 		case ABLEU:
-			ins.ass, ins.rs1, ins.rs2 = ABGEU, uint32(p.From.Reg), uint32(p.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABGEU, uint32(p.From.Reg), uint32(p.Reg)
 		case ABLEZ:
-			ins.ass, ins.rs1, ins.rs2 = ABGE, uint32(p.From.Reg), REG_ZERO
+			ins.as, ins.rs1, ins.rs2 = ABGE, uint32(p.From.Reg), REG_ZERO
 		case ABLTZ:
-			ins.ass, ins.rs1, ins.rs2 = ABLT, REG_ZERO, uint32(p.From.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABLT, REG_ZERO, uint32(p.From.Reg)
 		case ABNEZ:
-			ins.ass, ins.rs1, ins.rs2 = ABNE, REG_ZERO, uint32(p.From.Reg)
+			ins.as, ins.rs1, ins.rs2 = ABNE, REG_ZERO, uint32(p.From.Reg)
 		}
 		ins.imm = p.To.Offset
 
@@ -3318,10 +3318,10 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		inss = instructionsForMOV(p)
 
 	case ALW, ALWU, ALH, ALHU, ALB, ALBU, ALD, AFLW, AFLD:
-		inss = instructionsForLoad(p, ins.ass, p.From.Reg)
+		inss = instructionsForLoad(p, ins.as, p.From.Reg)
 
 	case ASW, ASH, ASB, ASD, AFSW, AFSD:
-		inss = instructionsForStore(p, ins.ass, p.To.Reg)
+		inss = instructionsForStore(p, ins.as, p.To.Reg)
 
 	case ALRW, ALRD:
 		// Set aq to use acquire access ordering
@@ -3329,7 +3329,7 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		ins.rs1, ins.rs2 = uint32(p.From.Reg), REG_ZERO
 
 	case AADDI, AANDI, AORI, AXORI:
-		inss = instructionsForOpImmediate(p, ins.ass, p.Reg)
+		inss = instructionsForOpImmediate(p, ins.as, p.Reg)
 
 	case ASCW, ASCD:
 		// Set release access ordering
@@ -3351,7 +3351,7 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		ins.imm = insEnc.csr
 
 	case ARDCYCLE, ARDTIME, ARDINSTRET:
-		ins.ass = ACSRRS
+		ins.as = ACSRRS
 		if p.To.Type == obj.TYPE_NONE {
 			ins.rd = REG_ZERO
 		}
@@ -3383,13 +3383,13 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 			p.Ctxt.Diag("%v needs an integer register output", p)
 			return nil
 		}
-		if ins.ass == AFNES {
-			ins.ass = AFEQS
+		if ins.as == AFNES {
+			ins.as = AFEQS
 		} else {
-			ins.ass = AFEQD
+			ins.as = AFEQD
 		}
 		ins2 := &instruction{
-			ass: AXORI, // [bit] xor 1 = not [bit]
+			as:  AXORI, // [bit] xor 1 = not [bit]
 			rd:  ins.rd,
 			rs1: ins.rd,
 			imm: 1,
@@ -3410,9 +3410,9 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 
 	case ANEG, ANEGW:
 		// NEG rs, rd -> SUB rs, X0, rd
-		ins.ass = ASUB
+		ins.as = ASUB
 		if p.As == ANEGW {
-			ins.ass = ASUBW
+			ins.as = ASUBW
 		}
 		ins.rs1 = REG_ZERO
 		if ins.rd == obj.REG_NONE {
@@ -3421,7 +3421,7 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 
 	case ANOT:
 		// NOT rs, rd -> XORI $-1, rs, rd
-		ins.ass = AXORI
+		ins.as = AXORI
 		ins.rs1, ins.rs2 = uint32(p.From.Reg), obj.REG_NONE
 		if ins.rd == obj.REG_NONE {
 			ins.rd = ins.rs1
@@ -3430,33 +3430,33 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 
 	case ASEQZ:
 		// SEQZ rs, rd -> SLTIU $1, rs, rd
-		ins.ass = ASLTIU
+		ins.as = ASLTIU
 		ins.rs1, ins.rs2 = uint32(p.From.Reg), obj.REG_NONE
 		ins.imm = 1
 
 	case ASNEZ:
 		// SNEZ rs, rd -> SLTU rs, x0, rd
-		ins.ass = ASLTU
+		ins.as = ASLTU
 		ins.rs1 = REG_ZERO
 
 	case AFABSS:
 		// FABSS rs, rd -> FSGNJXS rs, rs, rd
-		ins.ass = AFSGNJXS
+		ins.as = AFSGNJXS
 		ins.rs1 = uint32(p.From.Reg)
 
 	case AFABSD:
 		// FABSD rs, rd -> FSGNJXD rs, rs, rd
-		ins.ass = AFSGNJXD
+		ins.as = AFSGNJXD
 		ins.rs1 = uint32(p.From.Reg)
 
 	case AFNEGS:
 		// FNEGS rs, rd -> FSGNJNS rs, rs, rd
-		ins.ass = AFSGNJNS
+		ins.as = AFSGNJNS
 		ins.rs1 = uint32(p.From.Reg)
 
 	case AFNEGD:
 		// FNEGD rs, rd -> FSGNJND rs, rs, rd
-		ins.ass = AFSGNJND
+		ins.as = AFSGNJND
 		ins.rs1 = uint32(p.From.Reg)
 
 	case AROL, AROLW, AROR, ARORW:
@@ -3498,15 +3498,15 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		// ANDN -> (AND (NOT x) y)
 		// ORN  -> (OR  (NOT x) y)
 		bitwiseOp, notReg := AAND, ins.rd
-		if ins.ass == AORN {
+		if ins.as == AORN {
 			bitwiseOp = AOR
 		}
 		if ins.rs1 == notReg {
 			notReg = REG_TMP
 		}
 		inss = []*instruction{
-			&instruction{ass: AXORI, rs1: ins.rs2, rs2: obj.REG_NONE, rd: notReg, imm: -1},
-			&instruction{ass: bitwiseOp, rs1: ins.rs1, rs2: notReg, rd: ins.rd},
+			&instruction{as: AXORI, rs1: ins.rs2, rs2: obj.REG_NONE, rd: notReg, imm: -1},
+			&instruction{as: bitwiseOp, rs1: ins.rs1, rs2: notReg, rd: ins.rd},
 		}
 
 	case AXNOR:
@@ -3515,8 +3515,8 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 			break
 		}
 		// XNOR -> (NOT (XOR x y))
-		ins.ass = AXOR
-		inss = append(inss, &instruction{ass: AXORI, rs1: ins.rd, rs2: obj.REG_NONE, rd: ins.rd, imm: -1})
+		ins.as = AXOR
+		inss = append(inss, &instruction{as: AXORI, rs1: ins.rd, rs2: obj.REG_NONE, rd: ins.rd, imm: -1})
 
 	case AMIN, AMAX, AMINU, AMAXU:
 		inss = instructionsForMinMax(p, ins)
@@ -3528,7 +3528,7 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 			p.Ctxt.Diag("%v: %v", p, err)
 		}
 		ins.imm = int64(vtype)
-		if ins.ass == AVSETIVLI {
+		if ins.as == AVSETIVLI {
 			if p.From.Type != obj.TYPE_CONST {
 				p.Ctxt.Diag("%v: expected immediate value", p)
 			}
@@ -3569,15 +3569,15 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 
 	case AVL1RV, AVL1RE8V, AVL1RE16V, AVL1RE32V, AVL1RE64V, AVL2RV, AVL2RE8V, AVL2RE16V, AVL2RE32V, AVL2RE64V,
 		AVL4RV, AVL4RE8V, AVL4RE16V, AVL4RE32V, AVL4RE64V, AVL8RV, AVL8RE8V, AVL8RE16V, AVL8RE32V, AVL8RE64V:
-		switch ins.ass {
+		switch ins.as {
 		case AVL1RV:
-			ins.ass = AVL1RE8V
+			ins.as = AVL1RE8V
 		case AVL2RV:
-			ins.ass = AVL2RE8V
+			ins.as = AVL2RE8V
 		case AVL4RV:
-			ins.ass = AVL4RE8V
+			ins.as = AVL4RE8V
 		case AVL8RV:
-			ins.ass = AVL8RE8V
+			ins.as = AVL8RE8V
 		}
 		if ins.rs1 != obj.REG_NONE {
 			p.Ctxt.Diag("%v: too many operands for instruction", p)
@@ -3699,15 +3699,15 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		case ins.rs1 != REG_V0:
 			p.Ctxt.Diag("%v: invalid vector mask register", p)
 		}
-		switch ins.ass {
+		switch ins.as {
 		case AVNEGV:
-			ins.ass = AVRSUBVX
+			ins.as = AVRSUBVX
 		case AVWCVTXXV:
-			ins.ass = AVWADDVX
+			ins.as = AVWADDVX
 		case AVWCVTUXXV:
-			ins.ass = AVWADDUVX
+			ins.as = AVWADDUVX
 		case AVNCVTXXW:
-			ins.ass = AVNSRLWX
+			ins.as = AVNSRLWX
 		}
 		ins.rd, ins.rs1, ins.rs2 = uint32(p.To.Reg), REG_X0, uint32(p.From.Reg)
 
@@ -3719,7 +3719,7 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		case ins.rs1 != REG_V0:
 			p.Ctxt.Diag("%v: invalid vector mask register", p)
 		}
-		ins.ass = AVXORVI
+		ins.as = AVXORVI
 		ins.rd, ins.rs1, ins.rs2, ins.imm = uint32(p.To.Reg), obj.REG_NONE, uint32(p.From.Reg), -1
 
 	case AVMSGTVV, AVMSGTUVV, AVMSGEVV, AVMSGEUVV, AVMFGTVV, AVMFGEVV:
@@ -3730,19 +3730,19 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		case ins.rs3 != REG_V0:
 			p.Ctxt.Diag("%v: invalid vector mask register", p)
 		}
-		switch ins.ass {
+		switch ins.as {
 		case AVMSGTVV:
-			ins.ass = AVMSLTVV
+			ins.as = AVMSLTVV
 		case AVMSGTUVV:
-			ins.ass = AVMSLTUVV
+			ins.as = AVMSLTUVV
 		case AVMSGEVV:
-			ins.ass = AVMSLEVV
+			ins.as = AVMSLEVV
 		case AVMSGEUVV:
-			ins.ass = AVMSLEUVV
+			ins.as = AVMSLEUVV
 		case AVMFGTVV:
-			ins.ass = AVMFLTVV
+			ins.as = AVMFLTVV
 		case AVMFGEVV:
-			ins.ass = AVMFLEVV
+			ins.as = AVMFLEVV
 		}
 		ins.rd, ins.rs1, ins.rs2, ins.rs3 = uint32(p.To.Reg), uint32(p.Reg), uint32(p.From.Reg), obj.REG_NONE
 
@@ -3754,15 +3754,15 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		case ins.rs3 != REG_V0:
 			p.Ctxt.Diag("%v: invalid vector mask register", p)
 		}
-		switch ins.ass {
+		switch ins.as {
 		case AVMSLTVI:
-			ins.ass = AVMSLEVI
+			ins.as = AVMSLEVI
 		case AVMSLTUVI:
-			ins.ass = AVMSLEUVI
+			ins.as = AVMSLEUVI
 		case AVMSGEVI:
-			ins.ass = AVMSGTVI
+			ins.as = AVMSGTVI
 		case AVMSGEUVI:
-			ins.ass = AVMSGTUVI
+			ins.as = AVMSGTUVI
 		}
 		ins.rd, ins.rs1, ins.rs2, ins.rs3, ins.imm = uint32(p.To.Reg), obj.REG_NONE, uint32(p.Reg), obj.REG_NONE, ins.imm-1
 
@@ -3774,30 +3774,30 @@ func instructionsForProg(p *obj.Prog) []*instruction {
 		case ins.rs1 != REG_V0:
 			p.Ctxt.Diag("%v: invalid vector mask register", p)
 		}
-		switch ins.ass {
+		switch ins.as {
 		case AVFABSV:
-			ins.ass = AVFSGNJXVV
+			ins.as = AVFSGNJXVV
 		case AVFNEGV:
-			ins.ass = AVFSGNJNVV
+			ins.as = AVFSGNJNVV
 		}
 		ins.rd, ins.rs1, ins.rs2 = uint32(p.To.Reg), uint32(p.From.Reg), uint32(p.From.Reg)
 
 	case AVMANDMM, AVMNANDMM, AVMANDNMM, AVMXORMM, AVMORMM, AVMNORMM, AVMORNMM, AVMXNORMM, AVMMVM, AVMNOTM, AVCOMPRESSVM:
 		ins.rd, ins.rs1, ins.rs2 = uint32(p.To.Reg), uint32(p.From.Reg), uint32(p.Reg)
-		switch ins.ass {
+		switch ins.as {
 		case AVMMVM:
-			ins.ass, ins.rs2 = AVMANDMM, ins.rs1
+			ins.as, ins.rs2 = AVMANDMM, ins.rs1
 		case AVMNOTM:
-			ins.ass, ins.rs2 = AVMNANDMM, ins.rs1
+			ins.as, ins.rs2 = AVMNANDMM, ins.rs1
 		}
 
 	case AVMCLRM, AVMSETM:
 		ins.rd, ins.rs1, ins.rs2 = uint32(p.From.Reg), uint32(p.From.Reg), uint32(p.From.Reg)
-		switch ins.ass {
+		switch ins.as {
 		case AVMCLRM:
-			ins.ass = AVMXORMM
+			ins.as = AVMXORMM
 		case AVMSETM:
-			ins.ass = AVMXNORMM
+			ins.as = AVMXNORMM
 		}
 
 	case AVCPOPM, AVFIRSTM, AVMSBFM, AVMSIFM, AVMSOFM, AVIOTAM:

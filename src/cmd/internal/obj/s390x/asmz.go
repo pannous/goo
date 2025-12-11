@@ -56,408 +56,408 @@ const (
 )
 
 type Optab struct {
-	ass obj.As // opcode
-	i   uint8  // handler index
-	a1  uint8  // From
-	a2  uint8  // Reg
-	a3  uint8  // RestArgs[0]
-	a4  uint8  // RestArgs[1]
-	a5  uint8  // RestArgs[2]
-	a6  uint8  // To
+	as obj.As // opcode
+	i  uint8  // handler index
+	a1 uint8  // From
+	a2 uint8  // Reg
+	a3 uint8  // RestArgs[0]
+	a4 uint8  // RestArgs[1]
+	a5 uint8  // RestArgs[2]
+	a6 uint8  // To
 }
 
 var optab = []Optab{
 	// zero-length instructions
-	{i: 0, ass: obj.ATEXT, a1: C_ADDR, a6: C_TEXTSIZE},
-	{i: 0, ass: obj.ATEXT, a1: C_ADDR, a3: C_LCON, a6: C_TEXTSIZE},
-	{i: 0, ass: obj.APCDATA, a1: C_LCON, a6: C_LCON},
-	{i: 0, ass: obj.AFUNCDATA, a1: C_SCON, a6: C_ADDR},
-	{i: 0, ass: obj.ANOP},
-	{i: 0, ass: obj.ANOP, a1: C_SAUTO},
+	{i: 0, as: obj.ATEXT, a1: C_ADDR, a6: C_TEXTSIZE},
+	{i: 0, as: obj.ATEXT, a1: C_ADDR, a3: C_LCON, a6: C_TEXTSIZE},
+	{i: 0, as: obj.APCDATA, a1: C_LCON, a6: C_LCON},
+	{i: 0, as: obj.AFUNCDATA, a1: C_SCON, a6: C_ADDR},
+	{i: 0, as: obj.ANOP},
+	{i: 0, as: obj.ANOP, a1: C_SAUTO},
 
 	// move register
-	{i: 1, ass: AMOVD, a1: C_REG, a6: C_REG},
-	{i: 1, ass: AMOVB, a1: C_REG, a6: C_REG},
-	{i: 1, ass: AMOVBZ, a1: C_REG, a6: C_REG},
-	{i: 1, ass: AMOVW, a1: C_REG, a6: C_REG},
-	{i: 1, ass: AMOVWZ, a1: C_REG, a6: C_REG},
-	{i: 1, ass: AFMOVD, a1: C_FREG, a6: C_FREG},
-	{i: 1, ass: AMOVDBR, a1: C_REG, a6: C_REG},
+	{i: 1, as: AMOVD, a1: C_REG, a6: C_REG},
+	{i: 1, as: AMOVB, a1: C_REG, a6: C_REG},
+	{i: 1, as: AMOVBZ, a1: C_REG, a6: C_REG},
+	{i: 1, as: AMOVW, a1: C_REG, a6: C_REG},
+	{i: 1, as: AMOVWZ, a1: C_REG, a6: C_REG},
+	{i: 1, as: AFMOVD, a1: C_FREG, a6: C_FREG},
+	{i: 1, as: AMOVDBR, a1: C_REG, a6: C_REG},
 
 	// load constant
-	{i: 26, ass: AMOVD, a1: C_LACON, a6: C_REG},
-	{i: 26, ass: AMOVW, a1: C_LACON, a6: C_REG},
-	{i: 26, ass: AMOVWZ, a1: C_LACON, a6: C_REG},
-	{i: 3, ass: AMOVD, a1: C_DCON, a6: C_REG},
-	{i: 3, ass: AMOVW, a1: C_DCON, a6: C_REG},
-	{i: 3, ass: AMOVWZ, a1: C_DCON, a6: C_REG},
-	{i: 3, ass: AMOVB, a1: C_DCON, a6: C_REG},
-	{i: 3, ass: AMOVBZ, a1: C_DCON, a6: C_REG},
+	{i: 26, as: AMOVD, a1: C_LACON, a6: C_REG},
+	{i: 26, as: AMOVW, a1: C_LACON, a6: C_REG},
+	{i: 26, as: AMOVWZ, a1: C_LACON, a6: C_REG},
+	{i: 3, as: AMOVD, a1: C_DCON, a6: C_REG},
+	{i: 3, as: AMOVW, a1: C_DCON, a6: C_REG},
+	{i: 3, as: AMOVWZ, a1: C_DCON, a6: C_REG},
+	{i: 3, as: AMOVB, a1: C_DCON, a6: C_REG},
+	{i: 3, as: AMOVBZ, a1: C_DCON, a6: C_REG},
 
 	// store constant
-	{i: 72, ass: AMOVD, a1: C_SCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVD, a1: C_ADDCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVW, a1: C_SCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVW, a1: C_ADDCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVWZ, a1: C_SCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVWZ, a1: C_ADDCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVB, a1: C_SCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVB, a1: C_ADDCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVBZ, a1: C_SCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVBZ, a1: C_ADDCON, a6: C_LAUTO},
-	{i: 72, ass: AMOVD, a1: C_SCON, a6: C_LOREG},
-	{i: 72, ass: AMOVD, a1: C_ADDCON, a6: C_LOREG},
-	{i: 72, ass: AMOVW, a1: C_SCON, a6: C_LOREG},
-	{i: 72, ass: AMOVW, a1: C_ADDCON, a6: C_LOREG},
-	{i: 72, ass: AMOVWZ, a1: C_SCON, a6: C_LOREG},
-	{i: 72, ass: AMOVWZ, a1: C_ADDCON, a6: C_LOREG},
-	{i: 72, ass: AMOVB, a1: C_SCON, a6: C_LOREG},
-	{i: 72, ass: AMOVB, a1: C_ADDCON, a6: C_LOREG},
-	{i: 72, ass: AMOVBZ, a1: C_SCON, a6: C_LOREG},
-	{i: 72, ass: AMOVBZ, a1: C_ADDCON, a6: C_LOREG},
+	{i: 72, as: AMOVD, a1: C_SCON, a6: C_LAUTO},
+	{i: 72, as: AMOVD, a1: C_ADDCON, a6: C_LAUTO},
+	{i: 72, as: AMOVW, a1: C_SCON, a6: C_LAUTO},
+	{i: 72, as: AMOVW, a1: C_ADDCON, a6: C_LAUTO},
+	{i: 72, as: AMOVWZ, a1: C_SCON, a6: C_LAUTO},
+	{i: 72, as: AMOVWZ, a1: C_ADDCON, a6: C_LAUTO},
+	{i: 72, as: AMOVB, a1: C_SCON, a6: C_LAUTO},
+	{i: 72, as: AMOVB, a1: C_ADDCON, a6: C_LAUTO},
+	{i: 72, as: AMOVBZ, a1: C_SCON, a6: C_LAUTO},
+	{i: 72, as: AMOVBZ, a1: C_ADDCON, a6: C_LAUTO},
+	{i: 72, as: AMOVD, a1: C_SCON, a6: C_LOREG},
+	{i: 72, as: AMOVD, a1: C_ADDCON, a6: C_LOREG},
+	{i: 72, as: AMOVW, a1: C_SCON, a6: C_LOREG},
+	{i: 72, as: AMOVW, a1: C_ADDCON, a6: C_LOREG},
+	{i: 72, as: AMOVWZ, a1: C_SCON, a6: C_LOREG},
+	{i: 72, as: AMOVWZ, a1: C_ADDCON, a6: C_LOREG},
+	{i: 72, as: AMOVB, a1: C_SCON, a6: C_LOREG},
+	{i: 72, as: AMOVB, a1: C_ADDCON, a6: C_LOREG},
+	{i: 72, as: AMOVBZ, a1: C_SCON, a6: C_LOREG},
+	{i: 72, as: AMOVBZ, a1: C_ADDCON, a6: C_LOREG},
 
 	// store
-	{i: 35, ass: AMOVD, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVW, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVWZ, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVBZ, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVB, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVDBR, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVHBR, a1: C_REG, a6: C_LAUTO},
-	{i: 35, ass: AMOVD, a1: C_REG, a6: C_LOREG},
-	{i: 35, ass: AMOVW, a1: C_REG, a6: C_LOREG},
-	{i: 35, ass: AMOVWZ, a1: C_REG, a6: C_LOREG},
-	{i: 35, ass: AMOVBZ, a1: C_REG, a6: C_LOREG},
-	{i: 35, ass: AMOVB, a1: C_REG, a6: C_LOREG},
-	{i: 35, ass: AMOVDBR, a1: C_REG, a6: C_LOREG},
-	{i: 35, ass: AMOVHBR, a1: C_REG, a6: C_LOREG},
-	{i: 74, ass: AMOVD, a1: C_REG, a6: C_ADDR},
-	{i: 74, ass: AMOVW, a1: C_REG, a6: C_ADDR},
-	{i: 74, ass: AMOVWZ, a1: C_REG, a6: C_ADDR},
-	{i: 74, ass: AMOVBZ, a1: C_REG, a6: C_ADDR},
-	{i: 74, ass: AMOVB, a1: C_REG, a6: C_ADDR},
+	{i: 35, as: AMOVD, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVW, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVWZ, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVBZ, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVB, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVDBR, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVHBR, a1: C_REG, a6: C_LAUTO},
+	{i: 35, as: AMOVD, a1: C_REG, a6: C_LOREG},
+	{i: 35, as: AMOVW, a1: C_REG, a6: C_LOREG},
+	{i: 35, as: AMOVWZ, a1: C_REG, a6: C_LOREG},
+	{i: 35, as: AMOVBZ, a1: C_REG, a6: C_LOREG},
+	{i: 35, as: AMOVB, a1: C_REG, a6: C_LOREG},
+	{i: 35, as: AMOVDBR, a1: C_REG, a6: C_LOREG},
+	{i: 35, as: AMOVHBR, a1: C_REG, a6: C_LOREG},
+	{i: 74, as: AMOVD, a1: C_REG, a6: C_ADDR},
+	{i: 74, as: AMOVW, a1: C_REG, a6: C_ADDR},
+	{i: 74, as: AMOVWZ, a1: C_REG, a6: C_ADDR},
+	{i: 74, as: AMOVBZ, a1: C_REG, a6: C_ADDR},
+	{i: 74, as: AMOVB, a1: C_REG, a6: C_ADDR},
 
 	// load
-	{i: 36, ass: AMOVD, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVW, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVWZ, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVBZ, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVB, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVDBR, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVHBR, a1: C_LAUTO, a6: C_REG},
-	{i: 36, ass: AMOVD, a1: C_LOREG, a6: C_REG},
-	{i: 36, ass: AMOVW, a1: C_LOREG, a6: C_REG},
-	{i: 36, ass: AMOVWZ, a1: C_LOREG, a6: C_REG},
-	{i: 36, ass: AMOVBZ, a1: C_LOREG, a6: C_REG},
-	{i: 36, ass: AMOVB, a1: C_LOREG, a6: C_REG},
-	{i: 36, ass: AMOVDBR, a1: C_LOREG, a6: C_REG},
-	{i: 36, ass: AMOVHBR, a1: C_LOREG, a6: C_REG},
-	{i: 75, ass: AMOVD, a1: C_ADDR, a6: C_REG},
-	{i: 75, ass: AMOVW, a1: C_ADDR, a6: C_REG},
-	{i: 75, ass: AMOVWZ, a1: C_ADDR, a6: C_REG},
-	{i: 75, ass: AMOVBZ, a1: C_ADDR, a6: C_REG},
-	{i: 75, ass: AMOVB, a1: C_ADDR, a6: C_REG},
+	{i: 36, as: AMOVD, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVW, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVWZ, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVBZ, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVB, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVDBR, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVHBR, a1: C_LAUTO, a6: C_REG},
+	{i: 36, as: AMOVD, a1: C_LOREG, a6: C_REG},
+	{i: 36, as: AMOVW, a1: C_LOREG, a6: C_REG},
+	{i: 36, as: AMOVWZ, a1: C_LOREG, a6: C_REG},
+	{i: 36, as: AMOVBZ, a1: C_LOREG, a6: C_REG},
+	{i: 36, as: AMOVB, a1: C_LOREG, a6: C_REG},
+	{i: 36, as: AMOVDBR, a1: C_LOREG, a6: C_REG},
+	{i: 36, as: AMOVHBR, a1: C_LOREG, a6: C_REG},
+	{i: 75, as: AMOVD, a1: C_ADDR, a6: C_REG},
+	{i: 75, as: AMOVW, a1: C_ADDR, a6: C_REG},
+	{i: 75, as: AMOVWZ, a1: C_ADDR, a6: C_REG},
+	{i: 75, as: AMOVBZ, a1: C_ADDR, a6: C_REG},
+	{i: 75, as: AMOVB, a1: C_ADDR, a6: C_REG},
 
 	// interlocked load and op
-	{i: 99, ass: ALAAG, a1: C_REG, a2: C_REG, a6: C_LOREG},
+	{i: 99, as: ALAAG, a1: C_REG, a2: C_REG, a6: C_LOREG},
 
 	// integer arithmetic
-	{i: 2, ass: AADD, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 2, ass: AADD, a1: C_REG, a6: C_REG},
-	{i: 22, ass: AADD, a1: C_LCON, a2: C_REG, a6: C_REG},
-	{i: 22, ass: AADD, a1: C_LCON, a6: C_REG},
-	{i: 12, ass: AADD, a1: C_LOREG, a6: C_REG},
-	{i: 12, ass: AADD, a1: C_LAUTO, a6: C_REG},
-	{i: 21, ass: ASUB, a1: C_LCON, a2: C_REG, a6: C_REG},
-	{i: 21, ass: ASUB, a1: C_LCON, a6: C_REG},
-	{i: 12, ass: ASUB, a1: C_LOREG, a6: C_REG},
-	{i: 12, ass: ASUB, a1: C_LAUTO, a6: C_REG},
-	{i: 4, ass: AMULHD, a1: C_REG, a6: C_REG},
-	{i: 4, ass: AMULHD, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 62, ass: AMLGR, a1: C_REG, a6: C_REG},
-	{i: 2, ass: ADIVW, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 2, ass: ADIVW, a1: C_REG, a6: C_REG},
-	{i: 10, ass: ASUB, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 10, ass: ASUB, a1: C_REG, a6: C_REG},
-	{i: 47, ass: ANEG, a1: C_REG, a6: C_REG},
-	{i: 47, ass: ANEG, a6: C_REG},
+	{i: 2, as: AADD, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 2, as: AADD, a1: C_REG, a6: C_REG},
+	{i: 22, as: AADD, a1: C_LCON, a2: C_REG, a6: C_REG},
+	{i: 22, as: AADD, a1: C_LCON, a6: C_REG},
+	{i: 12, as: AADD, a1: C_LOREG, a6: C_REG},
+	{i: 12, as: AADD, a1: C_LAUTO, a6: C_REG},
+	{i: 21, as: ASUB, a1: C_LCON, a2: C_REG, a6: C_REG},
+	{i: 21, as: ASUB, a1: C_LCON, a6: C_REG},
+	{i: 12, as: ASUB, a1: C_LOREG, a6: C_REG},
+	{i: 12, as: ASUB, a1: C_LAUTO, a6: C_REG},
+	{i: 4, as: AMULHD, a1: C_REG, a6: C_REG},
+	{i: 4, as: AMULHD, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 62, as: AMLGR, a1: C_REG, a6: C_REG},
+	{i: 2, as: ADIVW, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 2, as: ADIVW, a1: C_REG, a6: C_REG},
+	{i: 10, as: ASUB, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 10, as: ASUB, a1: C_REG, a6: C_REG},
+	{i: 47, as: ANEG, a1: C_REG, a6: C_REG},
+	{i: 47, as: ANEG, a6: C_REG},
 
 	// integer logical
-	{i: 6, ass: AAND, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 6, ass: AAND, a1: C_REG, a6: C_REG},
-	{i: 23, ass: AAND, a1: C_LCON, a6: C_REG},
-	{i: 12, ass: AAND, a1: C_LOREG, a6: C_REG},
-	{i: 12, ass: AAND, a1: C_LAUTO, a6: C_REG},
-	{i: 6, ass: AANDW, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 6, ass: AANDW, a1: C_REG, a6: C_REG},
-	{i: 24, ass: AANDW, a1: C_LCON, a6: C_REG},
-	{i: 12, ass: AANDW, a1: C_LOREG, a6: C_REG},
-	{i: 12, ass: AANDW, a1: C_LAUTO, a6: C_REG},
-	{i: 7, ass: ASLD, a1: C_REG, a6: C_REG},
-	{i: 7, ass: ASLD, a1: C_REG, a2: C_REG, a6: C_REG},
-	{i: 7, ass: ASLD, a1: C_SCON, a2: C_REG, a6: C_REG},
-	{i: 7, ass: ASLD, a1: C_SCON, a6: C_REG},
-	{i: 13, ass: ARNSBG, a1: C_SCON, a3: C_SCON, a4: C_SCON, a5: C_REG, a6: C_REG},
+	{i: 6, as: AAND, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 6, as: AAND, a1: C_REG, a6: C_REG},
+	{i: 23, as: AAND, a1: C_LCON, a6: C_REG},
+	{i: 12, as: AAND, a1: C_LOREG, a6: C_REG},
+	{i: 12, as: AAND, a1: C_LAUTO, a6: C_REG},
+	{i: 6, as: AANDW, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 6, as: AANDW, a1: C_REG, a6: C_REG},
+	{i: 24, as: AANDW, a1: C_LCON, a6: C_REG},
+	{i: 12, as: AANDW, a1: C_LOREG, a6: C_REG},
+	{i: 12, as: AANDW, a1: C_LAUTO, a6: C_REG},
+	{i: 7, as: ASLD, a1: C_REG, a6: C_REG},
+	{i: 7, as: ASLD, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 7, as: ASLD, a1: C_SCON, a2: C_REG, a6: C_REG},
+	{i: 7, as: ASLD, a1: C_SCON, a6: C_REG},
+	{i: 13, as: ARNSBG, a1: C_SCON, a3: C_SCON, a4: C_SCON, a5: C_REG, a6: C_REG},
 
 	// compare and swap
-	{i: 79, ass: ACSG, a1: C_REG, a2: C_REG, a6: C_SOREG},
+	{i: 79, as: ACSG, a1: C_REG, a2: C_REG, a6: C_SOREG},
 
 	// floating point
-	{i: 32, ass: AFADD, a1: C_FREG, a6: C_FREG},
-	{i: 33, ass: AFABS, a1: C_FREG, a6: C_FREG},
-	{i: 33, ass: AFABS, a6: C_FREG},
-	{i: 34, ass: AFMADD, a1: C_FREG, a2: C_FREG, a6: C_FREG},
-	{i: 32, ass: AFMUL, a1: C_FREG, a6: C_FREG},
-	{i: 36, ass: AFMOVD, a1: C_LAUTO, a6: C_FREG},
-	{i: 36, ass: AFMOVD, a1: C_LOREG, a6: C_FREG},
-	{i: 75, ass: AFMOVD, a1: C_ADDR, a6: C_FREG},
-	{i: 35, ass: AFMOVD, a1: C_FREG, a6: C_LAUTO},
-	{i: 35, ass: AFMOVD, a1: C_FREG, a6: C_LOREG},
-	{i: 74, ass: AFMOVD, a1: C_FREG, a6: C_ADDR},
-	{i: 67, ass: AFMOVD, a1: C_ZCON, a6: C_FREG},
-	{i: 81, ass: ALDGR, a1: C_REG, a6: C_FREG},
-	{i: 81, ass: ALGDR, a1: C_FREG, a6: C_REG},
-	{i: 82, ass: ACEFBRA, a1: C_REG, a6: C_FREG},
-	{i: 83, ass: ACFEBRA, a1: C_FREG, a6: C_REG},
-	{i: 48, ass: AFIEBR, a1: C_SCON, a2: C_FREG, a6: C_FREG},
-	{i: 49, ass: ACPSDR, a1: C_FREG, a2: C_FREG, a6: C_FREG},
-	{i: 50, ass: ALTDBR, a1: C_FREG, a6: C_FREG},
-	{i: 51, ass: ATCDB, a1: C_FREG, a6: C_SCON},
+	{i: 32, as: AFADD, a1: C_FREG, a6: C_FREG},
+	{i: 33, as: AFABS, a1: C_FREG, a6: C_FREG},
+	{i: 33, as: AFABS, a6: C_FREG},
+	{i: 34, as: AFMADD, a1: C_FREG, a2: C_FREG, a6: C_FREG},
+	{i: 32, as: AFMUL, a1: C_FREG, a6: C_FREG},
+	{i: 36, as: AFMOVD, a1: C_LAUTO, a6: C_FREG},
+	{i: 36, as: AFMOVD, a1: C_LOREG, a6: C_FREG},
+	{i: 75, as: AFMOVD, a1: C_ADDR, a6: C_FREG},
+	{i: 35, as: AFMOVD, a1: C_FREG, a6: C_LAUTO},
+	{i: 35, as: AFMOVD, a1: C_FREG, a6: C_LOREG},
+	{i: 74, as: AFMOVD, a1: C_FREG, a6: C_ADDR},
+	{i: 67, as: AFMOVD, a1: C_ZCON, a6: C_FREG},
+	{i: 81, as: ALDGR, a1: C_REG, a6: C_FREG},
+	{i: 81, as: ALGDR, a1: C_FREG, a6: C_REG},
+	{i: 82, as: ACEFBRA, a1: C_REG, a6: C_FREG},
+	{i: 83, as: ACFEBRA, a1: C_FREG, a6: C_REG},
+	{i: 48, as: AFIEBR, a1: C_SCON, a2: C_FREG, a6: C_FREG},
+	{i: 49, as: ACPSDR, a1: C_FREG, a2: C_FREG, a6: C_FREG},
+	{i: 50, as: ALTDBR, a1: C_FREG, a6: C_FREG},
+	{i: 51, as: ATCDB, a1: C_FREG, a6: C_SCON},
 
 	// load symbol address (plus offset)
-	{i: 19, ass: AMOVD, a1: C_SYMADDR, a6: C_REG},
-	{i: 93, ass: AMOVD, a1: C_GOTADDR, a6: C_REG},
-	{i: 94, ass: AMOVD, a1: C_TLS_LE, a6: C_REG},
-	{i: 95, ass: AMOVD, a1: C_TLS_IE, a6: C_REG},
+	{i: 19, as: AMOVD, a1: C_SYMADDR, a6: C_REG},
+	{i: 93, as: AMOVD, a1: C_GOTADDR, a6: C_REG},
+	{i: 94, as: AMOVD, a1: C_TLS_LE, a6: C_REG},
+	{i: 95, as: AMOVD, a1: C_TLS_IE, a6: C_REG},
 
 	// system call
-	{i: 5, ass: ASYSCALL},
-	{i: 77, ass: ASYSCALL, a1: C_SCON},
+	{i: 5, as: ASYSCALL},
+	{i: 77, as: ASYSCALL, a1: C_SCON},
 
 	// branch
-	{i: 16, ass: ABEQ, a6: C_SBRA},
-	{i: 16, ass: ABRC, a1: C_SCON, a6: C_SBRA},
-	{i: 11, ass: ABR, a6: C_LBRA},
-	{i: 16, ass: ABC, a1: C_SCON, a2: C_REG, a6: C_LBRA},
-	{i: 18, ass: ABR, a6: C_REG},
-	{i: 18, ass: ABR, a1: C_REG, a6: C_REG},
-	{i: 15, ass: ABR, a6: C_ZOREG},
-	{i: 15, ass: ABC, a6: C_ZOREG},
+	{i: 16, as: ABEQ, a6: C_SBRA},
+	{i: 16, as: ABRC, a1: C_SCON, a6: C_SBRA},
+	{i: 11, as: ABR, a6: C_LBRA},
+	{i: 16, as: ABC, a1: C_SCON, a2: C_REG, a6: C_LBRA},
+	{i: 18, as: ABR, a6: C_REG},
+	{i: 18, as: ABR, a1: C_REG, a6: C_REG},
+	{i: 15, as: ABR, a6: C_ZOREG},
+	{i: 15, as: ABC, a6: C_ZOREG},
 
 	// compare and branch
-	{i: 89, ass: ACGRJ, a1: C_SCON, a2: C_REG, a3: C_REG, a6: C_SBRA},
-	{i: 89, ass: ACMPBEQ, a1: C_REG, a2: C_REG, a6: C_SBRA},
-	{i: 89, ass: ACLGRJ, a1: C_SCON, a2: C_REG, a3: C_REG, a6: C_SBRA},
-	{i: 89, ass: ACMPUBEQ, a1: C_REG, a2: C_REG, a6: C_SBRA},
-	{i: 90, ass: ACGIJ, a1: C_SCON, a2: C_REG, a3: C_ADDCON, a6: C_SBRA},
-	{i: 90, ass: ACGIJ, a1: C_SCON, a2: C_REG, a3: C_SCON, a6: C_SBRA},
-	{i: 90, ass: ACMPBEQ, a1: C_REG, a3: C_ADDCON, a6: C_SBRA},
-	{i: 90, ass: ACMPBEQ, a1: C_REG, a3: C_SCON, a6: C_SBRA},
-	{i: 90, ass: ACLGIJ, a1: C_SCON, a2: C_REG, a3: C_ADDCON, a6: C_SBRA},
-	{i: 90, ass: ACMPUBEQ, a1: C_REG, a3: C_ANDCON, a6: C_SBRA},
+	{i: 89, as: ACGRJ, a1: C_SCON, a2: C_REG, a3: C_REG, a6: C_SBRA},
+	{i: 89, as: ACMPBEQ, a1: C_REG, a2: C_REG, a6: C_SBRA},
+	{i: 89, as: ACLGRJ, a1: C_SCON, a2: C_REG, a3: C_REG, a6: C_SBRA},
+	{i: 89, as: ACMPUBEQ, a1: C_REG, a2: C_REG, a6: C_SBRA},
+	{i: 90, as: ACGIJ, a1: C_SCON, a2: C_REG, a3: C_ADDCON, a6: C_SBRA},
+	{i: 90, as: ACGIJ, a1: C_SCON, a2: C_REG, a3: C_SCON, a6: C_SBRA},
+	{i: 90, as: ACMPBEQ, a1: C_REG, a3: C_ADDCON, a6: C_SBRA},
+	{i: 90, as: ACMPBEQ, a1: C_REG, a3: C_SCON, a6: C_SBRA},
+	{i: 90, as: ACLGIJ, a1: C_SCON, a2: C_REG, a3: C_ADDCON, a6: C_SBRA},
+	{i: 90, as: ACMPUBEQ, a1: C_REG, a3: C_ANDCON, a6: C_SBRA},
 
 	// branch on count
-	{i: 41, ass: ABRCT, a1: C_REG, a6: C_SBRA},
-	{i: 41, ass: ABRCTG, a1: C_REG, a6: C_SBRA},
+	{i: 41, as: ABRCT, a1: C_REG, a6: C_SBRA},
+	{i: 41, as: ABRCTG, a1: C_REG, a6: C_SBRA},
 
 	// move on condition
-	{i: 17, ass: AMOVDEQ, a1: C_REG, a6: C_REG},
+	{i: 17, as: AMOVDEQ, a1: C_REG, a6: C_REG},
 
 	// load on condition
-	{i: 25, ass: ALOCGR, a1: C_SCON, a2: C_REG, a6: C_REG},
+	{i: 25, as: ALOCGR, a1: C_SCON, a2: C_REG, a6: C_REG},
 
 	// find leftmost one
-	{i: 8, ass: AFLOGR, a1: C_REG, a6: C_REG},
+	{i: 8, as: AFLOGR, a1: C_REG, a6: C_REG},
 
 	// population count
-	{i: 9, ass: APOPCNT, a1: C_REG, a6: C_REG},
+	{i: 9, as: APOPCNT, a1: C_REG, a6: C_REG},
 
 	// compare
-	{i: 70, ass: ACMP, a1: C_REG, a6: C_REG},
-	{i: 71, ass: ACMP, a1: C_REG, a6: C_LCON},
-	{i: 70, ass: ACMPU, a1: C_REG, a6: C_REG},
-	{i: 71, ass: ACMPU, a1: C_REG, a6: C_LCON},
-	{i: 70, ass: AFCMPO, a1: C_FREG, a6: C_FREG},
-	{i: 70, ass: AFCMPO, a1: C_FREG, a2: C_REG, a6: C_FREG},
+	{i: 70, as: ACMP, a1: C_REG, a6: C_REG},
+	{i: 71, as: ACMP, a1: C_REG, a6: C_LCON},
+	{i: 70, as: ACMPU, a1: C_REG, a6: C_REG},
+	{i: 71, as: ACMPU, a1: C_REG, a6: C_LCON},
+	{i: 70, as: AFCMPO, a1: C_FREG, a6: C_FREG},
+	{i: 70, as: AFCMPO, a1: C_FREG, a2: C_REG, a6: C_FREG},
 
 	// test under mask
-	{i: 91, ass: ATMHH, a1: C_REG, a6: C_ANDCON},
+	{i: 91, as: ATMHH, a1: C_REG, a6: C_ANDCON},
 
 	// insert program mask
-	{i: 92, ass: AIPM, a1: C_REG},
+	{i: 92, as: AIPM, a1: C_REG},
 
 	// set program mask
-	{i: 76, ass: ASPM, a1: C_REG},
+	{i: 76, as: ASPM, a1: C_REG},
 
 	// 32-bit access registers
-	{i: 68, ass: AMOVW, a1: C_AREG, a6: C_REG},
-	{i: 68, ass: AMOVWZ, a1: C_AREG, a6: C_REG},
-	{i: 69, ass: AMOVW, a1: C_REG, a6: C_AREG},
-	{i: 69, ass: AMOVWZ, a1: C_REG, a6: C_AREG},
+	{i: 68, as: AMOVW, a1: C_AREG, a6: C_REG},
+	{i: 68, as: AMOVWZ, a1: C_AREG, a6: C_REG},
+	{i: 69, as: AMOVW, a1: C_REG, a6: C_AREG},
+	{i: 69, as: AMOVWZ, a1: C_REG, a6: C_AREG},
 
 	// macros
-	{i: 96, ass: ACLEAR, a1: C_LCON, a6: C_LOREG},
-	{i: 96, ass: ACLEAR, a1: C_LCON, a6: C_LAUTO},
+	{i: 96, as: ACLEAR, a1: C_LCON, a6: C_LOREG},
+	{i: 96, as: ACLEAR, a1: C_LCON, a6: C_LAUTO},
 
 	// load/store multiple
-	{i: 97, ass: ASTMG, a1: C_REG, a2: C_REG, a6: C_LOREG},
-	{i: 97, ass: ASTMG, a1: C_REG, a2: C_REG, a6: C_LAUTO},
-	{i: 98, ass: ALMG, a1: C_LOREG, a2: C_REG, a6: C_REG},
-	{i: 98, ass: ALMG, a1: C_LAUTO, a2: C_REG, a6: C_REG},
+	{i: 97, as: ASTMG, a1: C_REG, a2: C_REG, a6: C_LOREG},
+	{i: 97, as: ASTMG, a1: C_REG, a2: C_REG, a6: C_LAUTO},
+	{i: 98, as: ALMG, a1: C_LOREG, a2: C_REG, a6: C_REG},
+	{i: 98, as: ALMG, a1: C_LAUTO, a2: C_REG, a6: C_REG},
 
 	// bytes
-	{i: 40, ass: ABYTE, a1: C_SCON},
-	{i: 40, ass: AWORD, a1: C_LCON},
-	{i: 31, ass: ADWORD, a1: C_LCON},
-	{i: 31, ass: ADWORD, a1: C_DCON},
+	{i: 40, as: ABYTE, a1: C_SCON},
+	{i: 40, as: AWORD, a1: C_LCON},
+	{i: 31, as: ADWORD, a1: C_LCON},
+	{i: 31, as: ADWORD, a1: C_DCON},
 
 	// fast synchronization
-	{i: 80, ass: ASYNC},
+	{i: 80, as: ASYNC},
 
 	// store clock
-	{i: 88, ass: ASTCK, a6: C_SAUTO},
-	{i: 88, ass: ASTCK, a6: C_SOREG},
+	{i: 88, as: ASTCK, a6: C_SAUTO},
+	{i: 88, as: ASTCK, a6: C_SOREG},
 
 	// storage and storage
-	{i: 84, ass: AMVC, a1: C_SCON, a3: C_LOREG, a6: C_LOREG},
-	{i: 84, ass: AMVC, a1: C_SCON, a3: C_LOREG, a6: C_LAUTO},
-	{i: 84, ass: AMVC, a1: C_SCON, a3: C_LAUTO, a6: C_LAUTO},
+	{i: 84, as: AMVC, a1: C_SCON, a3: C_LOREG, a6: C_LOREG},
+	{i: 84, as: AMVC, a1: C_SCON, a3: C_LOREG, a6: C_LAUTO},
+	{i: 84, as: AMVC, a1: C_SCON, a3: C_LAUTO, a6: C_LAUTO},
 
 	// address
-	{i: 85, ass: ALARL, a1: C_LCON, a6: C_REG},
-	{i: 85, ass: ALARL, a1: C_SYMADDR, a6: C_REG},
-	{i: 86, ass: ALA, a1: C_SOREG, a6: C_REG},
-	{i: 86, ass: ALA, a1: C_SAUTO, a6: C_REG},
-	{i: 87, ass: AEXRL, a1: C_SYMADDR, a6: C_REG},
+	{i: 85, as: ALARL, a1: C_LCON, a6: C_REG},
+	{i: 85, as: ALARL, a1: C_SYMADDR, a6: C_REG},
+	{i: 86, as: ALA, a1: C_SOREG, a6: C_REG},
+	{i: 86, as: ALA, a1: C_SAUTO, a6: C_REG},
+	{i: 87, as: AEXRL, a1: C_SYMADDR, a6: C_REG},
 
 	// undefined (deliberate illegal instruction)
-	{i: 78, ass: obj.AUNDEF},
+	{i: 78, as: obj.AUNDEF},
 
 	// Break point instruction(0x0001 opcode)
-	{i: 73, ass: ABRRK},
+	{i: 73, as: ABRRK},
 
 	// 2 byte no-operation
-	{i: 66, ass: ANOPH},
+	{i: 66, as: ANOPH},
 
 	// crypto instructions
 
 	// KM
-	{i: 124, ass: AKM, a1: C_REG, a6: C_REG},
+	{i: 124, as: AKM, a1: C_REG, a6: C_REG},
 
 	// KDSA
-	{i: 125, ass: AKDSA, a1: C_REG, a6: C_REG},
+	{i: 125, as: AKDSA, a1: C_REG, a6: C_REG},
 
 	// KMA
-	{i: 126, ass: AKMA, a1: C_REG, a2: C_REG, a6: C_REG},
+	{i: 126, as: AKMA, a1: C_REG, a2: C_REG, a6: C_REG},
 
 	// vector instructions
 
 	// VRX store
-	{i: 100, ass: AVST, a1: C_VREG, a6: C_SOREG},
-	{i: 100, ass: AVST, a1: C_VREG, a6: C_SAUTO},
-	{i: 100, ass: AVSTEG, a1: C_SCON, a2: C_VREG, a6: C_SOREG},
-	{i: 100, ass: AVSTEG, a1: C_SCON, a2: C_VREG, a6: C_SAUTO},
+	{i: 100, as: AVST, a1: C_VREG, a6: C_SOREG},
+	{i: 100, as: AVST, a1: C_VREG, a6: C_SAUTO},
+	{i: 100, as: AVSTEG, a1: C_SCON, a2: C_VREG, a6: C_SOREG},
+	{i: 100, as: AVSTEG, a1: C_SCON, a2: C_VREG, a6: C_SAUTO},
 
 	// VRX load
-	{i: 101, ass: AVL, a1: C_SOREG, a6: C_VREG},
-	{i: 101, ass: AVL, a1: C_SAUTO, a6: C_VREG},
-	{i: 101, ass: AVLEG, a1: C_SCON, a3: C_SOREG, a6: C_VREG},
-	{i: 101, ass: AVLEG, a1: C_SCON, a3: C_SAUTO, a6: C_VREG},
+	{i: 101, as: AVL, a1: C_SOREG, a6: C_VREG},
+	{i: 101, as: AVL, a1: C_SAUTO, a6: C_VREG},
+	{i: 101, as: AVLEG, a1: C_SCON, a3: C_SOREG, a6: C_VREG},
+	{i: 101, as: AVLEG, a1: C_SCON, a3: C_SAUTO, a6: C_VREG},
 
 	// VRV scatter
-	{i: 102, ass: AVSCEG, a1: C_SCON, a2: C_VREG, a6: C_SOREG},
-	{i: 102, ass: AVSCEG, a1: C_SCON, a2: C_VREG, a6: C_SAUTO},
+	{i: 102, as: AVSCEG, a1: C_SCON, a2: C_VREG, a6: C_SOREG},
+	{i: 102, as: AVSCEG, a1: C_SCON, a2: C_VREG, a6: C_SAUTO},
 
 	// VRV gather
-	{i: 103, ass: AVGEG, a1: C_SCON, a3: C_SOREG, a6: C_VREG},
-	{i: 103, ass: AVGEG, a1: C_SCON, a3: C_SAUTO, a6: C_VREG},
+	{i: 103, as: AVGEG, a1: C_SCON, a3: C_SOREG, a6: C_VREG},
+	{i: 103, as: AVGEG, a1: C_SCON, a3: C_SAUTO, a6: C_VREG},
 
 	// VRS element shift/rotate and load gr to/from vr element
-	{i: 104, ass: AVESLG, a1: C_SCON, a2: C_VREG, a6: C_VREG},
-	{i: 104, ass: AVESLG, a1: C_REG, a2: C_VREG, a6: C_VREG},
-	{i: 104, ass: AVESLG, a1: C_SCON, a6: C_VREG},
-	{i: 104, ass: AVESLG, a1: C_REG, a6: C_VREG},
-	{i: 104, ass: AVLGVG, a1: C_SCON, a2: C_VREG, a6: C_REG},
-	{i: 104, ass: AVLGVG, a1: C_REG, a2: C_VREG, a6: C_REG},
-	{i: 104, ass: AVLVGG, a1: C_SCON, a2: C_REG, a6: C_VREG},
-	{i: 104, ass: AVLVGG, a1: C_REG, a2: C_REG, a6: C_VREG},
+	{i: 104, as: AVESLG, a1: C_SCON, a2: C_VREG, a6: C_VREG},
+	{i: 104, as: AVESLG, a1: C_REG, a2: C_VREG, a6: C_VREG},
+	{i: 104, as: AVESLG, a1: C_SCON, a6: C_VREG},
+	{i: 104, as: AVESLG, a1: C_REG, a6: C_VREG},
+	{i: 104, as: AVLGVG, a1: C_SCON, a2: C_VREG, a6: C_REG},
+	{i: 104, as: AVLGVG, a1: C_REG, a2: C_VREG, a6: C_REG},
+	{i: 104, as: AVLVGG, a1: C_SCON, a2: C_REG, a6: C_VREG},
+	{i: 104, as: AVLVGG, a1: C_REG, a2: C_REG, a6: C_VREG},
 
 	// VRS store multiple
-	{i: 105, ass: AVSTM, a1: C_VREG, a2: C_VREG, a6: C_SOREG},
-	{i: 105, ass: AVSTM, a1: C_VREG, a2: C_VREG, a6: C_SAUTO},
+	{i: 105, as: AVSTM, a1: C_VREG, a2: C_VREG, a6: C_SOREG},
+	{i: 105, as: AVSTM, a1: C_VREG, a2: C_VREG, a6: C_SAUTO},
 
 	// VRS load multiple
-	{i: 106, ass: AVLM, a1: C_SOREG, a2: C_VREG, a6: C_VREG},
-	{i: 106, ass: AVLM, a1: C_SAUTO, a2: C_VREG, a6: C_VREG},
+	{i: 106, as: AVLM, a1: C_SOREG, a2: C_VREG, a6: C_VREG},
+	{i: 106, as: AVLM, a1: C_SAUTO, a2: C_VREG, a6: C_VREG},
 
 	// VRS store with length
-	{i: 107, ass: AVSTL, a1: C_REG, a2: C_VREG, a6: C_SOREG},
-	{i: 107, ass: AVSTL, a1: C_REG, a2: C_VREG, a6: C_SAUTO},
+	{i: 107, as: AVSTL, a1: C_REG, a2: C_VREG, a6: C_SOREG},
+	{i: 107, as: AVSTL, a1: C_REG, a2: C_VREG, a6: C_SAUTO},
 
 	// VRS load with length
-	{i: 108, ass: AVLL, a1: C_REG, a3: C_SOREG, a6: C_VREG},
-	{i: 108, ass: AVLL, a1: C_REG, a3: C_SAUTO, a6: C_VREG},
+	{i: 108, as: AVLL, a1: C_REG, a3: C_SOREG, a6: C_VREG},
+	{i: 108, as: AVLL, a1: C_REG, a3: C_SAUTO, a6: C_VREG},
 
 	// VRI-a
-	{i: 109, ass: AVGBM, a1: C_ANDCON, a6: C_VREG},
-	{i: 109, ass: AVZERO, a6: C_VREG},
-	{i: 109, ass: AVREPIG, a1: C_ADDCON, a6: C_VREG},
-	{i: 109, ass: AVREPIG, a1: C_SCON, a6: C_VREG},
-	{i: 109, ass: AVLEIG, a1: C_SCON, a3: C_ADDCON, a6: C_VREG},
-	{i: 109, ass: AVLEIG, a1: C_SCON, a3: C_SCON, a6: C_VREG},
+	{i: 109, as: AVGBM, a1: C_ANDCON, a6: C_VREG},
+	{i: 109, as: AVZERO, a6: C_VREG},
+	{i: 109, as: AVREPIG, a1: C_ADDCON, a6: C_VREG},
+	{i: 109, as: AVREPIG, a1: C_SCON, a6: C_VREG},
+	{i: 109, as: AVLEIG, a1: C_SCON, a3: C_ADDCON, a6: C_VREG},
+	{i: 109, as: AVLEIG, a1: C_SCON, a3: C_SCON, a6: C_VREG},
 
 	// VRI-b generate mask
-	{i: 110, ass: AVGMG, a1: C_SCON, a3: C_SCON, a6: C_VREG},
+	{i: 110, as: AVGMG, a1: C_SCON, a3: C_SCON, a6: C_VREG},
 
 	// VRI-c replicate
-	{i: 111, ass: AVREPG, a1: C_UCON, a2: C_VREG, a6: C_VREG},
+	{i: 111, as: AVREPG, a1: C_UCON, a2: C_VREG, a6: C_VREG},
 
 	// VRI-d element rotate and insert under mask and
 	// shift left double by byte
-	{i: 112, ass: AVERIMG, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
-	{i: 112, ass: AVSLDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 112, as: AVERIMG, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 112, as: AVSLDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
 
 	// VRI-d fp test data class immediate
-	{i: 113, ass: AVFTCIDB, a1: C_SCON, a2: C_VREG, a6: C_VREG},
+	{i: 113, as: AVFTCIDB, a1: C_SCON, a2: C_VREG, a6: C_VREG},
 
 	// VRR-a load reg
-	{i: 114, ass: AVLR, a1: C_VREG, a6: C_VREG},
+	{i: 114, as: AVLR, a1: C_VREG, a6: C_VREG},
 
 	// VRR-a compare
-	{i: 115, ass: AVECG, a1: C_VREG, a6: C_VREG},
+	{i: 115, as: AVECG, a1: C_VREG, a6: C_VREG},
 
 	// VRR-b
-	{i: 117, ass: AVCEQG, a1: C_VREG, a2: C_VREG, a6: C_VREG},
-	{i: 117, ass: AVFAEF, a1: C_VREG, a2: C_VREG, a6: C_VREG},
-	{i: 117, ass: AVPKSG, a1: C_VREG, a2: C_VREG, a6: C_VREG},
+	{i: 117, as: AVCEQG, a1: C_VREG, a2: C_VREG, a6: C_VREG},
+	{i: 117, as: AVFAEF, a1: C_VREG, a2: C_VREG, a6: C_VREG},
+	{i: 117, as: AVPKSG, a1: C_VREG, a2: C_VREG, a6: C_VREG},
 
 	// VRR-c
-	{i: 118, ass: AVAQ, a1: C_VREG, a2: C_VREG, a6: C_VREG},
-	{i: 118, ass: AVAQ, a1: C_VREG, a6: C_VREG},
-	{i: 118, ass: AVNOT, a1: C_VREG, a6: C_VREG},
-	{i: 123, ass: AVPDI, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 118, as: AVAQ, a1: C_VREG, a2: C_VREG, a6: C_VREG},
+	{i: 118, as: AVAQ, a1: C_VREG, a6: C_VREG},
+	{i: 118, as: AVNOT, a1: C_VREG, a6: C_VREG},
+	{i: 123, as: AVPDI, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
 
 	// VRR-c shifts
-	{i: 119, ass: AVERLLVG, a1: C_VREG, a2: C_VREG, a6: C_VREG},
-	{i: 119, ass: AVERLLVG, a1: C_VREG, a6: C_VREG},
+	{i: 119, as: AVERLLVG, a1: C_VREG, a2: C_VREG, a6: C_VREG},
+	{i: 119, as: AVERLLVG, a1: C_VREG, a6: C_VREG},
 
 	// VRR-c floating point min/max
-	{i: 128, ass: AVFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
-	{i: 128, ass: AWFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
-	{i: 128, ass: AWFMAXDB, a1: C_SCON, a2: C_FREG, a3: C_FREG, a6: C_FREG},
+	{i: 128, as: AVFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 128, as: AWFMAXDB, a1: C_SCON, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 128, as: AWFMAXDB, a1: C_SCON, a2: C_FREG, a3: C_FREG, a6: C_FREG},
 
 	// VRR-d
-	{i: 120, ass: AVACQ, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 120, as: AVACQ, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG},
 
 	// VRR-e
-	{i: 121, ass: AVSEL, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG},
+	{i: 121, as: AVSEL, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG},
 
 	// VRR-f
-	{i: 122, ass: AVLVGP, a1: C_REG, a2: C_REG, a6: C_VREG},
+	{i: 122, as: AVLVGP, a1: C_REG, a2: C_REG, a6: C_VREG},
 
 	// MVC storage and storage
-	{i: 127, ass: AMVCLE, a1: C_LOREG, a2: C_REG, a6: C_REG},
-	{i: 127, ass: AMVCLE, a1: C_SCON, a2: C_REG, a6: C_REG},
+	{i: 127, as: AMVCLE, a1: C_LOREG, a2: C_REG, a6: C_REG},
+	{i: 127, as: AMVCLE, a1: C_SCON, a2: C_REG, a6: C_REG},
 }
 
 var oprange [ALAST & obj.AMask][]Optab
@@ -863,8 +863,8 @@ func cmp(a int, b int) bool {
 }
 
 func ocmp(p1, p2 Optab) int {
-	if p1.ass != p2.ass {
-		return int(p1.ass) - int(p2.ass)
+	if p1.as != p2.as {
+		return int(p1.as) - int(p2.as)
 	}
 	if p1.a1 != p2.a1 {
 		return int(p1.a1) - int(p2.a1)
@@ -901,10 +901,10 @@ func buildop(ctxt *obj.Link) {
 	}
 	slices.SortFunc(optab, ocmp)
 	for i := 0; i < len(optab); i++ {
-		r := optab[i].ass
+		r := optab[i].as
 		start := i
 		for ; i+1 < len(optab); i++ {
-			if optab[i+1].ass != r {
+			if optab[i+1].as != r {
 				break
 			}
 		}

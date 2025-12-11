@@ -109,11 +109,11 @@ func ForCapture(fn *ir.Func) []VarAndLoop {
 					transformed = append(transformed, VarAndLoop{n, x, lastPos})
 					tk := typecheck.TempAt(base.Pos, fn, n.Type())
 					tk.SetTypecheck(1)
-					ass := ir.NewAssignStmt(x.Pos(), n, tk)
-					ass.Def = true
-					ass.SetTypecheck(1)
-					x.Body.Prepend(ass)
-					dclFixups[n] = ass
+					as := ir.NewAssignStmt(x.Pos(), n, tk)
+					as.Def = true
+					as.SetTypecheck(1)
+					x.Body.Prepend(as)
+					dclFixups[n] = as
 					return tk
 				}
 			}
@@ -302,16 +302,16 @@ func ForCapture(fn *ir.Func) []VarAndLoop {
 						tz.SetTypecheck(1)
 						zPrimeForZ[z] = tz
 
-						ass := ir.NewAssignStmt(x.Pos(), z, tz)
-						ass.Def = true
-						ass.SetTypecheck(1)
-						z.Defn = ass
-						preBody.Append(ass)
-						dclFixups[z] = ass
+						as := ir.NewAssignStmt(x.Pos(), z, tz)
+						as.Def = true
+						as.SetTypecheck(1)
+						z.Defn = as
+						preBody.Append(as)
+						dclFixups[z] = as
 
-						ass = ir.NewAssignStmt(x.Pos(), tz, z)
-						ass.SetTypecheck(1)
-						postBody.Append(ass)
+						as = ir.NewAssignStmt(x.Pos(), tz, z)
+						as.SetTypecheck(1)
+						postBody.Append(as)
 
 					}
 

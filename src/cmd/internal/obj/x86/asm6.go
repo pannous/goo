@@ -85,14 +85,14 @@ const (
 type opBytes [31]uint8
 
 type Optab struct {
-	ass    obj.As
+	as     obj.As
 	ytab   []ytab
 	prefix uint8
 	op     opBytes
 }
 
 type movtab struct {
-	ass  obj.As
+	as   obj.As
 	ft   uint8
 	f3t  uint8
 	tt   uint8
@@ -2271,14 +2271,14 @@ func instinit(ctxt *obj.Link) {
 	}
 
 	for i := range avxOptab {
-		c := avxOptab[i].ass
+		c := avxOptab[i].as
 		if opindex[c&obj.AMask] != nil {
 			ctxt.Diag("phase error in avxOptab: %d (%v)", i, c)
 		}
 		opindex[c&obj.AMask] = &avxOptab[i]
 	}
-	for i := 1; optab[i].ass != 0; i++ {
-		c := optab[i].ass
+	for i := 1; optab[i].as != 0; i++ {
+		c := optab[i].as
 		if opindex[c&obj.AMask] != nil {
 			ctxt.Diag("phase error in optab: %d (%v)", i, c)
 		}
@@ -4970,10 +4970,10 @@ func (ab *AsmBuf) doasm(ctxt *obj.Link, cursym *obj.LSym, p *obj.Prog) {
 	if p.GetFrom3() != nil {
 		f3t = oclass(ctxt, p, p.GetFrom3()) * Ymax
 	}
-	for mo := ymovtab; mo[0].ass != 0; mo = mo[1:] {
+	for mo := ymovtab; mo[0].as != 0; mo = mo[1:] {
 		var pp obj.Prog
 		var t []byte
-		if p.As == mo[0].ass {
+		if p.As == mo[0].as {
 			if ycover[ft+int(mo[0].ft)] != 0 && ycover[f3t+int(mo[0].f3t)] != 0 && ycover[tt+int(mo[0].tt)] != 0 {
 				t = mo[0].op[:]
 				switch mo[0].code {

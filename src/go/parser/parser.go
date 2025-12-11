@@ -2393,30 +2393,30 @@ func (p *parser) parseForStmt() ast.Stmt {
 	p.expectSemi()
 
 	if isRange {
-		ass := s2.(*ast.AssignStmt)
+		as := s2.(*ast.AssignStmt)
 		// check lhs
 		var key, value ast.Expr
-		switch len(ass.Lhs) {
+		switch len(as.Lhs) {
 		case 0:
 			// nothing to do
 		case 1:
-			key = ass.Lhs[0]
+			key = as.Lhs[0]
 		case 2:
-			key, value = ass.Lhs[0], ass.Lhs[1]
+			key, value = as.Lhs[0], as.Lhs[1]
 		default:
-			p.errorExpected(ass.Lhs[len(ass.Lhs)-1].Pos(), "at most 2 expressions")
+			p.errorExpected(as.Lhs[len(as.Lhs)-1].Pos(), "at most 2 expressions")
 			return &ast.BadStmt{From: pos, To: body.End()}
 		}
 		// parseSimpleStmt returned a right-hand side that
 		// is a single unary expression of the form "range x"
-		x := ass.Rhs[0].(*ast.UnaryExpr).X
+		x := as.Rhs[0].(*ast.UnaryExpr).X
 		return &ast.RangeStmt{
 			For:    pos,
 			Key:    key,
 			Value:  value,
-			TokPos: ass.TokPos,
-			Tok:    ass.Tok,
-			Range:  ass.Rhs[0].Pos(),
+			TokPos: as.TokPos,
+			Tok:    as.Tok,
+			Range:  as.Rhs[0].Pos(),
 			X:      x,
 			Body:   body,
 		}

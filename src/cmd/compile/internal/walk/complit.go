@@ -265,13 +265,13 @@ func fixedlit(ctxt initContext, kind initKind, n *ir.CompLitExpr, var_ ir.Node, 
 
 		// build list of assignments: var[index] = expr
 		ir.SetPos(a)
-		ass := ir.NewAssignStmt(base.Pos, a, value)
-		ass = typecheck.Stmt(ass).(*ir.AssignStmt)
+		as := ir.NewAssignStmt(base.Pos, a, value)
+		as = typecheck.Stmt(as).(*ir.AssignStmt)
 		switch kind {
 		case initKindStatic:
-			genAsStatic(ass)
+			genAsStatic(as)
 		case initKindDynamic, initKindLocalCode:
-			appendWalkStmt(init, orderStmtInPlace(ass, map[string][]*ir.Name{}))
+			appendWalkStmt(init, orderStmtInPlace(as, map[string][]*ir.Name{}))
 		default:
 			base.Fatalf("fixedlit: bad kind %d", kind)
 		}
@@ -404,8 +404,8 @@ func slicelit(ctxt initContext, n *ir.CompLitExpr, var_ ir.Node, init *ir.Nodes)
 
 		// build list of vauto[c] = expr
 		ir.SetPos(value)
-		ass := ir.NewAssignStmt(base.Pos, a, value)
-		appendWalkStmt(init, orderStmtInPlace(typecheck.Stmt(ass), map[string][]*ir.Name{}))
+		as := ir.NewAssignStmt(base.Pos, a, value)
+		appendWalkStmt(init, orderStmtInPlace(typecheck.Stmt(as), map[string][]*ir.Name{}))
 	}
 
 	// make slice out of heap (6)
@@ -651,17 +651,17 @@ func oaslit(n *ir.AssignStmt, init *ir.Nodes) bool {
 	return true
 }
 
-func genAsStatic(ass *ir.AssignStmt) {
-	if ass.X.Type() == nil {
+func genAsStatic(as *ir.AssignStmt) {
+	if as.X.Type() == nil {
 		base.Fatalf("genAsStatic as.Left not typechecked")
 	}
 
-	name, offset, ok := staticinit.StaticLoc(ass.X)
-	if !ok || (name.Class != ir.PEXTERN && ass.X != ir.BlankNode) {
-		base.Fatalf("genAsStatic: lhs %v", ass.X)
+	name, offset, ok := staticinit.StaticLoc(as.X)
+	if !ok || (name.Class != ir.PEXTERN && as.X != ir.BlankNode) {
+		base.Fatalf("genAsStatic: lhs %v", as.X)
 	}
 
-	switch r := ass.Y; r.Op() {
+	switch r := as.Y; r.Op() {
 	case ir.OLITERAL:
 		staticdata.InitConst(name, offset, r, int(r.Type().Size()))
 		return
@@ -672,12 +672,12 @@ func genAsStatic(ass *ir.AssignStmt) {
 	case ir.ONAME:
 		r := r.(*ir.Name)
 		if r.Offset_ != 0 {
-			base.Fatalf("genAsStatic %+v", ass)
+			base.Fatalf("genAsStatic %+v", as)
 		}
 		if r.Class == ir.PFUNC {
 			staticdata.InitAddr(name, offset, staticdata.FuncLinksym(r))
 			return
 		}
 	}
-	base.Fatalf("genAsStatic: rhs %v", ass.Y)
+	base.Fatalf("genAsStatic: rhs %v", as.Y)
 }
