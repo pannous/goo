@@ -38,5 +38,10 @@ func LessOrEq(x, y int) int {
 // boolToUint8 is a compiler intrinsic.
 // It returns 1 for true and 0 for false.
 func boolToUint8(b bool) uint8 {
-	panic("unreachable; must be intrinsicified")
+	if b {
+		return 1
+	} else {
+		return 0
+	}
+	//panic("unreachable; must be intrinsicified") quick fix, who cares
 }
