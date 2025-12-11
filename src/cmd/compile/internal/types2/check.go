@@ -187,12 +187,12 @@ type Checker struct {
 }
 
 // addDeclDep adds the dependency edge (check.decl -> to) if check.decl exists
-func (checks *Checker) addDeclDep(to Object) {
-	from := checks.decl
+func (check *Checker) addDeclDep(to Object) {
+	from := check.decl
 	if from == nil {
 		return // not in a package-level init expression
 	}
-	if _, found := checks.objMap[to]; !found {
+	if _, found := check.objMap[to]; !found {
 		return // to is not a package-level object
 	}
 	from.addDep(to)
@@ -204,33 +204,33 @@ func (checks *Checker) addDeclDep(to Object) {
 // brokenAlias records that alias doesn't have a determined type yet.
 // It also sets alias.typ to Typ[Invalid].
 // Not used if check.conf.EnableAlias is set.
-func (checks *Checker) brokenAlias(alias *TypeName) {
-	assert(!checks.conf.EnableAlias)
-	if checks.brokenAliases == nil {
-		checks.brokenAliases = make(map[*TypeName]bool)
+func (check *Checker) brokenAlias(alias *TypeName) {
+	assert(!check.conf.EnableAlias)
+	if check.brokenAliases == nil {
+		check.brokenAliases = make(map[*TypeName]bool)
 	}
-	checks.brokenAliases[alias] = true
+	check.brokenAliases[alias] = true
 	alias.typ = Typ[Invalid]
 }
 
 // validAlias records that alias has the valid type typ (possibly Typ[Invalid]).
-func (checks *Checker) validAlias(alias *TypeName, typ Type) {
-	assert(!checks.conf.EnableAlias)
-	delete(checks.brokenAliases, alias)
+func (check *Checker) validAlias(alias *TypeName, typ Type) {
+	assert(!check.conf.EnableAlias)
+	delete(check.brokenAliases, alias)
 	alias.typ = typ
 }
 
 // isBrokenAlias reports whether alias doesn't have a determined type yet.
-func (checks *Checker) isBrokenAlias(alias *TypeName) bool {
-	assert(!checks.conf.EnableAlias)
-	return checks.brokenAliases[alias]
+func (check *Checker) isBrokenAlias(alias *TypeName) bool {
+	assert(!check.conf.EnableAlias)
+	return check.brokenAliases[alias]
 }
 
-func (checks *Checker) rememberUntyped(e syntax.Expr, lhs bool, mode operandMode, typ *Basic, val constant.Value) {
-	m := checks.untyped
+func (check *Checker) rememberUntyped(e syntax.Expr, lhs bool, mode operandMode, typ *Basic, val constant.Value) {
+	m := check.untyped
 	if m == nil {
 		m = make(map[syntax.Expr]exprInfo)
-		checks.untyped = m
+		check.untyped = m
 	}
 	m[e] = exprInfo{lhs, mode, typ, val}
 }
@@ -241,24 +241,24 @@ func (checks *Checker) rememberUntyped(e syntax.Expr, lhs bool, mode operandMode
 // (so that f still sees the scope before any new declarations).
 // later returns the pushed action so one can provide a description
 // via action.describef for debugging, if desired.
-func (checks *Checker) later(f func()) *action {
-	i := len(checks.delayed)
-	checks.delayed = append(checks.delayed, action{version: checks.version, f: f})
-	return &checks.delayed[i]
+func (check *Checker) later(f func()) *action {
+	i := len(check.delayed)
+	check.delayed = append(check.delayed, action{version: check.version, f: f})
+	return &check.delayed[i]
 }
 
 // push pushes obj onto the object path and returns its index in the path.
-func (checks *Checker) push(obj Object) int {
-	checks.objPath = append(checks.objPath, obj)
-	return len(checks.objPath) - 1
+func (check *Checker) push(obj Object) int {
+	check.objPath = append(check.objPath, obj)
+	return len(check.objPath) - 1
 }
 
 // pop pops and returns the topmost object from the object path.
-func (checks *Checker) pop() Object {
-	i := len(checks.objPath) - 1
-	obj := checks.objPath[i]
-	checks.objPath[i] = nil
-	checks.objPath = checks.objPath[:i]
+func (check *Checker) pop() Object {
+	i := len(check.objPath) - 1
+	obj := check.objPath[i]
+	check.objPath[i] = nil
+	check.objPath = check.objPath[:i]
 	return obj
 }
 
@@ -268,8 +268,8 @@ type cleaner interface {
 
 // needsCleanup records objects/types that implement the cleanup method
 // which will be called at the end of type-checking.
-func (checks *Checker) needsCleanup(c cleaner) {
-	checks.cleaners = append(checks.cleaners, c)
+func (check *Checker) needsCleanup(c cleaner) {
+	check.cleaners = append(check.cleaners, c)
 }
 
 // NewChecker returns a new Checker instance for a given package.
@@ -305,68 +305,68 @@ func NewChecker(conf *Config, pkg *Package, info *Info) *Checker {
 
 // initFiles initializes the files-specific portion of checker.
 // The provided files must all belong to the same package.
-func (checks *Checker) initFiles(files []*syntax.File) {
+func (check *Checker) initFiles(files []*syntax.File) {
 	// start with a clean slate (check.Files may be called multiple times)
 	// TODO(gri): what determines which fields are zeroed out here, vs at the end
 	// of checkFiles?
-	checks.files = nil
-	checks.imports = nil
-	checks.dotImportMap = nil
+	check.files = nil
+	check.imports = nil
+	check.dotImportMap = nil
 
-	checks.firstErr = nil
-	checks.methods = nil
-	checks.untyped = nil
-	checks.delayed = nil
-	checks.objPath = nil
-	checks.cleaners = nil
+	check.firstErr = nil
+	check.methods = nil
+	check.untyped = nil
+	check.delayed = nil
+	check.objPath = nil
+	check.cleaners = nil
 
 	// We must initialize usedVars and usedPkgNames both here and in NewChecker,
 	// because initFiles is not called in the CheckExpr or Eval codepaths, yet we
 	// want to free this memory at the end of Files ('used' predicates are
 	// only needed in the context of a given file).
-	checks.usedVars = make(map[*Var]bool)
-	checks.usedPkgNames = make(map[*PkgName]bool)
+	check.usedVars = make(map[*Var]bool)
+	check.usedPkgNames = make(map[*PkgName]bool)
 
 	// determine package name and collect valid files
-	pkg := checks.pkg
+	pkg := check.pkg
 	for _, file := range files {
 		switch name := file.PkgName.Value; pkg.name {
 		case "":
 			if name != "_" {
 				pkg.name = name
 			} else {
-				checks.error(file.PkgName, BlankPkgName, "invalid package name _")
+				check.error(file.PkgName, BlankPkgName, "invalid package name _")
 			}
 			fallthrough
 
 		case name:
-			checks.files = append(checks.files, file)
+			check.files = append(check.files, file)
 
 		default:
-			checks.errorf(file, MismatchedPkgName, "package %s; expected package %s", name, pkg.name)
+			check.errorf(file, MismatchedPkgName, "package %s; expected package %s", name, pkg.name)
 			// ignore this file
 		}
 	}
 
 	// reuse Info.FileVersions if provided
-	versions := checks.Info.FileVersions
+	versions := check.Info.FileVersions
 	if versions == nil {
 		versions = make(map[*syntax.PosBase]string)
 	}
-	checks.versions = versions
+	check.versions = versions
 
-	pkgVersion := asGoVersion(checks.conf.GoVersion)
+	pkgVersion := asGoVersion(check.conf.GoVersion)
 	if pkgVersion.isValid() && len(files) > 0 && pkgVersion.cmp(go_current) > 0 {
-		checks.errorf(files[0], TooNew, "package requires newer Go version %v (application built with %v)",
+		check.errorf(files[0], TooNew, "package requires newer Go version %v (application built with %v)",
 			pkgVersion, go_current)
 	}
 
 	// determine Go version for each file
-	for _, file := range checks.files {
+	for _, file := range check.files {
 		// use unaltered Config.GoVersion by default
 		// (This version string may contain dot-release numbers as in go1.20.1,
 		// unlike file versions which are Go language versions only, if valid.)
-		v := checks.conf.GoVersion
+		v := check.conf.GoVersion
 
 		// If the file specifies a version, use max(fileVersion, go1.21).
 		if fileVersion := asGoVersion(file.GoVersion); fileVersion.isValid() {
@@ -387,7 +387,7 @@ func (checks *Checker) initFiles(files []*syntax.File) {
 			if fileVersion.cmp(go_current) > 0 {
 				// Use position of 'package [p]' for types/types2 consistency.
 				// (Ideally we would use the //build tag itself.)
-				checks.errorf(file.PkgName, TooNew, "file requires newer Go version %v", fileVersion)
+				check.errorf(file.PkgName, TooNew, "file requires newer Go version %v", fileVersion)
 			}
 		}
 		versions[file.Pos().FileBase()] = v // file.Pos().FileBase() may be nil for tests
@@ -402,25 +402,25 @@ func versionMax(a, b goVersion) goVersion {
 }
 
 // pushPos pushes pos onto the pos stack.
-func (checks *Checker) pushPos(pos syntax.Pos) {
-	checks.posStack = append(checks.posStack, pos)
+func (check *Checker) pushPos(pos syntax.Pos) {
+	check.posStack = append(check.posStack, pos)
 }
 
 // popPos pops from the pos stack.
-func (checks *Checker) popPos() {
-	checks.posStack = checks.posStack[:len(checks.posStack)-1]
+func (check *Checker) popPos() {
+	check.posStack = check.posStack[:len(check.posStack)-1]
 }
 
 // A bailout panic is used for early termination.
 type bailout struct{}
 
-func (checks *Checker) handleBailout(err *error) {
+func (check *Checker) handleBailout(err *error) {
 	switch p := recover().(type) {
 	case nil, bailout:
 		// normal return or early exit
-		*err = checks.firstErr
+		*err = check.firstErr
 	default:
-		if len(checks.posStack) > 0 {
+		if len(check.posStack) > 0 {
 			doPrint := func(ps []syntax.Pos) {
 				for i := len(ps) - 1; i >= 0; i-- {
 					fmt.Fprintf(os.Stderr, "\t%v\n", ps[i])
@@ -428,13 +428,13 @@ func (checks *Checker) handleBailout(err *error) {
 			}
 
 			fmt.Fprintln(os.Stderr, "The following panic happened checking types near:")
-			if len(checks.posStack) <= 10 {
-				doPrint(checks.posStack)
+			if len(check.posStack) <= 10 {
+				doPrint(check.posStack)
 			} else {
 				// if it's long, truncate the middle; it's least likely to help
-				doPrint(checks.posStack[len(checks.posStack)-5:])
+				doPrint(check.posStack[len(check.posStack)-5:])
 				fmt.Fprintln(os.Stderr, "\t...")
-				doPrint(checks.posStack[:5])
+				doPrint(check.posStack[:5])
 			}
 		}
 
@@ -444,8 +444,8 @@ func (checks *Checker) handleBailout(err *error) {
 }
 
 // Files checks the provided files as part of the checker's package.
-func (checks *Checker) Files(files []*syntax.File) (err error) {
-	if checks.pkg == Unsafe {
+func (check *Checker) Files(files []*syntax.File) (err error) {
+	if check.pkg == Unsafe {
 		// Defensive handling for Unsafe, which cannot be type checked, and must
 		// not be mutated. See https://go.dev/issue/61212 for an example of where
 		// Unsafe is passed to NewChecker.
@@ -456,8 +456,8 @@ func (checks *Checker) Files(files []*syntax.File) (err error) {
 	// localized to a piece of syntax and needn't prevent
 	// type-checking of the rest of the package.
 
-	defer checks.handleBailout(&err)
-	checks.checkFiles(files)
+	defer check.handleBailout(&err)
+	check.checkFiles(files)
 	return
 }
 
@@ -465,10 +465,10 @@ func (checks *Checker) Files(files []*syntax.File) (err error) {
 // a side effect, not by returning early, to ensure that well-formed
 // syntax is properly type annotated even in a package containing
 // errors.
-func (checks *Checker) checkFiles(files []*syntax.File) {
+func (check *Checker) checkFiles(files []*syntax.File) {
 	// Ensure that EnableAlias is consistent among concurrent type checking
 	// operations. See the documentation of [_aliasAny] for details.
-	if checks.conf.EnableAlias {
+	if check.conf.EnableAlias {
 		if atomic.AddInt32(&_aliasAny, 1) <= 0 {
 			panic("EnableAlias set while !EnableAlias type checking is ongoing")
 		}
@@ -481,102 +481,102 @@ func (checks *Checker) checkFiles(files []*syntax.File) {
 	}
 
 	print := func(msg string) {
-		if checks.conf.Trace {
+		if check.conf.Trace {
 			fmt.Println()
 			fmt.Println(msg)
 		}
 	}
 
 	print("== initFiles ==")
-	checks.initFiles(files)
+	check.initFiles(files)
 
 	print("== collectObjects ==")
-	checks.collectObjects()
+	check.collectObjects()
 
 	print("== packageObjects ==")
-	checks.packageObjects()
+	check.packageObjects()
 
 	print("== processDelayed ==")
-	checks.processDelayed(0) // incl. all functions
+	check.processDelayed(0) // incl. all functions
 
 	print("== cleanup ==")
-	checks.cleanup()
+	check.cleanup()
 
 	print("== initOrder ==")
-	checks.initOrder()
+	check.initOrder()
 
-	if !checks.conf.DisableUnusedImportCheck {
+	if !check.conf.DisableUnusedImportCheck {
 		print("== unusedImports ==")
-		checks.unusedImports()
+		check.unusedImports()
 	}
 
 	print("== recordUntyped ==")
-	checks.recordUntyped()
+	check.recordUntyped()
 
-	if checks.firstErr == nil {
+	if check.firstErr == nil {
 		// TODO(mdempsky): Ensure monomorph is safe when errors exist.
-		checks.monomorph()
+		check.monomorph()
 	}
 
-	checks.pkg.goVersion = checks.conf.GoVersion
-	checks.pkg.complete = true
+	check.pkg.goVersion = check.conf.GoVersion
+	check.pkg.complete = true
 
 	// no longer needed - release memory
-	checks.imports = nil
-	checks.dotImportMap = nil
-	checks.pkgPathMap = nil
-	checks.seenPkgMap = nil
-	checks.brokenAliases = nil
-	checks.unionTypeSets = nil
-	checks.usedVars = nil
-	checks.usedPkgNames = nil
-	checks.ctxt = nil
+	check.imports = nil
+	check.dotImportMap = nil
+	check.pkgPathMap = nil
+	check.seenPkgMap = nil
+	check.brokenAliases = nil
+	check.unionTypeSets = nil
+	check.usedVars = nil
+	check.usedPkgNames = nil
+	check.ctxt = nil
 
 	// TODO(gri): shouldn't the cleanup above occur after the bailout?
 	// TODO(gri) There's more memory we should release at this point.
 }
 
 // processDelayed processes all delayed actions pushed after top.
-func (checks *Checker) processDelayed(top int) {
+func (check *Checker) processDelayed(top int) {
 	// If each delayed action pushes a new action, the
 	// stack will continue to grow during this loop.
 	// However, it is only processing functions (which
 	// are processed in a delayed fashion) that may
 	// add more actions (such as nested functions), so
 	// this is a sufficiently bounded process.
-	savedVersion := checks.version
-	for i := top; i < len(checks.delayed); i++ {
-		a := &checks.delayed[i]
-		if checks.conf.Trace {
+	savedVersion := check.version
+	for i := top; i < len(check.delayed); i++ {
+		a := &check.delayed[i]
+		if check.conf.Trace {
 			if a.desc != nil {
-				checks.trace(a.desc.pos.Pos(), "-- "+a.desc.format, a.desc.args...)
+				check.trace(a.desc.pos.Pos(), "-- "+a.desc.format, a.desc.args...)
 			} else {
-				checks.trace(nopos, "-- delayed %p", a.f)
+				check.trace(nopos, "-- delayed %p", a.f)
 			}
 		}
-		checks.version = a.version // reestablish the effective Go version captured earlier
-		a.f()                      // may append to check.delayed
-		if checks.conf.Trace {
+		check.version = a.version // reestablish the effective Go version captured earlier
+		a.f()                     // may append to check.delayed
+		if check.conf.Trace {
 			fmt.Println()
 		}
 	}
-	assert(top <= len(checks.delayed)) // stack must not have shrunk
-	checks.delayed = checks.delayed[:top]
-	checks.version = savedVersion
+	assert(top <= len(check.delayed)) // stack must not have shrunk
+	check.delayed = check.delayed[:top]
+	check.version = savedVersion
 }
 
 // cleanup runs cleanup for all collected cleaners.
-func (checks *Checker) cleanup() {
+func (check *Checker) cleanup() {
 	// Don't use a range clause since Named.cleanup may add more cleaners.
-	for i := 0; i < len(checks.cleaners); i++ {
-		checks.cleaners[i].cleanup()
+	for i := 0; i < len(check.cleaners); i++ {
+		check.cleaners[i].cleanup()
 	}
-	checks.cleaners = nil
+	check.cleaners = nil
 }
 
 // types2-specific support for recording type information in the syntax tree.
-func (checks *Checker) recordTypeAndValueInSyntax(x syntax.Expr, mode operandMode, typ Type, val constant.Value) {
-	if checks.StoreTypesInSyntax {
+func (check *Checker) recordTypeAndValueInSyntax(x syntax.Expr, mode operandMode, typ Type, val constant.Value) {
+	if check.StoreTypesInSyntax {
 		tv := TypeAndValue{mode, typ, val}
 		stv := syntax.TypeAndValue{Type: typ, Value: val}
 		if tv.IsVoid() {
@@ -608,8 +608,8 @@ func (checks *Checker) recordTypeAndValueInSyntax(x syntax.Expr, mode operandMod
 }
 
 // types2-specific support for recording type information in the syntax tree.
-func (checks *Checker) recordCommaOkTypesInSyntax(x syntax.Expr, t0, t1 Type) {
-	if checks.StoreTypesInSyntax {
+func (check *Checker) recordCommaOkTypesInSyntax(x syntax.Expr, t0, t1 Type) {
+	if check.StoreTypesInSyntax {
 		// Note: this loop is duplicated because the type of tv is different.
 		// Above it is types2.TypeAndValue, here it is syntax.TypeAndValue.
 		for {
@@ -617,8 +617,8 @@ func (checks *Checker) recordCommaOkTypesInSyntax(x syntax.Expr, t0, t1 Type) {
 			assert(tv.Type != nil) // should have been recorded already
 			pos := x.Pos()
 			tv.Type = NewTuple(
-				NewParam(pos, checks.pkg, "", t0),
-				NewParam(pos, checks.pkg, "", t1),
+				NewParam(pos, check.pkg, "", t0),
+				NewParam(pos, check.pkg, "", t1),
 			)
 			x.SetTypeInfo(tv)
 			p, _ := x.(*syntax.ParenExpr)

@@ -52,7 +52,7 @@ func (m substMap) lookup(tpar *TypeParam) Type {
 //
 // If expanding is non-nil, it is the instance type currently being expanded.
 // One of expanding or ctxt must be non-nil.
-func (checks *Checker) subst(pos syntax.Pos, typ Type, smap substMap, expanding *Named, ctxt *Context) Type {
+func (check *Checker) subst(pos syntax.Pos, typ Type, smap substMap, expanding *Named, ctxt *Context) Type {
 	assert(expanding != nil || ctxt != nil)
 
 	if smap.empty() {
@@ -71,7 +71,7 @@ func (checks *Checker) subst(pos syntax.Pos, typ Type, smap substMap, expanding 
 	subst := subster{
 		pos:       pos,
 		smap:      smap,
-		checks:    checks,
+		checks:    check,
 		expanding: expanding,
 		ctxt:      ctxt,
 	}

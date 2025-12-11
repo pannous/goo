@@ -246,14 +246,14 @@ func (n *Named) setState(state namedState) {
 }
 
 // newNamed is like NewNamed but with a *Checker receiver.
-func (checks *Checker) newNamed(obj *TypeName, underlying Type, methods []*Func) *Named {
-	typ := &Named{checks: checks, obj: obj, fromRHS: underlying, underlying: underlying, methods: methods}
+func (check *Checker) newNamed(obj *TypeName, underlying Type, methods []*Func) *Named {
+	typ := &Named{checks: check, obj: obj, fromRHS: underlying, underlying: underlying, methods: methods}
 	if obj.typ == nil {
 		obj.typ = typ
 	}
 	// Ensure that typ is always sanity-checked.
-	if checks != nil {
-		checks.needsCleanup(typ)
+	if check != nil {
+		check.needsCleanup(typ)
 	}
 	return typ
 }
@@ -264,7 +264,7 @@ func (checks *Checker) newNamed(obj *TypeName, underlying Type, methods []*Func)
 //
 // If set, expanding is the named type instance currently being expanded, that
 // led to the creation of this instance.
-func (checks *Checker) newNamedInstance(pos syntax.Pos, orig *Named, targs []Type, expanding *Named) *Named {
+func (check *Checker) newNamedInstance(pos syntax.Pos, orig *Named, targs []Type, expanding *Named) *Named {
 	assert(len(targs) > 0)
 
 	obj := NewTypeName(pos, orig.obj.pkg, orig.obj.name, nil)
@@ -278,11 +278,11 @@ func (checks *Checker) newNamedInstance(pos syntax.Pos, orig *Named, targs []Typ
 	if expanding != nil && expanding.Obj().pkg == obj.pkg {
 		inst.ctxt = expanding.inst.ctxt
 	}
-	typ := &Named{checks: checks, obj: obj, inst: inst}
+	typ := &Named{checks: check, obj: obj, inst: inst}
 	obj.typ = typ
 	// Ensure that typ is always sanity-checked.
-	if checks != nil {
-		checks.needsCleanup(typ)
+	if check != nil {
+		check.needsCleanup(typ)
 	}
 	return typ
 }
@@ -626,11 +626,11 @@ func (n *Named) lookupMethod(pkg *Package, name string, foldCase bool) (int, *Fu
 }
 
 // context returns the type-checker context.
-func (checks *Checker) context() *Context {
-	if checks.ctxt == nil {
-		checks.ctxt = NewContext()
+func (check *Checker) context() *Context {
+	if check.ctxt == nil {
+		check.ctxt = NewContext()
 	}
-	return checks.ctxt
+	return check.ctxt
 }
 
 // expandUnderlying substitutes type arguments in the underlying type n.orig,

@@ -64,7 +64,7 @@ func (s *Struct) markComplete() {
 	}
 }
 
-func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
+func (check *Checker) structType(styp *Struct, e *syntax.StructType) {
 	if e.FieldList == nil {
 		styp.markComplete()
 		return
@@ -74,7 +74,7 @@ func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
 	var fields []*Var
 	var tags []string
 
-	// for double-declaration checks
+	// for double-declaration check
 	var fset objset
 
 	// current field typ and tag
@@ -90,11 +90,11 @@ func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
 
 		pos := ident.Pos()
 		name := ident.Value
-		fld := NewField(pos, checks.pkg, name, typ, embedded)
+		fld := NewField(pos, check.pkg, name, typ, embedded)
 		// spec: "Within a struct, non-blank field names must be unique."
-		if name == "_" || checks.declareInSet(&fset, pos, fld) {
+		if name == "_" || check.declareInSet(&fset, pos, fld) {
 			fields = append(fields, fld)
-			checks.recordDef(ident, fld)
+			check.recordDef(ident, fld)
 		}
 	}
 
@@ -113,12 +113,12 @@ func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
 		// Fields declared syntactically with the same type (e.g.: a, b, c T)
 		// share the same type expression. Only check type if it's a new type.
 		if i == 0 || f.Type != prev {
-			typ = checks.varType(f.Type)
+			typ = check.varType(f.Type)
 			prev = f.Type
 		}
 		tag = ""
 		if i < len(e.TagList) {
-			tag = checks.tag(e.TagList[i])
+			tag = check.tag(e.TagList[i])
 		}
 		if f.Name != nil {
 			// named field
@@ -131,7 +131,7 @@ func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
 			pos := syntax.StartPos(f.Type) // position of type, for errors
 			name := embeddedFieldIdent(f.Type)
 			if name == nil {
-				checks.errorf(pos, InvalidSyntaxTree, "invalid embedded field type %s", f.Type)
+				check.errorf(pos, InvalidSyntaxTree, "invalid embedded field type %s", f.Type)
 				name = syntax.NewName(pos, "_")
 				addInvalid(name)
 				continue
@@ -144,7 +144,7 @@ func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
 			// (via under(t)) a possibly incomplete type.
 			embeddedTyp := typ // for closure below
 			embeddedPos := pos
-			checks.later(func() {
+			check.later(func() {
 				t, isPtr := deref(embeddedTyp)
 				switch u := under(t).(type) {
 				case *Basic:
@@ -154,20 +154,20 @@ func (checks *Checker) structType(styp *Struct, e *syntax.StructType) {
 					}
 					// unsafe.Pointer is treated like a regular pointer
 					if u.kind == UnsafePointer {
-						checks.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be unsafe.Pointer")
+						check.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be unsafe.Pointer")
 					}
 				case *Pointer:
-					checks.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer")
+					check.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer")
 				case *Interface:
 					if isTypeParam(t) {
 						// The error code here is inconsistent with other error codes for
 						// invalid embedding, because this restriction may be relaxed in the
 						// future, and so it did not warrant a new error code.
-						checks.error(embeddedPos, MisplacedTypeParam, "embedded field type cannot be a (pointer to a) type parameter")
+						check.error(embeddedPos, MisplacedTypeParam, "embedded field type cannot be a (pointer to a) type parameter")
 						break
 					}
 					if isPtr {
-						checks.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer to an interface")
+						check.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer to an interface")
 					}
 				}
 			}).describef(embeddedPos, "check embedded type %s", embeddedTyp)
@@ -198,9 +198,9 @@ func embeddedFieldIdent(e syntax.Expr) *syntax.Name {
 	return nil // invalid embedded field
 }
 
-func (checks *Checker) declareInSet(oset *objset, pos syntax.Pos, obj Object) bool {
+func (check *Checker) declareInSet(oset *objset, pos syntax.Pos, obj Object) bool {
 	if alt := oset.insert(obj); alt != nil {
-		err := checks.newError(DuplicateDecl)
+		err := check.newError(DuplicateDecl)
 		err.addf(pos, "%s redeclared", obj.Name())
 		err.addAltDecl(alt)
 		err.report()
@@ -209,7 +209,7 @@ func (checks *Checker) declareInSet(oset *objset, pos syntax.Pos, obj Object) bo
 	return true
 }
 
-func (checks *Checker) tag(t *syntax.BasicLit) string {
+func (check *Checker) tag(t *syntax.BasicLit) string {
 	// If t.Bad, an error was reported during parsing.
 	if t != nil && !t.Bad {
 		if t.Kind == syntax.StringLit {
@@ -217,7 +217,7 @@ func (checks *Checker) tag(t *syntax.BasicLit) string {
 				return val
 			}
 		}
-		checks.errorf(t, InvalidSyntaxTree, "incorrect tag syntax: %q", t.Value)
+		check.errorf(t, InvalidSyntaxTree, "incorrect tag syntax: %q", t.Value)
 	}
 	return ""
 }
