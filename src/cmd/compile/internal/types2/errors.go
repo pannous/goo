@@ -43,11 +43,11 @@ type error_ struct {
 }
 
 // newError returns a new error_ with the given error code.
-func (checks *Checker) newError(code Code) *error_ {
+func (check *Checker) newError(code Code) *error_ {
 	if code == 0 {
 		panic("error code must not be 0")
 	}
-	return &error_{checks: checks, code: code}
+	return &error_{checks: check, code: code}
 }
 
 // addf adds formatted error information to err.
@@ -152,7 +152,7 @@ func (err *error_) report() {
 }
 
 // handleError should only be called by error_.report.
-func (checks *Checker) handleError(index int, pos syntax.Pos, code Code, msg string, soft bool) {
+func (check *Checker) handleError(index int, pos syntax.Pos, code Code, msg string, soft bool) {
 	assert(code != 0)
 
 	if index == 0 {
@@ -162,9 +162,9 @@ func (checks *Checker) handleError(index int, pos syntax.Pos, code Code, msg str
 		// constant identifier. Use the provided errpos instead.
 		// TODO(gri) We may also want to augment the error message and
 		// refer to the position (pos) in the original expression.
-		if checks.errpos.Pos().IsKnown() {
-			assert(checks.iota != nil)
-			pos = checks.errpos
+		if check.errpos.Pos().IsKnown() {
+			assert(check.iota != nil)
+			pos = check.errpos
 		}
 
 		// Report invalid syntax trees explicitly.
@@ -173,8 +173,8 @@ func (checks *Checker) handleError(index int, pos syntax.Pos, code Code, msg str
 		}
 
 		// If we have a URL for error codes, add a link to the first line.
-		if checks.conf.ErrorURL != "" {
-			url := fmt.Sprintf(checks.conf.ErrorURL, code)
+		if check.conf.ErrorURL != "" {
+			url := fmt.Sprintf(check.conf.ErrorURL, code)
 			if i := strings.Index(msg, "\n"); i >= 0 {
 				msg = msg[:i] + url + msg[i:]
 			} else {
@@ -195,11 +195,11 @@ func (checks *Checker) handleError(index int, pos syntax.Pos, code Code, msg str
 		Code: code,
 	}
 
-	if checks.firstErr == nil && !soft {
-		checks.firstErr = e
+	if check.firstErr == nil && !soft {
+		check.firstErr = e
 	}
 
-	f := checks.conf.Error
+	f := check.conf.Error
 	if f == nil {
 		panic(bailout{}) // record first error and exit
 	}
@@ -216,33 +216,33 @@ type poser interface {
 	Pos() syntax.Pos
 }
 
-func (checks *Checker) error(at poser, code Code, msg string) {
-	err := checks.newError(code)
+func (check *Checker) error(at poser, code Code, msg string) {
+	err := check.newError(code)
 	err.addf(at, "%s", msg)
 	err.report()
 }
 
-func (checks *Checker) errorf(at poser, code Code, format string, args ...any) {
-	err := checks.newError(code)
+func (check *Checker) errorf(at poser, code Code, format string, args ...any) {
+	err := check.newError(code)
 	err.addf(at, format, args...)
 	err.report()
 }
 
-func (checks *Checker) softErrorf(at poser, code Code, format string, args ...any) {
-	err := checks.newError(code)
+func (check *Checker) softErrorf(at poser, code Code, format string, args ...any) {
+	err := check.newError(code)
 	err.addf(at, format, args...)
 	err.soft = true
 	err.report()
 }
 
-func (checks *Checker) warningf(at poser, code Code, format string, args ...any) {
+func (check *Checker) warningf(at poser, code Code, format string, args ...any) {
 	fmt.Printf(format, args...)
 	// todo register warning
 }
 
-func (checks *Checker) versionErrorf(at poser, v goVersion, format string, args ...any) {
-	msg := checks.sprintf(format, args...)
-	err := checks.newError(UnsupportedFeature)
+func (check *Checker) versionErrorf(at poser, v goVersion, format string, args ...any) {
+	msg := check.sprintf(format, args...)
+	err := check.newError(UnsupportedFeature)
 	err.addf(at, "%s requires %s or later", msg, v)
 	err.report()
 }

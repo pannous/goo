@@ -372,7 +372,7 @@ func MissingMethod(V Type, T *Interface, static bool) (method *Func, wrongType b
 // lying type) is used for better error messages (reported through *cause).
 // The comparator is used to compare signatures.
 // If a method is missing and cause is not nil, *cause describes the error.
-func (checks *Checker) missingMethod(V, T Type, static bool, equivalent func(x, y Type) bool, cause *string) (method *Func, wrongType bool) {
+func (check *Checker) missingMethod(V, T Type, static bool, equivalent func(x, y Type) bool, cause *string) (method *Func, wrongType bool) {
 	methods := under(T).(*Interface).typeSet().methods // T must be an interface
 	if len(methods) == 0 {
 		return nil, false
@@ -446,8 +446,8 @@ func (checks *Checker) missingMethod(V, T Type, static bool, equivalent func(x, 
 			}
 
 			// methods may not have a fully set up signature yet
-			if checks != nil {
-				checks.objDecl(f, nil)
+			if check != nil {
+				check.objDecl(f, nil)
 			}
 
 			if !equivalent(f.typ, m.typ) {
@@ -465,31 +465,31 @@ func (checks *Checker) missingMethod(V, T Type, static bool, equivalent func(x, 
 		if f != nil {
 			// This method may be formatted in funcString below, so must have a fully
 			// set up signature.
-			if checks != nil {
-				checks.objDecl(f, nil)
+			if check != nil {
+				check.objDecl(f, nil)
 			}
 		}
 		switch state {
 		case notFound:
 			switch {
 			case isInterfacePtr(V):
-				*cause = "(" + checks.interfacePtrError(V) + ")"
+				*cause = "(" + check.interfacePtrError(V) + ")"
 			case isInterfacePtr(T):
-				*cause = "(" + checks.interfacePtrError(T) + ")"
+				*cause = "(" + check.interfacePtrError(T) + ")"
 			default:
-				*cause = checks.sprintf("(missing method %s)", m.Name())
+				*cause = check.sprintf("(missing method %s)", m.Name())
 			}
 		case wrongName:
-			fs, ms := checks.funcString(f, false), checks.funcString(m, false)
-			*cause = checks.sprintf("(missing method %s)\n\t\thave %s\n\t\twant %s", m.Name(), fs, ms)
+			fs, ms := check.funcString(f, false), check.funcString(m, false)
+			*cause = check.sprintf("(missing method %s)\n\t\thave %s\n\t\twant %s", m.Name(), fs, ms)
 		case unexported:
-			*cause = checks.sprintf("(unexported method %s)", m.Name())
+			*cause = check.sprintf("(unexported method %s)", m.Name())
 		case wrongSig:
-			fs, ms := checks.funcString(f, false), checks.funcString(m, false)
+			fs, ms := check.funcString(f, false), check.funcString(m, false)
 			if fs == ms {
 				// Don't report "want Foo, have Foo".
 				// Add package information to disambiguate (go.dev/issue/54258).
-				fs, ms = checks.funcString(f, true), checks.funcString(m, true)
+				fs, ms = check.funcString(f, true), check.funcString(m, true)
 			}
 			if fs == ms {
 				// We still have "want Foo, have Foo".
@@ -499,16 +499,16 @@ func (checks *Checker) missingMethod(V, T Type, static bool, equivalent func(x, 
 				// Rather than reporting this misleading error cause, for now
 				// just point out that the method signature is incorrect.
 				// TODO(gri) should find a good way to report the root cause
-				*cause = checks.sprintf("(wrong type for method %s)", m.Name())
+				*cause = check.sprintf("(wrong type for method %s)", m.Name())
 				break
 			}
-			*cause = checks.sprintf("(wrong type for method %s)\n\t\thave %s\n\t\twant %s", m.Name(), fs, ms)
+			*cause = check.sprintf("(wrong type for method %s)\n\t\thave %s\n\t\twant %s", m.Name(), fs, ms)
 		case ambigSel:
-			*cause = checks.sprintf("(ambiguous selector %s.%s)", V, m.Name())
+			*cause = check.sprintf("(ambiguous selector %s.%s)", V, m.Name())
 		case ptrRecv:
-			*cause = checks.sprintf("(method %s has pointer receiver)", m.Name())
+			*cause = check.sprintf("(method %s has pointer receiver)", m.Name())
 		case field:
-			*cause = checks.sprintf("(%s.%s is a field, not a method)", V, m.Name())
+			*cause = check.sprintf("(%s.%s is a field, not a method)", V, m.Name())
 		default:
 			panic("unreachable")
 		}
@@ -523,11 +523,11 @@ func (checks *Checker) missingMethod(V, T Type, static bool, equivalent func(x, 
 // (an embedded field may have the method in question).
 // If the result is false and cause is not nil, *cause describes the error.
 // Use hasAllMethods to avoid follow-on errors due to incorrect types.
-func (checks *Checker) hasAllMethods(V, T Type, static bool, equivalent func(x, y Type) bool, cause *string) bool {
+func (check *Checker) hasAllMethods(V, T Type, static bool, equivalent func(x, y Type) bool, cause *string) bool {
 	if !isValid(V) {
 		return true // we don't know anything about V, assume it implements T
 	}
-	m, _ := checks.missingMethod(V, T, static, equivalent, cause)
+	m, _ := check.missingMethod(V, T, static, equivalent, cause)
 	return m == nil || hasInvalidEmbeddedFields(V, nil)
 }
 
@@ -554,21 +554,21 @@ func isInterfacePtr(T Type) bool {
 }
 
 // check may be nil.
-func (checks *Checker) interfacePtrError(T Type) string {
+func (check *Checker) interfacePtrError(T Type) string {
 	assert(isInterfacePtr(T))
 	if p, _ := under(T).(*Pointer); isTypeParam(p.base) {
-		return checks.sprintf("type %s is pointer to type parameter, not type parameter", T)
+		return check.sprintf("type %s is pointer to type parameter, not type parameter", T)
 	}
-	return checks.sprintf("type %s is pointer to interface, not interface", T)
+	return check.sprintf("type %s is pointer to interface, not interface", T)
 }
 
 // funcString returns a string of the form name + signature for f.
 // check may be nil.
-func (checks *Checker) funcString(f *Func, pkgInfo bool) string {
+func (check *Checker) funcString(f *Func, pkgInfo bool) string {
 	buf := bytes.NewBufferString(f.name)
 	var qf Qualifier
-	if checks != nil && !pkgInfo {
-		qf = checks.qualifier
+	if check != nil && !pkgInfo {
+		qf = check.qualifier
 	}
 	w := newTypeWriter(buf, qf)
 	w.pkgInfo = pkgInfo
@@ -583,7 +583,7 @@ func (checks *Checker) funcString(f *Func, pkgInfo bool) string {
 // The underlying type of V must be an interface.
 // If the result is false and cause is not nil, *cause describes the error.
 // TODO(gri) replace calls to this function with calls to newAssertableTo.
-func (checks *Checker) assertableTo(V, T Type, cause *string) bool {
+func (check *Checker) assertableTo(V, T Type, cause *string) bool {
 	// no static check is required if T is an interface
 	// spec: "If T is an interface type, x.(T) asserts that the
 	//        dynamic type of x implements the interface T."
@@ -591,7 +591,7 @@ func (checks *Checker) assertableTo(V, T Type, cause *string) bool {
 		return true
 	}
 	// TODO(gri) fix this for generalized interfaces
-	return checks.hasAllMethods(T, V, false, Identical, cause)
+	return check.hasAllMethods(T, V, false, Identical, cause)
 }
 
 // newAssertableTo reports whether a value of type V can be asserted to have type T.
@@ -599,14 +599,14 @@ func (checks *Checker) assertableTo(V, T Type, cause *string) bool {
 // in constraint position (we have not yet defined that behavior in the spec).
 // The underlying type of V must be an interface.
 // If the result is false and cause is not nil, *cause is set to the error cause.
-func (checks *Checker) newAssertableTo(V, T Type, cause *string) bool {
+func (check *Checker) newAssertableTo(V, T Type, cause *string) bool {
 	// no static check is required if T is an interface
 	// spec: "If T is an interface type, x.(T) asserts that the
 	//        dynamic type of x implements the interface T."
 	if IsInterface(T) {
 		return true
 	}
-	return checks.implements(T, V, false, cause)
+	return check.implements(T, V, false, cause)
 }
 
 // deref dereferences typ if it is a *Pointer (but not a *Named type

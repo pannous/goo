@@ -12,7 +12,7 @@ import (
 	"go/constant"
 )
 
-func (checks *Checker) record(x *operand) {
+func (check *Checker) record(x *operand) {
 	// convert x into a user-friendly set of values
 	// TODO(gri) this code can be simplified
 	var typ Type
@@ -33,27 +33,27 @@ func (checks *Checker) record(x *operand) {
 	if isUntyped(typ) {
 		// delay type and value recording until we know the type
 		// or until the end of type checking
-		checks.rememberUntyped(x.expr, false, x.mode, typ.(*Basic), val)
+		check.rememberUntyped(x.expr, false, x.mode, typ.(*Basic), val)
 	} else {
-		checks.recordTypeAndValue(x.expr, x.mode, typ, val)
+		check.recordTypeAndValue(x.expr, x.mode, typ, val)
 	}
 }
 
-func (checks *Checker) recordUntyped() {
-	if !debug && !checks.recordTypes() {
+func (check *Checker) recordUntyped() {
+	if !debug && !check.recordTypes() {
 		return // nothing to do
 	}
 
-	for x, info := range checks.untyped {
+	for x, info := range check.untyped {
 		if debug && isTyped(info.typ) {
-			checks.dump("%v: %s (type %s) is typed", atPos(x), x, info.typ)
+			check.dump("%v: %s (type %s) is typed", atPos(x), x, info.typ)
 			panic("unreachable")
 		}
-		checks.recordTypeAndValue(x, info.mode, info.typ, info.val)
+		check.recordTypeAndValue(x, info.mode, info.typ, info.val)
 	}
 }
 
-func (checks *Checker) recordTypeAndValue(x syntax.Expr, mode operandMode, typ Type, val constant.Value) {
+func (check *Checker) recordTypeAndValue(x syntax.Expr, mode operandMode, typ Type, val constant.Value) {
 	assert(x != nil)
 	assert(typ != nil)
 	if mode == invalid {
@@ -65,19 +65,19 @@ func (checks *Checker) recordTypeAndValue(x syntax.Expr, mode operandMode, typ T
 		// recorded as type parameters.
 		assert(!isValid(typ) || allBasic(typ, IsConstType))
 	}
-	if m := checks.Types; m != nil {
+	if m := check.Types; m != nil {
 		m[x] = TypeAndValue{mode, typ, val}
 	}
-	checks.recordTypeAndValueInSyntax(x, mode, typ, val)
+	check.recordTypeAndValueInSyntax(x, mode, typ, val)
 }
 
-func (checks *Checker) recordBuiltinType(f syntax.Expr, sig *Signature) {
+func (check *Checker) recordBuiltinType(f syntax.Expr, sig *Signature) {
 	// f must be a (possibly parenthesized, possibly qualified)
 	// identifier denoting a built-in (including unsafe's non-constant
 	// functions Add and Slice): record the signature for f and possible
 	// children.
 	for {
-		checks.recordTypeAndValue(f, builtin, sig, nil)
+		check.recordTypeAndValue(f, builtin, sig, nil)
 		switch p := f.(type) {
 		case *syntax.Name, *syntax.SelectorExpr:
 			return // we're done
@@ -91,7 +91,7 @@ func (checks *Checker) recordBuiltinType(f syntax.Expr, sig *Signature) {
 
 // recordCommaOkTypes updates recorded types to reflect that x is used in a commaOk context
 // (and therefore has tuple type).
-func (checks *Checker) recordCommaOkTypes(x syntax.Expr, a []*operand) {
+func (check *Checker) recordCommaOkTypes(x syntax.Expr, a []*operand) {
 	assert(x != nil)
 	assert(len(a) == 2)
 	if a[0].mode == invalid {
@@ -99,14 +99,14 @@ func (checks *Checker) recordCommaOkTypes(x syntax.Expr, a []*operand) {
 	}
 	t0, t1 := a[0].typ, a[1].typ
 	assert(isTyped(t0) && isTyped(t1) && (allBoolean(t1) || t1 == universeError))
-	if m := checks.Types; m != nil {
+	if m := check.Types; m != nil {
 		for {
 			tv := m[x]
 			assert(tv.Type != nil) // should have been recorded already
 			pos := x.Pos()
 			tv.Type = NewTuple(
-				newVar(LocalVar, pos, checks.pkg, "", t0),
-				newVar(LocalVar, pos, checks.pkg, "", t1),
+				newVar(LocalVar, pos, check.pkg, "", t0),
+				newVar(LocalVar, pos, check.pkg, "", t1),
 			)
 			m[x] = tv
 			// if x is a parenthesized expression (p.X), update p.X
@@ -117,7 +117,7 @@ func (checks *Checker) recordCommaOkTypes(x syntax.Expr, a []*operand) {
 			x = p.X
 		}
 	}
-	checks.recordCommaOkTypesInSyntax(x, t0, t1)
+	check.recordCommaOkTypesInSyntax(x, t0, t1)
 }
 
 // recordInstance records instantiation information into check.Info, if the
@@ -126,50 +126,50 @@ func (checks *Checker) recordCommaOkTypes(x syntax.Expr, a []*operand) {
 //
 // TODO(rfindley): the expr parameter is fragile. See if we can access the
 // instantiated identifier in some other way.
-func (checks *Checker) recordInstance(expr syntax.Expr, targs []Type, typ Type) {
+func (check *Checker) recordInstance(expr syntax.Expr, targs []Type, typ Type) {
 	ident := instantiatedIdent(expr)
 	assert(ident != nil)
 	assert(typ != nil)
-	if m := checks.Instances; m != nil {
+	if m := check.Instances; m != nil {
 		m[ident] = Instance{newTypeList(targs), typ}
 	}
 }
 
-func (checks *Checker) recordDef(id *syntax.Name, obj Object) {
+func (check *Checker) recordDef(id *syntax.Name, obj Object) {
 	assert(id != nil)
-	if m := checks.Defs; m != nil {
+	if m := check.Defs; m != nil {
 		m[id] = obj
 	}
 }
 
-func (checks *Checker) recordUse(id *syntax.Name, obj Object) {
+func (check *Checker) recordUse(id *syntax.Name, obj Object) {
 	assert(id != nil)
 	assert(obj != nil)
-	if m := checks.Uses; m != nil {
+	if m := check.Uses; m != nil {
 		m[id] = obj
 	}
 }
 
-func (checks *Checker) recordImplicit(node syntax.Node, obj Object) {
+func (check *Checker) recordImplicit(node syntax.Node, obj Object) {
 	assert(node != nil)
 	assert(obj != nil)
-	if m := checks.Implicits; m != nil {
+	if m := check.Implicits; m != nil {
 		m[node] = obj
 	}
 }
 
-func (checks *Checker) recordSelection(x *syntax.SelectorExpr, kind SelectionKind, recv Type, obj Object, index []int, indirect bool) {
+func (check *Checker) recordSelection(x *syntax.SelectorExpr, kind SelectionKind, recv Type, obj Object, index []int, indirect bool) {
 	assert(obj != nil && (recv == nil || len(index) > 0))
-	checks.recordUse(x.Sel, obj)
-	if m := checks.Selections; m != nil {
+	check.recordUse(x.Sel, obj)
+	if m := check.Selections; m != nil {
 		m[x] = &Selection{kind, recv, obj, index, indirect}
 	}
 }
 
-func (checks *Checker) recordScope(node syntax.Node, scope *Scope) {
+func (check *Checker) recordScope(node syntax.Node, scope *Scope) {
 	assert(node != nil)
 	assert(scope != nil)
-	if m := checks.Scopes; m != nil {
+	if m := check.Scopes; m != nil {
 		m[node] = scope
 	}
 }
