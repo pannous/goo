@@ -130,12 +130,12 @@ func (c nssCriterion) standardStatusAction(last bool) bool {
 	if c.negate {
 		return false
 	}
-	var defi string
+	var def string
 	switch c.status {
 	case "success":
-		defi = "return"
+		def = "return"
 	case "notfound", "unavail", "tryagain":
-		defi = "continue"
+		def = "continue"
 	default:
 		// Unknown status
 		return false
@@ -143,7 +143,7 @@ func (c nssCriterion) standardStatusAction(last bool) bool {
 	if last && c.action == "return" {
 		return true
 	}
-	return c.action == defi
+	return c.action == def
 }
 
 func parseNSSConfFile(file string) *nssConf {

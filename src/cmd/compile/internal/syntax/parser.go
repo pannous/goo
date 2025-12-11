@@ -3438,22 +3438,22 @@ func (p *parser) simpleStmt(lhs Expr, keyword token) SimpleStmt {
 	}
 }
 
-func (p *parser) newRangeClause(lhs Expr, defi bool) *RangeClause {
+func (p *parser) newRangeClause(lhs Expr, def bool) *RangeClause {
 	r := new(RangeClause)
 	r.pos = p.pos()
 	p.next() // consume _Range
 	r.Lhs = lhs
-	r.Def = defi
+	r.Def = def
 	r.X = p.expr()
 	return r
 }
 
-func (p *parser) newInClause(lhs Expr, defi bool) *InClause {
+func (p *parser) newInClause(lhs Expr, def bool) *InClause {
 	i := new(InClause)
 	i.pos = p.pos()
 	p.next() // consume in operator
 	i.Lhs = lhs
-	i.Def = defi
+	i.Def = def
 	i.X = p.expr()
 	return i
 }

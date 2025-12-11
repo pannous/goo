@@ -2800,10 +2800,10 @@ func (b *Builder) gccArchArgs() []string {
 // The environment variable must be quoted correctly for
 // quoted.Split. This should be done before building
 // anything, for example, in BuildInit.
-func envList(key, defi string) []string {
+func envList(key, def string) []string {
 	v := cfg.Getenv(key)
 	if v == "" {
-		v = defi
+		v = def
 	}
 	args, err := quoted.Split(v)
 	if err != nil {
@@ -3714,13 +3714,13 @@ func needsStringsImport(p *load.Package) bool {
 		if !strings.HasSuffix(file, ".goo") {
 			continue
 		}
-		
+
 		fullPath := filepath.Join(p.Dir, file)
 		content, err := os.ReadFile(fullPath)
 		if err != nil {
 			continue
 		}
-		
+
 		contentStr := string(content)
 		// Look for string method patterns that will be transformed to strings.* calls
 		stringMethods := []string{".toUpper(", ".toLower(", ".contains(", ".indexOf(", ".replace(", ".trim(", ".split("}
@@ -3746,13 +3746,13 @@ func needsSlicesImport(p *load.Package) bool {
 		if !strings.HasSuffix(file, ".goo") {
 			continue
 		}
-		
+
 		fullPath := filepath.Join(p.Dir, file)
 		content, err := os.ReadFile(fullPath)
 		if err != nil {
 			continue
 		}
-		
+
 		contentStr := string(content)
 		// Look for slice method patterns that will be transformed to slices.* calls
 		sliceMethods := []string{".contains(", ".indexOf(", ".reverse(", ".sort(", ".min(", ".max("}
@@ -3778,7 +3778,7 @@ func findStdlibPackagePath(pkg string) string {
 	// For standard library packages, we need to find their compiled .a file
 	// This is a simplified approach - in reality we'd need to ensure they're built
 	// For now, let's try to find them in the standard locations
-	
+
 	// Try to find in GOROOT/pkg
 	goroot := runtime.GOROOT()
 	if goroot == "" {
@@ -3787,15 +3787,15 @@ func findStdlibPackagePath(pkg string) string {
 	if goroot == "" {
 		goroot = "/opt/other/go" // Our custom GOROOT
 	}
-	
+
 	// Standard library packages are typically in $GOROOT/pkg/$GOOS_$GOARCH/
 	pkgDir := filepath.Join(goroot, "pkg", runtime.GOOS+"_"+runtime.GOARCH)
 	pkgPath := filepath.Join(pkgDir, pkg+".a")
-	
+
 	if _, err := os.Stat(pkgPath); err == nil {
 		return pkgPath
 	}
-	
+
 	// If not found in standard location, return empty (will be handled by regular build system)
 	return ""
 }

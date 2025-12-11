@@ -297,13 +297,13 @@ func defaultGOPATH() string {
 		env = "home"
 	}
 	if home := os.Getenv(env); home != "" {
-		defi := filepath.Join(home, "go")
-		if filepath.Clean(defi) == filepath.Clean(runtime.GOROOT()) {
+		def := filepath.Join(home, "go")
+		if filepath.Clean(def) == filepath.Clean(runtime.GOROOT()) {
 			// Don't set the default GOPATH to GOROOT,
 			// as that will trigger warnings from the go tool.
 			return ""
 		}
-		return defi
+		return def
 	}
 	return ""
 }
@@ -378,10 +378,10 @@ func defaultContext() Context {
 	return c
 }
 
-func envOr(name, defi string) string {
+func envOr(name, def string) string {
 	s := os.Getenv(name)
 	if s == "" {
-		return defi
+		return def
 	}
 	return s
 }

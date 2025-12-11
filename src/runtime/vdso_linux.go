@@ -190,19 +190,19 @@ func vdsoFindVersion(info *vdsoInfo, ver *vdsoVersionKey) int32 {
 		return 0
 	}
 
-	defi := info.verdef
+	def := info.verdef
 	for {
-		if defi.vd_flags&_VER_FLG_BASE == 0 {
-			aux := (*elfVerdaux)(add(unsafe.Pointer(defi), uintptr(defi.vd_aux)))
-			if defi.vd_hash == ver.verHash && ver.version == gostringnocopy(&info.symstrings[aux.vda_name]) {
-				return int32(defi.vd_ndx & 0x7fff)
+		if def.vd_flags&_VER_FLG_BASE == 0 {
+			aux := (*elfVerdaux)(add(unsafe.Pointer(def), uintptr(def.vd_aux)))
+			if def.vd_hash == ver.verHash && ver.version == gostringnocopy(&info.symstrings[aux.vda_name]) {
+				return int32(def.vd_ndx & 0x7fff)
 			}
 		}
 
-		if defi.vd_next == 0 {
+		if def.vd_next == 0 {
 			break
 		}
-		defi = (*elfVerdef)(add(unsafe.Pointer(defi), uintptr(defi.vd_next)))
+		def = (*elfVerdef)(add(unsafe.Pointer(def), uintptr(def.vd_next)))
 	}
 
 	return -1 // cannot match any version
