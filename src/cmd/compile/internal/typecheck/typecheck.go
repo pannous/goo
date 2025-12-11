@@ -654,27 +654,27 @@ func RewriteNonNameCall(n *ir.CallExpr) {
 	}
 
 	tmp := TempAt(base.Pos, ir.CurFunc, (*np).Type())
-	ass := ir.NewAssignStmt(base.Pos, tmp, *np)
-	ass.PtrInit().Append(Stmt(ir.NewDecl(n.Pos(), ir.ODCL, tmp)))
+	as := ir.NewAssignStmt(base.Pos, tmp, *np)
+	as.PtrInit().Append(Stmt(ir.NewDecl(n.Pos(), ir.ODCL, tmp)))
 	*np = tmp
 
-	n.PtrInit().Append(Stmt(ass))
+	n.PtrInit().Append(Stmt(as))
 }
 
 // RewriteMultiValueCall rewrites multi-valued f() to use temporaries,
 // so the backend wouldn't need to worry about tuple-valued expressions.
 func RewriteMultiValueCall(n ir.InitNode, call ir.Node) {
-	ass := ir.NewAssignListStmt(base.Pos, ir.OAS2, nil, []ir.Node{call})
+	as := ir.NewAssignListStmt(base.Pos, ir.OAS2, nil, []ir.Node{call})
 	results := call.Type().Fields()
 	list := make([]ir.Node, len(results))
 	for i, result := range results {
 		tmp := TempAt(base.Pos, ir.CurFunc, result.Type)
-		ass.PtrInit().Append(ir.NewDecl(base.Pos, ir.ODCL, tmp))
-		ass.Lhs.Append(tmp)
+		as.PtrInit().Append(ir.NewDecl(base.Pos, ir.ODCL, tmp))
+		as.Lhs.Append(tmp)
 		list[i] = tmp
 	}
 
-	n.PtrInit().Append(Stmt(ass))
+	n.PtrInit().Append(Stmt(as))
 
 	switch n := n.(type) {
 	default:
@@ -687,7 +687,7 @@ func RewriteMultiValueCall(n ir.InitNode, call ir.Node) {
 		if n.Op() != ir.OAS2FUNC {
 			base.Fatalf("RewriteMultiValueCall: invalid op %v", n.Op())
 		}
-		ass.SetOp(ir.OAS2FUNC)
+		as.SetOp(ir.OAS2FUNC)
 		n.SetOp(ir.OAS2)
 		n.Rhs = make([]ir.Node, len(list))
 		for i, tmp := range list {

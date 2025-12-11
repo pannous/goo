@@ -501,13 +501,13 @@ func walkSwitchType(sw *ir.SwitchStmt) {
 		if len(concreteCases) > 0 {
 			var clauses []typeClause
 			for _, c := range concreteCases {
-				ass := ir.NewAssignListStmt(c.pos, ir.OAS2,
+				as := ir.NewAssignListStmt(c.pos, ir.OAS2,
 					[]ir.Node{ir.BlankNode, s.okName},                               // _, ok =
 					[]ir.Node{ir.NewTypeAssertExpr(c.pos, s.srcName, c.typ.Type())}) // iface.(type)
 				nif := ir.NewIfStmt(c.pos, s.okName, []ir.Node{c.jmp}, nil)
 				clauses = append(clauses, typeClause{
 					hash: types.TypeHash(c.typ.Type()),
-					body: []ir.Node{typecheck.Stmt(ass), typecheck.Stmt(nif)},
+					body: []ir.Node{typecheck.Stmt(as), typecheck.Stmt(nif)},
 				})
 			}
 			s.flush(clauses, &sw.Compiled)
@@ -584,16 +584,16 @@ caseLoop:
 			dot.SetType(c.typ.Type())
 			dot.SetTypecheck(1)
 
-			ass := ir.NewAssignListStmt(c.pos, ir.OAS2, nil, nil)
-			ass.Lhs = []ir.Node{ir.BlankNode, s.okName} // _, ok =
+			as := ir.NewAssignListStmt(c.pos, ir.OAS2, nil, nil)
+			as.Lhs = []ir.Node{ir.BlankNode, s.okName} // _, ok =
 			if c.val != nil {
-				ass.Lhs[0] = c.val // tmpVar, ok =
+				as.Lhs[0] = c.val // tmpVar, ok =
 			}
-			ass.Rhs = []ir.Node{dot}
-			typecheck.Stmt(ass)
+			as.Rhs = []ir.Node{dot}
+			typecheck.Stmt(as)
 
 			nif := ir.NewIfStmt(c.pos, s.okName, []ir.Node{c.jmp}, nil)
-			sw.Compiled.Append(ass, nif)
+			sw.Compiled.Append(as, nif)
 			continue
 		}
 

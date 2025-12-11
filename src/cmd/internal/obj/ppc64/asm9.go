@@ -71,7 +71,7 @@ const (
 )
 
 type Optab struct {
-	ass   obj.As // Opcode
+	as    obj.As // Opcode
 	a1    uint8  // p.From argument (obj.Addr). p is of type obj.Prog.
 	a2    uint8  // p.Reg argument (int16 Register)
 	a3    uint8  // p.RestArgs[0]  (obj.AddrPos)
@@ -109,415 +109,415 @@ type Optab struct {
 var optab []Optab
 
 var optabBase = []Optab{
-	{ass: obj.ATEXT, a1: C_LOREG, a6: C_TEXTSIZE, type_: 0, size: 0},
-	{ass: obj.ATEXT, a1: C_LOREG, a3: C_32CON, a6: C_TEXTSIZE, type_: 0, size: 0},
-	{ass: obj.ATEXT, a1: C_ADDR, a6: C_TEXTSIZE, type_: 0, size: 0},
-	{ass: obj.ATEXT, a1: C_ADDR, a3: C_32CON, a6: C_TEXTSIZE, type_: 0, size: 0},
+	{as: obj.ATEXT, a1: C_LOREG, a6: C_TEXTSIZE, type_: 0, size: 0},
+	{as: obj.ATEXT, a1: C_LOREG, a3: C_32CON, a6: C_TEXTSIZE, type_: 0, size: 0},
+	{as: obj.ATEXT, a1: C_ADDR, a6: C_TEXTSIZE, type_: 0, size: 0},
+	{as: obj.ATEXT, a1: C_ADDR, a3: C_32CON, a6: C_TEXTSIZE, type_: 0, size: 0},
 	/* move register */
-	{ass: AADD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: AADD, a1: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: AADD, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 4, size: 4},
-	{ass: AADD, a1: C_S16CON, a6: C_REG, type_: 4, size: 4},
-	{ass: AADD, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 22, size: 8},
-	{ass: AADD, a1: C_U16CON, a6: C_REG, type_: 22, size: 8},
-	{ass: AADDIS, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 20, size: 4},
-	{ass: AADDIS, a1: C_S16CON, a6: C_REG, type_: 20, size: 4},
-	{ass: AADDC, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: AADDC, a1: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: AADDC, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 4, size: 4},
-	{ass: AADDC, a1: C_S16CON, a6: C_REG, type_: 4, size: 4},
-	{ass: AADDC, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 22, size: 12},
-	{ass: AADDC, a1: C_32CON, a6: C_REG, type_: 22, size: 12},
-	{ass: AAND, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4}, /* logical, no literal */
-	{ass: AAND, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: AANDCC, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: AANDCC, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: AANDCC, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
-	{ass: AANDCC, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
-	{ass: AANDCC, a1: C_S16CON, a6: C_REG, type_: 23, size: 8},
-	{ass: AANDCC, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 23, size: 8},
-	{ass: AANDCC, a1: C_32CON, a6: C_REG, type_: 23, size: 12},
-	{ass: AANDCC, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 23, size: 12},
-	{ass: AANDISCC, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
-	{ass: AANDISCC, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
-	{ass: AMULLW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: AMULLW, a1: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: AMULLW, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 4, size: 4},
-	{ass: AMULLW, a1: C_S16CON, a6: C_REG, type_: 4, size: 4},
-	{ass: AMULLW, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 22, size: 12},
-	{ass: AMULLW, a1: C_32CON, a6: C_REG, type_: 22, size: 12},
-	{ass: ASUBC, a1: C_REG, a2: C_REG, a6: C_REG, type_: 10, size: 4},
-	{ass: ASUBC, a1: C_REG, a6: C_REG, type_: 10, size: 4},
-	{ass: ASUBC, a1: C_REG, a3: C_S16CON, a6: C_REG, type_: 27, size: 4},
-	{ass: ASUBC, a1: C_REG, a3: C_32CON, a6: C_REG, type_: 28, size: 12},
-	{ass: AOR, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4}, /* logical, literal not cc (or/xor) */
-	{ass: AOR, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: AOR, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
-	{ass: AOR, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
-	{ass: AOR, a1: C_S16CON, a6: C_REG, type_: 23, size: 8},
-	{ass: AOR, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 23, size: 8},
-	{ass: AOR, a1: C_U32CON, a2: C_REG, a6: C_REG, type_: 21, size: 8},
-	{ass: AOR, a1: C_U32CON, a6: C_REG, type_: 21, size: 8},
-	{ass: AOR, a1: C_32CON, a6: C_REG, type_: 23, size: 12},
-	{ass: AOR, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 23, size: 12},
-	{ass: AORIS, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
-	{ass: AORIS, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
-	{ass: ADIVW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4}, /* op r1[,r2],r3 */
-	{ass: ADIVW, a1: C_REG, a6: C_REG, type_: 2, size: 4},
-	{ass: ASUB, a1: C_REG, a2: C_REG, a6: C_REG, type_: 10, size: 4}, /* op r2[,r1],r3 */
-	{ass: ASUB, a1: C_REG, a6: C_REG, type_: 10, size: 4},
-	{ass: ASLW, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASLW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASLD, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASLD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASLD, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 25, size: 4},
-	{ass: ASLD, a1: C_U15CON, a6: C_REG, type_: 25, size: 4},
-	{ass: AEXTSWSLI, a1: C_U15CON, a6: C_REG, type_: 25, size: 4},
-	{ass: AEXTSWSLI, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 25, size: 4},
-	{ass: ASLW, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 57, size: 4},
-	{ass: ASLW, a1: C_U15CON, a6: C_REG, type_: 57, size: 4},
-	{ass: ASRAW, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASRAW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASRAW, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 56, size: 4},
-	{ass: ASRAW, a1: C_U15CON, a6: C_REG, type_: 56, size: 4},
-	{ass: ASRAD, a1: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASRAD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
-	{ass: ASRAD, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 56, size: 4},
-	{ass: ASRAD, a1: C_U15CON, a6: C_REG, type_: 56, size: 4},
-	{ass: ARLWNM, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 63, size: 4},
-	{ass: ARLWNM, a1: C_U15CON, a2: C_REG, a3: C_U15CON, a4: C_U15CON, a6: C_REG, type_: 63, size: 4},
-	{ass: ARLWNM, a1: C_REG, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 63, size: 4},
-	{ass: ARLWNM, a1: C_REG, a2: C_REG, a3: C_U15CON, a4: C_U15CON, a6: C_REG, type_: 63, size: 4},
-	{ass: ACLRLSLWI, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 62, size: 4},
-	{ass: ARLDMI, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 30, size: 4},
-	{ass: ARLDC, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 29, size: 4},
-	{ass: ARLDC, a1: C_REG, a3: C_U8CON, a4: C_U8CON, a6: C_REG, type_: 9, size: 4},
-	{ass: ARLDCL, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 29, size: 4},
-	{ass: ARLDCL, a1: C_REG, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
-	{ass: ARLDICL, a1: C_REG, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
-	{ass: ARLDICL, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
-	{ass: ARLDCL, a1: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
-	{ass: AFADD, a1: C_FREG, a6: C_FREG, type_: 2, size: 4},
-	{ass: AFADD, a1: C_FREG, a2: C_FREG, a6: C_FREG, type_: 2, size: 4},
-	{ass: ADADDQ, a1: C_FREGP, a6: C_FREGP, type_: 2, size: 4},
-	{ass: ADADDQ, a1: C_FREGP, a2: C_FREGP, a6: C_FREGP, type_: 2, size: 4},
-	{ass: AFABS, a1: C_FREG, a6: C_FREG, type_: 33, size: 4},
-	{ass: AFABS, a6: C_FREG, type_: 33, size: 4},
-	{ass: AFMADD, a1: C_FREG, a2: C_FREG, a3: C_FREG, a6: C_FREG, type_: 34, size: 4},
-	{ass: AFMUL, a1: C_FREG, a6: C_FREG, type_: 32, size: 4},
-	{ass: AFMUL, a1: C_FREG, a2: C_FREG, a6: C_FREG, type_: 32, size: 4},
-	{ass: ADMULQ, a1: C_FREGP, a6: C_FREGP, type_: 32, size: 4},
-	{ass: ADMULQ, a1: C_FREGP, a2: C_FREGP, a6: C_FREGP, type_: 32, size: 4},
+	{as: AADD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: AADD, a1: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: AADD, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 4, size: 4},
+	{as: AADD, a1: C_S16CON, a6: C_REG, type_: 4, size: 4},
+	{as: AADD, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 22, size: 8},
+	{as: AADD, a1: C_U16CON, a6: C_REG, type_: 22, size: 8},
+	{as: AADDIS, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 20, size: 4},
+	{as: AADDIS, a1: C_S16CON, a6: C_REG, type_: 20, size: 4},
+	{as: AADDC, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: AADDC, a1: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: AADDC, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 4, size: 4},
+	{as: AADDC, a1: C_S16CON, a6: C_REG, type_: 4, size: 4},
+	{as: AADDC, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 22, size: 12},
+	{as: AADDC, a1: C_32CON, a6: C_REG, type_: 22, size: 12},
+	{as: AAND, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4}, /* logical, no literal */
+	{as: AAND, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: AANDCC, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: AANDCC, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: AANDCC, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
+	{as: AANDCC, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
+	{as: AANDCC, a1: C_S16CON, a6: C_REG, type_: 23, size: 8},
+	{as: AANDCC, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 23, size: 8},
+	{as: AANDCC, a1: C_32CON, a6: C_REG, type_: 23, size: 12},
+	{as: AANDCC, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 23, size: 12},
+	{as: AANDISCC, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
+	{as: AANDISCC, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
+	{as: AMULLW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: AMULLW, a1: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: AMULLW, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 4, size: 4},
+	{as: AMULLW, a1: C_S16CON, a6: C_REG, type_: 4, size: 4},
+	{as: AMULLW, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 22, size: 12},
+	{as: AMULLW, a1: C_32CON, a6: C_REG, type_: 22, size: 12},
+	{as: ASUBC, a1: C_REG, a2: C_REG, a6: C_REG, type_: 10, size: 4},
+	{as: ASUBC, a1: C_REG, a6: C_REG, type_: 10, size: 4},
+	{as: ASUBC, a1: C_REG, a3: C_S16CON, a6: C_REG, type_: 27, size: 4},
+	{as: ASUBC, a1: C_REG, a3: C_32CON, a6: C_REG, type_: 28, size: 12},
+	{as: AOR, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4}, /* logical, literal not cc (or/xor) */
+	{as: AOR, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: AOR, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
+	{as: AOR, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
+	{as: AOR, a1: C_S16CON, a6: C_REG, type_: 23, size: 8},
+	{as: AOR, a1: C_S16CON, a2: C_REG, a6: C_REG, type_: 23, size: 8},
+	{as: AOR, a1: C_U32CON, a2: C_REG, a6: C_REG, type_: 21, size: 8},
+	{as: AOR, a1: C_U32CON, a6: C_REG, type_: 21, size: 8},
+	{as: AOR, a1: C_32CON, a6: C_REG, type_: 23, size: 12},
+	{as: AOR, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 23, size: 12},
+	{as: AORIS, a1: C_U16CON, a6: C_REG, type_: 58, size: 4},
+	{as: AORIS, a1: C_U16CON, a2: C_REG, a6: C_REG, type_: 58, size: 4},
+	{as: ADIVW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 2, size: 4}, /* op r1[,r2],r3 */
+	{as: ADIVW, a1: C_REG, a6: C_REG, type_: 2, size: 4},
+	{as: ASUB, a1: C_REG, a2: C_REG, a6: C_REG, type_: 10, size: 4}, /* op r2[,r1],r3 */
+	{as: ASUB, a1: C_REG, a6: C_REG, type_: 10, size: 4},
+	{as: ASLW, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASLW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASLD, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASLD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASLD, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 25, size: 4},
+	{as: ASLD, a1: C_U15CON, a6: C_REG, type_: 25, size: 4},
+	{as: AEXTSWSLI, a1: C_U15CON, a6: C_REG, type_: 25, size: 4},
+	{as: AEXTSWSLI, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 25, size: 4},
+	{as: ASLW, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 57, size: 4},
+	{as: ASLW, a1: C_U15CON, a6: C_REG, type_: 57, size: 4},
+	{as: ASRAW, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASRAW, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASRAW, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 56, size: 4},
+	{as: ASRAW, a1: C_U15CON, a6: C_REG, type_: 56, size: 4},
+	{as: ASRAD, a1: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASRAD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 6, size: 4},
+	{as: ASRAD, a1: C_U15CON, a2: C_REG, a6: C_REG, type_: 56, size: 4},
+	{as: ASRAD, a1: C_U15CON, a6: C_REG, type_: 56, size: 4},
+	{as: ARLWNM, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 63, size: 4},
+	{as: ARLWNM, a1: C_U15CON, a2: C_REG, a3: C_U15CON, a4: C_U15CON, a6: C_REG, type_: 63, size: 4},
+	{as: ARLWNM, a1: C_REG, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 63, size: 4},
+	{as: ARLWNM, a1: C_REG, a2: C_REG, a3: C_U15CON, a4: C_U15CON, a6: C_REG, type_: 63, size: 4},
+	{as: ACLRLSLWI, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 62, size: 4},
+	{as: ARLDMI, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 30, size: 4},
+	{as: ARLDC, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 29, size: 4},
+	{as: ARLDC, a1: C_REG, a3: C_U8CON, a4: C_U8CON, a6: C_REG, type_: 9, size: 4},
+	{as: ARLDCL, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 29, size: 4},
+	{as: ARLDCL, a1: C_REG, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
+	{as: ARLDICL, a1: C_REG, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
+	{as: ARLDICL, a1: C_U15CON, a2: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
+	{as: ARLDCL, a1: C_REG, a3: C_32CON, a6: C_REG, type_: 14, size: 4},
+	{as: AFADD, a1: C_FREG, a6: C_FREG, type_: 2, size: 4},
+	{as: AFADD, a1: C_FREG, a2: C_FREG, a6: C_FREG, type_: 2, size: 4},
+	{as: ADADDQ, a1: C_FREGP, a6: C_FREGP, type_: 2, size: 4},
+	{as: ADADDQ, a1: C_FREGP, a2: C_FREGP, a6: C_FREGP, type_: 2, size: 4},
+	{as: AFABS, a1: C_FREG, a6: C_FREG, type_: 33, size: 4},
+	{as: AFABS, a6: C_FREG, type_: 33, size: 4},
+	{as: AFMADD, a1: C_FREG, a2: C_FREG, a3: C_FREG, a6: C_FREG, type_: 34, size: 4},
+	{as: AFMUL, a1: C_FREG, a6: C_FREG, type_: 32, size: 4},
+	{as: AFMUL, a1: C_FREG, a2: C_FREG, a6: C_FREG, type_: 32, size: 4},
+	{as: ADMULQ, a1: C_FREGP, a6: C_FREGP, type_: 32, size: 4},
+	{as: ADMULQ, a1: C_FREGP, a2: C_FREGP, a6: C_FREGP, type_: 32, size: 4},
 
-	{ass: AMOVBU, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AMOVBU, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
-	{ass: AMOVBU, a1: C_SOREG, a6: C_REG, type_: 8, size: 8},
-	{ass: AMOVBU, a1: C_XOREG, a6: C_REG, type_: 109, size: 8},
+	{as: AMOVBU, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AMOVBU, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AMOVBU, a1: C_SOREG, a6: C_REG, type_: 8, size: 8},
+	{as: AMOVBU, a1: C_XOREG, a6: C_REG, type_: 109, size: 8},
 
-	{ass: AMOVBZU, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AMOVBZU, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
-	{ass: AMOVBZU, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
-	{ass: AMOVBZU, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
+	{as: AMOVBZU, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AMOVBZU, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AMOVBZU, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
+	{as: AMOVBZU, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
 
-	{ass: AMOVHBR, a1: C_REG, a6: C_XOREG, type_: 44, size: 4},
-	{ass: AMOVHBR, a1: C_XOREG, a6: C_REG, type_: 45, size: 4},
+	{as: AMOVHBR, a1: C_REG, a6: C_XOREG, type_: 44, size: 4},
+	{as: AMOVHBR, a1: C_XOREG, a6: C_REG, type_: 45, size: 4},
 
-	{ass: AMOVB, a1: C_SOREG, a6: C_REG, type_: 8, size: 8},
-	{ass: AMOVB, a1: C_XOREG, a6: C_REG, type_: 109, size: 8},
-	{ass: AMOVB, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AMOVB, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
-	{ass: AMOVB, a1: C_REG, a6: C_REG, type_: 13, size: 4},
+	{as: AMOVB, a1: C_SOREG, a6: C_REG, type_: 8, size: 8},
+	{as: AMOVB, a1: C_XOREG, a6: C_REG, type_: 109, size: 8},
+	{as: AMOVB, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AMOVB, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AMOVB, a1: C_REG, a6: C_REG, type_: 13, size: 4},
 
-	{ass: AMOVBZ, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
-	{ass: AMOVBZ, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
-	{ass: AMOVBZ, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AMOVBZ, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
-	{ass: AMOVBZ, a1: C_REG, a6: C_REG, type_: 13, size: 4},
+	{as: AMOVBZ, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
+	{as: AMOVBZ, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
+	{as: AMOVBZ, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AMOVBZ, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AMOVBZ, a1: C_REG, a6: C_REG, type_: 13, size: 4},
 
-	{ass: AMOVD, a1: C_16CON, a6: C_REG, type_: 3, size: 4},
-	{ass: AMOVD, a1: C_SACON, a6: C_REG, type_: 3, size: 4},
-	{ass: AMOVD, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
-	{ass: AMOVD, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
-	{ass: AMOVD, a1: C_SOREG, a6: C_SPR, type_: 107, size: 8},
-	{ass: AMOVD, a1: C_SPR, a6: C_REG, type_: 66, size: 4},
-	{ass: AMOVD, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AMOVD, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
-	{ass: AMOVD, a1: C_SPR, a6: C_SOREG, type_: 106, size: 8},
-	{ass: AMOVD, a1: C_REG, a6: C_SPR, type_: 66, size: 4},
-	{ass: AMOVD, a1: C_REG, a6: C_REG, type_: 13, size: 4},
+	{as: AMOVD, a1: C_16CON, a6: C_REG, type_: 3, size: 4},
+	{as: AMOVD, a1: C_SACON, a6: C_REG, type_: 3, size: 4},
+	{as: AMOVD, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
+	{as: AMOVD, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
+	{as: AMOVD, a1: C_SOREG, a6: C_SPR, type_: 107, size: 8},
+	{as: AMOVD, a1: C_SPR, a6: C_REG, type_: 66, size: 4},
+	{as: AMOVD, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AMOVD, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AMOVD, a1: C_SPR, a6: C_SOREG, type_: 106, size: 8},
+	{as: AMOVD, a1: C_REG, a6: C_SPR, type_: 66, size: 4},
+	{as: AMOVD, a1: C_REG, a6: C_REG, type_: 13, size: 4},
 
-	{ass: AMOVW, a1: C_16CON, a6: C_REG, type_: 3, size: 4},
-	{ass: AMOVW, a1: C_SACON, a6: C_REG, type_: 3, size: 4},
-	{ass: AMOVW, a1: C_CREG, a6: C_REG, type_: 68, size: 4},
-	{ass: AMOVW, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
-	{ass: AMOVW, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
-	{ass: AMOVW, a1: C_SPR, a6: C_REG, type_: 66, size: 4},
-	{ass: AMOVW, a1: C_REG, a6: C_CREG, type_: 69, size: 4},
-	{ass: AMOVW, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AMOVW, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
-	{ass: AMOVW, a1: C_REG, a6: C_SPR, type_: 66, size: 4},
-	{ass: AMOVW, a1: C_REG, a6: C_REG, type_: 13, size: 4},
+	{as: AMOVW, a1: C_16CON, a6: C_REG, type_: 3, size: 4},
+	{as: AMOVW, a1: C_SACON, a6: C_REG, type_: 3, size: 4},
+	{as: AMOVW, a1: C_CREG, a6: C_REG, type_: 68, size: 4},
+	{as: AMOVW, a1: C_SOREG, a6: C_REG, type_: 8, size: 4},
+	{as: AMOVW, a1: C_XOREG, a6: C_REG, type_: 109, size: 4},
+	{as: AMOVW, a1: C_SPR, a6: C_REG, type_: 66, size: 4},
+	{as: AMOVW, a1: C_REG, a6: C_CREG, type_: 69, size: 4},
+	{as: AMOVW, a1: C_REG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AMOVW, a1: C_REG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AMOVW, a1: C_REG, a6: C_SPR, type_: 66, size: 4},
+	{as: AMOVW, a1: C_REG, a6: C_REG, type_: 13, size: 4},
 
-	{ass: AFMOVD, a1: C_S16CON, a6: C_FREG, type_: 24, size: 8},
-	{ass: AFMOVD, a1: C_SOREG, a6: C_FREG, type_: 8, size: 4},
-	{ass: AFMOVD, a1: C_XOREG, a6: C_FREG, type_: 109, size: 4},
-	{ass: AFMOVD, a1: C_ZCON, a6: C_FREG, type_: 24, size: 4},
-	{ass: AFMOVD, a1: C_FREG, a6: C_FREG, type_: 33, size: 4},
-	{ass: AFMOVD, a1: C_FREG, a6: C_SOREG, type_: 7, size: 4},
-	{ass: AFMOVD, a1: C_FREG, a6: C_XOREG, type_: 108, size: 4},
+	{as: AFMOVD, a1: C_S16CON, a6: C_FREG, type_: 24, size: 8},
+	{as: AFMOVD, a1: C_SOREG, a6: C_FREG, type_: 8, size: 4},
+	{as: AFMOVD, a1: C_XOREG, a6: C_FREG, type_: 109, size: 4},
+	{as: AFMOVD, a1: C_ZCON, a6: C_FREG, type_: 24, size: 4},
+	{as: AFMOVD, a1: C_FREG, a6: C_FREG, type_: 33, size: 4},
+	{as: AFMOVD, a1: C_FREG, a6: C_SOREG, type_: 7, size: 4},
+	{as: AFMOVD, a1: C_FREG, a6: C_XOREG, type_: 108, size: 4},
 
-	{ass: AFMOVSX, a1: C_XOREG, a6: C_FREG, type_: 45, size: 4},
-	{ass: AFMOVSX, a1: C_FREG, a6: C_XOREG, type_: 44, size: 4},
+	{as: AFMOVSX, a1: C_XOREG, a6: C_FREG, type_: 45, size: 4},
+	{as: AFMOVSX, a1: C_FREG, a6: C_XOREG, type_: 44, size: 4},
 
-	{ass: AFMOVSZ, a1: C_ZOREG, a6: C_FREG, type_: 45, size: 4},
-	{ass: AFMOVSZ, a1: C_XOREG, a6: C_FREG, type_: 45, size: 4},
+	{as: AFMOVSZ, a1: C_ZOREG, a6: C_FREG, type_: 45, size: 4},
+	{as: AFMOVSZ, a1: C_XOREG, a6: C_FREG, type_: 45, size: 4},
 
-	{ass: AMOVFL, a1: C_CREG, a6: C_CREG, type_: 67, size: 4},
-	{ass: AMOVFL, a1: C_FPSCR, a6: C_CREG, type_: 73, size: 4},
-	{ass: AMOVFL, a1: C_FPSCR, a6: C_FREG, type_: 53, size: 4},
-	{ass: AMOVFL, a1: C_FREG, a3: C_32CON, a6: C_FPSCR, type_: 64, size: 4},
-	{ass: AMOVFL, a1: C_FREG, a6: C_FPSCR, type_: 64, size: 4},
-	{ass: AMOVFL, a1: C_32CON, a6: C_FPSCR, type_: 65, size: 4},
-	{ass: AMOVFL, a1: C_REG, a6: C_CREG, type_: 69, size: 4},
-	{ass: AMOVFL, a1: C_REG, a6: C_32CON, type_: 69, size: 4},
+	{as: AMOVFL, a1: C_CREG, a6: C_CREG, type_: 67, size: 4},
+	{as: AMOVFL, a1: C_FPSCR, a6: C_CREG, type_: 73, size: 4},
+	{as: AMOVFL, a1: C_FPSCR, a6: C_FREG, type_: 53, size: 4},
+	{as: AMOVFL, a1: C_FREG, a3: C_32CON, a6: C_FPSCR, type_: 64, size: 4},
+	{as: AMOVFL, a1: C_FREG, a6: C_FPSCR, type_: 64, size: 4},
+	{as: AMOVFL, a1: C_32CON, a6: C_FPSCR, type_: 65, size: 4},
+	{as: AMOVFL, a1: C_REG, a6: C_CREG, type_: 69, size: 4},
+	{as: AMOVFL, a1: C_REG, a6: C_32CON, type_: 69, size: 4},
 
-	{ass: ASYSCALL, type_: 5, size: 4},
-	{ass: ASYSCALL, a1: C_REG, type_: 77, size: 12},
-	{ass: ASYSCALL, a1: C_U15CON, type_: 77, size: 12},
-	{ass: ABEQ, a6: C_BRA, type_: 16, size: 4},
-	{ass: ABEQ, a1: C_CREG, a6: C_BRA, type_: 16, size: 4},
-	{ass: ABEQ, a1: C_CREG, a6: C_LR, type_: 17, size: 4},
-	{ass: ABR, a6: C_BRA, type_: 11, size: 4},                                         // b label
-	{ass: ABR, a6: C_BRAPIC, type_: 11, size: 8},                                      // b label; nop
-	{ass: ABR, a6: C_LR, type_: 18, size: 4},                                          // blr
-	{ass: ABR, a6: C_CTR, type_: 18, size: 4},                                         // bctr
-	{ass: ABC, a1: C_U15CON, a2: C_CRBIT, a6: C_BRA, type_: 16, size: 4},              // bc bo, bi, label
-	{ass: ABC, a1: C_U15CON, a2: C_CRBIT, a6: C_LR, type_: 18, size: 4},               // bclr bo, bi
-	{ass: ABC, a1: C_U15CON, a2: C_CRBIT, a3: C_U15CON, a6: C_LR, type_: 18, size: 4}, // bclr bo, bi, bh
-	{ass: ABC, a1: C_U15CON, a2: C_CRBIT, a6: C_CTR, type_: 18, size: 4},              // bcctr bo, bi
-	{ass: ABDNZ, a6: C_BRA, type_: 16, size: 4},
-	{ass: ASYNC, type_: 46, size: 4},
-	{ass: AWORD, a1: C_32CON, type_: 40, size: 4},
-	{ass: ADWORD, a1: C_64CON, type_: 31, size: 8},
-	{ass: ADWORD, a1: C_LACON, type_: 31, size: 8},
-	{ass: AADDME, a1: C_REG, a6: C_REG, type_: 47, size: 4},
-	{ass: AEXTSB, a1: C_REG, a6: C_REG, type_: 48, size: 4},
-	{ass: AEXTSB, a6: C_REG, type_: 48, size: 4},
-	{ass: AISEL, a1: C_U5CON, a2: C_REG, a3: C_REG, a6: C_REG, type_: 84, size: 4},
-	{ass: AISEL, a1: C_CRBIT, a2: C_REG, a3: C_REG, a6: C_REG, type_: 84, size: 4},
-	{ass: ANEG, a1: C_REG, a6: C_REG, type_: 47, size: 4},
-	{ass: ANEG, a6: C_REG, type_: 47, size: 4},
-	{ass: AREM, a1: C_REG, a6: C_REG, type_: 50, size: 12},
-	{ass: AREM, a1: C_REG, a2: C_REG, a6: C_REG, type_: 50, size: 12},
-	{ass: AREMU, a1: C_REG, a6: C_REG, type_: 50, size: 16},
-	{ass: AREMU, a1: C_REG, a2: C_REG, a6: C_REG, type_: 50, size: 16},
-	{ass: AREMD, a1: C_REG, a6: C_REG, type_: 51, size: 12},
-	{ass: AREMD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 51, size: 12},
-	{ass: AMTFSB0, a1: C_U15CON, type_: 52, size: 4},
+	{as: ASYSCALL, type_: 5, size: 4},
+	{as: ASYSCALL, a1: C_REG, type_: 77, size: 12},
+	{as: ASYSCALL, a1: C_U15CON, type_: 77, size: 12},
+	{as: ABEQ, a6: C_BRA, type_: 16, size: 4},
+	{as: ABEQ, a1: C_CREG, a6: C_BRA, type_: 16, size: 4},
+	{as: ABEQ, a1: C_CREG, a6: C_LR, type_: 17, size: 4},
+	{as: ABR, a6: C_BRA, type_: 11, size: 4},                                         // b label
+	{as: ABR, a6: C_BRAPIC, type_: 11, size: 8},                                      // b label; nop
+	{as: ABR, a6: C_LR, type_: 18, size: 4},                                          // blr
+	{as: ABR, a6: C_CTR, type_: 18, size: 4},                                         // bctr
+	{as: ABC, a1: C_U15CON, a2: C_CRBIT, a6: C_BRA, type_: 16, size: 4},              // bc bo, bi, label
+	{as: ABC, a1: C_U15CON, a2: C_CRBIT, a6: C_LR, type_: 18, size: 4},               // bclr bo, bi
+	{as: ABC, a1: C_U15CON, a2: C_CRBIT, a3: C_U15CON, a6: C_LR, type_: 18, size: 4}, // bclr bo, bi, bh
+	{as: ABC, a1: C_U15CON, a2: C_CRBIT, a6: C_CTR, type_: 18, size: 4},              // bcctr bo, bi
+	{as: ABDNZ, a6: C_BRA, type_: 16, size: 4},
+	{as: ASYNC, type_: 46, size: 4},
+	{as: AWORD, a1: C_32CON, type_: 40, size: 4},
+	{as: ADWORD, a1: C_64CON, type_: 31, size: 8},
+	{as: ADWORD, a1: C_LACON, type_: 31, size: 8},
+	{as: AADDME, a1: C_REG, a6: C_REG, type_: 47, size: 4},
+	{as: AEXTSB, a1: C_REG, a6: C_REG, type_: 48, size: 4},
+	{as: AEXTSB, a6: C_REG, type_: 48, size: 4},
+	{as: AISEL, a1: C_U5CON, a2: C_REG, a3: C_REG, a6: C_REG, type_: 84, size: 4},
+	{as: AISEL, a1: C_CRBIT, a2: C_REG, a3: C_REG, a6: C_REG, type_: 84, size: 4},
+	{as: ANEG, a1: C_REG, a6: C_REG, type_: 47, size: 4},
+	{as: ANEG, a6: C_REG, type_: 47, size: 4},
+	{as: AREM, a1: C_REG, a6: C_REG, type_: 50, size: 12},
+	{as: AREM, a1: C_REG, a2: C_REG, a6: C_REG, type_: 50, size: 12},
+	{as: AREMU, a1: C_REG, a6: C_REG, type_: 50, size: 16},
+	{as: AREMU, a1: C_REG, a2: C_REG, a6: C_REG, type_: 50, size: 16},
+	{as: AREMD, a1: C_REG, a6: C_REG, type_: 51, size: 12},
+	{as: AREMD, a1: C_REG, a2: C_REG, a6: C_REG, type_: 51, size: 12},
+	{as: AMTFSB0, a1: C_U15CON, type_: 52, size: 4},
 	/* Other ISA 2.05+ instructions */
-	{ass: APOPCNTD, a1: C_REG, a6: C_REG, type_: 93, size: 4},            /* population count, x-form */
-	{ass: ACMPB, a1: C_REG, a2: C_REG, a6: C_REG, type_: 92, size: 4},    /* compare byte, x-form */
-	{ass: ACMPEQB, a1: C_REG, a2: C_REG, a6: C_CREG, type_: 92, size: 4}, /* compare equal byte, x-form, ISA 3.0 */
-	{ass: ACMPEQB, a1: C_REG, a6: C_REG, type_: 70, size: 4},
-	{ass: AFTDIV, a1: C_FREG, a2: C_FREG, a6: C_U15CON, type_: 92, size: 4},          /* floating test for sw divide, x-form */
-	{ass: AFTSQRT, a1: C_FREG, a6: C_U15CON, type_: 93, size: 4},                     /* floating test for sw square root, x-form */
-	{ass: ACOPY, a1: C_REG, a6: C_REG, type_: 92, size: 4},                           /* copy/paste facility, x-form */
-	{ass: ADARN, a1: C_U15CON, a6: C_REG, type_: 92, size: 4},                        /* deliver random number, x-form */
-	{ass: AMADDHD, a1: C_REG, a2: C_REG, a3: C_REG, a6: C_REG, type_: 83, size: 4},   /* multiply-add high/low doubleword, va-form */
-	{ass: AADDEX, a1: C_REG, a2: C_REG, a3: C_U15CON, a6: C_REG, type_: 94, size: 4}, /* add extended using alternate carry, z23-form */
-	{ass: ACRAND, a1: C_CRBIT, a2: C_CRBIT, a6: C_CRBIT, type_: 2, size: 4},          /* logical ops for condition register bits xl-form */
+	{as: APOPCNTD, a1: C_REG, a6: C_REG, type_: 93, size: 4},            /* population count, x-form */
+	{as: ACMPB, a1: C_REG, a2: C_REG, a6: C_REG, type_: 92, size: 4},    /* compare byte, x-form */
+	{as: ACMPEQB, a1: C_REG, a2: C_REG, a6: C_CREG, type_: 92, size: 4}, /* compare equal byte, x-form, ISA 3.0 */
+	{as: ACMPEQB, a1: C_REG, a6: C_REG, type_: 70, size: 4},
+	{as: AFTDIV, a1: C_FREG, a2: C_FREG, a6: C_U15CON, type_: 92, size: 4},          /* floating test for sw divide, x-form */
+	{as: AFTSQRT, a1: C_FREG, a6: C_U15CON, type_: 93, size: 4},                     /* floating test for sw square root, x-form */
+	{as: ACOPY, a1: C_REG, a6: C_REG, type_: 92, size: 4},                           /* copy/paste facility, x-form */
+	{as: ADARN, a1: C_U15CON, a6: C_REG, type_: 92, size: 4},                        /* deliver random number, x-form */
+	{as: AMADDHD, a1: C_REG, a2: C_REG, a3: C_REG, a6: C_REG, type_: 83, size: 4},   /* multiply-add high/low doubleword, va-form */
+	{as: AADDEX, a1: C_REG, a2: C_REG, a3: C_U15CON, a6: C_REG, type_: 94, size: 4}, /* add extended using alternate carry, z23-form */
+	{as: ACRAND, a1: C_CRBIT, a2: C_CRBIT, a6: C_CRBIT, type_: 2, size: 4},          /* logical ops for condition register bits xl-form */
 
 	/* Misc ISA 3.0 instructions */
-	{ass: ASETB, a1: C_CREG, a6: C_REG, type_: 110, size: 4},
-	{ass: AVCLZLSBB, a1: C_VREG, a6: C_REG, type_: 85, size: 4},
+	{as: ASETB, a1: C_CREG, a6: C_REG, type_: 110, size: 4},
+	{as: AVCLZLSBB, a1: C_VREG, a6: C_REG, type_: 85, size: 4},
 
 	/* Vector instructions */
 
 	/* Vector load */
-	{ass: ALVEBX, a1: C_XOREG, a6: C_VREG, type_: 45, size: 4}, /* vector load, x-form */
+	{as: ALVEBX, a1: C_XOREG, a6: C_VREG, type_: 45, size: 4}, /* vector load, x-form */
 
 	/* Vector store */
-	{ass: ASTVEBX, a1: C_VREG, a6: C_XOREG, type_: 44, size: 4}, /* vector store, x-form */
+	{as: ASTVEBX, a1: C_VREG, a6: C_XOREG, type_: 44, size: 4}, /* vector store, x-form */
 
 	/* Vector logical */
-	{ass: AVAND, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector and, vx-form */
-	{ass: AVOR, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},  /* vector or, vx-form */
+	{as: AVAND, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector and, vx-form */
+	{as: AVOR, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},  /* vector or, vx-form */
 
 	/* Vector add */
-	{ass: AVADDUM, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add unsigned modulo, vx-form */
-	{ass: AVADDCU, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add & write carry unsigned, vx-form */
-	{ass: AVADDUS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add unsigned saturate, vx-form */
-	{ass: AVADDSS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add signed saturate, vx-form */
-	{ass: AVADDE, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector add extended, va-form */
+	{as: AVADDUM, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add unsigned modulo, vx-form */
+	{as: AVADDCU, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add & write carry unsigned, vx-form */
+	{as: AVADDUS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add unsigned saturate, vx-form */
+	{as: AVADDSS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector add signed saturate, vx-form */
+	{as: AVADDE, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector add extended, va-form */
 
 	/* Vector subtract */
-	{ass: AVSUBUM, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract unsigned modulo, vx-form */
-	{ass: AVSUBCU, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract & write carry unsigned, vx-form */
-	{ass: AVSUBUS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract unsigned saturate, vx-form */
-	{ass: AVSUBSS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract signed saturate, vx-form */
-	{ass: AVSUBE, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector subtract extended, va-form */
+	{as: AVSUBUM, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract unsigned modulo, vx-form */
+	{as: AVSUBCU, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract & write carry unsigned, vx-form */
+	{as: AVSUBUS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract unsigned saturate, vx-form */
+	{as: AVSUBSS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},            /* vector subtract signed saturate, vx-form */
+	{as: AVSUBE, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector subtract extended, va-form */
 
 	/* Vector multiply */
-	{ass: AVMULESB, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},              /* vector multiply, vx-form */
-	{ass: AVPMSUM, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},               /* vector polynomial multiply & sum, vx-form */
-	{ass: AVMSUMUDM, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector multiply-sum, va-form */
+	{as: AVMULESB, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},              /* vector multiply, vx-form */
+	{as: AVPMSUM, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},               /* vector polynomial multiply & sum, vx-form */
+	{as: AVMSUMUDM, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector multiply-sum, va-form */
 
 	/* Vector rotate */
-	{ass: AVR, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector rotate, vx-form */
+	{as: AVR, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector rotate, vx-form */
 
 	/* Vector shift */
-	{ass: AVS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},                 /* vector shift, vx-form */
-	{ass: AVSA, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},                /* vector shift algebraic, vx-form */
-	{ass: AVSOI, a1: C_U16CON, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector shift by octet immediate, va-form */
+	{as: AVS, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},                 /* vector shift, vx-form */
+	{as: AVSA, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},                /* vector shift algebraic, vx-form */
+	{as: AVSOI, a1: C_U16CON, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector shift by octet immediate, va-form */
 
 	/* Vector count */
-	{ass: AVCLZ, a1: C_VREG, a6: C_VREG, type_: 85, size: 4},    /* vector count leading zeros, vx-form */
-	{ass: AVPOPCNT, a1: C_VREG, a6: C_VREG, type_: 85, size: 4}, /* vector population count, vx-form */
+	{as: AVCLZ, a1: C_VREG, a6: C_VREG, type_: 85, size: 4},    /* vector count leading zeros, vx-form */
+	{as: AVPOPCNT, a1: C_VREG, a6: C_VREG, type_: 85, size: 4}, /* vector population count, vx-form */
 
 	/* Vector compare */
-	{ass: AVCMPEQ, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},   /* vector compare equal, vc-form */
-	{ass: AVCMPGT, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},   /* vector compare greater than, vc-form */
-	{ass: AVCMPNEZB, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector compare not equal, vx-form */
+	{as: AVCMPEQ, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},   /* vector compare equal, vc-form */
+	{as: AVCMPGT, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},   /* vector compare greater than, vc-form */
+	{as: AVCMPNEZB, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector compare not equal, vx-form */
 
 	/* Vector merge */
-	{ass: AVMRGOW, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector merge odd word, vx-form */
+	{as: AVMRGOW, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector merge odd word, vx-form */
 
 	/* Vector permute */
-	{ass: AVPERM, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector permute, va-form */
+	{as: AVPERM, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector permute, va-form */
 
 	/* Vector bit permute */
-	{ass: AVBPERMQ, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector bit permute, vx-form */
+	{as: AVBPERMQ, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector bit permute, vx-form */
 
 	/* Vector select */
-	{ass: AVSEL, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector select, va-form */
+	{as: AVSEL, a1: C_VREG, a2: C_VREG, a3: C_VREG, a6: C_VREG, type_: 83, size: 4}, /* vector select, va-form */
 
 	/* Vector splat */
-	{ass: AVSPLTB, a1: C_S16CON, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},
-	{ass: AVSPLTISB, a1: C_S16CON, a6: C_VREG, type_: 82, size: 4},
+	{as: AVSPLTB, a1: C_S16CON, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},
+	{as: AVSPLTISB, a1: C_S16CON, a6: C_VREG, type_: 82, size: 4},
 
 	/* Vector AES */
-	{ass: AVCIPH, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},  /* vector AES cipher, vx-form */
-	{ass: AVNCIPH, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector AES inverse cipher, vx-form */
-	{ass: AVSBOX, a1: C_VREG, a6: C_VREG, type_: 82, size: 4},              /* vector AES subbytes, vx-form */
+	{as: AVCIPH, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4},  /* vector AES cipher, vx-form */
+	{as: AVNCIPH, a1: C_VREG, a2: C_VREG, a6: C_VREG, type_: 82, size: 4}, /* vector AES inverse cipher, vx-form */
+	{as: AVSBOX, a1: C_VREG, a6: C_VREG, type_: 82, size: 4},              /* vector AES subbytes, vx-form */
 
 	/* Vector SHA */
-	{ass: AVSHASIGMA, a1: C_U16CON, a2: C_VREG, a3: C_U16CON, a6: C_VREG, type_: 82, size: 4}, /* vector SHA sigma, vx-form */
+	{as: AVSHASIGMA, a1: C_U16CON, a2: C_VREG, a3: C_U16CON, a6: C_VREG, type_: 82, size: 4}, /* vector SHA sigma, vx-form */
 
 	/* VSX vector load */
-	{ass: ALXVD2X, a1: C_XOREG, a6: C_VSREG, type_: 87, size: 4},        /* vsx vector load, xx1-form */
-	{ass: ALXV, a1: C_SOREG, a6: C_VSREG, type_: 96, size: 4},           /* vsx vector load, dq-form */
-	{ass: ALXVL, a1: C_REG, a2: C_REG, a6: C_VSREG, type_: 98, size: 4}, /* vsx vector load length */
+	{as: ALXVD2X, a1: C_XOREG, a6: C_VSREG, type_: 87, size: 4},        /* vsx vector load, xx1-form */
+	{as: ALXV, a1: C_SOREG, a6: C_VSREG, type_: 96, size: 4},           /* vsx vector load, dq-form */
+	{as: ALXVL, a1: C_REG, a2: C_REG, a6: C_VSREG, type_: 98, size: 4}, /* vsx vector load length */
 
 	/* VSX vector store */
-	{ass: ASTXVD2X, a1: C_VSREG, a6: C_XOREG, type_: 86, size: 4},        /* vsx vector store, xx1-form */
-	{ass: ASTXV, a1: C_VSREG, a6: C_SOREG, type_: 97, size: 4},           /* vsx vector store, dq-form */
-	{ass: ASTXVL, a1: C_VSREG, a2: C_REG, a6: C_REG, type_: 99, size: 4}, /* vsx vector store with length x-form */
+	{as: ASTXVD2X, a1: C_VSREG, a6: C_XOREG, type_: 86, size: 4},        /* vsx vector store, xx1-form */
+	{as: ASTXV, a1: C_VSREG, a6: C_SOREG, type_: 97, size: 4},           /* vsx vector store, dq-form */
+	{as: ASTXVL, a1: C_VSREG, a2: C_REG, a6: C_REG, type_: 99, size: 4}, /* vsx vector store with length x-form */
 
 	/* VSX scalar load */
-	{ass: ALXSDX, a1: C_XOREG, a6: C_VSREG, type_: 87, size: 4}, /* vsx scalar load, xx1-form */
+	{as: ALXSDX, a1: C_XOREG, a6: C_VSREG, type_: 87, size: 4}, /* vsx scalar load, xx1-form */
 
 	/* VSX scalar store */
-	{ass: ASTXSDX, a1: C_VSREG, a6: C_XOREG, type_: 86, size: 4}, /* vsx scalar store, xx1-form */
+	{as: ASTXSDX, a1: C_VSREG, a6: C_XOREG, type_: 86, size: 4}, /* vsx scalar store, xx1-form */
 
 	/* VSX scalar as integer load */
-	{ass: ALXSIWAX, a1: C_XOREG, a6: C_VSREG, type_: 87, size: 4}, /* vsx scalar as integer load, xx1-form */
+	{as: ALXSIWAX, a1: C_XOREG, a6: C_VSREG, type_: 87, size: 4}, /* vsx scalar as integer load, xx1-form */
 
 	/* VSX scalar store as integer */
-	{ass: ASTXSIWX, a1: C_VSREG, a6: C_XOREG, type_: 86, size: 4}, /* vsx scalar as integer store, xx1-form */
+	{as: ASTXSIWX, a1: C_VSREG, a6: C_XOREG, type_: 86, size: 4}, /* vsx scalar as integer store, xx1-form */
 
 	/* VSX move from VSR */
-	{ass: AMFVSRD, a1: C_VSREG, a6: C_REG, type_: 88, size: 4},
-	{ass: AMFVSRD, a1: C_FREG, a6: C_REG, type_: 88, size: 4},
+	{as: AMFVSRD, a1: C_VSREG, a6: C_REG, type_: 88, size: 4},
+	{as: AMFVSRD, a1: C_FREG, a6: C_REG, type_: 88, size: 4},
 
 	/* VSX move to VSR */
-	{ass: AMTVSRD, a1: C_REG, a6: C_VSREG, type_: 104, size: 4},
-	{ass: AMTVSRD, a1: C_REG, a6: C_FREG, type_: 104, size: 4},
-	{ass: AMTVSRDD, a1: C_REG, a2: C_REG, a6: C_VSREG, type_: 104, size: 4},
+	{as: AMTVSRD, a1: C_REG, a6: C_VSREG, type_: 104, size: 4},
+	{as: AMTVSRD, a1: C_REG, a6: C_FREG, type_: 104, size: 4},
+	{as: AMTVSRDD, a1: C_REG, a2: C_REG, a6: C_VSREG, type_: 104, size: 4},
 
 	/* VSX xx3-form */
-	{ass: AXXLAND, a1: C_FREG, a2: C_FREG, a6: C_FREG, type_: 90, size: 4},    /* vsx xx3-form (FPR usage) */
-	{ass: AXXLAND, a1: C_VSREG, a2: C_VSREG, a6: C_VSREG, type_: 90, size: 4}, /* vsx xx3-form */
+	{as: AXXLAND, a1: C_FREG, a2: C_FREG, a6: C_FREG, type_: 90, size: 4},    /* vsx xx3-form (FPR usage) */
+	{as: AXXLAND, a1: C_VSREG, a2: C_VSREG, a6: C_VSREG, type_: 90, size: 4}, /* vsx xx3-form */
 
 	/* VSX select */
-	{ass: AXXSEL, a1: C_VSREG, a2: C_VSREG, a3: C_VSREG, a6: C_VSREG, type_: 91, size: 4}, /* vsx select, xx4-form */
+	{as: AXXSEL, a1: C_VSREG, a2: C_VSREG, a3: C_VSREG, a6: C_VSREG, type_: 91, size: 4}, /* vsx select, xx4-form */
 
 	/* VSX merge */
-	{ass: AXXMRGHW, a1: C_VSREG, a2: C_VSREG, a6: C_VSREG, type_: 90, size: 4}, /* vsx merge, xx3-form */
+	{as: AXXMRGHW, a1: C_VSREG, a2: C_VSREG, a6: C_VSREG, type_: 90, size: 4}, /* vsx merge, xx3-form */
 
 	/* VSX splat */
-	{ass: AXXSPLTW, a1: C_VSREG, a3: C_U15CON, a6: C_VSREG, type_: 89, size: 4}, /* vsx splat, xx2-form */
-	{ass: AXXSPLTIB, a1: C_U15CON, a6: C_VSREG, type_: 100, size: 4},            /* vsx splat, xx2-form */
+	{as: AXXSPLTW, a1: C_VSREG, a3: C_U15CON, a6: C_VSREG, type_: 89, size: 4}, /* vsx splat, xx2-form */
+	{as: AXXSPLTIB, a1: C_U15CON, a6: C_VSREG, type_: 100, size: 4},            /* vsx splat, xx2-form */
 
 	/* VSX permute */
-	{ass: AXXPERM, a1: C_VSREG, a2: C_VSREG, a6: C_VSREG, type_: 90, size: 4}, /* vsx permute, xx3-form */
+	{as: AXXPERM, a1: C_VSREG, a2: C_VSREG, a6: C_VSREG, type_: 90, size: 4}, /* vsx permute, xx3-form */
 
 	/* VSX shift */
-	{ass: AXXSLDWI, a1: C_VSREG, a2: C_VSREG, a3: C_U15CON, a6: C_VSREG, type_: 90, size: 4}, /* vsx shift immediate, xx3-form */
+	{as: AXXSLDWI, a1: C_VSREG, a2: C_VSREG, a3: C_U15CON, a6: C_VSREG, type_: 90, size: 4}, /* vsx shift immediate, xx3-form */
 
 	/* VSX reverse bytes */
-	{ass: AXXBRQ, a1: C_VSREG, a6: C_VSREG, type_: 101, size: 4}, /* vsx reverse bytes */
+	{as: AXXBRQ, a1: C_VSREG, a6: C_VSREG, type_: 101, size: 4}, /* vsx reverse bytes */
 
 	/* VSX scalar FP-FP conversion */
-	{ass: AXSCVDPSP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx scalar fp-fp conversion, xx2-form */
+	{as: AXSCVDPSP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx scalar fp-fp conversion, xx2-form */
 
 	/* VSX vector FP-FP conversion */
-	{ass: AXVCVDPSP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx vector fp-fp conversion, xx2-form */
+	{as: AXVCVDPSP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx vector fp-fp conversion, xx2-form */
 
 	/* VSX scalar FP-integer conversion */
-	{ass: AXSCVDPSXDS, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx scalar fp-integer conversion, xx2-form */
+	{as: AXSCVDPSXDS, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx scalar fp-integer conversion, xx2-form */
 
 	/* VSX scalar integer-FP conversion */
-	{ass: AXSCVSXDDP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx scalar integer-fp conversion, xx2-form */
+	{as: AXSCVSXDDP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx scalar integer-fp conversion, xx2-form */
 
 	/* VSX vector FP-integer conversion */
-	{ass: AXVCVDPSXDS, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx vector fp-integer conversion, xx2-form */
+	{as: AXVCVDPSXDS, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx vector fp-integer conversion, xx2-form */
 
 	/* VSX vector integer-FP conversion */
-	{ass: AXVCVSXDDP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx vector integer-fp conversion, xx2-form */
+	{as: AXVCVSXDDP, a1: C_VSREG, a6: C_VSREG, type_: 89, size: 4}, /* vsx vector integer-fp conversion, xx2-form */
 
-	{ass: ACMP, a1: C_REG, a6: C_REG, type_: 70, size: 4},
-	{ass: ACMP, a1: C_REG, a2: C_CREG, a6: C_REG, type_: 70, size: 4},
-	{ass: ACMP, a1: C_REG, a6: C_S16CON, type_: 70, size: 4},
-	{ass: ACMP, a1: C_REG, a2: C_CREG, a6: C_S16CON, type_: 70, size: 4},
-	{ass: ACMPU, a1: C_REG, a6: C_REG, type_: 70, size: 4},
-	{ass: ACMPU, a1: C_REG, a2: C_CREG, a6: C_REG, type_: 70, size: 4},
-	{ass: ACMPU, a1: C_REG, a6: C_U16CON, type_: 70, size: 4},
-	{ass: ACMPU, a1: C_REG, a2: C_CREG, a6: C_U16CON, type_: 70, size: 4},
-	{ass: AFCMPO, a1: C_FREG, a6: C_FREG, type_: 70, size: 4},
-	{ass: AFCMPO, a1: C_FREG, a2: C_CREG, a6: C_FREG, type_: 70, size: 4},
-	{ass: ADCMPOQ, a1: C_FREGP, a6: C_FREGP, type_: 70, size: 4},
-	{ass: ADCMPOQ, a1: C_FREGP, a2: C_CREG, a6: C_FREGP, type_: 70, size: 4},
-	{ass: ATW, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 60, size: 4},
-	{ass: ATW, a1: C_32CON, a2: C_REG, a6: C_S16CON, type_: 61, size: 4},
-	{ass: ADCBF, a1: C_SOREG, type_: 43, size: 4},
-	{ass: ADCBF, a1: C_XOREG, type_: 43, size: 4},
-	{ass: ADCBF, a1: C_XOREG, a2: C_REG, a6: C_U15CON, type_: 43, size: 4},
-	{ass: ADCBF, a1: C_SOREG, a6: C_U15CON, type_: 43, size: 4},
-	{ass: ADCBF, a1: C_XOREG, a6: C_U15CON, type_: 43, size: 4},
-	{ass: ASTDCCC, a1: C_REG, a2: C_REG, a6: C_XOREG, type_: 44, size: 4},
-	{ass: ASTDCCC, a1: C_REG, a6: C_XOREG, type_: 44, size: 4},
-	{ass: ALDAR, a1: C_XOREG, a6: C_REG, type_: 45, size: 4},
-	{ass: ALDAR, a1: C_XOREG, a3: C_U16CON, a6: C_REG, type_: 45, size: 4},
-	{ass: AEIEIO, type_: 46, size: 4},
-	{ass: ATLBIE, a1: C_REG, type_: 49, size: 4},
-	{ass: ATLBIE, a1: C_U15CON, a6: C_REG, type_: 49, size: 4},
-	{ass: ASLBMFEE, a1: C_REG, a6: C_REG, type_: 55, size: 4},
-	{ass: ASLBMTE, a1: C_REG, a6: C_REG, type_: 55, size: 4},
-	{ass: ASTSW, a1: C_REG, a6: C_XOREG, type_: 44, size: 4},
-	{ass: ASTSW, a1: C_REG, a3: C_32CON, a6: C_ZOREG, type_: 41, size: 4},
-	{ass: ALSW, a1: C_XOREG, a6: C_REG, type_: 45, size: 4},
-	{ass: ALSW, a1: C_ZOREG, a3: C_32CON, a6: C_REG, type_: 42, size: 4},
+	{as: ACMP, a1: C_REG, a6: C_REG, type_: 70, size: 4},
+	{as: ACMP, a1: C_REG, a2: C_CREG, a6: C_REG, type_: 70, size: 4},
+	{as: ACMP, a1: C_REG, a6: C_S16CON, type_: 70, size: 4},
+	{as: ACMP, a1: C_REG, a2: C_CREG, a6: C_S16CON, type_: 70, size: 4},
+	{as: ACMPU, a1: C_REG, a6: C_REG, type_: 70, size: 4},
+	{as: ACMPU, a1: C_REG, a2: C_CREG, a6: C_REG, type_: 70, size: 4},
+	{as: ACMPU, a1: C_REG, a6: C_U16CON, type_: 70, size: 4},
+	{as: ACMPU, a1: C_REG, a2: C_CREG, a6: C_U16CON, type_: 70, size: 4},
+	{as: AFCMPO, a1: C_FREG, a6: C_FREG, type_: 70, size: 4},
+	{as: AFCMPO, a1: C_FREG, a2: C_CREG, a6: C_FREG, type_: 70, size: 4},
+	{as: ADCMPOQ, a1: C_FREGP, a6: C_FREGP, type_: 70, size: 4},
+	{as: ADCMPOQ, a1: C_FREGP, a2: C_CREG, a6: C_FREGP, type_: 70, size: 4},
+	{as: ATW, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 60, size: 4},
+	{as: ATW, a1: C_32CON, a2: C_REG, a6: C_S16CON, type_: 61, size: 4},
+	{as: ADCBF, a1: C_SOREG, type_: 43, size: 4},
+	{as: ADCBF, a1: C_XOREG, type_: 43, size: 4},
+	{as: ADCBF, a1: C_XOREG, a2: C_REG, a6: C_U15CON, type_: 43, size: 4},
+	{as: ADCBF, a1: C_SOREG, a6: C_U15CON, type_: 43, size: 4},
+	{as: ADCBF, a1: C_XOREG, a6: C_U15CON, type_: 43, size: 4},
+	{as: ASTDCCC, a1: C_REG, a2: C_REG, a6: C_XOREG, type_: 44, size: 4},
+	{as: ASTDCCC, a1: C_REG, a6: C_XOREG, type_: 44, size: 4},
+	{as: ALDAR, a1: C_XOREG, a6: C_REG, type_: 45, size: 4},
+	{as: ALDAR, a1: C_XOREG, a3: C_U16CON, a6: C_REG, type_: 45, size: 4},
+	{as: AEIEIO, type_: 46, size: 4},
+	{as: ATLBIE, a1: C_REG, type_: 49, size: 4},
+	{as: ATLBIE, a1: C_U15CON, a6: C_REG, type_: 49, size: 4},
+	{as: ASLBMFEE, a1: C_REG, a6: C_REG, type_: 55, size: 4},
+	{as: ASLBMTE, a1: C_REG, a6: C_REG, type_: 55, size: 4},
+	{as: ASTSW, a1: C_REG, a6: C_XOREG, type_: 44, size: 4},
+	{as: ASTSW, a1: C_REG, a3: C_32CON, a6: C_ZOREG, type_: 41, size: 4},
+	{as: ALSW, a1: C_XOREG, a6: C_REG, type_: 45, size: 4},
+	{as: ALSW, a1: C_ZOREG, a3: C_32CON, a6: C_REG, type_: 42, size: 4},
 
-	{ass: obj.AUNDEF, type_: 78, size: 4},
-	{ass: obj.APCDATA, a1: C_32CON, a6: C_32CON, type_: 0, size: 0},
-	{ass: obj.AFUNCDATA, a1: C_U15CON, a6: C_ADDR, type_: 0, size: 0},
-	{ass: obj.ANOP, type_: 0, size: 0},
-	{ass: obj.ANOP, a1: C_32CON, type_: 0, size: 0}, // NOP operand variations added for #40689
-	{ass: obj.ANOP, a1: C_REG, type_: 0, size: 0},   // to preserve previous behavior
-	{ass: obj.ANOP, a1: C_FREG, type_: 0, size: 0},
-	{ass: obj.ADUFFZERO, a6: C_BRA, type_: 11, size: 4}, // same as ABR/ABL
-	{ass: obj.ADUFFCOPY, a6: C_BRA, type_: 11, size: 4}, // same as ABR/ABL
-	{ass: obj.APCALIGN, a1: C_32CON, type_: 0, size: 0}, // align code
+	{as: obj.AUNDEF, type_: 78, size: 4},
+	{as: obj.APCDATA, a1: C_32CON, a6: C_32CON, type_: 0, size: 0},
+	{as: obj.AFUNCDATA, a1: C_U15CON, a6: C_ADDR, type_: 0, size: 0},
+	{as: obj.ANOP, type_: 0, size: 0},
+	{as: obj.ANOP, a1: C_32CON, type_: 0, size: 0}, // NOP operand variations added for #40689
+	{as: obj.ANOP, a1: C_REG, type_: 0, size: 0},   // to preserve previous behavior
+	{as: obj.ANOP, a1: C_FREG, type_: 0, size: 0},
+	{as: obj.ADUFFZERO, a6: C_BRA, type_: 11, size: 4}, // same as ABR/ABL
+	{as: obj.ADUFFCOPY, a6: C_BRA, type_: 11, size: 4}, // same as ABR/ABL
+	{as: obj.APCALIGN, a1: C_32CON, type_: 0, size: 0}, // align code
 }
 
 // These are opcodes above which may generate different sequences depending on whether prefix opcode support
@@ -543,41 +543,41 @@ type PrefixableOptab struct {
 //
 // This requires an ISA 3.1 compatible cpu (e.g Power10), and when linking externally an ELFv2 1.5 compliant.
 var prefixableOptab = []PrefixableOptab{
-	{Optab: Optab{ass: AMOVD, a1: C_S34CON, a6: C_REG, type_: 19, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVD, a1: C_ADDR, a6: C_REG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVD, a1: C_TLS_LE, a6: C_REG, type_: 79, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVD, a1: C_TLS_IE, a6: C_REG, type_: 80, size: 12}, minGOPPC64: 10, pfxsize: 12},
-	{Optab: Optab{ass: AMOVD, a1: C_LACON, a6: C_REG, type_: 26, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVD, a1: C_LOREG, a6: C_REG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVD, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVD, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_S34CON, a6: C_REG, type_: 19, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_ADDR, a6: C_REG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_TLS_LE, a6: C_REG, type_: 79, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_TLS_IE, a6: C_REG, type_: 80, size: 12}, minGOPPC64: 10, pfxsize: 12},
+	{Optab: Optab{as: AMOVD, a1: C_LACON, a6: C_REG, type_: 26, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_LOREG, a6: C_REG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVD, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
 
-	{Optab: Optab{ass: AMOVW, a1: C_32CON, a6: C_REG, type_: 19, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVW, a1: C_LACON, a6: C_REG, type_: 26, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVW, a1: C_LOREG, a6: C_REG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVW, a1: C_ADDR, a6: C_REG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVW, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVW, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVW, a1: C_32CON, a6: C_REG, type_: 19, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVW, a1: C_LACON, a6: C_REG, type_: 26, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVW, a1: C_LOREG, a6: C_REG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVW, a1: C_ADDR, a6: C_REG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVW, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVW, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
 
-	{Optab: Optab{ass: AMOVB, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVB, a1: C_LOREG, a6: C_REG, type_: 36, size: 12}, minGOPPC64: 10, pfxsize: 12},
-	{Optab: Optab{ass: AMOVB, a1: C_ADDR, a6: C_REG, type_: 75, size: 12}, minGOPPC64: 10, pfxsize: 12},
-	{Optab: Optab{ass: AMOVB, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVB, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVB, a1: C_LOREG, a6: C_REG, type_: 36, size: 12}, minGOPPC64: 10, pfxsize: 12},
+	{Optab: Optab{as: AMOVB, a1: C_ADDR, a6: C_REG, type_: 75, size: 12}, minGOPPC64: 10, pfxsize: 12},
+	{Optab: Optab{as: AMOVB, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
 
-	{Optab: Optab{ass: AMOVBZ, a1: C_LOREG, a6: C_REG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVBZ, a1: C_ADDR, a6: C_REG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVBZ, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AMOVBZ, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVBZ, a1: C_LOREG, a6: C_REG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVBZ, a1: C_ADDR, a6: C_REG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVBZ, a1: C_REG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AMOVBZ, a1: C_REG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
 
-	{Optab: Optab{ass: AFMOVD, a1: C_LOREG, a6: C_FREG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AFMOVD, a1: C_ADDR, a6: C_FREG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AFMOVD, a1: C_FREG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AFMOVD, a1: C_FREG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AFMOVD, a1: C_LOREG, a6: C_FREG, type_: 36, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AFMOVD, a1: C_ADDR, a6: C_FREG, type_: 75, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AFMOVD, a1: C_FREG, a6: C_LOREG, type_: 35, size: 8}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AFMOVD, a1: C_FREG, a6: C_ADDR, type_: 74, size: 8}, minGOPPC64: 10, pfxsize: 8},
 
-	{Optab: Optab{ass: AADD, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 22, size: 12}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AADD, a1: C_32CON, a6: C_REG, type_: 22, size: 12}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AADD, a1: C_S34CON, a2: C_REG, a6: C_REG, type_: 22, size: 20}, minGOPPC64: 10, pfxsize: 8},
-	{Optab: Optab{ass: AADD, a1: C_S34CON, a6: C_REG, type_: 22, size: 20}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AADD, a1: C_32CON, a2: C_REG, a6: C_REG, type_: 22, size: 12}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AADD, a1: C_32CON, a6: C_REG, type_: 22, size: 12}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AADD, a1: C_S34CON, a2: C_REG, a6: C_REG, type_: 22, size: 20}, minGOPPC64: 10, pfxsize: 8},
+	{Optab: Optab{as: AADD, a1: C_S34CON, a6: C_REG, type_: 22, size: 20}, minGOPPC64: 10, pfxsize: 8},
 }
 
 var oprange [ALAST & obj.AMask][]Optab
@@ -1198,7 +1198,7 @@ func cmp(a int, b int) bool {
 func optabLess(i, j int) bool {
 	p1 := &optab[i]
 	p2 := &optab[j]
-	n := int(p1.ass) - int(p2.ass)
+	n := int(p1.as) - int(p2.as)
 	// same opcode
 	if n != 0 {
 		return n < 0
@@ -1300,10 +1300,10 @@ func buildop(ctxt *obj.Link) {
 	}
 
 	for i := 0; i < len(optab); {
-		r := optab[i].ass
+		r := optab[i].as
 		r0 := r & obj.AMask
 		start := i
-		for i < len(optab) && optab[i].ass == r {
+		for i < len(optab) && optab[i].as == r {
 			i++
 		}
 		oprange[r0] = optab[start:i]

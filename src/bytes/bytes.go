@@ -247,9 +247,9 @@ func IndexAny(s []byte, chars string) int {
 		return IndexRune(s, r)
 	}
 	if len(s) > 8 {
-		if ass, isASCII := makeASCIISet(chars); isASCII {
+		if as, isASCII := makeASCIISet(chars); isASCII {
 			for i, c := range s {
-				if ass.contains(c) {
+				if as.contains(c) {
 					return i
 				}
 			}
@@ -302,9 +302,9 @@ func LastIndexAny(s []byte, chars string) int {
 		return -1
 	}
 	if len(s) > 8 {
-		if ass, isASCII := makeASCIISet(chars); isASCII {
+		if as, isASCII := makeASCIISet(chars); isASCII {
 			for i := len(s) - 1; i >= 0; i-- {
-				if ass.contains(s[i]) {
+				if as.contains(s[i]) {
 					return i
 				}
 			}
@@ -959,20 +959,20 @@ type asciiSet [8]uint32
 
 // makeASCIISet creates a set of ASCII characters and reports whether all
 // characters in chars are ASCII.
-func makeASCIISet(chars string) (ass asciiSet, ok bool) {
+func makeASCIISet(chars string) (as asciiSet, ok bool) {
 	for i := 0; i < len(chars); i++ {
 		c := chars[i]
 		if c >= utf8.RuneSelf {
-			return ass, false
+			return as, false
 		}
-		ass[c/32] |= 1 << (c % 32)
+		as[c/32] |= 1 << (c % 32)
 	}
-	return ass, true
+	return as, true
 }
 
 // contains reports whether c is inside the set.
-func (ass *asciiSet) contains(c byte) bool {
-	return (ass[c/32] & (1 << (c % 32))) != 0
+func (as *asciiSet) contains(c byte) bool {
+	return (as[c/32] & (1 << (c % 32))) != 0
 }
 
 // containsRune is a simplified version of strings.ContainsRune
@@ -1000,8 +1000,8 @@ func Trim(s []byte, cutset string) []byte {
 	if len(cutset) == 1 && cutset[0] < utf8.RuneSelf {
 		return trimLeftByte(trimRightByte(s, cutset[0]), cutset[0])
 	}
-	if ass, ok := makeASCIISet(cutset); ok {
-		return trimLeftASCII(trimRightASCII(s, &ass), &ass)
+	if as, ok := makeASCIISet(cutset); ok {
+		return trimLeftASCII(trimRightASCII(s, &as), &as)
 	}
 	return trimLeftUnicode(trimRightUnicode(s, cutset), cutset)
 }
@@ -1019,8 +1019,8 @@ func TrimLeft(s []byte, cutset string) []byte {
 	if len(cutset) == 1 && cutset[0] < utf8.RuneSelf {
 		return trimLeftByte(s, cutset[0])
 	}
-	if ass, ok := makeASCIISet(cutset); ok {
-		return trimLeftASCII(s, &ass)
+	if as, ok := makeASCIISet(cutset); ok {
+		return trimLeftASCII(s, &as)
 	}
 	return trimLeftUnicode(s, cutset)
 }
@@ -1036,9 +1036,9 @@ func trimLeftByte(s []byte, c byte) []byte {
 	return s
 }
 
-func trimLeftASCII(s []byte, ass *asciiSet) []byte {
+func trimLeftASCII(s []byte, as *asciiSet) []byte {
 	for len(s) > 0 {
-		if !ass.contains(s[0]) {
+		if !as.contains(s[0]) {
 			break
 		}
 		s = s[1:]
@@ -1077,8 +1077,8 @@ func TrimRight(s []byte, cutset string) []byte {
 	if len(cutset) == 1 && cutset[0] < utf8.RuneSelf {
 		return trimRightByte(s, cutset[0])
 	}
-	if ass, ok := makeASCIISet(cutset); ok {
-		return trimRightASCII(s, &ass)
+	if as, ok := makeASCIISet(cutset); ok {
+		return trimRightASCII(s, &as)
 	}
 	return trimRightUnicode(s, cutset)
 }
@@ -1090,9 +1090,9 @@ func trimRightByte(s []byte, c byte) []byte {
 	return s
 }
 
-func trimRightASCII(s []byte, ass *asciiSet) []byte {
+func trimRightASCII(s []byte, as *asciiSet) []byte {
 	for len(s) > 0 {
-		if !ass.contains(s[len(s)-1]) {
+		if !as.contains(s[len(s)-1]) {
 			break
 		}
 		s = s[:len(s)-1]

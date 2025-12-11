@@ -111,12 +111,12 @@ func headerEq(a, b Header) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for k, ass := range a {
+	for k, as := range a {
 		bs, ok := b[k]
 		if !ok {
 			return false
 		}
-		if !slices.Equal(ass, bs) {
+		if !slices.Equal(as, bs) {
 			return false
 		}
 	}

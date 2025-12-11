@@ -69,7 +69,7 @@ const (
 )
 
 type Optab struct {
-	ass   obj.As
+	as    obj.As
 	a1    uint8 // Prog.From
 	a2    uint8 // 2nd source operand, Prog.Reg or Prog.RestArgs[XXX]
 	a3    uint8 // 3rd source operand, Prog.RestArgs[XXX]
@@ -82,11 +82,11 @@ type Optab struct {
 	scond uint8
 }
 
-func IsAtomicInstruction(ass obj.As) bool {
-	if _, ok := atomicLDADD[ass]; ok {
+func IsAtomicInstruction(as obj.As) bool {
+	if _, ok := atomicLDADD[as]; ok {
 		return true
 	}
-	if _, ok := atomicSWP[ass]; ok {
+	if _, ok := atomicSWP[as]; ok {
 		return true
 	}
 	return false
@@ -2696,8 +2696,8 @@ func cmp(a int, b int) bool {
 }
 
 func ocmp(p1, p2 Optab) int {
-	if p1.ass != p2.ass {
-		return int(p1.ass) - int(p2.ass)
+	if p1.as != p2.as {
+		return int(p1.as) - int(p2.as)
 	}
 	if p1.a1 != p2.a1 {
 		return int(p1.a1) - int(p2.a1)
@@ -2739,17 +2739,17 @@ func buildop(ctxt *obj.Link) {
 
 	slices.SortFunc(optab, ocmp)
 	for i := 0; i < len(optab); i++ {
-		ass, start := optab[i].ass, i
+		as, start := optab[i].as, i
 		for ; i < len(optab)-1; i++ {
-			if optab[i+1].ass != ass {
+			if optab[i+1].as != as {
 				break
 			}
 		}
 		t := optab[start : i+1]
-		oprangeset(ass, t)
-		switch ass {
+		oprangeset(as, t)
+		switch as {
 		default:
-			ctxt.Diag("unknown op in build: %v", ass)
+			ctxt.Diag("unknown op in build: %v", as)
 			ctxt.DiagFlush()
 			log.Fatalf("bad code")
 
@@ -3363,9 +3363,9 @@ func (c *ctxt7) checkindex(p *obj.Prog, index, maxindex int) {
 }
 
 /* checkoffset checks whether the immediate offset is valid for VLD[1-4].P and VST[1-4].P */
-func (c *ctxt7) checkoffset(p *obj.Prog, ass obj.As) {
+func (c *ctxt7) checkoffset(p *obj.Prog, as obj.As) {
 	var offset, list, n, expect int64
-	switch ass {
+	switch as {
 	case AVLD1, AVLD2, AVLD3, AVLD4, AVLD1R, AVLD2R, AVLD3R, AVLD4R:
 		offset = p.From.Offset
 		list = p.To.Offset
@@ -3394,7 +3394,7 @@ func (c *ctxt7) checkoffset(p *obj.Prog, ass obj.As) {
 		c.ctxt.Diag("invalid register numbers in ARM64 register list: %v", p)
 	}
 
-	switch ass {
+	switch as {
 	case AVLD1R, AVLD2R, AVLD3R, AVLD4R:
 		if offset != n*(1<<uint(size)) {
 			c.ctxt.Diag("invalid post-increment offset: %v", p)
@@ -3405,7 +3405,7 @@ func (c *ctxt7) checkoffset(p *obj.Prog, ass obj.As) {
 		}
 	}
 
-	switch ass {
+	switch as {
 	case AVLD1, AVST1:
 		return
 	case AVLD1R:
@@ -3989,9 +3989,9 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		// Otherwise, use constant pool:
 		//	mov $L, Rtmp (from constant pool)
 		//	str R, (R+Rtmp)
-		s := movesize(o.ass)
+		s := movesize(o.as)
 		if s < 0 {
-			c.ctxt.Diag("unexpected long move, op %v tab %v\n%v", p.As, o.ass, p)
+			c.ctxt.Diag("unexpected long move, op %v tab %v\n%v", p.As, o.as, p)
 		}
 
 		rt, rf := p.To.Reg, p.From.Reg
@@ -4045,9 +4045,9 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		// Otherwise, use constant pool:
 		//	mov $L, Rtmp (from constant pool)
 		//	ldr (R+Rtmp), R
-		s := movesize(o.ass)
+		s := movesize(o.as)
 		if s < 0 {
-			c.ctxt.Diag("unexpected long move, op %v tab %v\n%v", p.As, o.ass, p)
+			c.ctxt.Diag("unexpected long move, op %v tab %v\n%v", p.As, o.as, p)
 		}
 
 		rt, rf := p.To.Reg, p.From.Reg
@@ -4286,12 +4286,12 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		o1 = c.opextr(p, p.As, p.From.Offset, p.GetFrom3().Reg, p.Reg, p.To.Reg)
 
 	case 45: /* sxt/uxt[bhw] R,R; movT R,R -> sxtT R,R */
-		ass := p.As
+		as := p.As
 		rt, rf := p.To.Reg, p.From.Reg
 		if rf == REGZERO {
-			ass = AMOVWU /* clearer in disassembly */
+			as = AMOVWU /* clearer in disassembly */
 		}
-		switch ass {
+		switch as {
 		case AMOVB, ASXTB:
 			o1 = c.opbfm(p, ASBFM, 0, 7, rf, rt)
 
@@ -4308,7 +4308,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			o1 = c.opbfm(p, AUBFM, 0, 15, rf, rt)
 
 		case AMOVWU:
-			o1 = c.oprrr(p, ass, p.To.Reg, REGZERO, p.From.Reg)
+			o1 = c.oprrr(p, as, p.To.Reg, REGZERO, p.From.Reg)
 
 		case AUXTW:
 			o1 = c.opbfm(p, AUBFM, 0, 31, rf, rt)
@@ -4326,7 +4326,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			o1 = c.opbfm(p, AUBFMW, 0, 15, rf, rt)
 
 		default:
-			c.ctxt.Diag("bad sxt %v", ass)
+			c.ctxt.Diag("bad sxt %v", as)
 			break
 		}
 
@@ -7323,7 +7323,7 @@ func (c *ctxt7) oaddi12(p *obj.Prog, v int32, rd, rn int16) uint32 {
 /*
  * load a literal value into dr
  */
-func (c *ctxt7) omovlit(ass obj.As, p *obj.Prog, a *obj.Addr, dr int) uint32 {
+func (c *ctxt7) omovlit(as obj.As, p *obj.Prog, a *obj.Addr, dr int) uint32 {
 	var o1 int32
 	if p.Pool == nil { /* not in literal pool */
 		c.aclass(a)
@@ -7341,7 +7341,7 @@ func (c *ctxt7) omovlit(ass obj.As, p *obj.Prog, a *obj.Addr, dr int) uint32 {
 		o1 |= ((v & 0xFFF) << 10) | (REGZERO & 31 << 5) | int32(dr&31)
 	} else {
 		fp, w := 0, 0
-		switch ass {
+		switch as {
 		case AFMOVS, AVMOVS:
 			fp = 1
 			w = 0 /* 32-bit SIMD/FP */
@@ -7372,7 +7372,7 @@ func (c *ctxt7) omovlit(ass obj.As, p *obj.Prog, a *obj.Addr, dr int) uint32 {
 			w = 2 /* 32-bit, sign-extended to 64-bit */
 
 		default:
-			c.ctxt.Diag("invalid operation %v in %v", ass, p)
+			c.ctxt.Diag("invalid operation %v in %v", as, p)
 		}
 
 		v := int32(c.brdist(p, 0, 19, 2))
@@ -7385,12 +7385,12 @@ func (c *ctxt7) omovlit(ass obj.As, p *obj.Prog, a *obj.Addr, dr int) uint32 {
 }
 
 // load a constant (MOVCON or BITCON) in a into rt
-func (c *ctxt7) omovconst(ass obj.As, p *obj.Prog, a *obj.Addr, rt int) (o1 uint32) {
+func (c *ctxt7) omovconst(as obj.As, p *obj.Prog, a *obj.Addr, rt int) (o1 uint32) {
 	if cls := int(a.Class); (cls == C_BITCON || cls == C_ABCON || cls == C_ABCON0) && rt != REGZERO {
 		// or $bitcon, REGZERO, rt. rt can't be ZR.
 		mode := 64
 		var as1 obj.As
-		switch ass {
+		switch as {
 		case AMOVW:
 			as1 = AORRW
 			mode = 32
@@ -7402,7 +7402,7 @@ func (c *ctxt7) omovconst(ass obj.As, p *obj.Prog, a *obj.Addr, rt int) (o1 uint
 		return o1
 	}
 
-	if ass == AMOVW {
+	if as == AMOVW {
 		d := uint32(a.Offset)
 		s := movcon(int64(d))
 		if s < 0 || s >= 32 {
@@ -7417,7 +7417,7 @@ func (c *ctxt7) omovconst(ass obj.As, p *obj.Prog, a *obj.Addr, rt int) (o1 uint
 		}
 		o1 |= MOVCONST(int64(d), s>>4, rt)
 	}
-	if ass == AMOVD {
+	if as == AMOVD {
 		d := a.Offset
 		s := movcon(d)
 		if s < 0 || s >= 64 {
@@ -7437,8 +7437,8 @@ func (c *ctxt7) omovconst(ass obj.As, p *obj.Prog, a *obj.Addr, rt int) (o1 uint
 
 // load a 32-bit/64-bit large constant (LCON or VCON) in a.Offset into rt
 // put the instruction sequence in os and return the number of instructions.
-func (c *ctxt7) omovlconst(ass obj.As, p *obj.Prog, a *obj.Addr, rt int, os []uint32) (num uint8) {
-	switch ass {
+func (c *ctxt7) omovlconst(as obj.As, p *obj.Prog, a *obj.Addr, rt int, os []uint32) (num uint8) {
+	switch as {
 	case AMOVW:
 		d := uint32(a.Offset)
 		// use MOVZW and MOVKW to load a constant to rt

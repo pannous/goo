@@ -638,9 +638,9 @@ func (a As) String() string {
 		return Anames[a]
 	}
 	for i := range aSpace {
-		ass := &aSpace[i]
-		if ass.lo <= a && int(a-ass.lo) < len(ass.names) {
-			return ass.names[a-ass.lo]
+		as := &aSpace[i]
+		if as.lo <= a && int(a-as.lo) < len(as.names) {
+			return as.names[a-as.lo]
 		}
 	}
 	return fmt.Sprintf("A???%d", a)

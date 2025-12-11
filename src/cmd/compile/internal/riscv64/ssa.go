@@ -204,11 +204,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if rs == rd {
 			return
 		}
-		ass := riscv.AMOV
+		as := riscv.AMOV
 		if v.Type.IsFloat() {
-			ass = riscv.AMOVD
+			as = riscv.AMOVD
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = rs
 		p.To.Type = obj.TYPE_REG
@@ -254,7 +254,7 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		for a.Op == ssa.OpCopy || a.Op == ssa.OpRISCV64MOVDreg {
 			a = a.Args[0]
 		}
-		ass := v.Op.Asm()
+		as := v.Op.Asm()
 		rs := v.Args[0].Reg()
 		rd := v.Reg()
 		if a.Op == ssa.OpLoadReg {
@@ -270,11 +270,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 				if rs == rd {
 					return
 				}
-				ass = riscv.AMOV
+				as = riscv.AMOV
 			default:
 			}
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = rs
 		p.To.Type = obj.TYPE_REG
@@ -606,11 +606,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		s.Prog(riscv.AFENCE)
 
 	case ssa.OpRISCV64LoweredAtomicLoad32, ssa.OpRISCV64LoweredAtomicLoad64:
-		ass := riscv.ALRW
+		as := riscv.ALRW
 		if v.Op == ssa.OpRISCV64LoweredAtomicLoad64 {
-			ass = riscv.ALRD
+			as = riscv.ALRD
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_MEM
 		p.From.Reg = v.Args[0].Reg()
 		p.To.Type = obj.TYPE_REG
@@ -626,11 +626,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		s.Prog(riscv.AFENCE)
 
 	case ssa.OpRISCV64LoweredAtomicStore32, ssa.OpRISCV64LoweredAtomicStore64:
-		ass := riscv.AAMOSWAPW
+		as := riscv.AAMOSWAPW
 		if v.Op == ssa.OpRISCV64LoweredAtomicStore64 {
-			ass = riscv.AAMOSWAPD
+			as = riscv.AAMOSWAPD
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = v.Args[1].Reg()
 		p.To.Type = obj.TYPE_MEM
@@ -638,11 +638,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		p.RegTo2 = riscv.REG_ZERO
 
 	case ssa.OpRISCV64LoweredAtomicAdd32, ssa.OpRISCV64LoweredAtomicAdd64:
-		ass := riscv.AAMOADDW
+		as := riscv.AAMOADDW
 		if v.Op == ssa.OpRISCV64LoweredAtomicAdd64 {
-			ass = riscv.AAMOADDD
+			as = riscv.AAMOADDD
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = v.Args[1].Reg()
 		p.To.Type = obj.TYPE_MEM
@@ -657,11 +657,11 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		p2.To.Reg = v.Reg0()
 
 	case ssa.OpRISCV64LoweredAtomicExchange32, ssa.OpRISCV64LoweredAtomicExchange64:
-		ass := riscv.AAMOSWAPW
+		as := riscv.AAMOSWAPW
 		if v.Op == ssa.OpRISCV64LoweredAtomicExchange64 {
-			ass = riscv.AAMOSWAPD
+			as = riscv.AAMOSWAPD
 		}
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = v.Args[1].Reg()
 		p.To.Type = obj.TYPE_MEM
@@ -897,18 +897,18 @@ func ssaGenBlock(s *ssagen.State, b, next *ssa.Block) {
 		ssa.BlockRISCV64BLT, ssa.BlockRISCV64BLEZ, ssa.BlockRISCV64BGE, ssa.BlockRISCV64BGEZ,
 		ssa.BlockRISCV64BLTZ, ssa.BlockRISCV64BGTZ, ssa.BlockRISCV64BLTU, ssa.BlockRISCV64BGEU:
 
-		ass := blockBranch[b.Kind]
-		invAs := riscv.InvertBranch(ass)
+		as := blockBranch[b.Kind]
+		invAs := riscv.InvertBranch(as)
 
 		var p *obj.Prog
 		switch next {
 		case b.Succs[0].Block():
 			p = s.Br(invAs, b.Succs[1].Block())
 		case b.Succs[1].Block():
-			p = s.Br(ass, b.Succs[0].Block())
+			p = s.Br(as, b.Succs[0].Block())
 		default:
 			if b.Likely != ssa.BranchUnlikely {
-				p = s.Br(ass, b.Succs[0].Block())
+				p = s.Br(as, b.Succs[0].Block())
 				s.Br(obj.AJMP, b.Succs[1].Block())
 			} else {
 				p = s.Br(invAs, b.Succs[1].Block())

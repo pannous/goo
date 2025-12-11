@@ -90,15 +90,15 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if x == y {
 			return
 		}
-		ass := mips.AMOVW
+		as := mips.AMOVW
 		if isFPreg(x) && isFPreg(y) {
-			ass = mips.AMOVF
+			as = mips.AMOVF
 			if t.Size() == 8 {
-				ass = mips.AMOVD
+				as = mips.AMOVD
 			}
 		}
 
-		p := s.Prog(ass)
+		p := s.Prog(as)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = x
 		p.To.Type = obj.TYPE_REG

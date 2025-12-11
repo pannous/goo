@@ -235,8 +235,8 @@ func walkRange(nrange *ir.RangeStmt) ir.Node {
 		// This reads from hp and writes to hu.
 		huVal = ir.NewConvExpr(base.Pos, ir.OCONVNOP, types.Types[types.TUNSAFEPTR], hp)
 		huVal = ir.NewConvExpr(base.Pos, ir.OCONVNOP, types.Types[types.TUINTPTR], huVal)
-		ass := ir.NewAssignStmt(base.Pos, hu, ir.NewBinaryExpr(base.Pos, ir.OADD, huVal, ir.NewInt(base.Pos, elem.Size())))
-		nfor.Post = ir.NewBlockStmt(base.Pos, []ir.Node{nfor.Post, ass})
+		as := ir.NewAssignStmt(base.Pos, hu, ir.NewBinaryExpr(base.Pos, ir.OADD, huVal, ir.NewInt(base.Pos, elem.Size())))
+		nfor.Post = ir.NewBlockStmt(base.Pos, []ir.Node{nfor.Post, as})
 
 	case k == types.TMAP:
 		// order.stmt allocated the iterator for us.

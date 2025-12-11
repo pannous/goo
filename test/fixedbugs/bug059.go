@@ -22,10 +22,10 @@ func P(a []string) string {
 
 func main() {
 	m := make(map[string][]string)
-	ass := new([2]string)
-	ass[0] = "0"
-	ass[1] = "1"
-	m["0"] = ass[0:]
+	as := new([2]string)
+	as[0] = "0"
+	as[1] = "1"
+	m["0"] = as[0:]
 
 	a := m["0"]
 	a[0] = "x"

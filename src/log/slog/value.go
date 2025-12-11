@@ -176,26 +176,26 @@ func DurationValue(v time.Duration) Value {
 
 // GroupValue returns a new [Value] for a list of Attrs.
 // The caller must not subsequently mutate the argument slice.
-func GroupValue(ass ...Attr) Value {
+func GroupValue(as ...Attr) Value {
 	// Remove empty groups.
 	// It is simpler overall to do this at construction than
 	// to check each Group recursively for emptiness.
-	if n := countEmptyGroups(ass); n > 0 {
-		as2 := make([]Attr, 0, len(ass)-n)
-		for _, a := range ass {
+	if n := countEmptyGroups(as); n > 0 {
+		as2 := make([]Attr, 0, len(as)-n)
+		for _, a := range as {
 			if !a.Value.isEmptyGroup() {
 				as2 = append(as2, a)
 			}
 		}
-		ass = as2
+		as = as2
 	}
-	return Value{num: uint64(len(ass)), any: groupptr(unsafe.SliceData(ass))}
+	return Value{num: uint64(len(as)), any: groupptr(unsafe.SliceData(as))}
 }
 
 // countEmptyGroups returns the number of empty group values in its argument.
-func countEmptyGroups(ass []Attr) int {
+func countEmptyGroups(as []Attr) int {
 	n := 0
-	for _, a := range ass {
+	for _, a := range as {
 		if a.Value.isEmptyGroup() {
 			n++
 		}

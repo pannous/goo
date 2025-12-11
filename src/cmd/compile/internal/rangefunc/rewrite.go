@@ -954,9 +954,9 @@ func (r *rewriter) editBranch(x *syntax.BranchStmt) syntax.Stmt {
 	}
 
 	// Assign #next = next and do the return.
-	ass := &syntax.AssignStmt{Lhs: r.next(), Rhs: r.intConst(next)}
+	as := &syntax.AssignStmt{Lhs: r.next(), Rhs: r.intConst(next)}
 	bl := &syntax.BlockStmt{
-		List: []syntax.Stmt{ass},
+		List: []syntax.Stmt{as},
 	}
 
 	if r.checkFuncMisuse() {
@@ -1162,10 +1162,10 @@ func (r *rewriter) bodyFunc(body []syntax.Stmt, lhs []syntax.Expr, defi bool, ft
 			paramVar = types2.NewVar(start, r.pkg, fmt.Sprintf("#p%d", 1+i), typ)
 			if i < len(lhs) {
 				x := lhs[i]
-				ass := &syntax.AssignStmt{Lhs: x, Rhs: r.useObj(paramVar)}
-				ass.SetPos(x.Pos())
-				setPos(ass.Rhs, x.Pos())
-				bodyFunc.Body.List = append(bodyFunc.Body.List, ass)
+				as := &syntax.AssignStmt{Lhs: x, Rhs: r.useObj(paramVar)}
+				as.SetPos(x.Pos())
+				setPos(as.Rhs, x.Pos())
+				bodyFunc.Body.List = append(bodyFunc.Body.List, as)
 			}
 		}
 		params = append(params, paramVar)

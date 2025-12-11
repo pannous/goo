@@ -122,8 +122,8 @@ func (h *defaultHandler) Handle(ctx context.Context, r Record) error {
 	return h.output(r.PC, *buf)
 }
 
-func (h *defaultHandler) WithAttrs(ass []Attr) Handler {
-	return &defaultHandler{h.ch.withAttrs(ass), h.output}
+func (h *defaultHandler) WithAttrs(as []Attr) Handler {
+	return &defaultHandler{h.ch.withAttrs(as), h.output}
 }
 
 func (h *defaultHandler) WithGroup(name string) Handler {
@@ -227,10 +227,10 @@ func (h *commonHandler) enabled(l Level) bool {
 	return l >= minLevel
 }
 
-func (h *commonHandler) withAttrs(ass []Attr) *commonHandler {
+func (h *commonHandler) withAttrs(as []Attr) *commonHandler {
 	// We are going to ignore empty groups, so if the entire slice consists of
 	// them, there is nothing to do.
-	if countEmptyGroups(ass) == len(ass) {
+	if countEmptyGroups(as) == len(as) {
 		return h
 	}
 	h2 := h.clone()
@@ -247,7 +247,7 @@ func (h *commonHandler) withAttrs(ass []Attr) *commonHandler {
 	// Remember the position in the buffer, in case all attrs are empty.
 	pos := state.buf.Len()
 	state.openGroups()
-	if !state.appendAttrs(ass) {
+	if !state.appendAttrs(as) {
 		state.buf.SetLen(pos)
 	} else {
 		// Remember the new prefix for later keys.
@@ -460,9 +460,9 @@ func (s *handleState) closeGroup(name string) {
 
 // appendAttrs appends the slice of Attrs.
 // It reports whether something was appended.
-func (s *handleState) appendAttrs(ass []Attr) bool {
+func (s *handleState) appendAttrs(as []Attr) bool {
 	nonEmpty := false
-	for _, a := range ass {
+	for _, a := range as {
 		if s.appendAttr(a) {
 			nonEmpty = true
 		}

@@ -239,7 +239,7 @@ func parseKernelInetAddr(af int, b []byte) (int, Addr, error) {
 }
 
 func parseAddrs(attrs uint, b []byte) ([]Addr, error) {
-	var ass [syscall.RTAX_MAX]Addr
+	var as [syscall.RTAX_MAX]Addr
 	af := int(syscall.AF_UNSPEC)
 	for i := uint(0); i < syscall.RTAX_MAX && len(b) >= roundup(0); i++ {
 		if attrs&(1<<i) == 0 {
@@ -252,7 +252,7 @@ func parseAddrs(attrs uint, b []byte) ([]Addr, error) {
 				if err != nil {
 					return nil, err
 				}
-				ass[i] = a
+				as[i] = a
 				l := roundup(int(b[0]))
 				if len(b) < l {
 					return nil, errMessageTooShort
@@ -264,7 +264,7 @@ func parseAddrs(attrs uint, b []byte) ([]Addr, error) {
 				if err != nil {
 					return nil, err
 				}
-				ass[i] = a
+				as[i] = a
 				l := roundup(int(b[0]))
 				if len(b) < l {
 					return nil, errMessageTooShort
@@ -275,7 +275,7 @@ func parseAddrs(attrs uint, b []byte) ([]Addr, error) {
 				if err != nil {
 					return nil, err
 				}
-				ass[i] = a
+				as[i] = a
 				ll := roundup(l)
 				if len(b) < ll {
 					b = b[l:]
@@ -296,5 +296,5 @@ func parseAddrs(attrs uint, b []byte) ([]Addr, error) {
 	// However, under some circumstances DragonFly BSD appears to put
 	// more addresses in the message than are indicated in the address
 	// bitmask, so don't check for this.
-	return ass[:], nil
+	return as[:], nil
 }

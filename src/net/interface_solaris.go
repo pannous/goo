@@ -63,12 +63,12 @@ func interfaceAddrTable(ifi *Interface) ([]Addr, error) {
 	if ifi != nil {
 		name = ifi.Name
 	}
-	ass, err := lif.Addrs(syscall.AF_UNSPEC, name)
+	as, err := lif.Addrs(syscall.AF_UNSPEC, name)
 	if err != nil {
 		return nil, err
 	}
 	var ifat []Addr
-	for _, a := range ass {
+	for _, a := range as {
 		var ip IP
 		var mask IPMask
 		switch a := a.(type) {

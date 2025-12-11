@@ -10,7 +10,7 @@ package p
 
 func f() {
 	var s string
-	var ass []string
-	switch false && (s+"a"+ass[0]+s+ass[0]+s == "") {
+	var as []string
+	switch false && (s+"a"+as[0]+s+as[0]+s == "") {
 	}
 }

@@ -671,11 +671,11 @@ func typecheck1(cfg *TypeConfig, f any, typeof map[any]string, assign map[string
 			// but go/parser generates just one variable.
 			// Repeat type check for each case with more precise
 			// type information.
-			ass, ok := n.Assign.(*ast.AssignStmt)
+			as, ok := n.Assign.(*ast.AssignStmt)
 			if !ok {
 				return
 			}
-			varx, ok := ass.Lhs[0].(*ast.Ident)
+			varx, ok := as.Lhs[0].(*ast.Ident)
 			if !ok {
 				return
 			}

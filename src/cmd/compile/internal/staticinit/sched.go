@@ -1109,18 +1109,18 @@ func tryWrapGlobalInit(n ir.Node) *ir.Func {
 	if n.Op() != ir.OAS {
 		return nil
 	}
-	ass := n.(*ir.AssignStmt)
-	if ir.IsBlank(ass.X) || ass.X.Op() != ir.ONAME {
+	as := n.(*ir.AssignStmt)
+	if ir.IsBlank(as.X) || as.X.Op() != ir.ONAME {
 		return nil
 	}
-	nm := ass.X.(*ir.Name)
+	nm := as.X.(*ir.Name)
 	if !nm.Type().IsMap() {
 		return nil
 	}
 
 	// Determine size of RHS.
 	rsiz := 0
-	ir.Any(ass.Y, func(n ir.Node) bool {
+	ir.Any(as.Y, func(n ir.Node) bool {
 		rsiz++
 		return false
 	})
@@ -1139,7 +1139,7 @@ func tryWrapGlobalInit(n ir.Node) *ir.Func {
 	}
 
 	// Reject right hand sides with side effects.
-	if AnySideEffects(ass.Y) {
+	if AnySideEffects(as.Y) {
 		if base.Debug.WrapGlobalMapDbg > 0 {
 			fmt.Fprintf(os.Stderr, "=-= rejected %v due to side effects\n", nm)
 		}
@@ -1172,7 +1172,7 @@ func tryWrapGlobalInit(n ir.Node) *ir.Func {
 	// need code here that relocates or duplicates inline temps.
 
 	// Insert assignment into function body; mark body finished.
-	fn.Body = []ir.Node{ass}
+	fn.Body = []ir.Node{as}
 	typecheck.FinishFuncBody()
 
 	if base.Debug.WrapGlobalMapDbg > 1 {
