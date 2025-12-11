@@ -1,3 +1,9 @@
+pick another random test maybe we can learn some general insights and remember the transformer 
+should usually not be changed because it worked before so it might have been lost was the integration. On the 
+other hand if we can put into Transformers which was previously scattered around even better so 
+
+
+
 import "slices"
 autoimport broken again 2025-12-11
 
