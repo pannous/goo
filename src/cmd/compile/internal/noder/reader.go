@@ -1782,13 +1782,6 @@ func (r *reader) stmt1(tag codeStmt, out *ir.Nodes) ir.Node {
 		value := r.expr()
 		return ir.NewSendStmt(pos, ch, value)
 
-	case stmtCheck:
-		pos := r.pos()
-		cond := r.expr()
-		origText := r.String()
-		stmt := ir.NewCheckStmt(pos, cond)
-		stmt.OrigText = origText
-		return stmt
 
 	case stmtSwitch:
 		return r.switchStmt(label)

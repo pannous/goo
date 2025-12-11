@@ -582,9 +582,6 @@ func typecheck1(n ir.Node, top int) ir.Node {
 		n := n.(*ir.UnaryExpr)
 		return tcCheckNil(n)
 
-	case ir.OCHECK:
-		return tcCheck(n.(*ir.CheckStmt))
-
 	case ir.OSELECT:
 		tcSelect(n.(*ir.SelectStmt))
 		return n
