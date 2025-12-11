@@ -69,6 +69,8 @@ func panicSliceConvert(x int, y int)
 
 func printbool(bool)
 func printfloat(float64)
+func printfloat32(float32)
+func printfloat64(float64)
 func printint(int64)
 func printhex(uint64)
 func printuint(uint64)

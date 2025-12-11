@@ -74,6 +74,8 @@ var runtimeDecls = [...]struct {
 	{"panicSliceConvert", funcTag, 14},
 	{"printbool", funcTag, 17},
 	{"printfloat", funcTag, 19},
+	{"printfloat32", funcTag, 18},
+	{"printfloat64", funcTag, 19},
 	{"printint", funcTag, 21},
 	{"printhex", funcTag, 23},
 	{"printuint", funcTag, 23},
