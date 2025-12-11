@@ -9,7 +9,6 @@ import (
 	"cmd/compile/internal/types"
 	"cmd/internal/obj"
 	"cmd/internal/src"
-	"fmt"
 	"go/constant"
 )
 

@@ -1,0 +1,14 @@
+package main
+
+import "fmt"
+
+func main() {
+	// Test as keyword
+	var x interface{} = 42
+	y := x as int
+	fmt.Println("as works:", y)
+
+	// Test check keyword
+	check y == 42
+	fmt.Println("check works:", y)
+}

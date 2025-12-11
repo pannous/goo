@@ -1,0 +1,6 @@
+package main
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	_ = z[0]
+}

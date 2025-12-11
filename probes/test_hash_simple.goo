@@ -1,8 +1,7 @@
-// Test hash syntax starting from #1 instead of #0
-arr := [10, 20, 30]
-print("arr#1 should be 20:", arr#1)
-print("arr#2 should be 30:", arr#2)
+package main
 
-// Try assignment
-arr#1 = 999
-print("After arr#1 = 999, arr#1 should be 999:", arr#1)
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	val := z#1
+	_ = val
+}

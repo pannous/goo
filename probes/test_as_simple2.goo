@@ -1,0 +1,5 @@
+import "fmt"
+
+var y interface{} = 42
+z := y as int
+fmt.Println("Result:", z)

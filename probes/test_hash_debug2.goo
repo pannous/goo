@@ -1,0 +1,12 @@
+package main
+
+import "fmt"
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	fmt.Printf("z[0] = %c\n", z[0])
+	fmt.Printf("z[1-1] = %c\n", z[1-1])
+	val := z#1
+	fmt.Printf("z#1 = %c\n", val)
+	fmt.Printf("val == 'a': %v\n", val == 'a')
+}
