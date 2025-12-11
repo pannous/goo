@@ -46,17 +46,17 @@ func (p *Printer) Text(d *Doc) []byte {
 		tp.block(&out, x)
 	}
 	anyUsed := false
-	for _, defi := range d.Links {
-		if defi.Used {
+	for _, def := range d.Links {
+		if def.Used {
 			anyUsed = true
 			break
 		}
 	}
 	if anyUsed {
 		writeNL(&out)
-		for _, defi := range d.Links {
-			if defi.Used {
-				fmt.Fprintf(&out, "[%s]: %s\n", defi.Text, defi.URL)
+		for _, def := range d.Links {
+			if def.Used {
+				fmt.Fprintf(&out, "[%s]: %s\n", def.Text, def.URL)
 			}
 		}
 	}

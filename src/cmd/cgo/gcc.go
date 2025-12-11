@@ -1112,8 +1112,8 @@ func (p *Package) hasPointer(f *File, t ast.Expr, top bool) bool {
 				}
 			}
 		}
-		if defi := typedef[t.Name]; defi != nil {
-			return p.hasPointer(f, defi.Go, top)
+		if def := typedef[t.Name]; def != nil {
+			return p.hasPointer(f, def.Go, top)
 		}
 		if t.Name == "string" {
 			return !top

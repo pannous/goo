@@ -442,23 +442,23 @@ func tcReturn(n *ir.ReturnStmt) ir.Node {
 
 // select
 func tcSelect(sel *ir.SelectStmt) {
-	var defi *ir.CommClause
+	var def *ir.CommClause
 	lno := ir.SetPos(sel)
 	Stmts(sel.Init())
 	for _, ncase := range sel.Cases {
 		if ncase.Comm == nil {
 			// default
-			if defi != nil {
-				base.ErrorfAt(ncase.Pos(), errors.DuplicateDefault, "multiple defaults in select (first at %v)", ir.Line(defi))
+			if def != nil {
+				base.ErrorfAt(ncase.Pos(), errors.DuplicateDefault, "multiple defaults in select (first at %v)", ir.Line(def))
 			} else {
-				defi = ncase
+				def = ncase
 			}
 		} else {
 			n := Stmt(ncase.Comm)
 			ncase.Comm = n
-			oselrecv2 := func(dst, recv ir.Node, defi bool) {
+			oselrecv2 := func(dst, recv ir.Node, def bool) {
 				selrecv := ir.NewAssignListStmt(n.Pos(), ir.OSELRECV2, []ir.Node{dst, ir.BlankNode}, []ir.Node{recv})
-				selrecv.Def = defi
+				selrecv.Def = def
 				selrecv.SetTypecheck(1)
 				selrecv.SetInit(n.Init())
 				ncase.Comm = selrecv

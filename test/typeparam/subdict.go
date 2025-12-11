@@ -20,16 +20,16 @@ type value[T C] struct {
 	val T
 }
 
-func (v *value[T]) test(defi T) bool {
-	return (v.val == defi)
+func (v *value[T]) test(def T) bool {
+	return (v.val == def)
 }
 
-func (v *value[T]) get(defi T) T {
+func (v *value[T]) get(def T) T {
 	var c value[int]
 	if c.test(32) {
-		return defi
-	} else if v.test(defi) {
-		return defi
+		return def
+	} else if v.test(def) {
+		return def
 	} else {
 		return v.val
 	}

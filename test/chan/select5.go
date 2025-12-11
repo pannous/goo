@@ -56,7 +56,7 @@ func run(t *template.Template, a interface{}, out io.Writer) {
 }
 
 type arg struct {
-	defi   bool
+	def    bool
 	nreset int
 }
 
@@ -65,19 +65,19 @@ func (a *arg) Maybe() bool {
 }
 
 func (a *arg) MaybeDefault() bool {
-	if a.defi {
+	if a.def {
 		return false
 	}
-	a.defi = maybe()
-	return a.defi
+	a.def = maybe()
+	return a.def
 }
 
 func (a *arg) MustDefault() bool {
-	return !a.defi
+	return !a.def
 }
 
 func (a *arg) reset() {
-	a.defi = false
+	a.def = false
 	a.nreset++
 }
 

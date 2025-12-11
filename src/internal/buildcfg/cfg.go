@@ -133,12 +133,12 @@ func goarm() (g GoarmFeatures) {
 		softFloatOpt = ",softfloat"
 		hardFloatOpt = ",hardfloat"
 	)
-	defi := DefaultGOARM
+	def := DefaultGOARM
 	if GOOS == "android" && GOARCH == "arm" {
 		// Android arm devices always support GOARM=7.
-		defi = "7"
+		def = "7"
 	}
-	v := envOr("GOARM", defi)
+	v := envOr("GOARM", def)
 
 	floatSpecified := false
 	if strings.HasSuffix(v, softFloatOpt) {
@@ -160,7 +160,7 @@ func goarm() (g GoarmFeatures) {
 		g.Version = 7
 	default:
 		Error = fmt.Errorf("invalid GOARM: must start with 5, 6, or 7, and may optionally end in either %q or %q", hardFloatOpt, softFloatOpt)
-		g.Version = int(defi[0] - '0')
+		g.Version = int(def[0] - '0')
 	}
 
 	// 5 defaults to softfloat. 6 and 7 default to hardfloat.

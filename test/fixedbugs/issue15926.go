@@ -11,9 +11,9 @@ package main
 
 type S struct{}
 
-func (s S) defi() {}
+func (s S) def() {}
 
-var I = S.defi
+var I = S.def
 
 func main() {
 	I(S{})

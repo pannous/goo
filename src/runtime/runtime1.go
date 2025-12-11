@@ -296,7 +296,7 @@ type dbgVar struct {
 	name   string
 	value  *int32        // for variables that can only be set at startup
 	atomic *atomic.Int32 // for variables that can be changed during execution
-	defi   int32         // default value (ideally zero)
+	def    int32         // default value (ideally zero)
 }
 
 // Holds variables parsed from GODEBUG env var,
@@ -372,9 +372,9 @@ var dbgvars = []*dbgVar{
 	{name: "asynctimerchan", atomic: &debug.asynctimerchan},
 	{name: "cgocheck", value: &debug.cgocheck},
 	{name: "clobberfree", value: &debug.clobberfree},
-	{name: "containermaxprocs", value: &debug.containermaxprocs, defi: 1},
+	{name: "containermaxprocs", value: &debug.containermaxprocs, def: 1},
 	{name: "dataindependenttiming", value: &debug.dataindependenttiming},
-	{name: "decoratemappings", value: &debug.decoratemappings, defi: 1},
+	{name: "decoratemappings", value: &debug.decoratemappings, def: 1},
 	{name: "disablethp", value: &debug.disablethp},
 	{name: "dontfreezetheworld", value: &debug.dontfreezetheworld},
 	{name: "checkfinalizers", value: &debug.checkfinalizers},
@@ -389,7 +389,7 @@ var dbgvars = []*dbgVar{
 	{name: "invalidptr", value: &debug.invalidptr},
 	{name: "madvdontneed", value: &debug.madvdontneed},
 	{name: "panicnil", atomic: &debug.panicnil},
-	{name: "profstackdepth", value: &debug.profstackdepth, defi: 128},
+	{name: "profstackdepth", value: &debug.profstackdepth, def: 128},
 	{name: "sbrk", value: &debug.sbrk},
 	{name: "scavtrace", value: &debug.scavtrace},
 	{name: "scheddetail", value: &debug.scheddetail},
@@ -398,9 +398,9 @@ var dbgvars = []*dbgVar{
 	{name: "traceallocfree", atomic: &debug.traceallocfree},
 	{name: "tracecheckstackownership", value: &debug.traceCheckStackOwnership},
 	{name: "tracebackancestors", value: &debug.tracebackancestors},
-	{name: "tracebacklabels", atomic: &debug.tracebacklabels, defi: 0},
+	{name: "tracebacklabels", atomic: &debug.tracebacklabels, def: 0},
 	{name: "tracefpunwindoff", value: &debug.tracefpunwindoff},
-	{name: "updatemaxprocs", value: &debug.updatemaxprocs, defi: 1},
+	{name: "updatemaxprocs", value: &debug.updatemaxprocs, def: 1},
 }
 
 func parseRuntimeDebugVars(godebug string) {
@@ -423,12 +423,12 @@ func parseRuntimeDebugVars(godebug string) {
 
 	// apply runtime defaults, if any
 	for _, v := range dbgvars {
-		if v.defi != 0 {
+		if v.def != 0 {
 			// Every var should have either v.value or v.atomic set.
 			if v.value != nil {
-				*v.value = v.defi
+				*v.value = v.def
 			} else if v.atomic != nil {
-				v.atomic.Store(v.defi)
+				v.atomic.Store(v.def)
 			}
 		}
 	}
