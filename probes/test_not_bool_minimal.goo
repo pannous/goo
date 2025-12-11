@@ -1,0 +1,6 @@
+package main
+
+x := true
+if not x {
+	print("x is false")
+}

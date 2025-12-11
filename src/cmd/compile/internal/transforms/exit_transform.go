@@ -69,7 +69,8 @@ func (t *ExitTransform) transformStmt(stmt syntax.Stmt) (syntax.Stmt, bool) {
 		imported := false
 		newList := make([]syntax.Stmt, len(s.List))
 		for i, inner := range s.List {
-			newList[i], imp := t.transformStmt(inner)
+			var imp bool
+			newList[i], imp = t.transformStmt(inner)
 			if newList[i] != inner {
 				changed = true
 			}
@@ -85,7 +86,9 @@ func (t *ExitTransform) transformStmt(stmt syntax.Stmt) (syntax.Stmt, bool) {
 		return s, imported
 
 	case *syntax.ExprStmt:
-		newExpr, imported := t.transformExpr(s.X)
+		var imported bool
+		var newExpr syntax.Expr
+		newExpr, imported = t.transformExpr(s.X)
 		if newExpr != s.X {
 			newStmt := *s
 			newStmt.X = newExpr
@@ -94,9 +97,12 @@ func (t *ExitTransform) transformStmt(stmt syntax.Stmt) (syntax.Stmt, bool) {
 		return s, imported
 
 	case *syntax.IfStmt:
-		newCond, imported := t.transformExpr(s.Cond)
-		newThen, imp1 := t.transformStmt(s.Then)
-		newElse, imp2 := t.transformStmt(s.Else)
+		var imported, imp1, imp2 bool
+		var newCond syntax.Expr
+		var newThen, newElse syntax.Stmt
+		newCond, imported = t.transformExpr(s.Cond)
+		newThen, imp1 = t.transformStmt(s.Then)
+		newElse, imp2 = t.transformStmt(s.Else)
 
 		if newCond != s.Cond || newThen != s.Then || newElse != s.Else {
 			newIf := *s
