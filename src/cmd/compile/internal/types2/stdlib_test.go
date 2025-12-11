@@ -360,6 +360,9 @@ func TestStdKen(t *testing.T) {
 var excluded = map[string]bool{
 	"builtin":                       true,
 	"cmd/compile/internal/ssa/_gen": true,
+	"runtime/_mkmalloc":             true,
+	"simd/archsimd/_gen/simdgen":    true,
+	"simd/archsimd/_gen/unify":      true,
 }
 
 // printPackageMu synchronizes the printing of type-checked package files in
@@ -459,7 +462,7 @@ func pkgFilenames(dir string, includeTest bool) ([]string, error) {
 	return filenames, nil
 }
 
-func walkPkgDirs(dir string, pkgh func(dir string, filenames []string), errh func(args ...interface{})) {
+func walkPkgDirs(dir string, pkgh func(dir string, filenames []string), errh func(args ...any)) {
 	w := walker{pkgh, errh}
 	w.walk(dir)
 }

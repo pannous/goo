@@ -145,13 +145,14 @@ func checkFunc(f *Func) {
 					f.Fatalf("bad int32 AuxInt value for %v", v)
 				}
 				canHaveAuxInt = true
-			case auxInt64, auxARM64BitField:
+			case auxInt64, auxARM64BitField, auxARM64ConditionalParams:
 				canHaveAuxInt = true
 			case auxInt128:
 				// AuxInt must be zero, so leave canHaveAuxInt set to false.
 			case auxUInt8:
-				if v.AuxInt != int64(uint8(v.AuxInt)) {
-					f.Fatalf("bad uint8 AuxInt value for %v", v)
+				// Cast to int8 due to requirement of AuxInt, check its comment for details.
+				if v.AuxInt != int64(int8(v.AuxInt)) {
+					f.Fatalf("bad uint8 AuxInt value for %v, saw %d but need %d", v, v.AuxInt, int64(int8(v.AuxInt)))
 				}
 				canHaveAuxInt = true
 			case auxFloat32:

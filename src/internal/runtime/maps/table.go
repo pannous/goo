@@ -2,12 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package maps implements Go's builtin map type.
 package maps
 
 import (
 	"internal/abi"
-	"internal/goarch"
 	"internal/runtime/math"
 	"unsafe"
 )
@@ -598,18 +596,43 @@ func (t *table) tombstones() uint16 {
 	return (t.capacity*maxAvgGroupLoad)/abi.MapGroupSlots - t.used - t.growthLeft
 }
 
-// Clear deletes all entries from the map resulting in an empty map.
+// Clear deletes all entries from the table resulting in an empty table.
 func (t *table) Clear(typ *abi.MapType) {
 	mgl := t.maxGrowthLeft()
 	if t.used == 0 && t.growthLeft == mgl { // no current entries and no tombstones
 		return
 	}
-	for i := uint64(0); i <= t.groups.lengthMask; i++ {
-		g := t.groups.group(typ, i)
-		if g.ctrls().matchFull() != 0 {
-			typedmemclr(typ.Group, g.data)
+	// We only want to do the work of clearing slots
+	// if they are full. But we also don't want to do too
+	// much work to figure out whether a slot is full or not,
+	// especially if clearing a slot is cheap.
+	//  1) We decide group-by-group instead of slot-by-slot.
+	//     If any slot in a group is full, we zero the whole group.
+	//  2) If groups are unlikely to be empty, don't bother
+	//     testing for it.
+	//  3) If groups are 50%/50% likely to be empty, also don't
+	//     bother testing, as it confuses the branch predictor. See #75097.
+	//  4) But if a group is really large, do the test anyway, as
+	//     clearing is expensive.
+	fullTest := uint64(t.used)*4 <= t.groups.lengthMask // less than ~0.25 entries per group -> >3/4 empty groups
+	if typ.SlotSize > 32 {
+		// For large slots, it is always worth doing the test first.
+		fullTest = true
+	}
+	if fullTest {
+		for i := uint64(0); i <= t.groups.lengthMask; i++ {
+			g := t.groups.group(typ, i)
+			if g.ctrls().anyFull() {
+				typedmemclr(typ.Group, g.data)
+			}
+			g.ctrls().setEmpty()
 		}
-		g.ctrls().setEmpty()
+	} else {
+		for i := uint64(0); i <= t.groups.lengthMask; i++ {
+			g := t.groups.group(typ, i)
+			typedmemclr(typ.Group, g.data)
+			g.ctrls().setEmpty()
+		}
 	}
 	t.used = 0
 	t.growthLeft = mgl
@@ -692,7 +715,7 @@ func (it *Iter) Key() unsafe.Pointer {
 	return it.key
 }
 
-// Key returns a pointer to the current element. nil indicates end of
+// Elem returns a pointer to the current element. nil indicates end of
 // iteration.
 //
 // Must not be called prior to Next.
@@ -1146,7 +1169,7 @@ func (t *table) rehash(typ *abi.MapType, m *Map) {
 
 // Bitmask for the last selection bit at this depth.
 func localDepthMask(localDepth uint8) uintptr {
-	if goarch.PtrSize == 4 {
+	if !Use64BitHash {
 		return uintptr(1) << (32 - localDepth)
 	}
 	return uintptr(1) << (64 - localDepth)
@@ -1237,8 +1260,10 @@ func (t *table) grow(typ *abi.MapType, m *Map, newCapacity uint16) {
 
 // probeSeq maintains the state for a probe sequence that iterates through the
 // groups in a table. The sequence is a triangular progression of the form
+// hash, hash + 1, hash + 1 + 2, hash + 1 + 2 + 3, ..., modulo mask + 1.
+// The i-th term of the sequence is
 //
-//	p(i) := (i^2 + i)/2 + hash (mod mask+1)
+//	p(i) := hash + (i^2 + i)/2 (mod mask+1)
 //
 // The sequence effectively outputs the indexes of *groups*. The group
 // machinery allows us to check an entire group with minimal branching.

@@ -526,7 +526,7 @@ func (pkg *Package) funcsDoc() {
 	}
 }
 
-// funcsDoc prints all type documentation, if any, including a header.
+// typesDoc prints all type documentation, if any, including a header.
 func (pkg *Package) typesDoc() {
 	var header bool
 	for _, typ := range pkg.doc.Types {
@@ -920,7 +920,7 @@ func trimUnexportedFields(fields *ast.FieldList, isInterface bool) *ast.FieldLis
 
 			start := doc.List[0].Slash
 			doc.List = doc.List[:0]
-			for _, line := range strings.Split(text, "\n") {
+			for line := range strings.SplitSeq(text, "\n") {
 				prefix := "// "
 				if len(line) > 0 && line[0] == '\t' {
 					prefix = "//"

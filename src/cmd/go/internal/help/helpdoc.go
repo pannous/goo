@@ -573,8 +573,10 @@ General-purpose environment variables:
 		The name of checksum database to use and optionally its public key and
 		URL. See https://golang.org/ref/mod#authenticating.
 	GOTMPDIR
-		The directory where the go command will write
-		temporary source files, packages, and binaries.
+		Temporary directory used by the go command and testing package.
+		Overrides the platform-specific temporary directory such as "/tmp".
+		The go command and testing package will write temporary source files,
+		packages, and binaries here.
 	GOTOOLCHAIN
 		Controls which Go toolchain is used. See https://go.dev/doc/toolchain.
 	GOVCS
@@ -1006,6 +1008,12 @@ carry the constraint:
 Naming a file dns_windows.go will cause it to be included only when
 building the package for Windows; similarly, math_386.s will be included
 only when building the package for 32-bit x86.
+
+By convention, packages with assembly implementations may provide a go-only
+version under the "purego" build constraint. This does not limit the use of
+cgo (use the "cgo" build constraint) or unsafe. For example:
+
+        //go:build purego
 
 Go versions 1.16 and earlier used a different syntax for build constraints,
 with a "// +build" prefix. The gofmt command will add an equivalent //go:build

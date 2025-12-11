@@ -403,8 +403,7 @@ func TestAlertForwarding(t *testing.T) {
 
 	err := Server(s, testConfig).Handshake()
 	s.Close()
-	var opErr *net.OpError
-	if !errors.As(err, &opErr) || opErr.Err != error(alertUnknownCA) {
+	if opErr, ok := errors.AsType[*net.OpError](err); !ok || opErr.Err != error(alertUnknownCA) {
 		t.Errorf("Got error: %s; expected: %s", err, error(alertUnknownCA))
 	}
 }
@@ -906,13 +905,29 @@ func TestHandshakeServerHelloRetryRequest(t *testing.T) {
 	config := testConfig.Clone()
 	config.CurvePreferences = []CurveID{CurveP256}
 
+	var clientHelloInfoHRR bool
+	var getCertificateCalled bool
+	eeCert := config.Certificates[0]
+	config.Certificates = nil
+	config.GetCertificate = func(clientHello *ClientHelloInfo) (*Certificate, error) {
+		getCertificateCalled = true
+		clientHelloInfoHRR = clientHello.HelloRetryRequest
+		return &eeCert, nil
+	}
+
 	test := &serverTest{
 		name:    "HelloRetryRequest",
 		command: []string{"openssl", "s_client", "-no_ticket", "-ciphersuites", "TLS_CHACHA20_POLY1305_SHA256", "-curves", "X25519:P-256"},
 		config:  config,
 		validate: func(cs ConnectionState) error {
-			if !cs.testingOnlyDidHRR {
+			if !cs.HelloRetryRequest {
 				return errors.New("expected HelloRetryRequest")
+			}
+			if !getCertificateCalled {
+				return errors.New("expected GetCertificate to be called")
+			}
+			if !clientHelloInfoHRR {
+				return errors.New("expected ClientHelloInfo.HelloRetryRequest to be true")
 			}
 			return nil
 		},
@@ -921,18 +936,37 @@ func TestHandshakeServerHelloRetryRequest(t *testing.T) {
 }
 
 // TestHandshakeServerKeySharePreference checks that we prefer a key share even
-// if it's later in the CurvePreferences order.
+// if it's later in the CurvePreferences order, and that the client hello HRR
+// field is correctly represented.
 func TestHandshakeServerKeySharePreference(t *testing.T) {
 	config := testConfig.Clone()
 	config.CurvePreferences = []CurveID{X25519, CurveP256}
+
+	// We also use this test as a convenient place to assert the ClientHelloInfo
+	// HelloRetryRequest field is _not_ set for a non-HRR hello.
+	var clientHelloInfoHRR bool
+	var getCertificateCalled bool
+	eeCert := config.Certificates[0]
+	config.Certificates = nil
+	config.GetCertificate = func(clientHello *ClientHelloInfo) (*Certificate, error) {
+		getCertificateCalled = true
+		clientHelloInfoHRR = clientHello.HelloRetryRequest
+		return &eeCert, nil
+	}
 
 	test := &serverTest{
 		name:    "KeySharePreference",
 		command: []string{"openssl", "s_client", "-no_ticket", "-ciphersuites", "TLS_CHACHA20_POLY1305_SHA256", "-curves", "P-256:X25519"},
 		config:  config,
 		validate: func(cs ConnectionState) error {
-			if cs.testingOnlyDidHRR {
+			if cs.HelloRetryRequest {
 				return errors.New("unexpected HelloRetryRequest")
+			}
+			if !getCertificateCalled {
+				return errors.New("expected GetCertificate to be called")
+			}
+			if clientHelloInfoHRR {
+				return errors.New("expected ClientHelloInfo.HelloRetryRequest to be false")
 			}
 			return nil
 		},
@@ -1590,9 +1624,7 @@ var getConfigForClientTests = []struct {
 		},
 		func(clientHello *ClientHelloInfo) (*Config, error) {
 			config := testConfig.Clone()
-			for i := range config.SessionTicketKey {
-				config.SessionTicketKey[i] = 0
-			}
+			clear(config.SessionTicketKey[:])
 			config.sessionTicketKeys = nil
 			return config, nil
 		},
