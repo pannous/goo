@@ -857,19 +857,19 @@ func TestDefsInfo(t *testing.T) {
 		name := mustTypecheck(test.src, nil, &info).Name()
 
 		// find object
-		var defi Object
+		var def Object
 		for id, obj := range info.Defs {
 			if id.Name == test.obj {
-				defi = obj
+				def = obj
 				break
 			}
 		}
-		if defi == nil {
+		if def == nil {
 			t.Errorf("package %s: %s not found", name, test.obj)
 			continue
 		}
 
-		if got := defi.String(); got != test.want {
+		if got := def.String(); got != test.want {
 			t.Errorf("package %s: got %s; want %s", name, got, test.want)
 		}
 	}
@@ -988,10 +988,10 @@ func (r *N[C]) n() {  }
 		if !ok {
 			continue
 		}
-		defi := info.Defs[fdecl.Name].(*Func)
+		def := info.Defs[fdecl.Name].(*Func)
 		switch fdecl.Name.Name {
 		case "m":
-			dm = defi
+			dm = def
 			ast.Inspect(fdecl.Body, func(n ast.Node) bool {
 				if call, ok := n.(*ast.CallExpr); ok {
 					sel := call.Fun.(*ast.SelectorExpr)
@@ -1013,7 +1013,7 @@ func (r *N[C]) n() {  }
 				return true
 			})
 		case "n":
-			dn = defi
+			dn = def
 		}
 	}
 
@@ -1600,10 +1600,10 @@ func TestFiles(t *testing.T) {
 	fset := token.NewFileSet()
 	pkg := NewPackage("p", "p")
 	var info Info
-	checks := NewChecker(&conf, fset, pkg, &info)
+	check := NewChecker(&conf, fset, pkg, &info)
 
 	for _, src := range sources {
-		if err := checks.Files([]*ast.File{mustParse(fset, src)}); err != nil {
+		if err := check.Files([]*ast.File{mustParse(fset, src)}); err != nil {
 			t.Error(err)
 		}
 	}
@@ -2617,30 +2617,30 @@ func fn() {
 				t.Fatalf("found %d identifiers named %s, want 1", got, test.name)
 			}
 			ident := idents[test.name][0]
-			defi := info.Defs[ident]
-			if defi == test.obj {
+			def := info.Defs[ident]
+			if def == test.obj {
 				t.Fatalf("info.Defs[%s] contains the test object", test.name)
 			}
-			if orig := originObject(test.obj); defi != orig {
+			if orig := originObject(test.obj); def != orig {
 				t.Errorf("info.Defs[%s] does not match obj.Origin()", test.name)
 			}
-			if defi.Pkg() != test.obj.Pkg() {
-				t.Errorf("Pkg() = %v, want %v", defi.Pkg(), test.obj.Pkg())
+			if def.Pkg() != test.obj.Pkg() {
+				t.Errorf("Pkg() = %v, want %v", def.Pkg(), test.obj.Pkg())
 			}
-			if defi.Name() != test.obj.Name() {
-				t.Errorf("Name() = %v, want %v", defi.Name(), test.obj.Name())
+			if def.Name() != test.obj.Name() {
+				t.Errorf("Name() = %v, want %v", def.Name(), test.obj.Name())
 			}
-			if defi.Pos() != test.obj.Pos() {
-				t.Errorf("Pos() = %v, want %v", defi.Pos(), test.obj.Pos())
+			if def.Pos() != test.obj.Pos() {
+				t.Errorf("Pos() = %v, want %v", def.Pos(), test.obj.Pos())
 			}
-			if defi.Parent() != test.obj.Parent() {
-				t.Fatalf("Parent() = %v, want %v", defi.Parent(), test.obj.Parent())
+			if def.Parent() != test.obj.Parent() {
+				t.Fatalf("Parent() = %v, want %v", def.Parent(), test.obj.Parent())
 			}
-			if defi.Exported() != test.obj.Exported() {
-				t.Fatalf("Exported() = %v, want %v", defi.Exported(), test.obj.Exported())
+			if def.Exported() != test.obj.Exported() {
+				t.Fatalf("Exported() = %v, want %v", def.Exported(), test.obj.Exported())
 			}
-			if defi.Id() != test.obj.Id() {
-				t.Fatalf("Id() = %v, want %v", defi.Id(), test.obj.Id())
+			if def.Id() != test.obj.Id() {
+				t.Fatalf("Id() = %v, want %v", def.Id(), test.obj.Id())
 			}
 			// String and Type are expected to differ.
 		})
@@ -3092,8 +3092,8 @@ func TestVersionIssue69477(t *testing.T) {
 	// Type check. The checker will consult the effective
 	// version for the BasicLit 123. This used to panic.
 	pkg := NewPackage("p", "p")
-	checks := NewChecker(&Config{}, fset, pkg, nil)
-	if err := checks.Files([]*ast.File{f}); err != nil {
+	check := NewChecker(&Config{}, fset, pkg, nil)
+	if err := check.Files([]*ast.File{f}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -3120,8 +3120,8 @@ func TestVersionWithoutPos(t *testing.T) {
 	// range-over-func are permitted: they are not.
 	// (Previously, no error was reported.)
 	pkg := NewPackage("p", "p")
-	checks := NewChecker(&Config{}, fset, pkg, nil)
-	err := checks.Files([]*ast.File{f})
+	check := NewChecker(&Config{}, fset, pkg, nil)
+	err := check.Files([]*ast.File{f})
 	got := fmt.Sprint(err)
 	want := "range over s (variable of type func(func() bool)): requires go1.23"
 	if !strings.Contains(got, want) {
@@ -3150,8 +3150,8 @@ func (recv T) f(param int) (result int) {
 
 	pkg := NewPackage("p", "p")
 	info := &Info{Defs: make(map[*ast.Ident]Object)}
-	checks := NewChecker(&Config{}, fset, pkg, info)
-	if err := checks.Files([]*ast.File{f}); err != nil {
+	check := NewChecker(&Config{}, fset, pkg, info)
+	if err := check.Files([]*ast.File{f}); err != nil {
 		t.Fatal(err)
 	}
 	var got []string
@@ -3188,8 +3188,8 @@ var _ = f[B]
 
 	pkg := NewPackage("p", "p")
 	info := &Info{Types: make(map[ast.Expr]TypeAndValue)}
-	checks := NewChecker(&Config{}, fset, pkg, info)
-	if err := checks.Files([]*ast.File{f}); err != nil {
+	check := NewChecker(&Config{}, fset, pkg, info)
+	if err := check.Files([]*ast.File{f}); err != nil {
 		t.Fatal(err)
 	}
 

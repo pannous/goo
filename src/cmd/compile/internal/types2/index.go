@@ -345,7 +345,7 @@ func (check *Checker) sliceExpr(x *operand, e *syntax.SliceExpr) {
 	}
 
 	// constant indices must be in range
-	// (check.index already check that existing indices >= 0)
+	// (check.index already checks that existing indices >= 0)
 L:
 	for i, x := range ind[:len(ind)-1] {
 		if x > 0 {

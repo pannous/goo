@@ -57,7 +57,7 @@ func (check *Checker) funcInst(T *target, pos syntax.Pos, x *operand, inst *synt
 
 	// Check the number of type arguments (got) vs number of type parameters (want).
 	// Note that x is a function value, not a type expression, so we don't need to
-	// call under below.
+	// call Underlying below.
 	sig := x.typ.(*Signature)
 	got, want := len(targs), sig.TypeParams().Len()
 	if got > want {
@@ -169,86 +169,6 @@ func (check *Checker) instantiateSignature(pos syntax.Pos, expr syntax.Expr, typ
 }
 
 func (check *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
-	// Transform printf calls to fmt.Printf calls TODO: put into a separate function
-	if name, ok := call.Fun.(*syntax.Name); ok && (name.Value == "printf") {
-		// Check if this is not a user-defined function (no local definition found)
-		if check.lookup("printf") == nil {
-			// For now, require manual fmt import until auto-import is working
-			if check.lookup("fmt") != nil {
-				// Transform printf(...) to fmt.Printf(...) by modifying call in place
-				fmtName := syntax.NewName(name.Pos(), "fmt")
-				printfName := syntax.NewName(name.Pos(), "Printf")
-				selector := &syntax.SelectorExpr{
-					X:   fmtName,
-					Sel: printfName,
-				}
-				selector.SetPos(name.Pos())
-
-				// Replace the function in the original call
-				call.Fun = selector
-			} else {
-				// Provide helpful error message
-				check.errorf(name, UndeclaredName, "printf requires 'import \"fmt\"' - automatic import only for .goo files")
-				return expression
-			}
-		}
-	}
-
-	// Transform put calls to fmt.Printf calls with %v\n format TODO: put into a separate function
-	if name, ok := call.Fun.(*syntax.Name); ok && (name.Value == "put" || name.Value == "prints") {
-		// Check if this is not a user-defined function (no local definition found)
-		if check.lookup("put") == nil {
-			// For now, require manual fmt import until auto-import is working
-			if check.lookup("fmt") != nil {
-				// Transform put(arg) to fmt.Printf("%v\n", arg) by modifying call in place
-				fmtName := syntax.NewName(name.Pos(), "fmt")
-				printfName := syntax.NewName(name.Pos(), "Printf")
-				selector := &syntax.SelectorExpr{
-					X:   fmtName,
-					Sel: printfName,
-				}
-				selector.SetPos(name.Pos())
-
-				// Create format string with spaces between arguments, e.g. "%v %v %v\n"
-				numArgs := len(call.ArgList)
-				var formatValue string
-				if numArgs == 0 {
-					formatValue = "\"\\n\""
-				} else if numArgs == 1 {
-					formatValue = "\"%v\\n\""
-				} else {
-					// Build format string with spaces: "%v %v %v\n"
-					formatValue = "\""
-					for i := 0; i < numArgs; i++ {
-						if i > 0 {
-							formatValue += " "
-						}
-						formatValue += "%v"
-					}
-					formatValue += "\\n\""
-				}
-				formatStr := &syntax.BasicLit{
-					Kind:  syntax.StringLit,
-					Value: formatValue,
-				}
-				formatStr.SetPos(name.Pos())
-
-				// Insert format string as first argument
-				newArgs := make([]syntax.Expr, len(call.ArgList)+1)
-				newArgs[0] = formatStr
-				copy(newArgs[1:], call.ArgList)
-				call.ArgList = newArgs
-
-				// Replace the function in the original call
-				call.Fun = selector
-			} else {
-				// Provide helpful error message
-				check.errorf(name, UndeclaredName, "put requires 'import \"fmt\"' - automatic import only for .goo files")
-				return expression
-			}
-		}
-	}
-
 	var inst *syntax.IndexExpr // function instantiation, if any
 	if iexpr, _ := call.Fun.(*syntax.IndexExpr); iexpr != nil {
 		if check.indexExpr(x, iexpr) {
@@ -285,7 +205,7 @@ func (check *Checker) callExpr(x *operand, call *syntax.CallExpr) exprKind {
 		case 1:
 			check.expr(nil, x, call.ArgList[0])
 			if x.mode != invalid {
-				if t, _ := under(T).(*Interface); t != nil && !isTypeParam(T) {
+				if t, _ := T.Underlying().(*Interface); t != nil && !isTypeParam(T) {
 					if !t.IsMethodSet() {
 						check.errorf(call, MisplacedConstraintIface, "cannot use interface %s in conversion (contains specific type constraints or is comparable)", T)
 						break
@@ -749,7 +669,7 @@ var cgoPrefixes = [...]string{
 	"_Cmacro_", // function to evaluate the expanded expression
 }
 
-func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeName, wantType bool) {
+func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, wantType bool) {
 	// these must be declared before the "goto Error" statements
 	var (
 		obj      Object
@@ -795,7 +715,7 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeNam
 					}
 					goto Error
 				}
-				check.objDecl(exp, nil)
+				check.objDecl(exp)
 			} else {
 				exp = pkg.scope.Lookup(sel)
 				if exp == nil {
@@ -857,12 +777,6 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeNam
 
 	check.exprOrType(x, e.X, false)
 	switch x.mode {
-	case typexpr:
-		// don't crash for "type T T.x" (was go.dev/issue/51509)
-		if defi != nil && defi.typ == x.typ {
-			check.cycleError([]Object{defi}, 0)
-			goto Error
-		}
 	case builtin:
 		check.errorf(e.Pos(), UncalledBuiltin, "invalid use of %s in selector expression", x)
 		goto Error
@@ -892,7 +806,7 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeNam
 	obj, index, indirect = lookupFieldOrMethod(x.typ, x.mode == variable, check.pkg, sel, false)
 	if obj == nil {
 		// Don't report another error if the underlying type was invalid (go.dev/issue/49541).
-		if !isValid(under(x.typ)) {
+		if !isValid(x.typ.Underlying()) {
 			goto Error
 		}
 
@@ -924,7 +838,7 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeNam
 
 	// methods may not have a fully set up signature yet
 	if m, _ := obj.(*Func); m != nil {
-		check.objDecl(m, nil)
+		check.objDecl(m)
 	}
 
 	if x.mode == typexpr {
@@ -1011,6 +925,7 @@ func (check *Checker) selector(x *operand, e *syntax.SelectorExpr, defi *TypeNam
 
 Error:
 	x.mode = invalid
+	x.typ = Typ[Invalid]
 	x.expr = e
 }
 

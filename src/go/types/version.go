@@ -43,6 +43,7 @@ var (
 	go1_21 = asGoVersion("go1.21")
 	go1_22 = asGoVersion("go1.22")
 	go1_23 = asGoVersion("go1.23")
+	go1_26 = asGoVersion("go1.26")
 
 	// current (deployed) Go version
 	go_current = asGoVersion(fmt.Sprintf("go1.%d", goversion.Version))
@@ -51,15 +52,15 @@ var (
 // allowVersion reports whether the current effective Go version
 // (which may vary from one file to another) is allowed to use the
 // feature version (want).
-func (checks *Checker) allowVersion(want goVersion) bool {
-	return !checks.version.isValid() || checks.version.cmp(want) >= 0
+func (check *Checker) allowVersion(want goVersion) bool {
+	return !check.version.isValid() || check.version.cmp(want) >= 0
 }
 
 // verifyVersionf is like allowVersion but also accepts a format string and arguments
 // which are used to report a version error if allowVersion returns false.
-func (checks *Checker) verifyVersionf(at positioner, v goVersion, format string, args ...interface{}) bool {
-	if !checks.allowVersion(v) {
-		checks.versionErrorf(at, v, format, args...)
+func (check *Checker) verifyVersionf(at positioner, v goVersion, format string, args ...any) bool {
+	if !check.allowVersion(v) {
+		check.versionErrorf(at, v, format, args...)
 		return false
 	}
 	return true

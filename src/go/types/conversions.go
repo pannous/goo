@@ -17,14 +17,14 @@ import (
 
 // conversion type-checks the conversion T(x).
 // The result is in x.
-func (checks *Checker) conversion(x *operand, T Type) {
+func (check *Checker) conversion(x *operand, T Type) {
 	constArg := x.mode == constant_
 
 	constConvertibleTo := func(T Type, val *constant.Value) bool {
 		switch t, _ := T.Underlying().(*Basic); {
 		case t == nil:
 			// nothing to do
-		case representableConst(x.val, checks, t, val):
+		case representableConst(x.val, check, t, val):
 			return true
 		case isInteger(x.typ) && isString(t):
 			codepoint := unicode.ReplacementChar
@@ -49,7 +49,7 @@ func (checks *Checker) conversion(x *operand, T Type) {
 		// can only fail if there's overflow. Give a concise error.
 		// (go.dev/issue/63563)
 		if !ok && isInteger(x.typ) && isInteger(T) {
-			checks.errorf(x, InvalidConversion, "constant %s overflows %s", x.val, T)
+			check.errorf(x, InvalidConversion, "constant %s overflows %s", x.val, T)
 			x.mode = invalid
 			return
 		}
@@ -62,7 +62,7 @@ func (checks *Checker) conversion(x *operand, T Type) {
 		ok = underIs(T, func(u Type) bool {
 			// u is nil if there are no specific type terms
 			if u == nil {
-				cause = checks.sprintf("%s does not contain specific types", T)
+				cause = check.sprintf("%s does not contain specific types", T)
 				return false
 			}
 			if isString(x.typ) && isBytesOrRunes(u) {
@@ -71,16 +71,16 @@ func (checks *Checker) conversion(x *operand, T Type) {
 			if !constConvertibleTo(u, nil) {
 				if isInteger(x.typ) && isInteger(u) {
 					// see comment above on constant conversion
-					cause = checks.sprintf("constant %s overflows %s (in %s)", x.val, u, T)
+					cause = check.sprintf("constant %s overflows %s (in %s)", x.val, u, T)
 				} else {
-					cause = checks.sprintf("cannot convert %s to type %s (in %s)", x, u, T)
+					cause = check.sprintf("cannot convert %s to type %s (in %s)", x, u, T)
 				}
 				return false
 			}
 			return true
 		})
 		x.mode = value // type parameters are not constants
-	case x.convertibleTo(checks, T, &cause):
+	case x.convertibleTo(check, T, &cause):
 		// non-constant conversion
 		ok = true
 		x.mode = value
@@ -88,9 +88,9 @@ func (checks *Checker) conversion(x *operand, T Type) {
 
 	if !ok {
 		if cause != "" {
-			checks.errorf(x, InvalidConversion, "cannot convert %s to type %s: %s", x, T, cause)
+			check.errorf(x, InvalidConversion, "cannot convert %s to type %s: %s", x, T, cause)
 		} else {
-			checks.errorf(x, InvalidConversion, "cannot convert %s to type %s", x, T)
+			check.errorf(x, InvalidConversion, "cannot convert %s to type %s", x, T)
 		}
 		x.mode = invalid
 		return
@@ -116,7 +116,7 @@ func (checks *Checker) conversion(x *operand, T Type) {
 		} else if x.mode == constant_ && isInteger(x.typ) && allString(T) {
 			final = x.typ
 		}
-		checks.updateExprType(x.expr, final, true)
+		check.updateExprType(x.expr, final, true)
 	}
 
 	x.typ = T
@@ -136,9 +136,9 @@ func (checks *Checker) conversion(x *operand, T Type) {
 // may be set to the cause for the failure.
 // The check parameter may be nil if convertibleTo is invoked through an
 // exported API call, i.e., when all methods have been type-checked.
-func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
+func (x *operand) convertibleTo(check *Checker, T Type, cause *string) bool {
 	// "x is assignable to T"
-	if ok, _ := x.assignableTo(checks, T, cause); ok {
+	if ok, _ := x.assignableTo(check, T, cause); ok {
 		return true
 	}
 
@@ -203,7 +203,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 		switch a := Tu.(type) {
 		case *Array:
 			if Identical(s.Elem(), a.Elem()) {
-				if checks == nil || checks.allowVersion(go1_20) {
+				if check == nil || check.allowVersion(go1_20) {
 					return true
 				}
 				// check != nil
@@ -216,7 +216,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 		case *Pointer:
 			if a, _ := a.Elem().Underlying().(*Array); a != nil {
 				if Identical(s.Elem(), a.Elem()) {
-					if checks == nil || checks.allowVersion(go1_17) {
+					if check == nil || check.allowVersion(go1_17) {
 						return true
 					}
 					// check != nil
@@ -235,8 +235,8 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 	}
 
 	errorf := func(format string, args ...any) {
-		if checks != nil && cause != nil {
-			msg := checks.sprintf(format, args...)
+		if check != nil && cause != nil {
+			msg := check.sprintf(format, args...)
 			if *cause != "" {
 				msg += "\n\t" + *cause
 			}
@@ -258,7 +258,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 				if T == nil {
 					return false // no specific types
 				}
-				if !x.convertibleTo(checks, T.typ, cause) {
+				if !x.convertibleTo(check, T.typ, cause) {
 					errorf("cannot convert %s (in %s) to type %s (in %s)", V.typ, Vp, T.typ, Tp)
 					return false
 				}
@@ -272,7 +272,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 				return false // no specific types
 			}
 			x.typ = V.typ
-			if !x.convertibleTo(checks, T, cause) {
+			if !x.convertibleTo(check, T, cause) {
 				errorf("cannot convert %s (in %s) to type %s", V.typ, Vp, origT)
 				return false
 			}
@@ -283,7 +283,7 @@ func (x *operand) convertibleTo(checks *Checker, T Type, cause *string) bool {
 			if T == nil {
 				return false // no specific types
 			}
-			if !x.convertibleTo(checks, T.typ, cause) {
+			if !x.convertibleTo(check, T.typ, cause) {
 				errorf("cannot convert %s to type %s (in %s)", x.typ, T.typ, Tp)
 				return false
 			}

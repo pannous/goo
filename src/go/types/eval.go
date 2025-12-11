@@ -84,16 +84,16 @@ func CheckExpr(fset *token.FileSet, pkg *Package, pos token.Pos, expr ast.Expr, 
 	}
 
 	// initialize checker
-	checks := NewChecker(nil, fset, pkg, info)
-	checks.scope = scope
-	checks.exprPos = pos
-	defer checks.handleBailout(&err)
+	check := NewChecker(nil, fset, pkg, info)
+	check.scope = scope
+	check.exprPos = pos
+	defer check.handleBailout(&err)
 
 	// evaluate node
 	var x operand
-	checks.rawExpr(nil, &x, expr, nil, true) // allow generic expressions
-	checks.processDelayed(0)                 // incl. all functions
-	checks.recordUntyped()
+	check.rawExpr(nil, &x, expr, nil, true) // allow generic expressions
+	check.processDelayed(0)                 // incl. all functions
+	check.recordUntyped()
 
 	return nil
 }

@@ -20,16 +20,16 @@ import (
 // reports whether the call is valid, with *x holding the result;
 // but x.expr is not set. If the call is invalid, the result is
 // false, and *x is undefined.
-func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ bool) {
+func (check *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ bool) {
 	argList := call.Args
 
 	// append is the only built-in that permits the use of ... for the last argument
 	bin := predeclaredFuncs[id]
 	if hasDots(call) && id != _Append {
-		checks.errorf(dddErrPos(call),
+		check.errorf(dddErrPos(call),
 			InvalidDotDotDot,
 			invalidOp+"invalid use of ... with built-in %s", bin.name)
-		checks.use(argList...)
+		check.use(argList...)
 		return
 	}
 
@@ -40,9 +40,9 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 	//       all arguments.
 	if id == _Len || id == _Cap {
 		defer func(b bool) {
-			checks.hasCallOrRecv = b
-		}(checks.hasCallOrRecv)
-		checks.hasCallOrRecv = false
+			check.hasCallOrRecv = b
+		}(check.hasCallOrRecv)
+		check.hasCallOrRecv = false
 	}
 
 	// Evaluate arguments for built-ins that use ordinary (value) arguments.
@@ -53,7 +53,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 	switch id {
 	default:
 		// check all arguments
-		args = checks.exprList(argList)
+		args = check.exprList(argList)
 		nargs = len(args)
 		for _, a := range args {
 			if a.mode == invalid {
@@ -78,7 +78,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			msg = "too many"
 		}
 		if msg != "" {
-			checks.errorf(argErrPos(call), WrongArgCount, invalidOp+"%s arguments for %v (expected %d, found %d)", msg, call, bin.nargs, nargs)
+			check.errorf(argErrPos(call), WrongArgCount, invalidOp+"%s arguments for %v (expected %d, found %d)", msg, call, bin.nargs, nargs)
 			return
 		}
 	}
@@ -94,24 +94,35 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// to type []byte with a second argument of string type followed by ... .
 		// This form appends the bytes of the string."
 
+		// In either case, the first argument must be a slice; in particular it
+		// cannot be the predeclared nil value. Note that nil is not excluded by
+		// the assignability requirement alone for the special case (go.dev/issue/76220).
+		// spec: "If S is a type parameter, all types in its type set
+		// must have the same underlying slice type []E."
+		E, err := sliceElem(x)
+		if err != nil {
+			check.errorf(x, InvalidAppend, "invalid append: %s", err.format(check))
+			return
+		}
+
 		// Handle append(bytes, y...) special case, where
 		// the type set of y is {string} or {string, []byte}.
 		var sig *Signature
 		if nargs == 2 && hasDots(call) {
-			if ok, _ := x.assignableTo(checks, NewSlice(universeByte), nil); ok {
+			if ok, _ := x.assignableTo(check, NewSlice(universeByte), nil); ok {
 				y := args[1]
 				hasString := false
-				typeset(y.typ, func(_, u Type) bool {
+				for _, u := range typeset(y.typ) {
 					if s, _ := u.(*Slice); s != nil && Identical(s.elem, universeByte) {
-						return true
-					}
-					if isString(u) {
+						// typeset ⊇ {[]byte}
+					} else if isString(u) {
+						// typeset ⊇ {string}
 						hasString = true
-						return true
+					} else {
+						y = nil
+						break
 					}
-					y = nil
-					return false
-				})
+				}
 				if y != nil && hasString {
 					// setting the signature also signals that we're done
 					sig = makeSig(x.typ, x.typ, y.typ)
@@ -122,22 +133,15 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 		// general case
 		if sig == nil {
-			// spec: "If S is a type parameter, all types in its type set
-			// must have the same underlying slice type []E."
-			E, err := sliceElem(x)
-			if err != nil {
-				checks.errorf(x, InvalidAppend, "invalid append: %s", err.format(checks))
-				return
-			}
 			// check arguments by creating custom signature
 			sig = makeSig(x.typ, x.typ, NewSlice(E)) // []E required for variadic signature
 			sig.variadic = true
-			checks.arguments(call, sig, nil, nil, args, nil) // discard result (we know the result type)
+			check.arguments(call, sig, nil, nil, args, nil) // discard result (we know the result type)
 			// ok to continue even if check.arguments reported errors
 		}
 
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, sig)
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, sig)
 		}
 		x.mode = value
 		// x.typ is unchanged
@@ -147,7 +151,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// len(x)
 		mode := invalid
 		var val constant.Value
-		switch t := arrayPtrDeref(under(x.typ)).(type) {
+		switch t := arrayPtrDeref(x.typ.Underlying()).(type) {
 		case *Basic:
 			if isString(t) && id == _Len {
 				if x.mode == constant_ {
@@ -164,7 +168,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			// if the type of s is an array or pointer to an array and
 			// the expression s does not contain channel receives or
 			// function calls; in this case s is not evaluated."
-			if !checks.hasCallOrRecv {
+			if !check.hasCallOrRecv {
 				mode = constant_
 				if t.len >= 0 {
 					val = constant.MakeInt64(t.len)
@@ -206,19 +210,19 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 		if mode == invalid {
 			// avoid error if underlying type is invalid
-			if isValid(under(x.typ)) {
+			if isValid(x.typ.Underlying()) {
 				code := InvalidCap
 				if id == _Len {
 					code = InvalidLen
 				}
-				checks.errorf(x, code, invalidArg+"%s for built-in %s", x, bin.name)
+				check.errorf(x, code, invalidArg+"%s for built-in %s", x, bin.name)
 			}
 			return
 		}
 
 		// record the signature before changing x.typ
-		if checks.recordTypes() && mode != constant_ {
-			checks.recordBuiltinType(call.Fun, makeSig(Typ[Int], x.typ))
+		if check.recordTypes() && mode != constant_ {
+			check.recordBuiltinType(call.Fun, makeSig(Typ[Int], x.typ))
 		}
 
 		x.mode = mode
@@ -227,22 +231,22 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 	case _Clear:
 		// clear(m)
-		checks.verifyVersionf(call.Fun, go1_21, "clear")
+		check.verifyVersionf(call.Fun, go1_21, "clear")
 
 		if !underIs(x.typ, func(u Type) bool {
 			switch u.(type) {
 			case *Map, *Slice:
 				return true
 			}
-			checks.errorf(x, InvalidClear, invalidArg+"cannot clear %s: argument must be (or constrained by) map or slice", x)
+			check.errorf(x, InvalidClear, invalidArg+"cannot clear %s: argument must be (or constrained by) map or slice", x)
 			return false
 		}) {
 			return
 		}
 
 		x.mode = novalue
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(nil, x.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(nil, x.typ))
 		}
 
 	case _Close:
@@ -250,11 +254,11 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		if !underIs(x.typ, func(u Type) bool {
 			uch, _ := u.(*Chan)
 			if uch == nil {
-				checks.errorf(x, InvalidClose, invalidOp+"cannot close non-channel %s", x)
+				check.errorf(x, InvalidClose, invalidOp+"cannot close non-channel %s", x)
 				return false
 			}
 			if uch.dir == RecvOnly {
-				checks.errorf(x, InvalidClose, invalidOp+"cannot close receive-only channel %s", x)
+				check.errorf(x, InvalidClose, invalidOp+"cannot close receive-only channel %s", x)
 				return false
 			}
 			return true
@@ -262,8 +266,8 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			return
 		}
 		x.mode = novalue
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(nil, x.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(nil, x.typ))
 		}
 
 	case _Complex:
@@ -283,10 +287,10 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			// x and y are typed => nothing to do
 		case 1:
 			// only x is untyped => convert to type of y
-			checks.convertUntyped(x, y.typ)
+			check.convertUntyped(x, y.typ)
 		case 2:
 			// only y is untyped => convert to type of x
-			checks.convertUntyped(y, x.typ)
+			check.convertUntyped(y, x.typ)
 		case 3:
 			// x and y are untyped =>
 			// 1) if both are constants, convert them to untyped
@@ -305,8 +309,8 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 				toFloat(x)
 				toFloat(y)
 			} else {
-				checks.convertUntyped(x, Typ[Float64])
-				checks.convertUntyped(y, Typ[Float64])
+				check.convertUntyped(x, Typ[Float64])
+				check.convertUntyped(y, Typ[Float64])
 				// x and y should be invalid now, but be conservative
 				// and check below
 			}
@@ -317,7 +321,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 		// both argument types must be identical
 		if !Identical(x.typ, y.typ) {
-			checks.errorf(x, InvalidComplex, invalidOp+"%v (mismatched types %s and %s)", call, x.typ, y.typ)
+			check.errorf(x, InvalidComplex, invalidOp+"%v (mismatched types %s and %s)", call, x.typ, y.typ)
 			return
 		}
 
@@ -325,7 +329,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// (applyTypeFunc never calls f with a type parameter)
 		f := func(typ Type) Type {
 			assert(!isTypeParam(typ))
-			if t, _ := under(typ).(*Basic); t != nil {
+			if t, _ := typ.Underlying().(*Basic); t != nil {
 				switch t.kind {
 				case Float32:
 					return Typ[Complex64]
@@ -337,9 +341,9 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			}
 			return nil
 		}
-		resTyp := checks.applyTypeFunc(f, x, id)
+		resTyp := check.applyTypeFunc(f, x, id)
 		if resTyp == nil {
-			checks.errorf(x, InvalidComplex, invalidArg+"arguments have type %s, expected floating-point", x.typ)
+			check.errorf(x, InvalidComplex, invalidArg+"arguments have type %s, expected floating-point", x.typ)
 			return
 		}
 
@@ -350,8 +354,8 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			x.mode = value
 		}
 
-		if checks.recordTypes() && x.mode != constant_ {
-			checks.recordBuiltinType(call.Fun, makeSig(resTyp, x.typ, x.typ))
+		if check.recordTypes() && x.mode != constant_ {
+			check.recordBuiltinType(call.Fun, makeSig(resTyp, x.typ, x.typ))
 		}
 
 		x.typ = resTyp
@@ -369,18 +373,18 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// get special case out of the way
 		y := args[1]
 		var special bool
-		if ok, _ := x.assignableTo(checks, NewSlice(universeByte), nil); ok {
+		if ok, _ := x.assignableTo(check, NewSlice(universeByte), nil); ok {
 			special = true
-			typeset(y.typ, func(_, u Type) bool {
+			for _, u := range typeset(y.typ) {
 				if s, _ := u.(*Slice); s != nil && Identical(s.elem, universeByte) {
-					return true
+					// typeset ⊇ {[]byte}
+				} else if isString(u) {
+					// typeset ⊇ {string}
+				} else {
+					special = false
+					break
 				}
-				if isString(u) {
-					return true
-				}
-				special = false
-				return false
-			})
+			}
 		}
 
 		// general case
@@ -389,26 +393,26 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			// in their respective type sets must have the same underlying slice type []E."
 			dstE, err := sliceElem(x)
 			if err != nil {
-				checks.errorf(x, InvalidCopy, "invalid copy: %s", err.format(checks))
+				check.errorf(x, InvalidCopy, "invalid copy: %s", err.format(check))
 				return
 			}
 			srcE, err := sliceElem(y)
 			if err != nil {
 				// If we have a string, for a better error message proceed with byte element type.
 				if !allString(y.typ) {
-					checks.errorf(y, InvalidCopy, "invalid copy: %s", err.format(checks))
+					check.errorf(y, InvalidCopy, "invalid copy: %s", err.format(check))
 					return
 				}
 				srcE = universeByte
 			}
 			if !Identical(dstE, srcE) {
-				checks.errorf(x, InvalidCopy, "invalid copy: arguments %s and %s have different element types %s and %s", x, y, dstE, srcE)
+				check.errorf(x, InvalidCopy, "invalid copy: arguments %s and %s have different element types %s and %s", x, y, dstE, srcE)
 				return
 			}
 		}
 
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(Typ[Int], x.typ, y.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(Typ[Int], x.typ, y.typ))
 		}
 		x.mode = value
 		x.typ = Typ[Int]
@@ -422,11 +426,11 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		if !underIs(map_, func(u Type) bool {
 			map_, _ := u.(*Map)
 			if map_ == nil {
-				checks.errorf(x, InvalidDelete, invalidArg+"%s is not a map", x)
+				check.errorf(x, InvalidDelete, invalidArg+"%s is not a map", x)
 				return false
 			}
 			if key != nil && !Identical(map_.key, key) {
-				checks.errorf(x, InvalidDelete, invalidArg+"maps of %s must have identical key types", x)
+				check.errorf(x, InvalidDelete, invalidArg+"maps of %s must have identical key types", x)
 				return false
 			}
 			key = map_.key
@@ -436,14 +440,14 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		}
 
 		*x = *args[1] // key
-		checks.assignment(x, key, "argument to delete")
+		check.assignment(x, key, "argument to delete")
 		if x.mode == invalid {
 			return
 		}
 
 		x.mode = novalue
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(nil, map_, key))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(nil, map_, key))
 		}
 
 	case _Imag, _Real:
@@ -463,7 +467,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 				// it contains a (yet untyped non-constant) shift
 				// expression: convert it to complex128 which will
 				// result in an error (shift of complex value)
-				checks.convertUntyped(x, Typ[Complex128])
+				check.convertUntyped(x, Typ[Complex128])
 				// x should be invalid now, but be conservative and check
 				if x.mode == invalid {
 					return
@@ -475,7 +479,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// (applyTypeFunc never calls f with a type parameter)
 		f := func(typ Type) Type {
 			assert(!isTypeParam(typ))
-			if t, _ := under(typ).(*Basic); t != nil {
+			if t, _ := typ.Underlying().(*Basic); t != nil {
 				switch t.kind {
 				case Complex64:
 					return Typ[Float32]
@@ -487,13 +491,13 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			}
 			return nil
 		}
-		resTyp := checks.applyTypeFunc(f, x, id)
+		resTyp := check.applyTypeFunc(f, x, id)
 		if resTyp == nil {
 			code := InvalidImag
 			if id == _Real {
 				code = InvalidReal
 			}
-			checks.errorf(x, code, invalidArg+"argument has type %s, expected complex type", x.typ)
+			check.errorf(x, code, invalidArg+"argument has type %s, expected complex type", x.typ)
 			return
 		}
 
@@ -508,8 +512,8 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			x.mode = value
 		}
 
-		if checks.recordTypes() && x.mode != constant_ {
-			checks.recordBuiltinType(call.Fun, makeSig(resTyp, x.typ))
+		if check.recordTypes() && x.mode != constant_ {
+			check.recordBuiltinType(call.Fun, makeSig(resTyp, x.typ))
 		}
 
 		x.typ = resTyp
@@ -519,7 +523,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// make(T, n, m)
 		// (no argument evaluated yet)
 		arg0 := argList[0]
-		T := checks.varType(arg0)
+		T := check.varType(arg0)
 		if !isValid(T) {
 			return
 		}
@@ -535,7 +539,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			}
 		})
 		if err != nil {
-			checks.errorf(arg0, InvalidMake, invalidArg+"cannot make %s: %s", arg0, err.format(checks))
+			check.errorf(arg0, InvalidMake, invalidArg+"cannot make %s: %s", arg0, err.format(check))
 			return
 		}
 
@@ -550,33 +554,33 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			panic("unreachable")
 		}
 		if nargs < min || min+1 < nargs {
-			checks.errorf(call, WrongArgCount, invalidOp+"%v expects %d or %d arguments; found %d", call, min, min+1, nargs)
+			check.errorf(call, WrongArgCount, invalidOp+"%v expects %d or %d arguments; found %d", call, min, min+1, nargs)
 			return
 		}
 
 		types := []Type{T}
 		var sizes []int64 // constant integer arguments, if any
 		for _, arg := range argList[1:] {
-			typ, size := checks.index(arg, -1) // ok to continue with typ == Typ[Invalid]
+			typ, size := check.index(arg, -1) // ok to continue with typ == Typ[Invalid]
 			types = append(types, typ)
 			if size >= 0 {
 				sizes = append(sizes, size)
 			}
 		}
 		if len(sizes) == 2 && sizes[0] > sizes[1] {
-			checks.error(argList[1], SwappedMakeArgs, invalidArg+"length and capacity swapped")
+			check.error(argList[1], SwappedMakeArgs, invalidArg+"length and capacity swapped")
 			// safe to continue
 		}
 		x.mode = value
 		x.typ = T
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, types...))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, types...))
 		}
 
 	case _Max, _Min:
 		// max(x, ...)
 		// min(x, ...)
-		checks.verifyVersionf(call.Fun, go1_21, "built-in %s", bin.name)
+		check.verifyVersionf(call.Fun, go1_21, "built-in %s", bin.name)
 
 		op := token.LSS
 		if id == _Max {
@@ -589,19 +593,19 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			}
 
 			if !allOrdered(a.typ) {
-				checks.errorf(a, InvalidMinMaxOperand, invalidArg+"%s cannot be ordered", a)
+				check.errorf(a, InvalidMinMaxOperand, invalidArg+"%s cannot be ordered", a)
 				return
 			}
 
 			// The first argument is already in x and there's nothing left to do.
 			if i > 0 {
-				checks.matchTypes(x, a)
+				check.matchTypes(x, a)
 				if x.mode == invalid {
 					return
 				}
 
 				if !Identical(x.typ, a.typ) {
-					checks.errorf(a, MismatchedTypes, invalidArg+"mismatched types %s (previous argument) and %s (type of %s)", x.typ, a.typ, a.expr)
+					check.errorf(a, MismatchedTypes, invalidArg+"mismatched types %s (previous argument) and %s (type of %s)", x.typ, a.typ, a.expr)
 					return
 				}
 
@@ -619,7 +623,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		if x.mode != constant_ {
 			x.mode = value
 			// A value must not be untyped.
-			checks.assignment(x, &emptyInterface, "argument to built-in "+bin.name)
+			check.assignment(x, &emptyInterface, "argument to built-in "+bin.name)
 			if x.mode == invalid {
 				return
 			}
@@ -627,54 +631,73 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 		// Use the final type computed above for all arguments.
 		for _, a := range args {
-			checks.updateExprType(a.expr, x.typ, true)
+			check.updateExprType(a.expr, x.typ, true)
 		}
 
-		if checks.recordTypes() && x.mode != constant_ {
+		if check.recordTypes() && x.mode != constant_ {
 			types := make([]Type, nargs)
 			for i := range types {
 				types[i] = x.typ
 			}
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, types...))
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, types...))
 		}
 
 	case _New:
-		// new(T)
+		// new(T) or new(expr)
 		// (no argument evaluated yet)
-		T := checks.varType(argList[0])
-		if !isValid(T) {
+		arg := argList[0]
+		check.exprOrType(x, arg, false)
+		check.exclude(x, 1<<novalue|1<<builtin)
+		switch x.mode {
+		case invalid:
 			return
+		case typexpr:
+			// new(T)
+			check.validVarType(arg, x.typ)
+		default:
+			// new(expr)
+			if isUntyped(x.typ) {
+				// check for overflow and untyped nil
+				check.assignment(x, nil, "argument to new")
+				if x.mode == invalid {
+					return
+				}
+				assert(isTyped(x.typ))
+			}
+			// report version error only if there are no other errors
+			check.verifyVersionf(call.Fun, go1_26, "new(%s)", arg)
 		}
 
+		T := x.typ
 		x.mode = value
-		x.typ = &Pointer{base: T}
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, T))
+		x.typ = NewPointer(T)
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, T))
 		}
 
 	case _Panic:
 		// panic(x)
 		// record panic call if inside a function with result parameters
 		// (for use in Checker.isTerminating)
-		if checks.sig != nil && checks.sig.results.Len() > 0 {
+		if check.sig != nil && check.sig.results.Len() > 0 {
 			// function has result parameters
-			p := checks.isPanic
+			p := check.isPanic
 			if p == nil {
 				// allocate lazily
 				p = make(map[*ast.CallExpr]bool)
-				checks.isPanic = p
+				check.isPanic = p
 			}
 			p[call] = true
 		}
 
-		checks.assignment(x, &emptyInterface, "argument to panic")
+		check.assignment(x, &emptyInterface, "argument to panic")
 		if x.mode == invalid {
 			return
 		}
 
 		x.mode = novalue
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(nil, &emptyInterface))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(nil, &emptyInterface))
 		}
 
 	case _Print, _Println:
@@ -684,7 +707,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		if nargs > 0 {
 			params = make([]Type, nargs)
 			for i, a := range args {
-				checks.assignment(a, nil, "argument to built-in "+predeclaredFuncs[id].name)
+				check.assignment(a, nil, "argument to built-in "+predeclaredFuncs[id].name)
 				if a.mode == invalid {
 					return
 				}
@@ -693,53 +716,53 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		}
 
 		x.mode = novalue
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(nil, params...))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(nil, params...))
 		}
 
 	case _Recover:
 		// recover() interface{}
 		x.mode = value
 		x.typ = &emptyInterface
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ))
 		}
 
 	case _Add:
 		// unsafe.Add(ptr unsafe.Pointer, len IntegerType) unsafe.Pointer
-		checks.verifyVersionf(call.Fun, go1_17, "unsafe.Add")
+		check.verifyVersionf(call.Fun, go1_17, "unsafe.Add")
 
-		checks.assignment(x, Typ[UnsafePointer], "argument to unsafe.Add")
+		check.assignment(x, Typ[UnsafePointer], "argument to unsafe.Add")
 		if x.mode == invalid {
 			return
 		}
 
 		y := args[1]
-		if !checks.isValidIndex(y, InvalidUnsafeAdd, "length", true) {
+		if !check.isValidIndex(y, InvalidUnsafeAdd, "length", true) {
 			return
 		}
 
 		x.mode = value
 		x.typ = Typ[UnsafePointer]
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, x.typ, y.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, x.typ, y.typ))
 		}
 
 	case _Alignof:
 		// unsafe.Alignof(x T) uintptr
-		checks.assignment(x, nil, "argument to unsafe.Alignof")
+		check.assignment(x, nil, "argument to unsafe.Alignof")
 		if x.mode == invalid {
 			return
 		}
 
 		if hasVarSize(x.typ, nil) {
 			x.mode = value
-			if checks.recordTypes() {
-				checks.recordBuiltinType(call.Fun, makeSig(Typ[Uintptr], x.typ))
+			if check.recordTypes() {
+				check.recordBuiltinType(call.Fun, makeSig(Typ[Uintptr], x.typ))
 			}
 		} else {
 			x.mode = constant_
-			x.val = constant.MakeInt64(checks.conf.alignof(x.typ))
+			x.val = constant.MakeInt64(check.conf.alignof(x.typ))
 			// result is constant - no need to record signature
 		}
 		x.typ = Typ[Uintptr]
@@ -750,38 +773,38 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		arg0 := argList[0]
 		selx, _ := ast.Unparen(arg0).(*ast.SelectorExpr)
 		if selx == nil {
-			checks.errorf(arg0, BadOffsetofSyntax, invalidArg+"%s is not a selector expression", arg0)
-			checks.use(arg0)
+			check.errorf(arg0, BadOffsetofSyntax, invalidArg+"%s is not a selector expression", arg0)
+			check.use(arg0)
 			return
 		}
 
-		checks.expr(nil, x, selx.X)
+		check.expr(nil, x, selx.X)
 		if x.mode == invalid {
 			return
 		}
 
 		base := derefStructPtr(x.typ)
 		sel := selx.Sel.Name
-		obj, index, indirect := lookupFieldOrMethod(base, false, checks.pkg, sel, false)
+		obj, index, indirect := lookupFieldOrMethod(base, false, check.pkg, sel, false)
 		switch obj.(type) {
 		case nil:
-			checks.errorf(x, MissingFieldOrMethod, invalidArg+"%s has no single field %s", base, sel)
+			check.errorf(x, MissingFieldOrMethod, invalidArg+"%s has no single field %s", base, sel)
 			return
 		case *Func:
 			// TODO(gri) Using derefStructPtr may result in methods being found
 			// that don't actually exist. An error either way, but the error
 			// message is confusing. See: https://play.golang.org/p/al75v23kUy ,
 			// but go/types reports: "invalid argument: x.m is a method value".
-			checks.errorf(arg0, InvalidOffsetof, invalidArg+"%s is a method value", arg0)
+			check.errorf(arg0, InvalidOffsetof, invalidArg+"%s is a method value", arg0)
 			return
 		}
 		if indirect {
-			checks.errorf(x, InvalidOffsetof, invalidArg+"field %s is embedded via a pointer in %s", sel, base)
+			check.errorf(x, InvalidOffsetof, invalidArg+"field %s is embedded via a pointer in %s", sel, base)
 			return
 		}
 
 		// TODO(gri) Should we pass x.typ instead of base (and have indirect report if derefStructPtr indirected)?
-		checks.recordSelection(selx, FieldVal, base, obj, index, false)
+		check.recordSelection(selx, FieldVal, base, obj, index, false)
 
 		// record the selector expression (was bug - go.dev/issue/47895)
 		{
@@ -789,7 +812,7 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 			if x.mode == variable || indirect {
 				mode = variable
 			}
-			checks.record(&operand{mode, selx, obj.Type(), nil, 0})
+			check.record(&operand{mode, selx, obj.Type(), nil, 0})
 		}
 
 		// The field offset is considered a variable even if the field is declared before
@@ -798,13 +821,13 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// arranging struct fields if it wanted to.
 		if hasVarSize(base, nil) {
 			x.mode = value
-			if checks.recordTypes() {
-				checks.recordBuiltinType(call.Fun, makeSig(Typ[Uintptr], obj.Type()))
+			if check.recordTypes() {
+				check.recordBuiltinType(call.Fun, makeSig(Typ[Uintptr], obj.Type()))
 			}
 		} else {
-			offs := checks.conf.offsetof(base, index)
+			offs := check.conf.offsetof(base, index)
 			if offs < 0 {
-				checks.errorf(x, TypeTooLarge, "%s is too large", x)
+				check.errorf(x, TypeTooLarge, "%s is too large", x)
 				return
 			}
 			x.mode = constant_
@@ -815,20 +838,20 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 	case _Sizeof:
 		// unsafe.Sizeof(x T) uintptr
-		checks.assignment(x, nil, "argument to unsafe.Sizeof")
+		check.assignment(x, nil, "argument to unsafe.Sizeof")
 		if x.mode == invalid {
 			return
 		}
 
 		if hasVarSize(x.typ, nil) {
 			x.mode = value
-			if checks.recordTypes() {
-				checks.recordBuiltinType(call.Fun, makeSig(Typ[Uintptr], x.typ))
+			if check.recordTypes() {
+				check.recordBuiltinType(call.Fun, makeSig(Typ[Uintptr], x.typ))
 			}
 		} else {
-			size := checks.conf.sizeof(x.typ)
+			size := check.conf.sizeof(x.typ)
 			if size < 0 {
-				checks.errorf(x, TypeTooLarge, "%s is too large", x)
+				check.errorf(x, TypeTooLarge, "%s is too large", x)
 				return
 			}
 			x.mode = constant_
@@ -839,76 +862,76 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 
 	case _Slice:
 		// unsafe.Slice(ptr *T, len IntegerType) []T
-		checks.verifyVersionf(call.Fun, go1_17, "unsafe.Slice")
+		check.verifyVersionf(call.Fun, go1_17, "unsafe.Slice")
 
 		u, _ := commonUnder(x.typ, nil)
 		ptr, _ := u.(*Pointer)
 		if ptr == nil {
-			checks.errorf(x, InvalidUnsafeSlice, invalidArg+"%s is not a pointer", x)
+			check.errorf(x, InvalidUnsafeSlice, invalidArg+"%s is not a pointer", x)
 			return
 		}
 
 		y := args[1]
-		if !checks.isValidIndex(y, InvalidUnsafeSlice, "length", false) {
+		if !check.isValidIndex(y, InvalidUnsafeSlice, "length", false) {
 			return
 		}
 
 		x.mode = value
 		x.typ = NewSlice(ptr.base)
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, ptr, y.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, ptr, y.typ))
 		}
 
 	case _SliceData:
 		// unsafe.SliceData(slice []T) *T
-		checks.verifyVersionf(call.Fun, go1_20, "unsafe.SliceData")
+		check.verifyVersionf(call.Fun, go1_20, "unsafe.SliceData")
 
 		u, _ := commonUnder(x.typ, nil)
 		slice, _ := u.(*Slice)
 		if slice == nil {
-			checks.errorf(x, InvalidUnsafeSliceData, invalidArg+"%s is not a slice", x)
+			check.errorf(x, InvalidUnsafeSliceData, invalidArg+"%s is not a slice", x)
 			return
 		}
 
 		x.mode = value
 		x.typ = NewPointer(slice.elem)
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, slice))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, slice))
 		}
 
 	case _String:
 		// unsafe.String(ptr *byte, len IntegerType) string
-		checks.verifyVersionf(call.Fun, go1_20, "unsafe.String")
+		check.verifyVersionf(call.Fun, go1_20, "unsafe.String")
 
-		checks.assignment(x, NewPointer(universeByte), "argument to unsafe.String")
+		check.assignment(x, NewPointer(universeByte), "argument to unsafe.String")
 		if x.mode == invalid {
 			return
 		}
 
 		y := args[1]
-		if !checks.isValidIndex(y, InvalidUnsafeString, "length", false) {
+		if !check.isValidIndex(y, InvalidUnsafeString, "length", false) {
 			return
 		}
 
 		x.mode = value
 		x.typ = Typ[String]
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, NewPointer(universeByte), y.typ))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, NewPointer(universeByte), y.typ))
 		}
 
 	case _StringData:
 		// unsafe.StringData(str string) *byte
-		checks.verifyVersionf(call.Fun, go1_20, "unsafe.StringData")
+		check.verifyVersionf(call.Fun, go1_20, "unsafe.StringData")
 
-		checks.assignment(x, Typ[String], "argument to unsafe.StringData")
+		check.assignment(x, Typ[String], "argument to unsafe.StringData")
 		if x.mode == invalid {
 			return
 		}
 
 		x.mode = value
 		x.typ = NewPointer(universeByte)
-		if checks.recordTypes() {
-			checks.recordBuiltinType(call.Fun, makeSig(x.typ, Typ[String]))
+		if check.recordTypes() {
+			check.recordBuiltinType(call.Fun, makeSig(x.typ, Typ[String]))
 		}
 
 	case _Assert:
@@ -916,15 +939,15 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// The result of assert is the value of pred if there is no error.
 		// Note: assert is only available in self-test mode.
 		if x.mode != constant_ || !isBoolean(x.typ) {
-			checks.errorf(x, Test, invalidArg+"%s is not a boolean constant", x)
+			check.errorf(x, Test, invalidArg+"%s is not a boolean constant", x)
 			return
 		}
 		if x.val.Kind() != constant.Bool {
-			checks.errorf(x, Test, "internal error: value of %s should be a boolean constant", x)
+			check.errorf(x, Test, "internal error: value of %s should be a boolean constant", x)
 			return
 		}
 		if !constant.BoolVal(x.val) {
-			checks.errorf(call, Test, "%v failed", call)
+			check.errorf(call, Test, "%v failed", call)
 			// compile-time assertion failure - safe to continue
 		}
 		// result is constant - no need to record signature
@@ -936,15 +959,15 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 		// Note: trace is only available in self-test mode.
 		// (no argument evaluated yet)
 		if nargs == 0 {
-			checks.dump("%v: trace() without arguments", call.Pos())
+			check.dump("%v: trace() without arguments", call.Pos())
 			x.mode = novalue
 			break
 		}
 		var t operand
 		x1 := x
 		for _, arg := range argList {
-			checks.rawExpr(nil, x1, arg, nil, false) // permit trace for types, e.g.: new(trace(T))
-			checks.dump("%v: %s", x1.Pos(), x1)
+			check.rawExpr(nil, x1, arg, nil, false) // permit trace for types, e.g.: new(trace(T))
+			check.dump("%v: %s", x1.Pos(), x1)
 			x1 = &t // use incoming x only for first argument
 		}
 		if x.mode == invalid {
@@ -964,29 +987,22 @@ func (checks *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ 
 // or a type error if x is not a slice (or a type set of slices).
 func sliceElem(x *operand) (Type, *typeError) {
 	var E Type
-	var err *typeError
-	typeset(x.typ, func(_, u Type) bool {
+	for _, u := range typeset(x.typ) {
 		s, _ := u.(*Slice)
 		if s == nil {
 			if x.isNil() {
 				// Printing x in this case would just print "nil".
 				// Special case this so we can emphasize "untyped".
-				err = typeErrorf("argument must be a slice; have untyped nil")
+				return nil, typeErrorf("argument must be a slice; have untyped nil")
 			} else {
-				err = typeErrorf("argument must be a slice; have %s", x)
+				return nil, typeErrorf("argument must be a slice; have %s", x)
 			}
-			return false
 		}
 		if E == nil {
 			E = s.elem
 		} else if !Identical(E, s.elem) {
-			err = typeErrorf("mismatched slice element types %s and %s in %s", E, s.elem, x)
-			return false
+			return nil, typeErrorf("mismatched slice element types %s and %s in %s", E, s.elem, x)
 		}
-		return true
-	})
-	if err != nil {
-		return nil, err
 	}
 	return E, nil
 }
@@ -1011,7 +1027,7 @@ func hasVarSize(t Type, seen map[*Named]bool) (varSized bool) {
 		}()
 	}
 
-	switch u := under(t).(type) {
+	switch u := t.Underlying().(type) {
 	case *Array:
 		return hasVarSize(u.elem, seen)
 	case *Struct:
@@ -1035,7 +1051,7 @@ func hasVarSize(t Type, seen map[*Named]bool) (varSized bool) {
 // of x. If any of these applications of f return nil,
 // applyTypeFunc returns nil.
 // If x is not a type parameter, the result is f(x).
-func (checks *Checker) applyTypeFunc(f func(Type) Type, x *operand, id builtinId) Type {
+func (check *Checker) applyTypeFunc(f func(Type) Type, x *operand, id builtinId) Type {
 	if tp, _ := Unalias(x.typ).(*TypeParam); tp != nil {
 		// Test if t satisfies the requirements for the argument
 		// type and collect possible result types at the same time.
@@ -1068,13 +1084,13 @@ func (checks *Checker) applyTypeFunc(f func(Type) Type, x *operand, id builtinId
 		default:
 			panic("unreachable")
 		}
-		checks.softErrorf(x, code, "%s not supported as argument to built-in %s for go1.18 (see go.dev/issue/50937)", x, predeclaredFuncs[id].name)
+		check.softErrorf(x, code, "%s not supported as argument to built-in %s for go1.18 (see go.dev/issue/50937)", x, predeclaredFuncs[id].name)
 
 		// Construct a suitable new type parameter for the result type.
 		// The type parameter is placed in the current package so export/import
 		// works as expected.
-		tpar := NewTypeName(nopos, checks.pkg, tp.obj.name, nil)
-		ptyp := checks.newTypeParam(tpar, NewInterfaceType(nil, []Type{NewUnion(terms)})) // assigns type to tpar as a side-effect
+		tpar := NewTypeName(nopos, check.pkg, tp.obj.name, nil)
+		ptyp := check.newTypeParam(tpar, NewInterfaceType(nil, []Type{NewUnion(terms)})) // assigns type to tpar as a side-effect
 		ptyp.index = tp.index
 
 		return ptyp
@@ -1103,7 +1119,7 @@ func makeSig(res Type, args ...Type) *Signature {
 // otherwise it returns typ.
 func arrayPtrDeref(typ Type) Type {
 	if p, ok := Unalias(typ).(*Pointer); ok {
-		if a, _ := under(p.base).(*Array); a != nil {
+		if a, _ := p.base.Underlying().(*Array); a != nil {
 			return a
 		}
 	}

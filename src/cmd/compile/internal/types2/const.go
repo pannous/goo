@@ -61,14 +61,14 @@ func (check *Checker) overflow(x *operand, opPos syntax.Pos) {
 // The check parameter may be nil if representableConst is invoked
 // (indirectly) through an exported API call (AssignableTo, ConvertibleTo)
 // because we don't need the Checker's config for those calls.
-func representableConst(x constant.Value, checks *Checker, typ *Basic, rounded *constant.Value) bool {
+func representableConst(x constant.Value, check *Checker, typ *Basic, rounded *constant.Value) bool {
 	if x.Kind() == constant.Unknown {
 		return true // avoid follow-up errors
 	}
 
 	var conf *Config
-	if checks != nil {
-		conf = checks.conf
+	if check != nil {
+		conf = check.conf
 	}
 
 	sizeof := func(T Type) int64 {

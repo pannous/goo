@@ -65,7 +65,7 @@ func (s *Struct) markComplete() {
 	}
 }
 
-func (checks *Checker) structType(styp *Struct, e *ast.StructType) {
+func (check *Checker) structType(styp *Struct, e *ast.StructType) {
 	list := e.Fields
 	if list == nil {
 		styp.markComplete()
@@ -92,11 +92,11 @@ func (checks *Checker) structType(styp *Struct, e *ast.StructType) {
 
 		pos := ident.Pos()
 		name := ident.Name
-		fld := NewField(pos, checks.pkg, name, typ, embedded)
+		fld := NewField(pos, check.pkg, name, typ, embedded)
 		// spec: "Within a struct, non-blank field names must be unique."
-		if name == "_" || checks.declareInSet(&fset, pos, fld) {
+		if name == "_" || check.declareInSet(&fset, pos, fld) {
 			fields = append(fields, fld)
-			checks.recordDef(ident, fld)
+			check.recordDef(ident, fld)
 		}
 	}
 
@@ -111,8 +111,8 @@ func (checks *Checker) structType(styp *Struct, e *ast.StructType) {
 	}
 
 	for _, f := range list.List {
-		typ = checks.varType(f.Type)
-		tag = checks.tag(f.Tag)
+		typ = check.varType(f.Type)
+		tag = check.tag(f.Tag)
 		if len(f.Names) > 0 {
 			// named fields
 			for _, name := range f.Names {
@@ -126,7 +126,7 @@ func (checks *Checker) structType(styp *Struct, e *ast.StructType) {
 			pos := f.Type.Pos() // position of type, for errors
 			name := embeddedFieldIdent(f.Type)
 			if name == nil {
-				checks.errorf(f.Type, InvalidSyntaxTree, "embedded field type %s has no name", f.Type)
+				check.errorf(f.Type, InvalidSyntaxTree, "embedded field type %s has no name", f.Type)
 				name = ast.NewIdent("_")
 				name.NamePos = pos
 				addInvalid(name)
@@ -143,7 +143,7 @@ func (checks *Checker) structType(styp *Struct, e *ast.StructType) {
 			embeddedTyp := typ
 			embeddedPos := f.Type
 
-			checks.later(func() {
+			check.later(func() {
 				t, isPtr := deref(embeddedTyp)
 				switch u := t.Underlying().(type) {
 				case *Basic:
@@ -153,20 +153,20 @@ func (checks *Checker) structType(styp *Struct, e *ast.StructType) {
 					}
 					// unsafe.Pointer is treated like a regular pointer
 					if u.kind == UnsafePointer {
-						checks.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be unsafe.Pointer")
+						check.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be unsafe.Pointer")
 					}
 				case *Pointer:
-					checks.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer")
+					check.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer")
 				case *Interface:
 					if isTypeParam(t) {
 						// The error code here is inconsistent with other error codes for
 						// invalid embedding, because this restriction may be relaxed in the
 						// future, and so it did not warrant a new error code.
-						checks.error(embeddedPos, MisplacedTypeParam, "embedded field type cannot be a (pointer to a) type parameter")
+						check.error(embeddedPos, MisplacedTypeParam, "embedded field type cannot be a (pointer to a) type parameter")
 						break
 					}
 					if isPtr {
-						checks.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer to an interface")
+						check.error(embeddedPos, InvalidPtrEmbed, "embedded field type cannot be a pointer to an interface")
 					}
 				}
 			}).describef(embeddedPos, "check embedded type %s", embeddedTyp)
@@ -197,9 +197,9 @@ func embeddedFieldIdent(e ast.Expr) *ast.Ident {
 	return nil // invalid embedded field
 }
 
-func (checks *Checker) declareInSet(oset *objset, pos token.Pos, obj Object) bool {
+func (check *Checker) declareInSet(oset *objset, pos token.Pos, obj Object) bool {
 	if alt := oset.insert(obj); alt != nil {
-		err := checks.newError(DuplicateDecl)
+		err := check.newError(DuplicateDecl)
 		err.addf(atPos(pos), "%s redeclared", obj.Name())
 		err.addAltDecl(alt)
 		err.report()
@@ -208,14 +208,14 @@ func (checks *Checker) declareInSet(oset *objset, pos token.Pos, obj Object) boo
 	return true
 }
 
-func (checks *Checker) tag(t *ast.BasicLit) string {
+func (check *Checker) tag(t *ast.BasicLit) string {
 	if t != nil {
 		if t.Kind == token.STRING {
 			if val, err := strconv.Unquote(t.Value); err == nil {
 				return val
 			}
 		}
-		checks.errorf(t, InvalidSyntaxTree, "incorrect tag syntax: %q", t.Value)
+		check.errorf(t, InvalidSyntaxTree, "incorrect tag syntax: %q", t.Value)
 	}
 	return ""
 }

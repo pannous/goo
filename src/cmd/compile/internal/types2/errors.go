@@ -36,10 +36,10 @@ type errorDesc struct {
 // A new error_ is created with Checker.newError.
 // To report an error_, call error_.report.
 type error_ struct {
-	checks *Checker
-	desc   []errorDesc
-	code   Code
-	soft   bool // TODO(gri) eventually determine this from an error code
+	check *Checker
+	desc  []errorDesc
+	code  Code
+	soft  bool // TODO(gri) eventually determine this from an error code
 }
 
 // newError returns a new error_ with the given error code.
@@ -47,7 +47,7 @@ func (check *Checker) newError(code Code) *error_ {
 	if code == 0 {
 		panic("error code must not be 0")
 	}
-	return &error_{checks: check, code: code}
+	return &error_{check: check, code: code}
 }
 
 // addf adds formatted error information to err.
@@ -56,8 +56,8 @@ func (check *Checker) newError(code Code) *error_ {
 // Subsequent calls to addf provide additional information in the form of additional lines
 // in the error message (types2) or continuation errors identified by a tab-indented error
 // message (go/types).
-func (err *error_) addf(at poser, format string, args ...interface{}) {
-	err.desc = append(err.desc, errorDesc{atPos(at), err.checks.sprintf(format, args...)})
+func (err *error_) addf(at poser, format string, args ...any) {
+	err.desc = append(err.desc, errorDesc{atPos(at), err.check.sprintf(format, args...)})
 }
 
 // addAltDecl is a specialized form of addf reporting another declaration of obj.
@@ -112,8 +112,8 @@ func (err *error_) report() {
 	// follow-on errors which don't add useful information. Only
 	// exclude them if these strings are not at the beginning,
 	// and only if we have at least one error already reported.
-	checks := err.checks
-	if checks.firstErr != nil {
+	check := err.check
+	if check.firstErr != nil {
 		// It is sufficient to look at the first sub-error only.
 		msg := err.desc[0].msg
 		if strings.Index(msg, "invalid operand") > 0 || strings.Index(msg, "invalid type") > 0 {
@@ -121,8 +121,8 @@ func (err *error_) report() {
 		}
 	}
 
-	if checks.conf.Trace {
-		checks.trace(err.pos(), "ERROR: %s (code = %d)", err.desc[0].msg, err.code)
+	if check.conf.Trace {
+		check.trace(err.pos(), "ERROR: %s (code = %d)", err.desc[0].msg, err.code)
 	}
 
 	// In go/types, if there is a sub-error with a valid position,
@@ -141,10 +141,10 @@ func (err *error_) report() {
 	if multiError {
 		for i := range err.desc {
 			p := &err.desc[i]
-			checks.handleError(i, p.pos, err.code, p.msg, err.soft)
+			check.handleError(i, p.pos, err.code, p.msg, err.soft)
 		}
 	} else {
-		checks.handleError(0, err.pos(), err.code, err.msg(), err.soft)
+		check.handleError(0, err.pos(), err.code, err.msg(), err.soft)
 	}
 
 	// make sure the error is not reported twice
@@ -195,7 +195,7 @@ func (check *Checker) handleError(index int, pos syntax.Pos, code Code, msg stri
 		Code: code,
 	}
 
-	if check.firstErr == nil && !soft {
+	if check.firstErr == nil {
 		check.firstErr = e
 	}
 
@@ -233,11 +233,6 @@ func (check *Checker) softErrorf(at poser, code Code, format string, args ...any
 	err.addf(at, format, args...)
 	err.soft = true
 	err.report()
-}
-
-func (check *Checker) warningf(at poser, code Code, format string, args ...any) {
-	fmt.Printf(format, args...)
-	// todo register warning
 }
 
 func (check *Checker) versionErrorf(at poser, v goVersion, format string, args ...any) {

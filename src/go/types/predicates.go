@@ -200,13 +200,6 @@ func comparableType(T Type, dynamic bool, seen map[Type]bool) *typeError {
 		}
 		return typeErrorf(cause)
 
-	case *Slice:
-		// Slices are now comparable if element type is comparable
-		if comparableType(t.elem, dynamic, seen) != nil {
-			return typeErrorf("slice with non-comparable element type %s", t.elem)
-		}
-		return nil
-
 	default:
 		return typeErrorf("")
 	}
@@ -368,19 +361,19 @@ func (c *comparer) identical(x, y Type, p *ifacePair) bool {
 			}
 			smap := makeSubstMap(ytparams, targs)
 
-			var checks *Checker   // ok to call subst on a nil *Checker
+			var check *Checker   // ok to call subst on a nil *Checker
 			ctxt := NewContext() // need a non-nil Context for the substitution below
 
 			// Constraints must be pair-wise identical, after substitution.
 			for i, xtparam := range xtparams {
-				ybound := checks.subst(nopos, ytparams[i].bound, smap, nil, ctxt)
+				ybound := check.subst(nopos, ytparams[i].bound, smap, nil, ctxt)
 				if !c.identical(xtparam.bound, ybound, p) {
 					return false
 				}
 			}
 
-			yparams = checks.subst(nopos, y.params, smap, nil, ctxt).(*Tuple)
-			yresults = checks.subst(nopos, y.results, smap, nil, ctxt).(*Tuple)
+			yparams = check.subst(nopos, y.params, smap, nil, ctxt).(*Tuple)
+			yresults = check.subst(nopos, y.results, smap, nil, ctxt).(*Tuple)
 		}
 
 		return x.variadic == y.variadic &&

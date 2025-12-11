@@ -14,7 +14,7 @@ import (
 
 // An Interface represents an interface type.
 type Interface struct {
-	checks    *Checker      // for error reporting; nil once type set is computed
+	check     *Checker      // for error reporting; nil once type set is computed
 	methods   []*Func       // ordered list of explicitly declared methods
 	embeddeds []Type        // ordered list of explicitly embedded elements
 	embedPos  *[]syntax.Pos // positions of embedded elements; or nil (for error messages) - use pointer to save space
@@ -25,7 +25,7 @@ type Interface struct {
 }
 
 // typeSet returns the type set for interface t.
-func (t *Interface) typeSet() *_TypeSet { return computeInterfaceTypeSet(t.checks, nopos, t) }
+func (t *Interface) typeSet() *_TypeSet { return computeInterfaceTypeSet(t.check, nopos, t) }
 
 // emptyInterface represents the empty interface
 var emptyInterface = Interface{complete: true, tset: &topTypeSet}
@@ -58,7 +58,7 @@ func NewInterfaceType(methods []*Func, embeddeds []Type) *Interface {
 
 // check may be nil
 func (check *Checker) newInterface() *Interface {
-	typ := &Interface{checks: check}
+	typ := &Interface{check: check}
 	if check != nil {
 		check.needsCleanup(typ)
 	}
@@ -113,11 +113,11 @@ func (t *Interface) String() string   { return TypeString(t, nil) }
 
 func (t *Interface) cleanup() {
 	t.typeSet() // any interface that escapes type checking must be safe for concurrent use
-	t.checks = nil
+	t.check = nil
 	t.embedPos = nil
 }
 
-func (check *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceType, defi *TypeName) {
+func (check *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceType, def *TypeName) {
 	addEmbedded := func(pos syntax.Pos, typ Type) {
 		ityp.embeddeds = append(ityp.embeddeds, typ)
 		if ityp.embedPos == nil {
@@ -151,8 +151,8 @@ func (check *Checker) interfaceType(ityp *Interface, iface *syntax.InterfaceType
 
 		// use named receiver type if available (for better error messages)
 		var recvTyp Type = ityp
-		if defi != nil {
-			if named := asNamed(defi.typ); named != nil {
+		if def != nil {
+			if named := asNamed(def.typ); named != nil {
 				recvTyp = named
 			}
 		}

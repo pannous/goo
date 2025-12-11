@@ -162,7 +162,7 @@ func (check *Checker) compositeLit(x *operand, e *syntax.CompositeLit, hint Type
 					continue
 				}
 				key, _ := kv.Key.(*syntax.Name)
-				// do all possible check early (before exiting due to errors)
+				// do all possible checks early (before exiting due to errors)
 				// so we don't drop information on the floor
 				check.expr(nil, x, kv.Value)
 				if key == nil {

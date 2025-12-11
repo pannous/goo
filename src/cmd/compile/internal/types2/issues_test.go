@@ -346,9 +346,9 @@ func TestIssue28005(t *testing.T) {
 
 		// look for interface object X
 		var obj Object
-		for name, defi := range info.Defs {
+		for name, def := range info.Defs {
 			if name.Value == "X" {
-				obj = defi
+				obj = def
 				break
 			}
 		}
@@ -414,19 +414,19 @@ func TestIssue29029(t *testing.T) {
 	// type-check together
 	var conf Config
 	info := &Info{Defs: make(map[*syntax.Name]Object)}
-	checks := NewChecker(&conf, NewPackage("", "p"), info)
-	if err := checks.Files([]*syntax.File{f1, f2}); err != nil {
+	check := NewChecker(&conf, NewPackage("", "p"), info)
+	if err := check.Files([]*syntax.File{f1, f2}); err != nil {
 		t.Fatal(err)
 	}
 	want := printInfo(info)
 
 	// type-check incrementally
 	info = &Info{Defs: make(map[*syntax.Name]Object)}
-	checks = NewChecker(&conf, NewPackage("", "p"), info)
-	if err := checks.Files([]*syntax.File{f1}); err != nil {
+	check = NewChecker(&conf, NewPackage("", "p"), info)
+	if err := check.Files([]*syntax.File{f1}); err != nil {
 		t.Fatal(err)
 	}
-	if err := checks.Files([]*syntax.File{f2}); err != nil {
+	if err := check.Files([]*syntax.File{f2}); err != nil {
 		t.Fatal(err)
 	}
 	got := printInfo(info)

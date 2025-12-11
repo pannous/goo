@@ -68,8 +68,7 @@ func (check *Checker) usage(scope *Scope) {
 		return cmpPos(a.pos, b.pos)
 	})
 	for _, v := range unused {
-		check.warningf(v.pos, UnusedVar, "declared and not used: %s\n", v.name)
-		//check.softErrorf(v.pos, UnusedVar, "declared and not used: %s", v.name)
+		check.softErrorf(v.pos, UnusedVar, "declared and not used: %s", v.name)
 	}
 
 	for _, scope := range scope.children {
@@ -593,9 +592,8 @@ func (check *Checker) stmt(ctxt stmtContext, s syntax.Stmt) {
 		check.simpleStmt(s.Init)
 		var x operand
 		check.expr(nil, &x, s.Cond)
-		// Allow any type in if conditions - truthy conversion handled in typecheck
-		if x.mode == invalid {
-			return
+		if x.mode != invalid && !allBoolean(x.typ) {
+			check.error(s.Cond, InvalidCond, "non-boolean condition in if statement")
 		}
 		check.stmt(inner, s.Then)
 		// The parser produces a correct AST but if it was modified
@@ -696,9 +694,8 @@ func (check *Checker) stmt(ctxt stmtContext, s syntax.Stmt) {
 		if s.Cond != nil {
 			var x operand
 			check.expr(nil, &x, s.Cond)
-			// Allow any type in for conditions - truthy conversion handled in typecheck
-			if x.mode == invalid {
-				return
+			if x.mode != invalid && !allBoolean(x.typ) {
+				check.error(s.Cond, InvalidCond, "non-boolean condition in for statement")
 			}
 		}
 		check.simpleStmt(s.Post)
@@ -722,7 +719,7 @@ func (check *Checker) switchStmt(inner stmtContext, s *syntax.SwitchStmt) {
 	if s.Tag != nil {
 		check.expr(nil, &x, s.Tag)
 		// By checking assignment of x to an invisible temporary
-		// (as a compiler would), we get all the relevant check.
+		// (as a compiler would), we get all the relevant checks.
 		check.assignment(&x, nil, "switch expression")
 		if x.mode != invalid && !Comparable(x.typ) && !hasNil(x.typ) {
 			check.errorf(&x, InvalidExprSwitch, "cannot switch on %s (%s is not comparable)", &x, x.typ)
@@ -839,8 +836,7 @@ func (check *Checker) typeSwitchStmt(inner stmtContext, s *syntax.SwitchStmt, gu
 			check.usedVars[v] = true // avoid usage error when checking entire function
 		}
 		if !used {
-			//check.softErrorf(lhs, UnusedVar, "%s declared and not used", lhs.Value)
-			check.warningf(lhs, UnusedVar, "%s declared and not used", lhs.Value)
+			check.softErrorf(lhs, UnusedVar, "%s declared and not used", lhs.Value)
 		}
 	}
 }

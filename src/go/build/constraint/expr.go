@@ -54,6 +54,8 @@ func (x *TagExpr) String() string {
 
 func tag(tag string) Expr { return &TagExpr{tag} }
 
+func negate(x Expr) Expr { return &NotExpr{x} }
+
 // A NotExpr represents the expression !X (the negation of X).
 type NotExpr struct {
 	X Expr
@@ -74,7 +76,7 @@ func (x *NotExpr) String() string {
 	return "!" + s
 }
 
-func not(x Expr) Expr { return &NotExpr{x} }
+func negation(x Expr) Expr { return &NotExpr{x} }
 
 // An AndExpr represents the expression X && Y.
 type AndExpr struct {
@@ -102,7 +104,7 @@ func andArg(x Expr) string {
 	return s
 }
 
-func and(x, y Expr) Expr {
+func und(x, y Expr) Expr {
 	return &AndExpr{x, y}
 }
 
@@ -132,7 +134,7 @@ func orArg(x Expr) string {
 	return s
 }
 
-func or(x, y Expr) Expr {
+func oder(x, y Expr) Expr {
 	return &OrExpr{x, y}
 }
 
@@ -222,7 +224,7 @@ func parseExpr(text string) (x Expr, err error) {
 	}()
 
 	p := &exprParser{s: text}
-	x = p.or()
+	x = p.oder()
 	if p.tok != "" {
 		panic(&SyntaxError{Offset: p.pos, Err: "unexpected token " + p.tok})
 	}
@@ -232,10 +234,10 @@ func parseExpr(text string) (x Expr, err error) {
 // or parses a sequence of || expressions.
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
-func (p *exprParser) or() Expr {
-	x := p.and()
+func (p *exprParser) oder() Expr {
+	x := p.und()
 	for p.tok == "||" {
-		x = or(x, p.and())
+		x = oder(x, p.und())
 	}
 	return x
 }
@@ -243,18 +245,18 @@ func (p *exprParser) or() Expr {
 // and parses a sequence of && expressions.
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
-func (p *exprParser) and() Expr {
-	x := p.not()
+func (p *exprParser) und() Expr {
+	x := p.negationExpr()
 	for p.tok == "&&" {
-		x = and(x, p.not())
+		x = und(x, p.negationExpr())
 	}
 	return x
 }
 
-// not parses a ! expression.
+// negationExpr parses a ! expression.
 // On entry, the next input token has not yet been lexed.
 // On exit, the next input token has been lexed and is in p.tok.
-func (p *exprParser) not() Expr {
+func (p *exprParser) negationExpr() Expr {
 	p.size++
 	if p.size > maxSize {
 		panic(&SyntaxError{Offset: p.pos, Err: "build expression too large"})
@@ -265,7 +267,7 @@ func (p *exprParser) not() Expr {
 		if p.tok == "!" {
 			panic(&SyntaxError{Offset: p.pos, Err: "double negation not allowed"})
 		}
-		return not(p.atom())
+		return negation(p.atom())
 	}
 	return p.atom()
 }
@@ -285,7 +287,7 @@ func (p *exprParser) atom() Expr {
 				panic(e)
 			}
 		}()
-		x := p.or()
+		x := p.oder()
 		if p.tok != ")" {
 			panic(&SyntaxError{Offset: pos, Err: "missing close paren"})
 		}
@@ -406,9 +408,9 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 	size := 0
 
 	var x Expr
-	for clause := range strings.FieldsSeq(text) {
+	for _, clause := range strings.Fields(text) {
 		var y Expr
-		for lit := range strings.SplitSeq(clause, ",") {
+		for _, lit := range strings.Split(clause, ",") {
 			var z Expr
 			var neg bool
 			if strings.HasPrefix(lit, "!!") || lit == "!" {
@@ -424,7 +426,7 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 					z = tag("ignore")
 				}
 				if neg {
-					z = not(z)
+					z = negation(z)
 				}
 			}
 			if y == nil {
@@ -433,7 +435,7 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 				if size++; size > maxOldSize {
 					return nil, errComplex
 				}
-				y = and(y, z)
+				y = und(y, z)
 			}
 		}
 		if x == nil {
@@ -442,7 +444,7 @@ func parsePlusBuildExpr(text string) (Expr, error) {
 			if size++; size > maxOldSize {
 				return nil, errComplex
 			}
-			x = or(x, y)
+			x = oder(x, y)
 		}
 	}
 	if x == nil {
@@ -478,11 +480,11 @@ func PlusBuildLines(x Expr) ([]string, error) {
 
 	// Split into AND of ORs of ANDs of literals (tag or NOT tag).
 	var split [][][]Expr
-	for _, or := range appendSplitAnd(nil, x) {
+	for _, oder := range appendSplitAnd(nil, x) {
 		var ands [][]Expr
-		for _, and := range appendSplitOr(nil, or) {
+		for _, und := range appendSplitOr(nil, oder) {
 			var lits []Expr
-			for _, lit := range appendSplitAnd(nil, and) {
+			for _, lit := range appendSplitAnd(nil, und) {
 				switch lit.(type) {
 				case *TagExpr, *NotExpr:
 					lits = append(lits, lit)
@@ -499,34 +501,34 @@ func PlusBuildLines(x Expr) ([]string, error) {
 	// push the top-level ANDs to the bottom level, so that we get
 	// one // +build line instead of many.
 	maxOr := 0
-	for _, or := range split {
-		if maxOr < len(or) {
-			maxOr = len(or)
+	for _, oder := range split {
+		if maxOr < len(oder) {
+			maxOr = len(oder)
 		}
 	}
 	if maxOr == 1 {
 		var lits []Expr
-		for _, or := range split {
-			lits = append(lits, or[0]...)
+		for _, oder := range split {
+			lits = append(lits, oder[0]...)
 		}
 		split = [][][]Expr{{lits}}
 	}
 
 	// Prepare the +build lines.
 	var lines []string
-	for _, or := range split {
-		var line strings.Builder
-		line.WriteString("// +build")
-		for _, and := range or {
-			line.WriteString(" ")
-			for i, lit := range and {
+	for _, oder := range split {
+		line := "// +build"
+		for _, und := range oder {
+			clause := ""
+			for i, lit := range und {
 				if i > 0 {
-					line.WriteString(",")
+					clause += ","
 				}
-				line.WriteString(lit.String())
+				clause += lit.String()
 			}
+			line += " " + clause
 		}
-		lines = append(lines, line.String())
+		lines = append(lines, line)
 	}
 
 	return lines, nil
@@ -535,41 +537,41 @@ func PlusBuildLines(x Expr) ([]string, error) {
 // pushNot applies DeMorgan's law to push negations down the expression,
 // so that only tags are negated in the result.
 // (It applies the rewrites !(X && Y) => (!X || !Y) and !(X || Y) => (!X && !Y).)
-func pushNot(x Expr, not bool) Expr {
+func pushNot(x Expr, negate bool) Expr {
 	switch x := x.(type) {
 	default:
 		// unreachable
 		return x
 	case *NotExpr:
-		if _, ok := x.X.(*TagExpr); ok && !not {
+		if _, ok := x.X.(*TagExpr); ok && !negate {
 			return x
 		}
-		return pushNot(x.X, !not)
+		return pushNot(x.X, !negate)
 	case *TagExpr:
-		if not {
+		if negate {
 			return &NotExpr{X: x}
 		}
 		return x
 	case *AndExpr:
-		x1 := pushNot(x.X, not)
-		y1 := pushNot(x.Y, not)
-		if not {
-			return or(x1, y1)
+		x1 := pushNot(x.X, negate)
+		y1 := pushNot(x.Y, negate)
+		if negate {
+			return oder(x1, y1)
 		}
 		if x1 == x.X && y1 == x.Y {
 			return x
 		}
-		return and(x1, y1)
+		return und(x1, y1)
 	case *OrExpr:
-		x1 := pushNot(x.X, not)
-		y1 := pushNot(x.Y, not)
-		if not {
-			return and(x1, y1)
+		x1 := pushNot(x.X, negate)
+		y1 := pushNot(x.Y, negate)
+		if negate {
+			return und(x1, y1)
 		}
 		if x1 == x.X && y1 == x.Y {
 			return x
 		}
-		return or(x1, y1)
+		return oder(x1, y1)
 	}
 }
 
