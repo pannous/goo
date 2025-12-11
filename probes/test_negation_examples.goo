@@ -1,0 +1,20 @@
+package main
+
+// Examples of negation with arrays and comparisons
+
+func main() {
+	z := []rune{'a', 'b', 'c'}
+	idx := 2
+	
+	// ✅ Correct: Use ! with parentheses for whole expression
+	if !(z[idx - 1] == 'b') {
+		print("FAIL: negation with parentheses")
+	}
+	
+	// ✅ Alternative: Negate comparison
+	if z[idx - 1] != 'b' {
+		print("FAIL: inequality operator")
+	}
+	
+	print("All negation tests passed")
+}
