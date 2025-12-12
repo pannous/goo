@@ -45,10 +45,10 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 		}
 	}
 
-	// NOTE: Auto-import for "slices" is not currently implemented due to timing issues
-	// with the compiler's import resolution system. Users must manually add:
-	//   import "slices"
-	// at the top of files that use slice equality (==, !=) operations.
+	// Request slices import via ImportManager if we made any transformations
+	if changed {
+		RequestSlicesImport()
+	}
 
 	return changed
 }
