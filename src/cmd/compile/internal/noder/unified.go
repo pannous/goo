@@ -208,12 +208,10 @@ func unified(m posMap, noders []*noder) {
 	fileIdx := 0
 	for _, noder := range noders {
 		if noder.file != nil {
-			fmt.Printf("UPDATING noder.file[%d]: before=%p after=%p\n", fileIdx, noder.file, files[fileIdx])
 			noder.file = files[fileIdx]
 			fileIdx++
 		}
 	}
-	fmt.Printf("Updated %d noders\n", fileIdx)
 
 	// Re-resolve imports that may have been added by transforms
 	updateImportConfigForTransforms(files)
@@ -610,7 +608,7 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 		for _, decl := range file.DeclList {
 			if importDecl, ok := decl.(*syntax.ImportDecl); ok && importDecl.Path != nil {
 				importPath := strings.Trim(importDecl.Path.Value, `"`)
-				if val, exists := base.Flag.Cfg.PackageFile[importPath]; !exists || val == "" {
+				if _, exists := base.Flag.Cfg.PackageFile[importPath]; !exists {
 					newImports[importPath] = true
 				}
 			}
@@ -618,10 +616,14 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 	}
 
 	// Resolve and add new imports to the package file map
+	// Note: This approach doesn't work for modern Go (no pkg/$GOOS_$GOARCH/)
+	// A proper solution requires rebuilding dependencies after transforms add imports
+	// See commit 09efd3f8a0 on different branch for ImportManager solution
 	for importPath := range newImports {
 		if packageFile := resolveStandardLibraryPackage(importPath); packageFile != "" {
 			base.Flag.Cfg.PackageFile[importPath] = packageFile
 		}
+		// If resolution fails, openPackage will fall back to ImportDirs (fixed in import.go)
 	}
 }
 
