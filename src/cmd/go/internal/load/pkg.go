@@ -2045,6 +2045,39 @@ func (p *Package) load(loaderstate *modload.State, ctx context.Context, opts Pac
 		}
 	}
 	p.Internal.Imports = imports
+
+	// For .goo files, always add common stdlib packages that transforms might need
+	// This ensures they're built and available before transforms run
+	hasGooFiles := false
+	for _, f := range p.GoFiles {
+		if strings.HasSuffix(f, ".goo") {
+			hasGooFiles = true
+			break
+		}
+	}
+	if hasGooFiles {
+		commonImports := []string{"strings", "slices", "fmt", "strconv", "unicode"}
+		for _, impPath := range commonImports {
+			// Check if already imported
+			found := false
+			for _, existing := range p.Imports {
+				if existing == impPath {
+					found = true
+					break
+				}
+			}
+			if !found {
+				// Load the stdlib package and add to Internal.Imports only
+				// (not p.Imports to avoid "imported and not used" errors)
+				p1, err1 := loadImport(loaderstate, ctx, opts, nil, impPath, p.Dir, p, stk, nil, 0)
+				if err1 == nil && p1 != nil {
+					// Only add to Internal.Imports - transforms will add actual import statements
+					p.Internal.Imports = append(p.Internal.Imports, p1)
+				}
+			}
+		}
+	}
+
 	if p.Error == nil && p.Name == "main" && !p.Internal.ForceLibrary && !p.Incomplete && !opts.SuppressBuildInfo {
 		// TODO(bcmills): loading VCS metadata can be fairly slow.
 		// Consider starting this as a background goroutine and retrieving the result
@@ -3313,6 +3346,28 @@ func GoFilesPackage(loaderstate *modload.State, ctx context.Context, opts Packag
 	pkg.ImportPath = "command-line-arguments"
 	pkg.Target = ""
 	pkg.Match = gofiles
+
+	// For .goo files, always add common stdlib packages that transforms might need
+	// This ensures they're built and available before transforms run
+	for _, f := range gofiles {
+		if strings.HasSuffix(f, ".goo") {
+			commonImports := []string{"strings", "slices", "fmt", "strconv", "unicode"}
+			for _, imp := range commonImports {
+				// Only add if not already present
+				found := false
+				for _, existing := range pkg.Imports {
+					if existing == imp {
+						found = true
+						break
+					}
+				}
+				if !found {
+					pkg.Imports = append(pkg.Imports, imp)
+				}
+			}
+			break // Only need to check once
+		}
+	}
 
 	if pkg.Name == "main" {
 		exe := pkg.DefaultExecName() + cfg.ExeSuffix
