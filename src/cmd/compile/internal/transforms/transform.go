@@ -59,6 +59,9 @@ func ApplyTransformations(files []*syntax.File) {
 		fmt.Printf("APPLYING TRANSFORMS TO: pkg=%s\n", file.PkgName.Value)
 		ensureFileNodeBases(file)
 
+		// Reset GlobalImportManager for this file
+		GlobalImportManager = NewImportManager()
+
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
 		debug("Transform execution order:\n")
@@ -69,6 +72,11 @@ func ApplyTransformations(files []*syntax.File) {
 			if transformer.Transform(file, ctx) {
 				debug("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			}
+		}
+
+		// Apply all requested imports centrally
+		if GlobalImportManager.ApplyImports(file) {
+			debug("ImportManager: Applied imports to package: %s\n", file.PkgName.Value)
 		}
 	}
 }
