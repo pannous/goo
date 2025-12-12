@@ -457,6 +457,19 @@ func oneMainPkg(pkgs []*load.Package) []*load.Package {
 var pkgsFilter = func(pkgs []*load.Package) []*load.Package { return pkgs }
 
 func runBuild(ctx context.Context, cmd *base.Command, args []string) {
+	// Auto-enable transformers for .goo files
+	for _, arg := range args {
+		if strings.HasSuffix(arg, ".goo") {
+			if os.Getenv("GO111MODULE") == "" {
+				os.Setenv("GO111MODULE", "off")
+			}
+			if os.Getenv("GOO_USE_TRANSFORMERS") == "" {
+				os.Setenv("GOO_USE_TRANSFORMERS", "1")
+			}
+			break
+		}
+	}
+
 	moduleLoaderState := modload.NewState()
 	moduleLoaderState.InitWorkfile()
 	BuildInit(moduleLoaderState)

@@ -5,12 +5,14 @@
 package noder
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"internal/buildcfg"
 	"internal/exportdata"
 	"internal/pkgbits"
 	"os"
+	"os/exec"
 	pathpkg "path"
 	"runtime"
 	"strings"
@@ -123,6 +125,30 @@ func openPackage(path string) (*os.File, error) {
 			return file, nil
 		}
 	}
+
+	// Final fallback: try to find package in build cache using go list
+	// This is for transform-added imports that weren't in the original source
+	gooEnv := os.Getenv("GOO_USE_TRANSFORMERS")
+	fmt.Printf("DEBUG: openPackage: fallback for %s, GOO_USE_TRANSFORMERS=%s\n", path, gooEnv)
+	if gooEnv == "1" {
+		fmt.Printf("DEBUG: openPackage: trying go list for %s\n", path)
+		cmd := exec.Command("go", "list", "-export", "-f", "{{.Export}}", path)
+		cmd.Env = append(os.Environ(), "GO111MODULE=off")
+		// Capture stderr to see errors
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		output, err := cmd.Output()
+		fmt.Printf("DEBUG: openPackage: go list returned %d bytes, err=%v, stderr=%s\n", len(output), err, stderr.String())
+		if err == nil && len(output) > 0 {
+			exportPath := strings.TrimSpace(string(output))
+			fmt.Printf("DEBUG: openPackage: exportPath=%s\n", exportPath)
+			if exportPath != "" && exportPath != "<nil>" {
+				fmt.Printf("DEBUG: openPackage: Resolved %s to %s via go list\n", path, exportPath)
+				return os.Open(exportPath)
+			}
+		}
+	}
+
 	return nil, errors.New("file not found")
 }
 

@@ -105,3 +105,4 @@ For deploying web apps to Netlify, see the complete guide in Netlify-deploy.md w
 Subagents, plugins, skills, hooks, mcp scripts+servers, capabilities, connectors, tasks, apps, custom-gpts, ... the space needs some serious consolidation and standardization!
 - keep comments minimal
 - use src/build-compiler.sh for incremental build
+- create binary linux releases via cross compilation (not multipass)

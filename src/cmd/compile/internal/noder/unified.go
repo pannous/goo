@@ -631,16 +631,22 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 
 // resolveStandardLibraryPackage finds the compiled package file for a standard library package
 func resolveStandardLibraryPackage(importPath string) string {
-    // Attempt to locate stdlib archive in $GOROOT/pkg/$GOOS_$GOARCH/<importPath>.a
-    goroot := os.Getenv("GOROOT")
-    goos := os.Getenv("GOOS")
-    goarch := os.Getenv("GOARCH")
-    if goroot != "" && goos != "" && goarch != "" {
-        pkgDir := goroot + "/pkg/" + goos + "_" + goarch
-        cand := pkgDir + "/" + importPath + ".a"
-        if _, err := os.Stat(cand); err == nil {
-            return cand
-        }
-    }
-    return ""
+	// For transform-added imports, we don't pre-resolve them here.
+	// Instead, we let openPackage handle them via ImportDirs fallback or go list.
+	// This avoids recursion issues from calling 'go list' during compilation.
+
+	// Try $GOROOT/pkg (for pre-built installations)
+	goroot := os.Getenv("GOROOT")
+	goos := os.Getenv("GOOS")
+	goarch := os.Getenv("GOARCH")
+	if goroot != "" && goos != "" && goarch != "" {
+		pkgDir := goroot + "/pkg/" + goos + "_" + goarch
+		cand := pkgDir + "/" + importPath + ".a"
+		if _, err := os.Stat(cand); err == nil {
+			return cand
+		}
+	}
+
+	fmt.Printf("DEBUG: Could not resolve %s (not in GOROOT/pkg, will try build cache later)\n", importPath)
+	return ""
 }

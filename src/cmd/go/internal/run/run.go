@@ -103,6 +103,7 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 	// Smart module detection for .goo files
 	if shouldDisableModulesForGoo(args) {
 		os.Setenv("GO111MODULE", "off")
+		os.Setenv("GOO_USE_TRANSFORMERS", "1")
 		cfg.Getenv("GO111MODULE") // Refresh cfg with new value
 	}
 	moduleLoaderState := modload.NewState()
