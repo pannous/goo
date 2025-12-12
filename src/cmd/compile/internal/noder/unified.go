@@ -598,12 +598,9 @@ func writeUnifiedExport(out io.Writer) {
 // updateImportConfigForTransforms adds any new imports introduced by transforms
 // to the compiler's import configuration so they can be resolved.
 func updateImportConfigForTransforms(files []*syntax.File) {
-	fmt.Println("DEBUG updateImportConfigForTransforms: called")
 	if base.Flag.Cfg.PackageFile == nil {
-		fmt.Println("DEBUG updateImportConfigForTransforms: PackageFile is NIL, returning")
 		return // Import config not in use
 	}
-	fmt.Printf("DEBUG updateImportConfigForTransforms: PackageFile has %d entries\n", len(base.Flag.Cfg.PackageFile))
 
 	// Find all imports in the transformed files
 	newImports := make(map[string]bool)
@@ -621,10 +618,7 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 	// Resolve and add new imports to the package file map
 	for importPath := range newImports {
 		if packageFile := resolveStandardLibraryPackage(importPath); packageFile != "" {
-			fmt.Printf("DEBUG: Resolved %s to %s\n", importPath, packageFile)
 			base.Flag.Cfg.PackageFile[importPath] = packageFile
-		} else {
-			fmt.Printf("DEBUG: Could not resolve %s\n", importPath)
 		}
 	}
 }
@@ -647,6 +641,5 @@ func resolveStandardLibraryPackage(importPath string) string {
 		}
 	}
 
-	fmt.Printf("DEBUG: Could not resolve %s (not in GOROOT/pkg, will try build cache later)\n", importPath)
 	return ""
 }
