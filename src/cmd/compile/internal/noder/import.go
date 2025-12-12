@@ -89,7 +89,10 @@ func openPackage(path string) (*os.File, error) {
 	}
 
 	if base.Flag.Cfg.PackageFile != nil {
-		return os.Open(base.Flag.Cfg.PackageFile[path])
+		if packagePath, exists := base.Flag.Cfg.PackageFile[path]; exists && packagePath != "" {
+			return os.Open(packagePath)
+		}
+		// Fall through to ImportDirs if not in PackageFile
 	}
 
 	for _, dir := range base.Flag.Cfg.ImportDirs {
