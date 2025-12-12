@@ -1,5 +1,10 @@
 # The Goo Programming Language
-  
+
+```bash
+brew tap pannous/goo https://github.com/pannous/goo
+brew install goo
+```
+
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
 Goo is an up-to-date fork of [Go](https://github.com/golang/go) with the following syntactic sugar on top:  
