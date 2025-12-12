@@ -194,12 +194,16 @@ func (w *SyntaxWalker) walkStmt(stmt syntax.Stmt) {
 		if s.Results != nil {
 			w.walkExpr(s.Results)
 		}
+	case *syntax.CheckStmt:
+		if s.Cond != nil {
+			s.Cond = w.walkExpr(s.Cond)
+		}
 	}
 }
 
-func (w *SyntaxWalker) walkExpr(expr syntax.Expr) {
+func (w *SyntaxWalker) walkExpr(expr syntax.Expr) syntax.Expr {
 	if expr == nil {
-		return
+		return nil
 	}
 
 	if w.VisitExpr != nil {
@@ -236,6 +240,8 @@ func (w *SyntaxWalker) walkExpr(expr syntax.Expr) {
 		w.walkExpr(e.X)
 		w.walkExpr(e.Type)
 	}
+
+	return expr
 }
 
 // TransformRegistry holds all registered transformers.

@@ -25,13 +25,16 @@ func (t *ListEqualityTransform) Priority() int {
 
 func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	changed := false
+	debug("LIST_EQUALITY_TRANSFORM: Transform called")
 
 	// Use SyntaxWalker with VisitExpr - it walks EVERYTHING including function arguments!
 	walker := &SyntaxWalker{
 		VisitExpr: func(expr syntax.Expr) syntax.Expr {
 			// Check if this is a slice equality/inequality operation
 			if op, ok := expr.(*syntax.Operation); ok {
+				debug("LIST_EQUALITY checking operation: op=%v", op.Op)
 				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y) {
+					debug("LIST_EQUALITY transforming slice comparison!")
 					changed = true
 					return t.createSlicesEqualCall(op)
 				}
