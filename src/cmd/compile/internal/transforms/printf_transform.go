@@ -22,7 +22,7 @@ func (t *PrintfTransform) Name() string {
 }
 
 func (t *PrintfTransform) Priority() int {
-	return 100 // Default priority - between list methods (50) and lambda (200)
+	return 110 // Run after class transform (100), to catch printf in expanded class methods
 }
 
 func (t *PrintfTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
@@ -64,12 +64,12 @@ func (v *printfVisitor) convertPrintfCall(call *syntax.CallExpr) bool {
 			v.convertToFmtPrintf(call, name)
 			return true
 		case "put":
-			// Convert put() to fmt.Println()  
+			// Convert put() to fmt.Println()
 			v.convertToFmtPrintln(call, name)
 			return true
 		}
 	}
-	
+
 	return false
 }
 
