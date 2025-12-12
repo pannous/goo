@@ -174,7 +174,7 @@ func (w *SyntaxWalker) walkStmt(stmt syntax.Stmt) {
 		if s.Init != nil {
 			w.walkStmt(s.Init)
 		}
-		w.walkExpr(s.Cond)
+		s.Cond = w.walkExpr(s.Cond)
 		w.walkStmt(s.Then)
 		if s.Else != nil {
 			w.walkStmt(s.Else)
@@ -184,7 +184,7 @@ func (w *SyntaxWalker) walkStmt(stmt syntax.Stmt) {
 			w.walkStmt(s.Init)
 		}
 		if s.Cond != nil {
-			w.walkExpr(s.Cond)
+			s.Cond = w.walkExpr(s.Cond)
 		}
 		if s.Post != nil {
 			w.walkStmt(s.Post)
@@ -192,7 +192,7 @@ func (w *SyntaxWalker) walkStmt(stmt syntax.Stmt) {
 		w.walkStmt(s.Body)
 	case *syntax.ReturnStmt:
 		if s.Results != nil {
-			w.walkExpr(s.Results)
+			s.Results = w.walkExpr(s.Results)
 		}
 	case *syntax.CheckStmt:
 		if s.Cond != nil {

@@ -78,16 +78,9 @@ func (t *ListEqualityTransform) transformTopLevelStmt(stmt syntax.Stmt, changed 
 
 // looksLikeSliceComparison checks if an expression looks like it might be a slice
 func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr) bool {
-	// Transform if at least one side is definitely a list/slice literal
+	// Transform ONLY if at least one side is definitely a list/slice literal
+	// Don't transform variable comparisons - we can't know their types at this stage
 	if t.isListLiteral(x) || t.isListLiteral(y) {
-		return true
-	}
-
-	// Also transform if both sides are variables (could be slices)
-	// This is aggressive but necessary since we don't have full type info here
-	_, xIsName := x.(*syntax.Name)
-	_, yIsName := y.(*syntax.Name)
-	if xIsName && yIsName {
 		return true
 	}
 
@@ -124,18 +117,12 @@ func (t *ListEqualityTransform) isListLiteral(expr syntax.Expr) bool {
 	}
 }
 
-// extractElementType tries to extract the element type from a slice expression
-func (t *ListEqualityTransform) extractElementType(expr syntax.Expr) syntax.Expr {
+// extractSliceType tries to extract the slice type from a slice expression
+func (t *ListEqualityTransform) extractSliceType(expr syntax.Expr) syntax.Expr {
 	if comp, ok := expr.(*syntax.CompositeLit); ok && comp.Type != nil {
 		// For []Type{...}, comp.Type is the slice type
-		switch sliceType := comp.Type.(type) {
-		case *syntax.SliceType:
-			// Return the element type
-			return sliceType.Elem
-		case *syntax.IndexExpr:
-			// []Type might be represented as IndexExpr
-			return sliceType.Index
-		}
+		// Return the whole slice type (e.g., []int), not just the element type
+		return comp.Type
 	}
 	return nil
 }
@@ -157,24 +144,28 @@ func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation) synt
 	}
 	slicesEqualSel.SetPos(pos)
 
-	// Try to extract element type for generic instantiation
+	// Try to extract slice type for generic instantiation
 	var funExpr syntax.Expr = slicesEqualSel
-	if elemType := t.extractElementType(op.X); elemType != nil {
-		// Create slices.Equal[T] with type parameter
+	if sliceType := t.extractSliceType(op.X); sliceType != nil {
+		debug("LIST_EQUALITY: Extracted slice type from left side\n")
+		// Create slices.Equal[[]T] with type parameter
 		typeIndexExpr := &syntax.IndexExpr{
 			X:     slicesEqualSel,
-			Index: elemType,
+			Index: sliceType,
 		}
 		typeIndexExpr.SetPos(pos)
 		funExpr = typeIndexExpr
-	} else if elemType := t.extractElementType(op.Y); elemType != nil {
+	} else if sliceType := t.extractSliceType(op.Y); sliceType != nil {
+		debug("LIST_EQUALITY: Extracted slice type from right side\n")
 		// Try the right side if left didn't work
 		typeIndexExpr := &syntax.IndexExpr{
 			X:     slicesEqualSel,
-			Index: elemType,
+			Index: sliceType,
 		}
 		typeIndexExpr.SetPos(pos)
 		funExpr = typeIndexExpr
+	} else {
+		debug("LIST_EQUALITY: Could not extract slice type, using untyped slices.Equal\n")
 	}
 
 	equalCall := &syntax.CallExpr{
