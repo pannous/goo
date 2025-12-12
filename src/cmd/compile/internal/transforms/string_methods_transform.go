@@ -13,13 +13,9 @@ import (
 type StringMethodsTransform struct{}
 
 type methodVisitor struct {
-	transform          *StringMethodsTransform
-	ctx                *TransformContext
-	changed            bool
-	needsStringsImport bool
-	needsStrconvImport bool
-	needsUnicodeImport bool
-	needsSlicesImport  bool
+	transform *StringMethodsTransform
+	ctx       *TransformContext
+	changed   bool
 }
 
 func (t *StringMethodsTransform) Name() string {
@@ -255,23 +251,8 @@ func (t *StringMethodsTransform) Transform(file *syntax.File, ctx *TransformCont
 	visitor := &methodVisitor{transform: t, ctx: ctx}
 	syntax.Walk(file, visitor)
 
-	if visitor.needsStringsImport && !t.hasImport(file, "strings") {
-		println("Adding strings import")
-		t.addStringsImport(file)
-	}
-	if visitor.needsStrconvImport && !t.hasImport(file, "strconv") {
-		println("Adding strconv import")
-		t.addStrconvImport(file)
-	}
-	if visitor.needsUnicodeImport && !t.hasImport(file, "unicode") {
-		println("Adding unicode import")
-		t.addUnicodeImport(file)
-	}
-	if visitor.needsSlicesImport && !t.hasImport(file, "slices") {
-		println("Adding slices import")
-		t.addSlicesImport(file)
-	}
-
+	// Import requests are now handled by ImportManager
+	// (requested during transformation via RequestStringsImport(), etc.)
 	return visitor.changed
 }
 
@@ -331,25 +312,25 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 					for _, method := range stringsMethods {
 						if method == methodName {
-							v.needsStringsImport = true
+							RequestStringsImport()
 							break
 						}
 					}
 					for _, method := range unicodeMethods {
 						if method == methodName {
-							v.needsUnicodeImport = true
+							RequestStandardImport("unicode")
 							break
 						}
 					}
 					for _, method := range strconvMethods {
 						if method == methodName {
-							v.needsStrconvImport = true
+							RequestStrconvImport()
 							break
 						}
 					}
 					for _, method := range slicesMethods {
 						if method == methodName {
-							v.needsSlicesImport = true
+							RequestSlicesImport()
 							break
 						}
 					}

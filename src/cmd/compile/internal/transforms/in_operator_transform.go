@@ -15,11 +15,10 @@ import (
 type InOperatorTransform struct{}
 
 type inVisitor struct {
-	transform         *InOperatorTransform
-	ctx               *TransformContext
-	file              *syntax.File
-	changed           bool
-	needsSlicesImport bool
+	transform *InOperatorTransform
+	ctx       *TransformContext
+	file      *syntax.File
+	changed   bool
 }
 
 func (t *InOperatorTransform) Name() string {
@@ -36,11 +35,7 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	// Use syntax.Walk to traverse the entire AST
 	syntax.Walk(file, visitor)
 
-	if visitor.needsSlicesImport {
-		if addImportIfMissing(file, "slices") {
-			changed = true
-		}
-	}
+	// Import requests are now handled by ImportManager
 
 	// Second pass: statement-level rewrites for map membership to avoid func lits
 	// Walk function bodies and transform AssignStmt/CheckStmt/IfStmt with map 'in'
@@ -966,7 +961,7 @@ func (t *InOperatorTransform) createSliceContainsCall(op *syntax.Operation, visi
 		pos = generatedNodePos(visitor.file)
 	}
 
-	visitor.needsSlicesImport = true
+	RequestSlicesImport()
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
