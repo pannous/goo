@@ -1,9 +1,5 @@
 # The Goo Programming Language
 
-```bash
-brew tap pannous/goo https://github.com/pannous/goo
-brew install goo
-```
 
 Goo is an open source programming language that makes it easy to build simple, reliable, and efficient software.  
   
@@ -12,6 +8,16 @@ Goo is an up-to-date fork of [Go](https://github.com/golang/go) with the followi
 just like most ugliness in the world appears when you add a five to json(5)  
 so does adding a little o to Go[o] make everything a little more beautiful  
 -->  
+
+
+## Quick try out:
+```bash
+brew tap pannous/goo https://github.com/pannous/goo
+brew install goo
+goo eval "3 ** 2"
+```
+
+## Feature List
 ✅ if x {put("truthy")}   
 ✅ enum Status { OK, BAD } with generated .String() method  
 ✅ 3 ** 2 = 9  
