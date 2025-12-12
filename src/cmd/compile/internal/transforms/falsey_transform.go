@@ -25,7 +25,7 @@ func (t *FalseyTransform) Name() string {
 }
 
 func (t *FalseyTransform) Priority() int {
-	return 100 // Default priority - between list methods (50) and lambda (200)
+	return 160 // Run after check_transform (150) to clean up Not operations on non-booleans
 }
 
 func (t *FalseyTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
