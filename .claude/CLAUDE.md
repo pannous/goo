@@ -96,6 +96,25 @@ parcel => parser , fights => files
 # Transform-added imports solution
 For .goo files: inject stdlib imports (strings, slices, fmt, strconv, unicode) into Internal.Imports in src/cmd/go/internal/load/pkg.go (both GoFilesPackage and Package.load methods). This ensures packages are built before transforms run, avoiding "file not found" errors.
 
+# Merge Casualties Fixed (Dec 2025)
+After merging upstream Go 1.25, several Goo-specific modifications were lost:
+1. types2/errors.go - warningf function removed → restored
+2. types2/labels.go - unused label warningf → softErrorf → fixed
+3. types2/stmt.go - unused var warningf → softErrorf (2 places) → fixed
+4. types2/resolver.go - unused import warningf → softErrorf (2 places) → fixed
+5. types2/stmt.go - if truthiness (allow any type) → strict boolean → fixed
+
+These changes improved test pass rate from 65.5% (78/119) to 79.0% (94/119).
+
+To find merge casualties systematically:
+```bash
+# Find files with Goo-specific code before merge
+git grep -l "\.goo\|Goo\|GOO_USE" <pre-merge-commit> -- src/cmd/compile/internal/types2/ src/cmd/compile/internal/syntax/
+
+# For each file, check for warningf → softErrorf changes
+git show <pre-merge-commit>:path/to/file.go | grep -B3 -A3 warningf
+```
+
 # Hard extensions
 When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
 
