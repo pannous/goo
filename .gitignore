@@ -69,3 +69,4 @@ idea.log
 build-compiler.sh
 compiler-rebuild.sh
 fix-wiki.shgoo-*.tar.gz
+*.tar.gz
