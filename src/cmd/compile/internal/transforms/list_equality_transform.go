@@ -165,15 +165,35 @@ func (t *ListEqualityTransform) transformExpr(expr syntax.Expr) syntax.Expr {
 				e.ElemList[i] = newElem
 			}
 		}
+
+	case *syntax.CallExpr:
+		// Transform arguments in function calls (e.g., printf(..., a == b))
+		for i, arg := range e.ArgList {
+			if newArg := t.transformExpr(arg); newArg != arg {
+				e.ArgList[i] = newArg
+			}
+		}
 	}
-	
+
 	return expr
 }
 
 // looksLikeSliceComparison checks if an expression looks like it might be a slice
 func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr) bool {
-	// Only transform if at least one side is definitely a list/slice literal
-	return t.isListLiteral(x) || t.isListLiteral(y)
+	// Transform if at least one side is definitely a list/slice literal
+	if t.isListLiteral(x) || t.isListLiteral(y) {
+		return true
+	}
+
+	// Also transform if both sides are variables (could be slices)
+	// This is aggressive but necessary since we don't have full type info here
+	_, xIsName := x.(*syntax.Name)
+	_, yIsName := y.(*syntax.Name)
+	if xIsName && yIsName {
+		return true
+	}
+
+	return false
 }
 
 // isListLiteral checks if an expression is a list literal

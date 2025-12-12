@@ -8,6 +8,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 )
 
 // StringConcatTransform handles automatic string conversion in concatenation.
@@ -78,19 +79,25 @@ func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 	// Check for string concatenation operations (but skip if it's already an interpolation pattern)
 	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Add {
+		println("DEBUG Visit found Add operation:", syntax.String(op))
 		// Don't apply regular concatenation to operations that are part of interpolation patterns
 		parts := v.transform.extractInterpolationParts(op)
 		if len(parts) >= 3 && v.transform.isStringInterpolationPattern(parts, v.ctx) {
 			// This is already handled by string interpolation, skip regular concatenation
+			println("DEBUG Skipping because it's an interpolation pattern")
 			return v
 		}
-		
+
 		if transformed := v.transform.transformConcatOperation(op, v.ctx); transformed != nil {
+			println("DEBUG transformed:", syntax.String(transformed))
 			if newOp, ok := transformed.(*syntax.Operation); ok {
+				println("DEBUG newOp.X:", syntax.String(newOp.X), "newOp.Y:", syntax.String(newOp.Y))
 				op.X = newOp.X
 				op.Y = newOp.Y
 				v.changed = true
 				v.needsFmtImport = true
+			} else {
+				println("DEBUG transformed is NOT an *syntax.Operation, it's:", fmt.Sprintf("%T", transformed))
 			}
 		}
 	}
@@ -113,6 +120,8 @@ func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, c
 	// Fall back to individual operation handling
 	leftIsString := t.isStringExpression(op.X, ctx)
 	rightIsString := t.isStringExpression(op.Y, ctx)
+
+	println("DEBUG transformConcatOperation:", syntax.String(op.X), "+", syntax.String(op.Y), "leftIsString:", leftIsString, "rightIsString:", rightIsString)
 
 	if leftIsString && !rightIsString {
 		if t.mightBeNumericVariable(op.Y, ctx) {
@@ -139,6 +148,10 @@ func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, c
 func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	// Extract all parts of the concatenation chain
 	parts := t.extractConcatenationParts(op)
+	println("DEBUG transformConcatChain: parts count:", len(parts))
+	for i, p := range parts {
+		println("  part", i, ":", syntax.String(p))
+	}
 	if len(parts) < 2 {
 		return nil
 	}
@@ -148,6 +161,7 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 	for i := 0; i < len(parts)-1; i++ {
 		leftIsString := t.isStringExpression(parts[i], ctx) || t.containsString(parts[i], ctx)
 		rightIsString := t.isStringExpression(parts[i+1], ctx)
+		println("DEBUG chain part", i, "leftIsString:", leftIsString, "rightIsString:", rightIsString, "mightBeNumeric left:", t.mightBeNumericVariable(parts[i], ctx), "mightBeNumeric right:", t.mightBeNumericVariable(parts[i+1], ctx))
 
 		if (leftIsString && !rightIsString && t.mightBeNumericVariable(parts[i+1], ctx)) ||
 			(!leftIsString && rightIsString && t.mightBeNumericVariable(parts[i], ctx)) {
@@ -163,6 +177,12 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 	// Transform the chain: wrap non-string operands when they're being concatenated with strings
 	var result syntax.Expr = parts[0]
 
+	// If first part is numeric and second is string, wrap the first part
+	if len(parts) >= 2 && !t.isStringExpression(parts[0], ctx) && t.isStringExpression(parts[1], ctx) && t.mightBeNumericVariable(parts[0], ctx) {
+		result = t.createSprintfCall(parts[0])
+		println("DEBUG: Wrapped first part:", syntax.String(result))
+	}
+
 	for i := 1; i < len(parts); i++ {
 		leftIsStringish := t.isStringExpression(result, ctx) || t.containsString(result, ctx)
 		rightIsString := t.isStringExpression(parts[i], ctx)
@@ -172,6 +192,7 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 		// If left side is string-ish and right side is not string but could be numeric, wrap it
 		if leftIsStringish && !rightIsString && t.mightBeNumericVariable(parts[i], ctx) {
 			rightSide = t.createSprintfCall(parts[i])
+			println("DEBUG: Wrapped right part:", syntax.String(rightSide))
 		}
 
 		result = &syntax.Operation{

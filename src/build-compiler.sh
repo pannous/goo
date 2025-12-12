@@ -17,6 +17,8 @@ cd /opt/other/goo/src/
 $GOROOT/bin/go build -tags=transforms -o ../bin/compile ./cmd/compile
 cp ../bin/compile ../pkg/tool/darwin_arm64/compile
 
+../bin/go build -o /dev/null strings fmt slices strconv # just for caching through away the output
+
 # Build go command
 # $GOROOT/bin/go build -tags=transforms -o ../bin/go ./cmd/go
 
