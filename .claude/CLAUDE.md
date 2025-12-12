@@ -93,12 +93,8 @@ For rebuilding the compiler with the full transformer set, see compiler-build-gu
 I am using speech recognition which might misunderstand some words:
 parcel => parser , fights => files
 
-# automatic imports
-since we moved the import resolver in the pipeline to after the Transformers all the import issues were gone
-If you ever encounter automatic import problems again just look at: 
-goo/test_strings_auto_import.goo                                                                   │
-goo/test_list_methods.goo
-(together with their implementation and maybe their commits)
+# Transform-added imports solution
+For .goo files: inject stdlib imports (strings, slices, fmt, strconv, unicode) into Internal.Imports in src/cmd/go/internal/load/pkg.go (both GoFilesPackage and Package.load methods). This ensures packages are built before transforms run, avoiding "file not found" errors.
 
 # Hard extensions
 When creating new tokens or new expression types they need to be registered in the compiler visitor and Walker so that they are treated like normal nodes
@@ -111,3 +107,4 @@ Subagents, plugins, skills, hooks, mcp scripts+servers, capabilities, connectors
 - keep comments minimal
 - use src/build-compiler.sh for incremental build
 - create binary linux releases via cross compilation (not multipass)
+- IMPORTANT do ./run_all_tests.sh after each task
