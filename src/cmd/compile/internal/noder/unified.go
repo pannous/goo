@@ -616,14 +616,13 @@ func updateImportConfigForTransforms(files []*syntax.File) {
 	}
 
 	// Resolve and add new imports to the package file map
-	// Note: This approach doesn't work for modern Go (no pkg/$GOOS_$GOARCH/)
-	// A proper solution requires rebuilding dependencies after transforms add imports
-	// See commit 09efd3f8a0 on different branch for ImportManager solution
 	for importPath := range newImports {
 		if packageFile := resolveStandardLibraryPackage(importPath); packageFile != "" {
+			fmt.Printf("DEBUG: Resolved %s to %s\n", importPath, packageFile)
 			base.Flag.Cfg.PackageFile[importPath] = packageFile
+		} else {
+			fmt.Printf("DEBUG: Could not resolve %s\n", importPath)
 		}
-		// If resolution fails, openPackage will fall back to ImportDirs (fixed in import.go)
 	}
 }
 
