@@ -124,7 +124,23 @@ func (t *ListEqualityTransform) isListLiteral(expr syntax.Expr) bool {
 	}
 }
 
-// createSlicesEqualCall creates slices.Equal(a, b) or !slices.Equal(a, b)
+// extractElementType tries to extract the element type from a slice expression
+func (t *ListEqualityTransform) extractElementType(expr syntax.Expr) syntax.Expr {
+	if comp, ok := expr.(*syntax.CompositeLit); ok && comp.Type != nil {
+		// For []Type{...}, comp.Type is the slice type
+		switch sliceType := comp.Type.(type) {
+		case *syntax.SliceType:
+			// Return the element type
+			return sliceType.Elem
+		case *syntax.IndexExpr:
+			// []Type might be represented as IndexExpr
+			return sliceType.Index
+		}
+	}
+	return nil
+}
+
+// createSlicesEqualCall creates slices.Equal[T](a, b) or !slices.Equal[T](a, b)
 func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation) syntax.Expr {
 	pos := op.Pos()
 
@@ -141,8 +157,28 @@ func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation) synt
 	}
 	slicesEqualSel.SetPos(pos)
 
+	// Try to extract element type for generic instantiation
+	var funExpr syntax.Expr = slicesEqualSel
+	if elemType := t.extractElementType(op.X); elemType != nil {
+		// Create slices.Equal[T] with type parameter
+		typeIndexExpr := &syntax.IndexExpr{
+			X:     slicesEqualSel,
+			Index: elemType,
+		}
+		typeIndexExpr.SetPos(pos)
+		funExpr = typeIndexExpr
+	} else if elemType := t.extractElementType(op.Y); elemType != nil {
+		// Try the right side if left didn't work
+		typeIndexExpr := &syntax.IndexExpr{
+			X:     slicesEqualSel,
+			Index: elemType,
+		}
+		typeIndexExpr.SetPos(pos)
+		funExpr = typeIndexExpr
+	}
+
 	equalCall := &syntax.CallExpr{
-		Fun:     slicesEqualSel,
+		Fun:     funExpr,
 		ArgList: []syntax.Expr{op.X, op.Y},
 	}
 	equalCall.SetPos(pos)
