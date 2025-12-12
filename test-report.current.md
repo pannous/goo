@@ -20,12 +20,12 @@ Running all tests in ./goo/ directory...
 ✅ test_debug_imports.goo
 ✅ test_def_simple.goo
 ✅ test_def.goo
-❌ test_ellipsis.goo
+✅ test_ellipsis.goo
 ✅ test_enum_string.goo
 ✅ test_enum.goo
 ✅ test_explicit_main.goo
-❌ test_filter_simple.goo
-❌ test_filter_synonyms.goo
+✅ test_filter_simple.goo
+✅ test_filter_synonyms.goo
 ✅ test_fmt.goo
 ✅ test_for_in_key_value.goo
 ✅ test_for_loop.goo
@@ -51,12 +51,12 @@ Running all tests in ./goo/ directory...
 ❌ test_list_comparison2.goo
 ❌ test_list_equality.goo
 ✅ test_list_filter.goo
-❌ test_list_lambda.goo
-❌ test_list_map.goo
+✅ test_list_lambda.goo
+✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
 ❌ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
-❌ test_list_typed.goo
+✅ test_list_typed.goo
 ✅ test_list.goo
 ✅ test_manual_slices.goo
 ✅ test_manual_strings.goo
@@ -68,7 +68,7 @@ Running all tests in ./goo/ directory...
 ❌ test_map.goo
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
-❌ test_modify.goo
+✅ test_modify.goo
 ✅ test_nil.goo
 ✅ test_not_truthiness.goo
 ✅ test_not.goo
@@ -83,8 +83,8 @@ Running all tests in ./goo/ directory...
 ✅ test_simple_hash_check.goo
 ✅ test_simple_printf.goo
 ✅ test_simple.goo
-❌ test_slice_inference_core.goo
-❌ test_slice_inference_final.goo
+✅ test_slice_inference_core.goo
+✅ test_slice_inference_final.goo
 ✅ test_string_char_comparison.goo
 ✅ test_string_char_literal.goo
 ✅ test_string_comparison.goo
@@ -93,7 +93,7 @@ Running all tests in ./goo/ directory...
 ✅ test_string_format_simple.goo
 ✅ test_string_interpolation.goo
 ❌ test_string_methods_todo.goo
-❌ test_string_methods.goo
+✅ test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
 ✅ test_string_replace.goo
@@ -104,7 +104,7 @@ Running all tests in ./goo/ directory...
 ✅ test_synonyms_simple.goo
 ❌ test_tau_pi_approx.goo
 ❌ test_tensors.goo
-❌ test_transform_synonyms.goo
+✅ test_transform_synonyms.goo
 ❌ test_truthy_and.goo
 ❌ test_truthy.goo
 ✅ test_try_assign_context_aware.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 94/119 passed, 25 failed
+Summary: 105/119 passed, 14 failed
 ⚠️  Some tests failed
