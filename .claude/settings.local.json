@@ -55,7 +55,8 @@
       "Bash(multipass unmount goo && multipass mount /opt/other/goo goo:goo)",
       "Bash(multipass mount /opt/other/goo goo:goo)",
       "Bash(multipass exec goo -- bash -c \"ls -la ~/goo/ | head -20\")",
-      "Bash(multipass exec goo -- bash -c \"sudo ls -la /home/ubuntu/goo/ | head -20\")"
+      "Bash(multipass exec goo -- bash -c \"sudo ls -la /home/ubuntu/goo/ | head -20\")",
+      "Bash(git rev-list:*)"
     ],
     "deny": []
   },

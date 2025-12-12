@@ -64,7 +64,9 @@ gh release create v1.0.0 \
 
 4. Test installation:
 ```bash
-brew tap pannous/goo https://github.com/pannous/goo
+brew tap pannous/goo
 brew install goo
 goo version
 ```
+
+Note: The tap repository is now at https://github.com/pannous/homebrew-goo (separate from source repo)

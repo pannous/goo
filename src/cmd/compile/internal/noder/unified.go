@@ -598,9 +598,12 @@ func writeUnifiedExport(out io.Writer) {
 // updateImportConfigForTransforms adds any new imports introduced by transforms
 // to the compiler's import configuration so they can be resolved.
 func updateImportConfigForTransforms(files []*syntax.File) {
+	fmt.Println("DEBUG updateImportConfigForTransforms: called")
 	if base.Flag.Cfg.PackageFile == nil {
+		fmt.Println("DEBUG updateImportConfigForTransforms: PackageFile is NIL, returning")
 		return // Import config not in use
 	}
+	fmt.Printf("DEBUG updateImportConfigForTransforms: PackageFile has %d entries\n", len(base.Flag.Cfg.PackageFile))
 
 	// Find all imports in the transformed files
 	newImports := make(map[string]bool)
