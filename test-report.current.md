@@ -61,7 +61,7 @@ Running all tests in ./goo/ directory...
 ✅ test_manual_slices.goo
 ✅ test_manual_strings.goo
 ✅ test_map_dot_comprehensive.goo
-❌ test_map_dot_nested.goo
+✅ test_map_dot_nested.goo
 ✅ test_map_dot_notation.goo
 ✅ test_map_fields.goo
 ✅ test_map_type_inference.goo
@@ -78,7 +78,7 @@ Running all tests in ./goo/ directory...
 ✅ test_printf.goo
 ✅ test_put_no_import.goo
 ✅ test_put.goo
-❌ test_return_void.goo
+✅ test_return_void.goo
 ✅ test_shebang.goo
 ✅ test_simple_hash_check.goo
 ✅ test_simple_printf.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 92/119 passed, 27 failed
+Summary: 94/119 passed, 25 failed
 ⚠️  Some tests failed
