@@ -1,0 +1,12 @@
+{
+  "temp-session-id": {
+    "permissionMode": "default",
+    "backendVersion": "1.2.0",
+    "cwd": "/opt/other/goo"
+  },
+  "df1c457f-e3cb-41e7-a268-6192c972d9b3": {
+    "permissionMode": "bypassPermissions",
+    "backendVersion": "1.2.0",
+    "cwd": "/opt/other/goo"
+  }
+}

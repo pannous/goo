@@ -32,8 +32,55 @@
       "Bash(git ls-tree:*)",
       "Bash(git commit:*)",
       "WebFetch(domain:docs.anthropic.com)",
-      "Bash(git cherry-pick:*)"
+      "Bash(git cherry-pick:*)",
+      "Bash(git status)",
+      "Bash(git fetch origin && git merge origin/main)",
+      "Bash(git push)",
+      "Bash(grep -E \"(vm|virtual|linux|machine)\" ~/.bash_profile ~/.bashrc ~/.zshrc 2>/dev/null | head -20)",
+      "Bash(grep -iE \"(multipass|lima|colima|docker|ubuntu|debian)\" ~/.bash_profile ~/.bashrc ~/.zshrc 2>/dev/null | head -20)",
+      "Bash(which tmux && tmux -V)",
+      "Bash(docker ps -a | grep ubuntu)",
+      "Bash(colima start)",
+      "Bash(cat ~/.bash_profile | grep -A 2 -B 2 -i \"linux\" | head -50)",
+      "Bash(grep -E \"(multipass|lima|qemu|kvm|parallels|vmware)\" ~/.bash_profile)",
+      "Bash(multipass list)",
+      "Bash(multipass launch --memory 4G --name goo || echo \"goo instance may already exist\")",
+      "Bash(multipass mount /opt/other/goo goo:/opt/other/goo)",
+      "Bash(multipass exec goo -- bash -c \"sudo apt-get update && sudo apt-get install -y golang-go git build-essential && ./src/build-compiler.sh\")",
+      "Bash(multipass exec goo -- bash -c \"chmod +x src/build-compiler.sh && ./src/build-compiler.sh\")",
+      "Bash(multipass exec goo -- bash -c \"bash src/build-compiler.sh\")",
+      "Bash(multipass exec goo -- bash -c \"ls -la /mnt/ && find /mnt -name goo 2>/dev/null\")",
+      "Bash(multipass exec goo -- bash -c \"mount | grep goo\")",
+      "Bash(multipass exec goo -- bash -c \"ls -la /opt/other/goo/ | head -20\")",
+      "Bash(multipass unmount goo && multipass mount /opt/other/goo goo:goo)",
+      "Bash(multipass mount /opt/other/goo goo:goo)",
+      "Bash(multipass exec goo -- bash -c \"ls -la ~/goo/ | head -20\")",
+      "Bash(multipass exec goo -- bash -c \"sudo ls -la /home/ubuntu/goo/ | head -20\")"
     ],
     "deny": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "ExitPlanMode|Edit|MultiEdit|Write|NotebookEdit|WebFetch|WebSearch|Bash|BashOutput|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/permissions_hook.js",
+            "timeout": 300
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/permissions_hook.js",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
   }
 }
