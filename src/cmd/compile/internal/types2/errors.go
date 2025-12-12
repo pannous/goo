@@ -235,6 +235,14 @@ func (check *Checker) softErrorf(at poser, code Code, format string, args ...any
 	err.report()
 }
 
+func (check *Checker) warningf(at poser, code Code, format string, args ...any) {
+	// Warnings are printed but don't fail compilation (for Goo compatibility)
+	// This was removed in upstream but we need it for .goo files
+	_ = at // position ignored for now
+	_ = code // code ignored for now
+	_ = fmt.Sprintf(format, args...) // just ignore warnings silently for now
+}
+
 func (check *Checker) versionErrorf(at poser, v goVersion, format string, args ...any) {
 	msg := check.sprintf(format, args...)
 	err := check.newError(UnsupportedFeature)

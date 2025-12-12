@@ -4,7 +4,7 @@ Running all tests in ./goo/ directory...
 ✅ test_all_synonyms.goo
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
-❌ test_array_like_slice.goo
+✅ test_array_like_slice.goo
 ✅ test_as_cast_convert.goo
 ✅ test_as_cast.goo
 ✅ test_assert.goo
@@ -28,8 +28,8 @@ Running all tests in ./goo/ directory...
 ❌ test_filter_synonyms.goo
 ✅ test_fmt.goo
 ✅ test_for_in_key_value.goo
-❌ test_for_loop.goo
-❌ test_hash_index.goo
+✅ test_for_loop.goo
+✅ test_hash_index.goo
 ✅ test_hash_minimal.goo
 ✅ test_hash_with_if.goo
 ✅ test_implicit_main.goo
@@ -37,9 +37,9 @@ Running all tests in ./goo/ directory...
 ❌ test_import_folder.goo
 ✅ test_in_operator_auto_import.goo
 ✅ test_in_operator_maps.goo
-❌ test_in_operator_rune_strings.goo
+✅ test_in_operator_rune_strings.goo
 ❌ test_in_operator_slices.goo
-❌ test_in_operator_strings.goo
+✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_is_operator.goo
 ✅ test_iterator_for_in.goo
@@ -66,10 +66,10 @@ Running all tests in ./goo/ directory...
 ✅ test_map_fields.goo
 ✅ test_map_type_inference.goo
 ❌ test_map.goo
-❌ test_minimal_conflict.goo
+✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
 ❌ test_modify.goo
-❌ test_nil.goo
+✅ test_nil.goo
 ✅ test_not_truthiness.goo
 ✅ test_not.goo
 ✅ test_pipe.goo
@@ -107,18 +107,18 @@ Running all tests in ./goo/ directory...
 ❌ test_transform_synonyms.goo
 ❌ test_truthy_and.goo
 ❌ test_truthy.goo
-❌ test_try_assign_context_aware.goo
-❌ test_try_assign.goo
-❌ test_try_assignment.goo
+✅ test_try_assign_context_aware.goo
+✅ test_try_assign.goo
+✅ test_try_assignment.goo
 ✅ test_try_catch.goo
-❌ test_try_propagation.goo
+✅ test_try_propagation.goo
 ❌ test_typeof.goo
-❌ test_unicode_ops.goo
+✅ test_unicode_ops.goo
 ✅ test_unicode.goo
 ✅ test_units.goo
 ✅ test_user_defined_put.goo
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 80/119 passed, 39 failed
+Summary: 92/119 passed, 27 failed
 ⚠️  Some tests failed

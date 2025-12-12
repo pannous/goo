@@ -29,7 +29,7 @@ Running all tests in ./goo/ directory...
 ✅ test_fmt.goo
 ✅ test_for_in_key_value.goo
 ❌ test_for_loop.goo
-❌ test_hash_index.goo
+✅ test_hash_index.goo
 ✅ test_hash_minimal.goo
 ✅ test_hash_with_if.goo
 ✅ test_implicit_main.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 80/119 passed, 39 failed
+Summary: 81/119 passed, 38 failed
 ⚠️  Some tests failed

@@ -13,15 +13,6 @@ Transformers that add imports (e.g., string methods adding `import "strings"`) c
 
 **The Issue**: Transforms add imports INSIDE the compiler, but dependency resolution happens BEFORE the compiler runs. The go command never builds these transform-added packages.
 
-### Why go list Doesn't Work
-Attempted solution: Call `go list -export <package>` from within compiler to find packages in build cache.
-
-**Result**: Version mismatch errors:
-```
-compile: version "go1.26.1.1044d56fec" does not match go tool version "go1.25.5"
-```
-
-The recursive `go list` invocation creates a toolchain version conflict.
 
 ## What Works: ImportManager
 Successfully implemented centralized import management:
@@ -42,7 +33,7 @@ go build -o /dev/null strings fmt slices strconv 2>/dev/null
 go "$@"
 ```
 
-### Option 2: Two-Pass Compilation  
+### Option 2: Two-Pass Compilation
 1. First pass: Run transforms, collect needed imports
 2. Communicate imports back to go command
 3. Second pass: Full compilation with all dependencies

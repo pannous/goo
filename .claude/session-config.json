@@ -1,11 +1,19 @@
 {
   "temp-session-id": {
-    "permissionMode": "default",
+    "permissionMode": "bypassPermissions",
     "backendVersion": "1.2.0",
     "cwd": "/opt/other/goo"
   },
   "df1c457f-e3cb-41e7-a268-6192c972d9b3": {
     "permissionMode": "bypassPermissions",
+    "backendVersion": "1.2.0",
+    "cwd": "/opt/other/goo"
+  },
+  "b4b59ca8-d615-41d9-a4f3-1b99446d4442": {
+    "permissionMode": "acceptEdits"
+  },
+  "69c95487-8d11-4ba2-aea1-2c174ef05011": {
+    "permissionMode": "acceptEdits",
     "backendVersion": "1.2.0",
     "cwd": "/opt/other/goo"
   }

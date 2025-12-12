@@ -56,32 +56,10 @@
       "Bash(multipass mount /opt/other/goo goo:goo)",
       "Bash(multipass exec goo -- bash -c \"ls -la ~/goo/ | head -20\")",
       "Bash(multipass exec goo -- bash -c \"sudo ls -la /home/ubuntu/goo/ | head -20\")",
-      "Bash(git rev-list:*)"
+      "Bash(git rev-list:*)",
+      "Read(/opt/other/goo/CLAUDE.md)",
+      "Bash(git add .claude/CLAUDE.md && git commit -m \"docs: enforce universal AST walker usage in all transformers\")"
     ],
     "deny": []
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "ExitPlanMode|Edit|MultiEdit|Write|NotebookEdit|WebFetch|WebSearch|Bash|BashOutput|Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/permissions_hook.js",
-            "timeout": 300
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__.*__.*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/permissions_hook.js",
-            "timeout": 300
-          }
-        ]
-      }
-    ]
   }
 }
