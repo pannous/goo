@@ -118,6 +118,12 @@ func main() {
 		base.Usage()
 	}
 
+	// Auto-detect .goo files and inject "run" command
+	// This allows "go file.goo" to work as "go run file.goo"
+	if len(args) >= 1 && strings.HasSuffix(args[0], ".goo") {
+		args = append([]string{"run"}, args...)
+	}
+
 	cfg.CmdName = args[0] // for error messages
 	if args[0] == "help" {
 		counter.Inc("go/subcommand:" + strings.Join(append([]string{"help"}, args[1:]...), "-"))
