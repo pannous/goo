@@ -52,11 +52,8 @@ func ApplyTransformations(files []*syntax.File) {
 			continue /* Skip non-main packages */
 		}
 		if isToolchainPath(file) {
-			fmt.Printf("SKIPPING TOOLCHAIN PATH: pkg=%s, path=%v\n", file.PkgName.Value, file.Path)
 			continue /* Skip toolchain packages */
 		}
-
-		fmt.Printf("APPLYING TRANSFORMS TO: pkg=%s\n", file.PkgName.Value)
 		ensureFileNodeBases(file)
 
 		// Reset GlobalImportManager for this file
