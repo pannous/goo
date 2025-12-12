@@ -81,6 +81,11 @@ Or use a hybrid.
 ## Transformer Architecture
 The new NodeTransformer interface eliminates code duplication by using a centralized visitor pattern. The transformer architecture guide can be found under transformer-architecture-guide.md in the transforms folder. Key principle: Central visitor does ALL traversal, transformers handle only their specific node types (2-3 lines of CanHandle logic instead of 50+ lines of traversal duplication).
 
+**CRITICAL: All transformers MUST use the universal AST walker (SyntaxWalker) instead of implementing their own traversal logic.**
+- If the universal walker is missing a feature you need, ADD it to the universal walker
+- Never create workarounds or duplicate traversal logic in individual transformers
+- This ensures consistency, maintainability, and eliminates code duplication across all transforms
+
 For rebuilding the compiler with the full transformer set, see compiler-build-guide.md at the repo root.
 
 
