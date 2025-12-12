@@ -18,7 +18,7 @@ goo eval "3 ** 2"
 ```
 
 ## Feature List
-Each feature has a [test](https://github.com/pannous/goo/tree/main/goo)
+Each feature has a [test](https://github.com/pannous/goo/tree/main/goo)  
 ✅ if x {put("truthy")}   
 ✅ enum Status { OK, BAD } with generated .String() method  
 ✅ 3 ** 2 = 9  
