@@ -293,11 +293,20 @@ func collectFromVarDecl(varDecl *syntax.VarDecl, ctx *TransformContext) {
 			}
 		}
 		// Handle slice type declarations like: var xs []User
+		if sliceType, ok := varDecl.Type.(*syntax.SliceType); ok {
+			if elementType, ok := sliceType.Elem.(*syntax.Name); ok {
+				sliceTypeName := "[]" + elementType.Value
+				for _, name := range varDecl.NameList {
+					ctx.Types[name.Value] = sliceTypeName
+				}
+			}
+		}
+		// Handle array type declarations like: var xs [3]User
 		if arrayType, ok := varDecl.Type.(*syntax.ArrayType); ok {
 			if elementType, ok := arrayType.Elem.(*syntax.Name); ok {
-				sliceType := "[]" + elementType.Value
+				arrayTypeName := "[_]" + elementType.Value
 				for _, name := range varDecl.NameList {
-					ctx.Types[name.Value] = sliceType
+					ctx.Types[name.Value] = arrayTypeName
 				}
 			}
 		}
@@ -474,7 +483,7 @@ func collectFromStmt(stmt syntax.Stmt, ctx *TransformContext) {
 					} else {
 						// This is an array type like [3]int
 						if elemType, ok4 := arrayType.Elem.(*syntax.Name); ok4 {
-							ctx.Types[lhs.Value] = "[]" + elemType.Value // treat as slice for method purposes
+							ctx.Types[lhs.Value] = "[_]" + elemType.Value // array type with _ to distinguish from slices
 						} else {
 							ctx.Types[lhs.Value] = "array"
 						}

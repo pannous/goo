@@ -33,13 +33,9 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 		VisitExpr: func(expr syntax.Expr) syntax.Expr {
 			// Check if this is a slice equality/inequality operation
 			if op, ok := expr.(*syntax.Operation); ok {
-				debug("LIST_EQUALITY checking operation: op=%v\n", op.Op)
 				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y, ctx) {
-					debug("LIST_EQUALITY transforming slice comparison! X=%T, Y=%T\n", op.X, op.Y)
 					changed = true
-					newExpr := t.createSlicesEqualCall(op)
-					debug("LIST_EQUALITY created new expr: %T\n", newExpr)
-					return newExpr
+					return t.createSlicesEqualCall(op)
 				}
 			}
 			return expr
