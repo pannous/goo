@@ -54,7 +54,7 @@ Running all tests in ./goo/ directory...
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
 ❌ test_list_methods_broken.goo
-❌ test_list_methods.goo
+✅ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
 ✅ test_list_typed.goo
 ✅ test_list.goo
@@ -92,7 +92,7 @@ Running all tests in ./goo/ directory...
 ✅ test_string_format_chain.goo
 ✅ test_string_format_simple.goo
 ✅ test_string_interpolation.goo
-❌ test_string_methods_todo.goo
+✅ test_string_methods_todo.goo
 ✅ test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 106/119 passed, 13 failed
+Summary: 108/119 passed, 11 failed
 ⚠️  Some tests failed

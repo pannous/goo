@@ -8,6 +8,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"strings"
 )
 
 // ListEqualityTransform converts list/slice equality comparisons to slices.Equal calls
@@ -32,11 +33,13 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 		VisitExpr: func(expr syntax.Expr) syntax.Expr {
 			// Check if this is a slice equality/inequality operation
 			if op, ok := expr.(*syntax.Operation); ok {
-				debug("LIST_EQUALITY checking operation: op=%v", op.Op)
-				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y) {
-					debug("LIST_EQUALITY transforming slice comparison!")
+				debug("LIST_EQUALITY checking operation: op=%v\n", op.Op)
+				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y, ctx) {
+					debug("LIST_EQUALITY transforming slice comparison! X=%T, Y=%T\n", op.X, op.Y)
 					changed = true
-					return t.createSlicesEqualCall(op)
+					newExpr := t.createSlicesEqualCall(op)
+					debug("LIST_EQUALITY created new expr: %T\n", newExpr)
+					return newExpr
 				}
 			}
 			return expr
@@ -48,7 +51,7 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 	// Also handle top-level statements (implicit main)
 	if len(file.TopLevelStmts) > 0 {
 		for i, stmt := range file.TopLevelStmts {
-			file.TopLevelStmts[i] = t.transformTopLevelStmt(stmt, &changed)
+			file.TopLevelStmts[i] = t.transformTopLevelStmt(stmt, &changed, ctx)
 		}
 	}
 
@@ -60,11 +63,11 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 	return changed
 }
 
-func (t *ListEqualityTransform) transformTopLevelStmt(stmt syntax.Stmt, changed *bool) syntax.Stmt {
+func (t *ListEqualityTransform) transformTopLevelStmt(stmt syntax.Stmt, changed *bool, ctx *TransformContext) syntax.Stmt {
 	walker := &SyntaxWalker{
 		VisitExpr: func(expr syntax.Expr) syntax.Expr {
 			if op, ok := expr.(*syntax.Operation); ok {
-				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y) {
+				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y, ctx) {
 					*changed = true
 					return t.createSlicesEqualCall(op)
 				}
@@ -77,14 +80,38 @@ func (t *ListEqualityTransform) transformTopLevelStmt(stmt syntax.Stmt, changed 
 }
 
 // looksLikeSliceComparison checks if an expression looks like it might be a slice
-func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr) bool {
-	// Transform ONLY if at least one side is definitely a list/slice literal
-	// Don't transform variable comparisons - we can't know their types at this stage
+func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr, ctx *TransformContext) bool {
+	// Transform if at least one side is definitely a list/slice literal
 	if t.isListLiteral(x) || t.isListLiteral(y) {
 		return true
 	}
 
+	// Also transform if we have type information indicating slices
+	if t.isSliceVariable(x, ctx) || t.isSliceVariable(y, ctx) {
+		return true
+	}
+
 	return false
+}
+
+// isSliceVariable checks if an expression is a variable with a slice type
+func (t *ListEqualityTransform) isSliceVariable(expr syntax.Expr, ctx *TransformContext) bool {
+	if ctx == nil || ctx.Types == nil {
+		return false
+	}
+
+	name, ok := expr.(*syntax.Name)
+	if !ok {
+		return false
+	}
+
+	varType, exists := ctx.Types[name.Value]
+	if !exists {
+		return false
+	}
+
+	// Check if type is a slice (starts with "[]" or is "slice")
+	return strings.HasPrefix(varType, "[]") || varType == "slice"
 }
 
 // isListLiteral checks if an expression is a list literal

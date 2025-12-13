@@ -131,11 +131,11 @@ func (w *SyntaxWalker) walkDecl(decl syntax.Decl) {
 		w.walkStmt(d.Body)
 	case *syntax.VarDecl:
 		if d.Values != nil {
-			w.walkExpr(d.Values)
+			d.Values = w.walkExpr(d.Values)
 		}
 	case *syntax.ConstDecl:
 		if d.Values != nil {
-			w.walkExpr(d.Values)
+			d.Values = w.walkExpr(d.Values)
 		}
 	}
 }
@@ -162,10 +162,10 @@ func (w *SyntaxWalker) walkStmt(stmt syntax.Stmt) {
 			w.walkStmt(stmt)
 		}
 	case *syntax.ExprStmt:
-		w.walkExpr(s.X)
+		s.X = w.walkExpr(s.X)
 	case *syntax.AssignStmt:
-		w.walkExpr(s.Lhs)
-		w.walkExpr(s.Rhs)
+		s.Lhs = w.walkExpr(s.Lhs)
+		s.Rhs = w.walkExpr(s.Rhs)
 	case *syntax.DeclStmt:
 		for _, decl := range s.DeclList {
 			w.walkDecl(decl)
@@ -214,31 +214,31 @@ func (w *SyntaxWalker) walkExpr(expr syntax.Expr) syntax.Expr {
 
 	switch e := expr.(type) {
 	case *syntax.Operation:
-		w.walkExpr(e.X)
+		e.X = w.walkExpr(e.X)
 		if e.Y != nil {
-			w.walkExpr(e.Y)
+			e.Y = w.walkExpr(e.Y)
 		}
 	case *syntax.CallExpr:
-		w.walkExpr(e.Fun)
+		e.Fun = w.walkExpr(e.Fun)
 		if e.ArgList != nil {
-			for _, arg := range e.ArgList {
-				w.walkExpr(arg)
+			for i, arg := range e.ArgList {
+				e.ArgList[i] = w.walkExpr(arg)
 			}
 		}
 	case *syntax.SelectorExpr:
-		w.walkExpr(e.X)
+		e.X = w.walkExpr(e.X)
 	case *syntax.IndexExpr:
-		w.walkExpr(e.X)
-		w.walkExpr(e.Index)
+		e.X = w.walkExpr(e.X)
+		e.Index = w.walkExpr(e.Index)
 	case *syntax.ListExpr:
-		for _, elem := range e.ElemList {
-			w.walkExpr(elem)
+		for i, elem := range e.ElemList {
+			e.ElemList[i] = w.walkExpr(elem)
 		}
 	case *syntax.LambdaExpr:
-		w.walkExpr(e.Body)
+		e.Body = w.walkExpr(e.Body)
 	case *syntax.AsCastExpr:
-		w.walkExpr(e.X)
-		w.walkExpr(e.Type)
+		e.X = w.walkExpr(e.X)
+		e.Type = w.walkExpr(e.Type)
 	}
 
 	return expr
