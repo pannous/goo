@@ -601,6 +601,11 @@ func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx 
 	okInit := &syntax.AssignStmt{Op: syntax.Def, Lhs: okName, Rhs: falseLit}
 	okInit.SetPos(pos)
 
+	// Register the boolean variable type for later transforms
+	if ctx != nil && ctx.Types != nil {
+		ctx.Types[okVarName] = "bool"
+	}
+
 	// Create loop variables
 	iVarName := fmt.Sprintf("sliceInI_%s", posStr)
 	iVar := &syntax.Name{Value: iVarName}

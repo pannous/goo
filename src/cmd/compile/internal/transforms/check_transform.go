@@ -79,7 +79,7 @@ func (v *checkVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// transformBlock replaces CheckStmt in a block with if+panic
+// transformBlock replaces CheckStmt in a block with if+panic, recursively
 func (t *CheckTransform) transformBlock(block *syntax.BlockStmt, ctx *TransformContext) bool {
 	changed := false
 	newList := make([]syntax.Stmt, 0, len(block.List))
@@ -91,6 +91,8 @@ func (t *CheckTransform) transformBlock(block *syntax.BlockStmt, ctx *TransformC
 			newList = append(newList, ifStmt)
 			changed = true
 		} else {
+			// Recursively process nested blocks
+			stmt = t.transformStmtRecursive(stmt, ctx, &changed)
 			newList = append(newList, stmt)
 		}
 	}
@@ -100,6 +102,41 @@ func (t *CheckTransform) transformBlock(block *syntax.BlockStmt, ctx *TransformC
 	}
 
 	return changed
+}
+
+// transformStmtRecursive handles nested CheckStmt in if/for/switch bodies
+func (t *CheckTransform) transformStmtRecursive(stmt syntax.Stmt, ctx *TransformContext, changed *bool) syntax.Stmt {
+	switch s := stmt.(type) {
+	case *syntax.IfStmt:
+		// Transform CheckStmt in if body
+		if s.Then != nil && t.transformBlock(s.Then, ctx) {
+			*changed = true
+		}
+		// Transform CheckStmt in else body
+		if s.Else != nil {
+			if elseBlock, ok := s.Else.(*syntax.BlockStmt); ok {
+				if t.transformBlock(elseBlock, ctx) {
+					*changed = true
+				}
+			} else if elseIf, ok := s.Else.(*syntax.IfStmt); ok {
+				// Handle else if
+				if elseIf.Then != nil && t.transformBlock(elseIf.Then, ctx) {
+					*changed = true
+				}
+			}
+		}
+	case *syntax.ForStmt:
+		// Transform CheckStmt in for body
+		if s.Body != nil && t.transformBlock(s.Body, ctx) {
+			*changed = true
+		}
+	case *syntax.BlockStmt:
+		// Transform CheckStmt in nested block
+		if t.transformBlock(s, ctx) {
+			*changed = true
+		}
+	}
+	return stmt
 }
 
 // transformTopLevelStmts handles CheckStmt in file.TopLevelStmts
@@ -118,6 +155,8 @@ func (t *CheckTransform) transformTopLevelStmts(file *syntax.File, ctx *Transfor
 			newList = append(newList, ifStmt)
 			changed = true
 		} else {
+			// Recursively process nested blocks
+			stmt = t.transformStmtRecursive(stmt, ctx, &changed)
 			newList = append(newList, stmt)
 		}
 	}

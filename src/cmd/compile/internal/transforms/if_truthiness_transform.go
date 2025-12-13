@@ -104,13 +104,34 @@ func (t *IfTruthinessTransform) transformTopLevelStmt(stmt syntax.Stmt, changed 
 func (t *IfTruthinessTransform) makeTruthy(expr syntax.Expr, ctx *TransformContext) syntax.Expr {
 	pos := expr.Pos()
 
+	// Unwrap ParenExpr to check the inner expression
+	innerExpr := expr
+	if paren, ok := expr.(*syntax.ParenExpr); ok {
+		innerExpr = paren.X
+	}
+
 	// Skip if already boolean (Operation with ==, !=, <, >, etc.)
-	if op, ok := expr.(*syntax.Operation); ok {
+	if op, ok := innerExpr.(*syntax.Operation); ok {
 		switch op.Op {
 		case syntax.Eql, syntax.Neq, syntax.Lss, syntax.Leq, syntax.Gtr, syntax.Geq,
 			syntax.AndAnd, syntax.OrOr, syntax.Not:
-			return expr // Already boolean
+			return expr // Already boolean (return original with parens if present)
 		}
+	}
+
+	// Skip function calls - they return their declared type
+	if _, ok := innerExpr.(*syntax.CallExpr); ok {
+		return expr
+	}
+
+	// Skip selector expressions like foo.bar - they return their actual type
+	if _, ok := innerExpr.(*syntax.SelectorExpr); ok {
+		return expr
+	}
+
+	// Skip index expressions like arr[i] or map[key] - they return their actual type
+	if _, ok := innerExpr.(*syntax.IndexExpr); ok {
+		return expr
 	}
 
 	// Check for boolean names (true/false)
@@ -152,13 +173,9 @@ func (t *IfTruthinessTransform) makeTruthy(expr syntax.Expr, ctx *TransformConte
 
 	// Check for composite literals
 	if comp, ok := expr.(*syntax.CompositeLit); ok {
-		// Slices: if slice -> if slice != nil
+		// Slices: if slice -> if len(slice) != 0
 		if _, ok := comp.Type.(*syntax.SliceType); ok {
-			nilName := &syntax.Name{Value: "nil"}
-			nilName.SetPos(pos)
-			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: nilName}
-			neq.SetPos(pos)
-			return neq
+			return t.createLenCheck(expr, pos)
 		}
 	}
 
@@ -198,9 +215,13 @@ func (t *IfTruthinessTransform) makeTruthyForType(expr syntax.Expr, varType stri
 		// Already boolean, no change needed
 		return expr
 	default:
-		// For slices, maps, pointers, channels: if x -> if x != nil
-		if strings.HasPrefix(varType, "[]") || strings.HasPrefix(varType, "map[") ||
-			strings.HasPrefix(varType, "*") || strings.HasPrefix(varType, "chan ") {
+		// For slices: if x -> if len(x) != 0 (to handle both nil and empty)
+		if strings.HasPrefix(varType, "[]") {
+			return t.createLenCheck(expr, pos)
+		}
+		// For maps, pointers, channels: if x -> if x != nil
+		if strings.HasPrefix(varType, "map[") || strings.HasPrefix(varType, "*") ||
+			strings.HasPrefix(varType, "chan ") {
 			nilName := &syntax.Name{Value: "nil"}
 			nilName.SetPos(pos)
 			neq := &syntax.Operation{Op: syntax.Neq, X: expr, Y: nilName}
@@ -211,6 +232,28 @@ func (t *IfTruthinessTransform) makeTruthyForType(expr syntax.Expr, varType stri
 
 	// Default: no transformation
 	return expr
+}
+
+// createLenCheck creates len(expr) != 0 check for slices
+func (t *IfTruthinessTransform) createLenCheck(expr syntax.Expr, pos syntax.Pos) syntax.Expr {
+	// Create len(expr)
+	lenName := &syntax.Name{Value: "len"}
+	lenName.SetPos(pos)
+
+	lenCall := &syntax.CallExpr{
+		Fun:     lenName,
+		ArgList: []syntax.Expr{expr},
+	}
+	lenCall.SetPos(pos)
+
+	// Create 0
+	zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zero.SetPos(pos)
+
+	// Create len(expr) != 0
+	neq := &syntax.Operation{Op: syntax.Neq, X: lenCall, Y: zero}
+	neq.SetPos(pos)
+	return neq
 }
 
 func init() {

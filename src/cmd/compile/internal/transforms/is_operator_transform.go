@@ -50,6 +50,11 @@ func (v *isOperatorVisitor) Visit(node syntax.Node) syntax.Visitor {
 			if newExpr := v.transform.convertIsToFunctionCall(isOp); newExpr != isOp {
 				n.Rhs = newExpr
 				v.changed = true
+
+				// Register the LHS variable as bool type for later transforms
+				if lhsName, ok := n.Lhs.(*syntax.Name); ok && v.ctx != nil && v.ctx.Types != nil {
+					v.ctx.Types[lhsName.Value] = "bool"
+				}
 			}
 		}
 	case *syntax.Operation:
