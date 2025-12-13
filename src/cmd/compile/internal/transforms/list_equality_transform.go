@@ -26,16 +26,24 @@ func (t *ListEqualityTransform) Priority() int {
 
 func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
 	changed := false
+	usesSlices := false
+	usesMaps := false
 	debug("LIST_EQUALITY_TRANSFORM: Transform called")
 
 	// Use SyntaxWalker with VisitExpr - it walks EVERYTHING including function arguments!
 	walker := &SyntaxWalker{
 		VisitExpr: func(expr syntax.Expr) syntax.Expr {
-			// Check if this is a slice equality/inequality operation
+			// Check if this is a slice/map equality/inequality operation
 			if op, ok := expr.(*syntax.Operation); ok {
 				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y, ctx) {
+					pkgName := t.determineComparisonType(op.X, op.Y, ctx)
+					if pkgName == "maps" {
+						usesMaps = true
+					} else {
+						usesSlices = true
+					}
 					changed = true
-					return t.createSlicesEqualCall(op)
+					return t.createSlicesEqualCall(op, ctx)
 				}
 			}
 			return expr
@@ -47,13 +55,22 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 	// Also handle top-level statements (implicit main)
 	if len(file.TopLevelStmts) > 0 {
 		for i, stmt := range file.TopLevelStmts {
+			oldChanged := changed
 			file.TopLevelStmts[i] = t.transformTopLevelStmt(stmt, &changed, ctx)
+			// Track if we added maps in top level too
+			if changed && !oldChanged {
+				// Assume slices for now; proper detection would require passing back info
+				usesSlices = true
+			}
 		}
 	}
 
-	// Request slices import via ImportManager if we made any transformations
-	if changed {
+	// Request imports via ImportManager if we made any transformations
+	if usesSlices {
 		RequestSlicesImport()
+	}
+	if usesMaps {
+		RequestMapsImport()
 	}
 
 	return changed
@@ -65,7 +82,7 @@ func (t *ListEqualityTransform) transformTopLevelStmt(stmt syntax.Stmt, changed 
 			if op, ok := expr.(*syntax.Operation); ok {
 				if (op.Op == syntax.Eql || op.Op == syntax.Neq) && t.looksLikeSliceComparison(op.X, op.Y, ctx) {
 					*changed = true
-					return t.createSlicesEqualCall(op)
+					return t.createSlicesEqualCall(op, ctx)
 				}
 			}
 			return expr
@@ -75,7 +92,7 @@ func (t *ListEqualityTransform) transformTopLevelStmt(stmt syntax.Stmt, changed 
 	return stmt
 }
 
-// looksLikeSliceComparison checks if an expression looks like it might be a slice
+// looksLikeSliceComparison checks if an expression looks like it might be a slice or map
 func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr, ctx *TransformContext) bool {
 	// Transform if at least one side is definitely a list/slice literal
 	if t.isListLiteral(x) || t.isListLiteral(y) {
@@ -84,6 +101,11 @@ func (t *ListEqualityTransform) looksLikeSliceComparison(x, y syntax.Expr, ctx *
 
 	// Also transform if we have type information indicating slices
 	if t.isSliceVariable(x, ctx) || t.isSliceVariable(y, ctx) {
+		return true
+	}
+
+	// Also transform if we have type information indicating maps
+	if t.isMapVariable(x, ctx) || t.isMapVariable(y, ctx) {
 		return true
 	}
 
@@ -113,6 +135,26 @@ func (t *ListEqualityTransform) isSliceVariable(expr syntax.Expr, ctx *Transform
 
 	// Check if type is a slice (starts with "[]" or is "slice")
 	return strings.HasPrefix(varType, "[]") || varType == "slice"
+}
+
+// isMapVariable checks if an expression is a variable with a map type
+func (t *ListEqualityTransform) isMapVariable(expr syntax.Expr, ctx *TransformContext) bool {
+	if ctx == nil || ctx.Types == nil {
+		return false
+	}
+
+	name, ok := expr.(*syntax.Name)
+	if !ok {
+		return false
+	}
+
+	varType, exists := ctx.Types[name.Value]
+	if !exists {
+		return false
+	}
+
+	// Check if type is a map (starts with "map[")
+	return strings.HasPrefix(varType, "map[")
 }
 
 // isListLiteral checks if an expression is a list literal
@@ -154,12 +196,25 @@ func (t *ListEqualityTransform) extractSliceType(expr syntax.Expr) syntax.Expr {
 	return nil
 }
 
-// createSlicesEqualCall creates slices.Equal[T](a, b) or !slices.Equal[T](a, b)
-func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation) syntax.Expr {
+// determineComparisonType checks if we're comparing slices or maps
+func (t *ListEqualityTransform) determineComparisonType(x, y syntax.Expr, ctx *TransformContext) string {
+	// Check if either side is a map
+	if t.isMapVariable(x, ctx) || t.isMapVariable(y, ctx) {
+		return "maps"
+	}
+	// Default to slices
+	return "slices"
+}
+
+// createSlicesEqualCall creates slices.Equal[T](a, b) or maps.Equal(a, b) or negated versions
+func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	pos := op.Pos()
 
-	// Create slices.Equal(a, b) call
-	slicesName := &syntax.Name{Value: "slices"}
+	// Determine if we're comparing slices or maps
+	pkgName := t.determineComparisonType(op.X, op.Y, ctx)
+
+	// Create pkg.Equal(a, b) call
+	slicesName := &syntax.Name{Value: pkgName}
 	slicesName.SetPos(pos)
 
 	equalName := &syntax.Name{Value: "Equal"}

@@ -65,7 +65,7 @@ Running all tests in ./goo/ directory...
 ✅ test_map_dot_notation.goo
 ✅ test_map_fields.goo
 ✅ test_map_type_inference.goo
-❌ test_map.goo
+✅ test_map.goo
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
 ✅ test_modify.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 111/119 passed, 8 failed
+Summary: 112/119 passed, 7 failed
 ⚠️  Some tests failed

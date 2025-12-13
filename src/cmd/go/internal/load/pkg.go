@@ -2056,7 +2056,7 @@ func (p *Package) load(loaderstate *modload.State, ctx context.Context, opts Pac
 		}
 	}
 	if hasGooFiles {
-		commonImports := []string{"strings", "slices", "fmt", "strconv", "unicode"}
+		commonImports := []string{"strings", "slices", "maps", "fmt", "strconv", "unicode"}
 		for _, impPath := range commonImports {
 			// Check if already imported
 			found := false
@@ -3351,7 +3351,7 @@ func GoFilesPackage(loaderstate *modload.State, ctx context.Context, opts Packag
 	// This ensures they're built and available before transforms run
 	for _, f := range gofiles {
 		if strings.HasSuffix(f, ".goo") {
-			commonImports := []string{"strings", "slices", "fmt", "strconv", "unicode"}
+			commonImports := []string{"strings", "slices", "maps", "fmt", "strconv", "unicode"}
 			for _, imp := range commonImports {
 				// Only add if not already present
 				found := false

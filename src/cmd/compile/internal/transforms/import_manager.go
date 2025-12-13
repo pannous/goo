@@ -150,6 +150,10 @@ func RequestSlicesImport() {
 	RequestStandardImport("slices")
 }
 
+func RequestMapsImport() {
+	RequestStandardImport("maps")
+}
+
 func RequestFmtImport() {
 	RequestStandardImport("fmt")
 }

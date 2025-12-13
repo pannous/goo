@@ -127,3 +127,5 @@ Subagents, plugins, skills, hooks, mcp scripts+servers, capabilities, connectors
 - use src/build-compiler.sh for incremental build
 - create binary linux releases via cross compilation (not multipass)
 - IMPORTANT do ./run_all_tests.sh after each task
+- src/cmd/go/internal/load/pkg.go 
+       3354 +        commonImports := []string{"strings", "slices", "maps", "fmt", "strconv", "unicode"}
