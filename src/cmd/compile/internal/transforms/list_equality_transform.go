@@ -106,6 +106,11 @@ func (t *ListEqualityTransform) isSliceVariable(expr syntax.Expr, ctx *Transform
 		return false
 	}
 
+	// Exclude arrays (marked with "[_]" prefix) - they use native == comparison
+	if strings.HasPrefix(varType, "[_]") {
+		return false
+	}
+
 	// Check if type is a slice (starts with "[]" or is "slice")
 	return strings.HasPrefix(varType, "[]") || varType == "slice"
 }
@@ -115,21 +120,20 @@ func (t *ListEqualityTransform) isListLiteral(expr syntax.Expr) bool {
 	switch e := expr.(type) {
 	case *syntax.CompositeLit:
 		if e.Type != nil {
-			// Try all possible type representations
+			// Only transform slice types, not arrays
 			switch e.Type.(type) {
-			case *syntax.IndexExpr:
+			case *syntax.SliceType:
+				// []int{...} - this is a slice
 				return true
 			case *syntax.ArrayType:
-				return true
-			case *syntax.Operation:
-				// Might be []type represented as an operation
-				return true
-			case *syntax.SliceType:
+				// [2]int{...} or [...]int{...} - these are arrays, use native ==
+				return false
+			case *syntax.IndexExpr:
+				// Generic slice type like []T[K] - treat as slice
 				return true
 			default:
-				// Be aggressive - assume composite literals with unknown types are slices
-				// This handles []int{...}, [...]int{...}, etc.
-				return true
+				// Unknown type - be conservative, don't transform
+				return false
 			}
 		}
 		return false

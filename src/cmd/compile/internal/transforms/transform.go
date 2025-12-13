@@ -332,10 +332,22 @@ func inferTypeFromExpression(expr syntax.Expr, ctx *TransformContext) string {
 			return "string"
 		}
 	case *syntax.CompositeLit:
-		// Handle []User{{...}} literals with explicit types
+		// Handle slice literals like []User{{...}}
+		if sliceType, ok := e.Type.(*syntax.SliceType); ok {
+			if elementType, ok := sliceType.Elem.(*syntax.Name); ok {
+				return "[]" + elementType.Value
+			}
+		}
+		// Handle array/slice literals with ArrayType
 		if arrayType, ok := e.Type.(*syntax.ArrayType); ok {
 			if elementType, ok := arrayType.Elem.(*syntax.Name); ok {
-				return "[]" + elementType.Value
+				if arrayType.Len == nil {
+					// Slice: []int{...}
+					return "[]" + elementType.Value
+				} else {
+					// Array: [2]int{...}
+					return "[_]" + elementType.Value
+				}
 			}
 		}
 
