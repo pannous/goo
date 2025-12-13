@@ -1,8 +1,5 @@
 #!/usr/bin/env goo
-package main
-
-import "fmt"
-
+import math
 // Test Unicode identifiers
 var δ = 42
 var 变量 = "Chinese variable 变量"
