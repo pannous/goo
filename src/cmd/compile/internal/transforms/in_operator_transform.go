@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"cmd/compile/internal/syntax"
+	"fmt"
 	"strings"
 )
 
@@ -30,6 +31,7 @@ func (t *InOperatorTransform) Priority() int {
 }
 
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
+	debug("IN_OPERATOR: Transform called, TopLevelStmts count: %d, DeclList count: %d\n", len(file.TopLevelStmts), len(file.DeclList))
 	changed := false
 	visitor := &inVisitor{transform: t, ctx: ctx, file: file}
 	// Use syntax.Walk to traverse the entire AST
@@ -42,7 +44,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	changed = changed || visitor.changed
     for i, decl := range file.DeclList {
         if f, ok := decl.(*syntax.FuncDecl); ok && f.Body != nil {
+            debug("IN_OPERATOR: Processing function %s with body\n", f.Name.Value)
             if newBody := t.rewriteMapMembershipInBlock(f.Body, ctx); newBody != f.Body {
+                debug("IN_OPERATOR: Rewrote function body\n")
                 nf := *f
                 if bs, ok := newBody.(*syntax.BlockStmt); ok {
                     nf.Body = bs
@@ -55,7 +59,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 
 	// Also handle top-level statements for implicit main files (map and slice membership)
     if len(file.TopLevelStmts) > 0 {
+        debug("IN_OPERATOR: Calling rewriteMapMembershipInList for %d top-level stmts\n", len(file.TopLevelStmts))
         if newList, ok := t.rewriteMapMembershipInList(file.TopLevelStmts, ctx); ok {
+            debug("IN_OPERATOR: Rewrote top-level statements\n")
             file.TopLevelStmts = newList
             changed = true
         }
@@ -225,10 +231,20 @@ func (t *InOperatorTransform) rewriteMapMembershipInBlock(block *syntax.BlockStm
 				changed = true
 				continue
 			}
+			if repl, ok := t.rewriteAssignWithSliceIn(s, ctx); ok {
+				newList = append(newList, repl...)
+				changed = true
+				continue
+			}
 			newList = append(newList, s)
 		case *syntax.CheckStmt:
 			if repl, ok := t.rewriteCheckWithMapIn(s, ctx); ok {
 				newList = append(newList, repl)
+				changed = true
+				continue
+			}
+			if repl, ok := t.rewriteCheckWithSliceIn(s, ctx); ok {
+				newList = append(newList, repl...)
 				changed = true
 				continue
 			}
@@ -303,7 +319,7 @@ func (t *InOperatorTransform) rewriteMapMembershipInList(list []syntax.Stmt, ctx
 				continue
 			}
 			if repl, ok := t.rewriteCheckWithSliceIn(s, ctx); ok {
-				out = append(out, repl)
+				out = append(out, repl...)
 				changed = true
 				continue
 			}
@@ -523,10 +539,14 @@ func (t *InOperatorTransform) rewriteCheckWithMapIn(cs *syntax.CheckStmt, ctx *T
 }
 
 // rewriteCheckWithSliceIn handles: check (item in slice) for variable slices
-// Rewrites to: { ok := false; for i := 0; i < len(slice); i++ { if slice[i] == item { ok = true; break } } check ok }
-func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx *TransformContext) (syntax.Stmt, bool) {
-	// Check if this is a slice 'in' operation
+// Rewrites to: ok := false; for i := 0; i < len(slice); i++ { if slice[i] == item { ok = true; break } }; if !ok { panic(...) }
+func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx *TransformContext) ([]syntax.Stmt, bool) {
+	debug("IN_OPERATOR: rewriteCheckWithSliceIn called\n")
+	// Check if this is a slice 'in' operation, possibly wrapped in 'not'
 	cond := cs.Cond
+	isNegated := false
+
+	// Unwrap parentheses
 	for {
 		if p, ok := cond.(*syntax.ParenExpr); ok && p.X != nil {
 			cond = p.X
@@ -534,67 +554,151 @@ func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx 
 			break
 		}
 	}
+
+	// Check for 'not (x in y)' pattern
+	if notOp, ok := cond.(*syntax.Operation); ok && notOp.Op == syntax.Not {
+		isNegated = true
+		cond = notOp.X
+		// Unwrap parentheses again after 'not'
+		for {
+			if p, ok := cond.(*syntax.ParenExpr); ok && p.X != nil {
+				cond = p.X
+			} else {
+				break
+			}
+		}
+	}
+
 	op, ok := cond.(*syntax.Operation)
 	if !ok || op.Op != syntax.In {
+		debug("IN_OPERATOR: Not an 'in' operation\n")
 		return nil, false
 	}
-	if t.inferContainerType(op.Y, ctx) != "slice" {
+	containerType := t.inferContainerType(op.Y, ctx)
+	debug("IN_OPERATOR: Container type inferred as: %s\n", containerType)
+	if containerType != "slice" {
+		debug("IN_OPERATOR: Not a slice, returning\n")
 		return nil, false
+	}
+	debug("IN_OPERATOR: Rewriting check with slice in! (negated=%v)\n", isNegated)
+
+	pos := cs.Pos()
+
+	// Generate unique variable names based on position to avoid conflicts
+	posStr := ""
+	if pos.IsKnown() {
+		posStr = fmt.Sprintf("%d_%d", pos.Line(), pos.Col())
+	} else {
+		posStr = "0_0"
 	}
 
-	// Create: ok := false
-	okName := &syntax.Name{Value: "ok"}
+	// Create: sliceInOk_LINE_COL := false
+	okVarName := fmt.Sprintf("sliceInOk_%s", posStr)
+	okName := &syntax.Name{Value: okVarName}
+	okName.SetPos(pos)
 	falseLit := &syntax.Name{Value: "false"}
+	falseLit.SetPos(pos)
 	okInit := &syntax.AssignStmt{Op: syntax.Def, Lhs: okName, Rhs: falseLit}
+	okInit.SetPos(pos)
 
 	// Create loop variables
-	iVar := &syntax.Name{Value: "i"}
+	iVarName := fmt.Sprintf("sliceInI_%s", posStr)
+	iVar := &syntax.Name{Value: iVarName}
+	iVar.SetPos(pos)
 	zero := &syntax.BasicLit{Kind: syntax.IntLit, Value: "0"}
+	zero.SetPos(pos)
 	one := &syntax.BasicLit{Kind: syntax.IntLit, Value: "1"}
+	one.SetPos(pos)
 
 	// Create: i := 0
 	initI := &syntax.AssignStmt{Op: syntax.Def, Lhs: iVar, Rhs: zero}
+	initI.SetPos(pos)
 
 	// Create: len(slice)
 	lenFunc := &syntax.Name{Value: "len"}
+	lenFunc.SetPos(pos)
 	lenCall := &syntax.CallExpr{Fun: lenFunc, ArgList: []syntax.Expr{op.Y}}
+	lenCall.SetPos(pos)
 
 	// Create: i < len(slice)
-	condition := &syntax.Operation{Op: syntax.Lss, X: iVar, Y: lenCall}
+	iVar2 := &syntax.Name{Value: iVarName}
+	iVar2.SetPos(pos)
+	condition := &syntax.Operation{Op: syntax.Lss, X: iVar2, Y: lenCall}
+	condition.SetPos(pos)
 
 	// Create: i++
-	incI := &syntax.AssignStmt{Op: syntax.Add, Lhs: iVar, Rhs: one}
+	iVar3 := &syntax.Name{Value: iVarName}
+	iVar3.SetPos(pos)
+	incI := &syntax.AssignStmt{Op: syntax.Add, Lhs: iVar3, Rhs: one}
+	incI.SetPos(pos)
 
 	// Create: slice[i]
-	indexExpr := &syntax.IndexExpr{X: op.Y, Index: iVar}
+	iVar4 := &syntax.Name{Value: iVarName}
+	iVar4.SetPos(pos)
+	indexExpr := &syntax.IndexExpr{X: op.Y, Index: iVar4}
+	indexExpr.SetPos(pos)
 
 	// Create: slice[i] == item
 	comparison := &syntax.Operation{Op: syntax.Eql, X: indexExpr, Y: op.X}
+	comparison.SetPos(pos)
 
 	// Create: ok = true
 	trueLit := &syntax.Name{Value: "true"}
-	setOk := &syntax.AssignStmt{Op: 0, Lhs: okName, Rhs: trueLit}
+	trueLit.SetPos(pos)
+	okName2 := &syntax.Name{Value: okVarName}
+	okName2.SetPos(pos)
+	setOk := &syntax.AssignStmt{Op: 0, Lhs: okName2, Rhs: trueLit}
+	setOk.SetPos(pos)
 
 	// Create: break
 	breakStmt := &syntax.BranchStmt{Tok: syntax.Break}
+	breakStmt.SetPos(pos)
 
 	// Create: if slice[i] == item { ok = true; break }
 	ifBody := &syntax.BlockStmt{List: []syntax.Stmt{setOk, breakStmt}}
+	ifBody.SetPos(pos)
 	ifStmt := &syntax.IfStmt{Cond: comparison, Then: ifBody}
+	ifStmt.SetPos(pos)
 
 	// Create loop body
 	loopBody := &syntax.BlockStmt{List: []syntax.Stmt{ifStmt}}
+	loopBody.SetPos(pos)
 
 	// Create: for i := 0; i < len(slice); i++ { ... }
 	forStmt := &syntax.ForStmt{Init: initI, Cond: condition, Post: incI, Body: loopBody}
+	forStmt.SetPos(pos)
 
-	// Create: check ok
-	newCheck := &syntax.CheckStmt{Cond: okName}
+	// Create: if !sliceInOk { panic(...) } or if sliceInOk { panic(...) } depending on isNegated
+	okName3 := &syntax.Name{Value: okVarName}
+	okName3.SetPos(pos)
 
-	// Create block containing all statements
-	block := &syntax.BlockStmt{List: []syntax.Stmt{okInit, forStmt, newCheck}}
+	var checkCond syntax.Expr
+	if isNegated {
+		// For 'check not (x in y)', panic if x IS in y
+		checkCond = okName3
+	} else {
+		// For 'check (x in y)', panic if x is NOT in y
+		notOk := &syntax.Operation{Op: syntax.Not, X: okName3}
+		notOk.SetPos(pos)
+		checkCond = notOk
+	}
 
-	return block, true
+	panicName := &syntax.Name{Value: "panic"}
+	panicName.SetPos(pos)
+	panicMsg := &syntax.BasicLit{Kind: syntax.StringLit, Value: "`slice membership check failed`"}
+	panicMsg.SetPos(pos)
+	panicCall := &syntax.CallExpr{Fun: panicName, ArgList: []syntax.Expr{panicMsg}}
+	panicCall.SetPos(pos)
+	panicStmt := &syntax.ExprStmt{X: panicCall}
+	panicStmt.SetPos(pos)
+
+	panicBody := &syntax.BlockStmt{List: []syntax.Stmt{panicStmt}}
+	panicBody.SetPos(pos)
+	ifStmt2 := &syntax.IfStmt{Cond: checkCond, Then: panicBody}
+	ifStmt2.SetPos(pos)
+
+	// Return slice of statements to be flattened into parent block
+	return []syntax.Stmt{okInit, forStmt, ifStmt2}, true
 }
 
 // rewriteIfWithMapIn handles: if (key in m) { ... }

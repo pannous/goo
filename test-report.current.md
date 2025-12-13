@@ -38,7 +38,7 @@ Running all tests in ./goo/ directory...
 ✅ test_in_operator_auto_import.goo
 ✅ test_in_operator_maps.goo
 ✅ test_in_operator_rune_strings.goo
-❌ test_in_operator_slices.goo
+✅ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_is_operator.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 105/119 passed, 14 failed
+Summary: 106/119 passed, 13 failed
 ⚠️  Some tests failed
