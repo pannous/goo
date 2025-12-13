@@ -77,6 +77,7 @@ func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.I
 	if t.shouldConvertToLocalImport(importPath, sourceDir) {
 		// Convert bare directory name to relative import
 		newImportPath := "./" + importPath
+		println("Transforming local import:", importPath, "->", newImportPath)
 		importDecl.Path.Value = "\"" + newImportPath + "\""
 		return true
 	}

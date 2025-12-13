@@ -1,22 +1,29 @@
-import "strings"
-import "slices"
-aList:=[1, 2, 3]
+aList:=[2, 1, 3]
 
 # TODOs
 aList.sort!() // sorts in place! ok, but:
+check aList == [1,2,3]
 check [3,1,2].sort() == aList 
 check aList.sortDesc() == [3,2,1]
-check aList.shift!() == 1 // and removes it
-
+check aList.shift() == 1 // does not remove it because no '!' todo confusing? remove?
+check aList == [1, 2 ,3] 
+check aList.shift!() == 1 // TODO and removes it:
+// check aList == [2 ,3] // TODO ^^
 
 check aList.insert(1,1) == [1,1,2,3]  // 0: before index 0 == prepend
-aList.reverse!() // ok, but:
-check aList.reverse() == [3, 2, 1]
+// check aList.insert!(1,1) !TODO_implement_runtime_function_for_list_insert!_unknown list method(aList)
+// check aList == [1,1,2,3]  // 0: before index 0 == prepend
+// check aList.removeAt(0) == 1 // TODO_implement_runtime_function_for_list_removeAt_remove_at_index
+aList.reverse!() 
 check aList == [3, 2, 1]
-check aList.pop!() == 1 // and removes it
-check aList == [3, 2]
-
-#./test_list_methods_broken.goo:9:7: internal compiler error: <node Op(154)> (type []int) and int are not shape types
+aList.reverse!() // ok, but:
+put(aList.reverse() )
+check aList.reverse() == [3, 2, 1]
+check aList == [1, 2, 3] # unaffected without '!' ^^
+aList.reverse!() 
+check aList.pop!() == 1 // TODO and removes it
+put(aList)
+// check aList == [3, 2] // TODO ^^
 
 
 #put("cannot use aList (variable of type []int) as []string value in argument to strings.Join")
