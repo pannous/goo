@@ -1022,13 +1022,16 @@ func (check *Checker) builtin(x *operand, call *syntax.CallExpr, id builtinId) (
 		}
 
 	case _TypeOf:
-		// typeof(value) string
+		// typeof(value) string - returns compile-time constant with type name
 		check.assignment(x, nil, "argument to typeof")
 		if x.mode == invalid {
 			return
 		}
-		x.mode = value
+		// Save the argument's type before we change x
+		argType := x.typ
+		x.mode = constant_
 		x.typ = Typ[String]
+		x.val = constant.MakeString(argType.String())
 		if check.recordTypes() {
 			check.recordBuiltinType(call.Fun, makeSig(Typ[String], &emptyInterface))
 		}
