@@ -154,6 +154,10 @@ func RequestMapsImport() {
 	RequestStandardImport("maps")
 }
 
+func RequestMathImport() {
+	RequestStandardImport("math")
+}
+
 func RequestFmtImport() {
 	RequestStandardImport("fmt")
 }

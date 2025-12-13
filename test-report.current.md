@@ -102,7 +102,7 @@ Running all tests in ./goo/ directory...
 ✅ test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
-❌ test_tau_pi_approx.goo
+✅ test_tau_pi_approx.goo
 ❌ test_tensors.goo
 ✅ test_transform_synonyms.goo
 ❌ test_truthy_and.goo
@@ -120,5 +120,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 112/119 passed, 7 failed
+Summary: 113/119 passed, 6 failed
 ⚠️  Some tests failed
