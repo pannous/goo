@@ -28,7 +28,7 @@ func (t *StringMethodsTransform) Priority() int {
 
 // transformStringMethod transforms string method calls to standard library calls
 func (t *StringMethodsTransform) transformStringMethod(receiver syntax.Expr, methodName string, args []syntax.Expr) syntax.Expr {
-	println("transformStringMethod:", methodName)
+	trace("transformStringMethod: %s", methodName)
 	switch methodName {
 	// Basic string info
 	case "reverse", "flip":
@@ -268,7 +268,7 @@ func (v *methodVisitor) Visit(node syntax.Node) syntax.Visitor {
 			if v.transform.isStringExpression(selector.X, v.ctx) {
 				methodName := selector.Sel.Value
 				if transformed := v.transform.transformStringMethod(selector.X, methodName, call.ArgList); transformed != nil {
-					println("TRANSFORMING string method:", methodName)
+					trace("TRANSFORMING string method: %s", methodName)
 					// Handle different expression types
 					switch expr := transformed.(type) {
 					case *syntax.CallExpr:

@@ -28,7 +28,7 @@ func (t *ListEqualityTransform) Transform(file *syntax.File, ctx *TransformConte
 	changed := false
 	usesSlices := false
 	usesMaps := false
-	debug("LIST_EQUALITY_TRANSFORM: Transform called")
+	trace("LIST_EQUALITY_TRANSFORM: Transform called")
 
 	// Use SyntaxWalker with VisitExpr - it walks EVERYTHING including function arguments!
 	walker := &SyntaxWalker{
@@ -229,7 +229,7 @@ func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation, ctx 
 	// Try to extract slice type for generic instantiation
 	var funExpr syntax.Expr = slicesEqualSel
 	if sliceType := t.extractSliceType(op.X); sliceType != nil {
-		debug("LIST_EQUALITY: Extracted slice type from left side\n")
+		trace("LIST_EQUALITY: Extracted slice type from left side\n")
 		// Create slices.Equal[[]T] with type parameter
 		typeIndexExpr := &syntax.IndexExpr{
 			X:     slicesEqualSel,
@@ -238,7 +238,7 @@ func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation, ctx 
 		typeIndexExpr.SetPos(pos)
 		funExpr = typeIndexExpr
 	} else if sliceType := t.extractSliceType(op.Y); sliceType != nil {
-		debug("LIST_EQUALITY: Extracted slice type from right side\n")
+		trace("LIST_EQUALITY: Extracted slice type from right side\n")
 		// Try the right side if left didn't work
 		typeIndexExpr := &syntax.IndexExpr{
 			X:     slicesEqualSel,
@@ -247,7 +247,7 @@ func (t *ListEqualityTransform) createSlicesEqualCall(op *syntax.Operation, ctx 
 		typeIndexExpr.SetPos(pos)
 		funExpr = typeIndexExpr
 	} else {
-		debug("LIST_EQUALITY: Could not extract slice type, using untyped slices.Equal\n")
+		trace("LIST_EQUALITY: Could not extract slice type, using untyped slices.Equal\n")
 	}
 
 	equalCall := &syntax.CallExpr{

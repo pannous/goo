@@ -26,7 +26,7 @@ func NewImportManager() *ImportManager {
 // RequestImport registers that a package is needed
 func (im *ImportManager) RequestImport(packageName, importPath string) {
 	im.neededImports[packageName] = importPath
-	debug("ImportManager: Requesting import %s -> %s", packageName, importPath)
+	trace("ImportManager: Requesting import %s -> %s", packageName, importPath)
 }
 
 // GetRequestedImports returns all requested imports
@@ -45,7 +45,7 @@ func (im *ImportManager) ApplyImports(file *syntax.File) bool {
 		if !im.hasImport(file, importPath) {
 			im.addImport(file, packageName, importPath)
 			changed = true
-			debug("ImportManager: Added import %s (%s)", importPath, packageName)
+			trace("ImportManager: Added import %s (%s)", importPath, packageName)
 		}
 	}
 

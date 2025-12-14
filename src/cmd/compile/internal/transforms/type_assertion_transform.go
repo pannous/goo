@@ -44,9 +44,9 @@ func (v *typeAssertionVisitor) Visit(node syntax.Node) syntax.Visitor {
 	// Look for binary operations with "is" / "is?" / "isa" operator
 	if op, ok := node.(*syntax.Operation); ok {
 		if op.Op == syntax.IS {
-			println("Found 'is' binary operation")
+			trace("Found is binary operation")
 			if callExpr := v.transform.transformIsOperation(op); callExpr != nil {
-				println("TRANSFORMING 'isa' operation")
+				trace("TRANSFORMING isa operation")
 				// Transform to: instanceOf(x, Type) == true
 				op.Op = syntax.Eql
 				op.X = callExpr

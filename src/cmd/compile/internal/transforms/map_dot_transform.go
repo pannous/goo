@@ -43,7 +43,7 @@ func (v *mapDotVisitor) Visit(node syntax.Node) syntax.Visitor {
 		return nil
 	}
 
-	//debug("map_dot: visiting %T\n", node)
+	//trace("map_dot: visiting %T\n", node)
 
 	// Transform nodes that contain expressions that might have map dot access
 	switch n := node.(type) {
@@ -284,7 +284,7 @@ func (v *mapDotVisitor) walkExpr(exprPtr *syntax.Expr) {
 }
 
 func (v *mapDotVisitor) transformSelector(sel *syntax.SelectorExpr) syntax.Expr {
-	// debug("map_dot: transformSelector %s.%s\n", v.exprToString(sel.X), sel.Sel.Value)
+	// trace("map_dot: transformSelector %s.%s\n", v.exprToString(sel.X), sel.Sel.Value)
 	// Check if the base expression is a variable we know is a map with string keys
 	if name, ok := sel.X.(*syntax.Name); ok {
 		varType, exists := v.ctx.Types[name.Value]

@@ -29,13 +29,8 @@ type Transformer interface {
 	Priority() int
 }
 
-const DEBUGGING = false // Set to true to enable debug output
-
-func debug(format string, args ...any) {
-	if DEBUGGING {
-		fmt.Printf(format, args...)
-	}
-}
+// Debug output is now handled by trace() function in trace.go
+// Enable with: export GOO_TRACE=1
 
 // ApplyTransformations runs all registered transformers on the syntax tree.
 // called bycmd/compile/internal/noder/unified.go
@@ -61,19 +56,19 @@ func ApplyTransformations(files []*syntax.File) {
 
 		ctx := &TransformContext{Types: make(map[string]string)}
 		collectTypes(file, ctx)
-		debug("Transform execution order:\n")
+		trace("Transform execution order:\n")
 		for i, transformer := range TransformRegistry {
-			debug("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
+			trace("  %d. %s (priority %d)\n", i+1, transformer.Name(), transformer.Priority())
 		}
 		for _, transformer := range TransformRegistry {
 			if transformer.Transform(file, ctx) {
-				debug("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
+				trace("Applied transformer: %s to package: %s\n", transformer.Name(), file.PkgName.Value)
 			}
 		}
 
 		// Apply all requested imports centrally
 		if GlobalImportManager.ApplyImports(file) {
-			debug("ImportManager: Applied imports to package: %s\n", file.PkgName.Value)
+			trace("ImportManager: Applied imports to package: %s\n", file.PkgName.Value)
 		}
 	}
 }
@@ -109,7 +104,7 @@ func (w *SyntaxWalker) WalkFile(file *syntax.File) {
 		return
 	}
 
-	debug("Walking file for package:", file.PkgName.Value)
+	trace("Walking file for package:", file.PkgName.Value)
 
 	for i, decl := range file.DeclList {
 		if w.VisitDecl != nil {

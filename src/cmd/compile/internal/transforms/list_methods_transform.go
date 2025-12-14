@@ -878,7 +878,7 @@ func (t *ListMethodsTransform) createMapCall(receiver, transform syntax.Expr, ct
 		outputType = "any"
 	}
 
-	println("DEBUG: createMapCall using types:", sliceType, "->", outputType, "(element:", elementType, ")")
+	trace("createMapCall using types: %s -> %s (element: %s)", sliceType, outputType, elementType)
 
 	slicesName := &syntax.Name{Value: "slices"}
 	slicesName.SetPos(pos)
@@ -1161,11 +1161,11 @@ func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate sy
 	correctedLambda := *lambda
 	correctedLambda.SetPos(lambda.Pos())
 	
-	println("DEBUG: correcting lambda parameter type to:", elementType)
+	trace("correcting lambda parameter type to: %s", elementType)
 	
 	// Infer return type from lambda body
 	returnType := t.inferLambdaReturnType(lambda.Body, elementType)
-	println("DEBUG: inferred lambda return type:", returnType)
+	trace("inferred lambda return type: %s", returnType)
 	
 	// If lambda has parameters, fix their types
 	if lambda.ParamList != nil && len(lambda.ParamList) > 0 {
@@ -1181,7 +1181,7 @@ func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate sy
 			newParam.Type = elementTypeName
 			
 			newParamList[i] = &newParam
-			println("DEBUG: set parameter", i, "type to:", elementType)
+			trace("set parameter %d type to: %s", i, elementType)
 		}
 		correctedLambda.ParamList = newParamList
 	}
@@ -1189,7 +1189,7 @@ func (t *ListMethodsTransform) correctLambdaParameterType(receiver, predicate sy
 	// Return type inference will be handled by the Go type system
 	// We've fixed the parameter types, which is sufficient for proper type checking
 	if returnType != "" {
-		println("DEBUG: inferred lambda return type:", returnType, "- Go compiler will handle this automatically")
+		trace("inferred lambda return type: %s", returnType, "- Go compiler will handle this automatically")
 	}
 
 	return &correctedLambda
@@ -1210,11 +1210,11 @@ func (t *ListMethodsTransform) correctLambdaParameterTypeWithElement(predicate s
 	correctedLambda := *lambda
 	correctedLambda.SetPos(lambda.Pos())
 	
-	println("DEBUG: correcting lambda parameter type to:", elementType)
+	trace("correcting lambda parameter type to: %s", elementType)
 	
 	// Infer return type from lambda body
 	returnType := t.inferLambdaReturnType(lambda.Body, elementType)
-	println("DEBUG: inferred lambda return type:", returnType)
+	trace("inferred lambda return type: %s", returnType)
 	
 	// If lambda has parameters, fix their types
 	if lambda.ParamList != nil && len(lambda.ParamList) > 0 {
@@ -1230,14 +1230,14 @@ func (t *ListMethodsTransform) correctLambdaParameterTypeWithElement(predicate s
 			newParam.Type = elementTypeName
 			
 			newParamList[i] = &newParam
-			println("DEBUG: set parameter", i, "type to:", elementType)
+			trace("set parameter %d type to: %s", i, elementType)
 		}
 		correctedLambda.ParamList = newParamList
 	}
 	
 	// Return type inference will be handled by the Go type system
 	if returnType != "" {
-		println("DEBUG: inferred lambda return type:", returnType, "- Go compiler will handle this automatically")
+		trace("inferred lambda return type: %s", returnType, "- Go compiler will handle this automatically")
 	}
 
 	return &correctedLambda
@@ -1280,7 +1280,7 @@ func (t *ListMethodsTransform) inferChainedMethodType(receiver syntax.Expr, meth
 	if call, ok := receiver.(*syntax.CallExpr); ok {
 		if selector, ok := call.Fun.(*syntax.SelectorExpr); ok {
 			innerReceiverType := t.inferChainedMethodType(selector.X, selector.Sel.Value, ctx)
-			println("DEBUG: chained method", selector.Sel.Value, "on type", innerReceiverType, "returns", t.inferMethodReturnTypeFromType(innerReceiverType, selector.Sel.Value))
+			trace("chained method %s on type %s returns %s", selector.Sel.Value, innerReceiverType, t.inferMethodReturnTypeFromType(innerReceiverType, selector.Sel.Value))
 			return t.inferMethodReturnTypeFromType(innerReceiverType, selector.Sel.Value)
 		}
 	}
@@ -1288,7 +1288,7 @@ func (t *ListMethodsTransform) inferChainedMethodType(receiver syntax.Expr, meth
 	// If receiver is a simple variable name
 	if name, ok := receiver.(*syntax.Name); ok {
 		baseType := t.getSliceType(name.Value, ctx)
-		println("DEBUG: base variable", name.Value, "has type", baseType)
+		trace("base variable %s has type %s", name.Value, baseType)
 		return baseType
 	}
 	

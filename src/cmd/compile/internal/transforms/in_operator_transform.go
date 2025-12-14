@@ -31,7 +31,7 @@ func (t *InOperatorTransform) Priority() int {
 }
 
 func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext) bool {
-	debug("IN_OPERATOR: Transform called, TopLevelStmts count: %d, DeclList count: %d\n", len(file.TopLevelStmts), len(file.DeclList))
+	trace("IN_OPERATOR: Transform called, TopLevelStmts count: %d, DeclList count: %d\n", len(file.TopLevelStmts), len(file.DeclList))
 	changed := false
 	visitor := &inVisitor{transform: t, ctx: ctx, file: file}
 	// Use syntax.Walk to traverse the entire AST
@@ -44,9 +44,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 	changed = changed || visitor.changed
     for i, decl := range file.DeclList {
         if f, ok := decl.(*syntax.FuncDecl); ok && f.Body != nil {
-            debug("IN_OPERATOR: Processing function %s with body\n", f.Name.Value)
+            trace("IN_OPERATOR: Processing function %s with body\n", f.Name.Value)
             if newBody := t.rewriteMapMembershipInBlock(f.Body, ctx); newBody != f.Body {
-                debug("IN_OPERATOR: Rewrote function body\n")
+                trace("IN_OPERATOR: Rewrote function body\n")
                 nf := *f
                 if bs, ok := newBody.(*syntax.BlockStmt); ok {
                     nf.Body = bs
@@ -59,9 +59,9 @@ func (t *InOperatorTransform) Transform(file *syntax.File, ctx *TransformContext
 
 	// Also handle top-level statements for implicit main files (map and slice membership)
     if len(file.TopLevelStmts) > 0 {
-        debug("IN_OPERATOR: Calling rewriteMapMembershipInList for %d top-level stmts\n", len(file.TopLevelStmts))
+        trace("IN_OPERATOR: Calling rewriteMapMembershipInList for %d top-level stmts\n", len(file.TopLevelStmts))
         if newList, ok := t.rewriteMapMembershipInList(file.TopLevelStmts, ctx); ok {
-            debug("IN_OPERATOR: Rewrote top-level statements\n")
+            trace("IN_OPERATOR: Rewrote top-level statements\n")
             file.TopLevelStmts = newList
             changed = true
         }
@@ -541,7 +541,7 @@ func (t *InOperatorTransform) rewriteCheckWithMapIn(cs *syntax.CheckStmt, ctx *T
 // rewriteCheckWithSliceIn handles: check (item in slice) for variable slices
 // Rewrites to: ok := false; for i := 0; i < len(slice); i++ { if slice[i] == item { ok = true; break } }; if !ok { panic(...) }
 func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx *TransformContext) ([]syntax.Stmt, bool) {
-	debug("IN_OPERATOR: rewriteCheckWithSliceIn called\n")
+	trace("IN_OPERATOR: rewriteCheckWithSliceIn called\n")
 	// Check if this is a slice 'in' operation, possibly wrapped in 'not'
 	cond := cs.Cond
 	isNegated := false
@@ -571,16 +571,16 @@ func (t *InOperatorTransform) rewriteCheckWithSliceIn(cs *syntax.CheckStmt, ctx 
 
 	op, ok := cond.(*syntax.Operation)
 	if !ok || op.Op != syntax.In {
-		debug("IN_OPERATOR: Not an 'in' operation\n")
+		trace("IN_OPERATOR: Not an 'in' operation\n")
 		return nil, false
 	}
 	containerType := t.inferContainerType(op.Y, ctx)
-	debug("IN_OPERATOR: Container type inferred as: %s\n", containerType)
+	trace("IN_OPERATOR: Container type inferred as: %s\n", containerType)
 	if containerType != "slice" {
-		debug("IN_OPERATOR: Not a slice, returning\n")
+		trace("IN_OPERATOR: Not a slice, returning\n")
 		return nil, false
 	}
-	debug("IN_OPERATOR: Rewriting check with slice in! (negated=%v)\n", isNegated)
+	trace("IN_OPERATOR: Rewriting check with slice in! (negated=%v)\n", isNegated)
 
 	pos := cs.Pos()
 

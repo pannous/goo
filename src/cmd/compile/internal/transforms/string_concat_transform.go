@@ -44,7 +44,7 @@ func (t *StringConcatTransform) Transform(file *syntax.File, ctx *TransformConte
 
 	// Add fmt import if needed and transformations were made
 	if visitor.needsFmtImport && !t.hasImport(file, "fmt") {
-		println("Adding fmt import")
+		trace("Adding fmt import")
 		t.addFmtImport(file)
 	}
 
@@ -60,7 +60,7 @@ func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
 	// Check for string interpolation patterns in expressions
 	if expr, ok := node.(*syntax.ExprStmt); ok {
 		if transformed := v.transform.transformStringInterpolation(expr.X, v.ctx); transformed != nil {
-			println("TRANSFORMING INTERPOLATION:", syntax.String(expr.X), "->", syntax.String(transformed))
+			trace("TRANSFORMING INTERPOLATION: %s -> %s", syntax.String(expr.X), syntax.String(transformed))
 			expr.X = transformed
 			v.changed = true
 			v.needsFmtImport = true
@@ -70,7 +70,7 @@ func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
 	// Check for string interpolation in assignments
 	if assign, ok := node.(*syntax.AssignStmt); ok && assign.Rhs != nil {
 		if transformed := v.transform.transformStringInterpolation(assign.Rhs, v.ctx); transformed != nil {
-			println("TRANSFORMING ASSIGNMENT INTERPOLATION:", syntax.String(assign.Rhs), "->", syntax.String(transformed))
+			trace("TRANSFORMING ASSIGNMENT INTERPOLATION: %s -> %s", syntax.String(assign.Rhs), syntax.String(transformed))
 			assign.Rhs = transformed
 			v.changed = true
 			v.needsFmtImport = true
@@ -79,25 +79,25 @@ func (v *concatVisitor) Visit(node syntax.Node) syntax.Visitor {
 
 	// Check for string concatenation operations (but skip if it's already an interpolation pattern)
 	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Add {
-		println("DEBUG Visit found Add operation:", syntax.String(op))
+		trace("Visit found Add operation: %s", syntax.String(op))
 		// Don't apply regular concatenation to operations that are part of interpolation patterns
 		parts := v.transform.extractInterpolationParts(op)
 		if len(parts) >= 3 && v.transform.isStringInterpolationPattern(parts, v.ctx) {
 			// This is already handled by string interpolation, skip regular concatenation
-			println("DEBUG Skipping because it's an interpolation pattern")
+			trace("Skipping because it's an interpolation pattern")
 			return v
 		}
 
 		if transformed := v.transform.transformConcatOperation(op, v.ctx); transformed != nil {
-			println("DEBUG transformed:", syntax.String(transformed))
+			trace("transformed: %s", syntax.String(transformed))
 			if newOp, ok := transformed.(*syntax.Operation); ok {
-				println("DEBUG newOp.X:", syntax.String(newOp.X), "newOp.Y:", syntax.String(newOp.Y))
+				trace("newOp.X: %s newOp.Y: %s", syntax.String(newOp.X), syntax.String(newOp.Y))
 				op.X = newOp.X
 				op.Y = newOp.Y
 				v.changed = true
 				v.needsFmtImport = true
 			} else {
-				println("DEBUG transformed is NOT an *syntax.Operation, it's:", fmt.Sprintf("%T", transformed))
+				trace("transformed is NOT an *syntax.Operation, it's: %s", fmt.Sprintf("%T", transformed))
 			}
 		}
 	}
@@ -121,7 +121,7 @@ func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, c
 	leftIsString := t.isStringExpression(op.X, ctx)
 	rightIsString := t.isStringExpression(op.Y, ctx)
 
-	println("DEBUG transformConcatOperation:", syntax.String(op.X), "+", syntax.String(op.Y), "leftIsString:", leftIsString, "rightIsString:", rightIsString)
+	trace("transformConcatOperation: %s + %s leftIsString:%v rightIsString:%v", syntax.String(op.X), syntax.String(op.Y), leftIsString, rightIsString)
 
 	if leftIsString && !rightIsString {
 		if t.mightBeNumericVariable(op.Y, ctx) {
@@ -148,9 +148,9 @@ func (t *StringConcatTransform) transformConcatOperation(op *syntax.Operation, c
 func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *TransformContext) syntax.Expr {
 	// Extract all parts of the concatenation chain
 	parts := t.extractConcatenationParts(op)
-	println("DEBUG transformConcatChain: parts count:", len(parts))
+	trace("transformConcatChain: parts count: %d", len(parts))
 	for i, p := range parts {
-		println("  part", i, ":", syntax.String(p))
+		trace("  part %d: %s", i, syntax.String(p))
 	}
 	if len(parts) < 2 {
 		return nil
@@ -161,7 +161,7 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 	for i := 0; i < len(parts)-1; i++ {
 		leftIsString := t.isStringExpression(parts[i], ctx) || t.containsString(parts[i], ctx)
 		rightIsString := t.isStringExpression(parts[i+1], ctx)
-		println("DEBUG chain part", i, "leftIsString:", leftIsString, "rightIsString:", rightIsString, "mightBeNumeric left:", t.mightBeNumericVariable(parts[i], ctx), "mightBeNumeric right:", t.mightBeNumericVariable(parts[i+1], ctx))
+		trace("chain part %d leftIsString:%v rightIsString:%v mightBeNumeric left:%v mightBeNumeric right:%v", i, leftIsString, rightIsString, t.mightBeNumericVariable(parts[i], ctx), t.mightBeNumericVariable(parts[i+1], ctx))
 
 		if (leftIsString && !rightIsString && t.mightBeNumericVariable(parts[i+1], ctx)) ||
 			(!leftIsString && rightIsString && t.mightBeNumericVariable(parts[i], ctx)) {
@@ -180,7 +180,7 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 	// If first part is numeric and second is string, wrap the first part
 	if len(parts) >= 2 && !t.isStringExpression(parts[0], ctx) && t.isStringExpression(parts[1], ctx) && t.mightBeNumericVariable(parts[0], ctx) {
 		result = t.createSprintfCall(parts[0])
-		println("DEBUG: Wrapped first part:", syntax.String(result))
+		trace("Wrapped first part: %s", syntax.String(result))
 	}
 
 	for i := 1; i < len(parts); i++ {
@@ -192,7 +192,7 @@ func (t *StringConcatTransform) transformConcatChain(op *syntax.Operation, ctx *
 		// If left side is string-ish and right side is not string but could be numeric, wrap it
 		if leftIsStringish && !rightIsString && t.mightBeNumericVariable(parts[i], ctx) {
 			rightSide = t.createSprintfCall(parts[i])
-			println("DEBUG: Wrapped right part:", syntax.String(rightSide))
+			trace("Wrapped right part: %s", syntax.String(rightSide))
 		}
 
 		result = &syntax.Operation{
@@ -251,7 +251,7 @@ func (t *StringConcatTransform) transformStringInterpolation(expr syntax.Expr, c
 		// Check if this looks like string interpolation (consecutive operations)
 		parts := t.extractInterpolationParts(op)
 		if len(parts) >= 3 && t.isStringInterpolationPattern(parts, ctx) {
-			println("Found string interpolation pattern with", len(parts), "parts")
+			trace("Found string interpolation pattern with %d parts", len(parts), "parts")
 			return t.buildInterpolationChain(parts, ctx)
 		}
 	}
