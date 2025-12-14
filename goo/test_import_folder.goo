@@ -1,4 +1,4 @@
-import "helper" // folder import ok!
+import "./helper" // Local directory imports require explicit ./ prefix
 
 message := helper.Hello()
 print("Message:", message)

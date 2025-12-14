@@ -44,7 +44,6 @@ func (t *GooImportTransform) Transform(file *syntax.File, ctx *TransformContext)
 			}
 		}
 	}
-
 	return changed
 }
 
@@ -66,21 +65,14 @@ func (t *GooImportTransform) transformImportDeclWithContext(importDecl *syntax.I
 		// Create new relative import path
 		newImportPath := "./" + baseName
 
-		println("Transformed .goo import to:", newImportPath)
-
 		// Update import path in place
 		importDecl.Path.Value = "\"" + newImportPath + "\""
 		return true
 	}
 
-	// Check if this is a local directory import that should be converted to relative
-	if t.shouldConvertToLocalImport(importPath, sourceDir) {
-		// Convert bare directory name to relative import
-		newImportPath := "./" + importPath
-		println("Transforming local import:", importPath, "->", newImportPath)
-		importDecl.Path.Value = "\"" + newImportPath + "\""
-		return true
-	}
+	// NOTE: Bare directory imports like "helper" are now handled by resolveImportPath in pkg.go
+	// The AST should keep the original import path, and the import mapping handles resolution
+	// Only transform .goo file imports here
 
 	return false
 }

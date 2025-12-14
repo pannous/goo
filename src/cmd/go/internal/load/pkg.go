@@ -1165,6 +1165,10 @@ func ResolveImportPath(s *modload.State, parent *Package, path string) (found st
 }
 
 func resolveImportPath(s *modload.State, path, parentPath, parentDir, parentRoot string, parentIsStd bool) (found string) {
+	// Note: Bare directory imports for .goo files (e.g., import "helper") are complex
+	// because they require coordination between package loading and AST transformation.
+	// The recommended syntax is explicit relative paths: import "./helper"
+
 	if cfg.ModulesEnabled {
 		if _, p, e := modload.Lookup(s, parentPath, parentIsStd, path); e == nil {
 			return p
