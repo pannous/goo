@@ -199,13 +199,15 @@ redo:
 		if s.ch == '.' {
 			s.nextch()
 			if s.ch == '.' {
+				// ... is kept as _DotDotDot for variadic parameters and array literals
 				s.nextch()
 				s.tok = _DotDotDot
 				break
 			}
-			// Rewind for two separate dots
-			s.rewind() // now s.ch holds 1st '.'
-			s.nextch() // consume 1st '.' again
+			// .. is exclusive range operator
+			s.op, s.prec = RangeExclusive, precAdd
+			s.tok = _Operator
+			break
 		}
 		if isDecimal(s.ch) {
 			s.number(true)
@@ -213,7 +215,7 @@ redo:
 		}
 		s.tok = _Dot
 
-	case '…': // ellipsis as range operator
+	case '…': // ellipsis (U+2026) as inclusive range operator
 		s.nextch()
 		s.op, s.prec = Range, precAdd
 		s.tok = _Operator
@@ -773,6 +775,11 @@ func (s *scanner) number(seenPoint bool) {
 		}
 		digsep |= s.digits(base, &invalid)
 		if s.ch == '.' {
+			// Check for .. range operator - don't consume the . if it's followed by another .
+			if s.peek() == '.' {
+				// This is the start of .. range operator, don't treat as decimal point
+				goto done
+			}
 			if prefix == 'o' || prefix == 'b' {
 				s.errorf("invalid radix point in %s literal", baseName(base))
 				ok = false
@@ -781,6 +788,8 @@ func (s *scanner) number(seenPoint bool) {
 			seenPoint = true
 		}
 	}
+
+done:
 
 	// fractional part
 	if seenPoint {
@@ -1248,12 +1257,23 @@ func (s *scanner) checkHashDirective() bool {
 	return false
 }
 
+// peek returns the next character without consuming it
+func (s *scanner) peek() rune {
+	savedR := s.r
+	savedCh := s.ch
+	s.nextch()
+	nextCh := s.ch
+	s.r = savedR
+	s.ch = savedCh
+	return nextCh
+}
+
 // peekAhead checks if the next characters match the given string
 func (s *scanner) peekAhead(target string) bool {
 	// Save current position
 	savedR := s.r
 	savedCh := s.ch
-	
+
 	// Try to match each character
 	for _, expectedCh := range target {
 		if s.ch != expectedCh {
@@ -1264,7 +1284,7 @@ func (s *scanner) peekAhead(target string) bool {
 		}
 		s.nextch()
 	}
-	
+
 	// Check that it's followed by whitespace or end of line
 	if s.ch == ' ' || s.ch == '\t' || s.ch == '\n' || s.ch < 0 {
 		// Restore position to start of matched text
@@ -1272,7 +1292,7 @@ func (s *scanner) peekAhead(target string) bool {
 		s.ch = savedCh
 		return true
 	}
-	
+
 	// Restore position and return false
 	s.r = savedR
 	s.ch = savedCh

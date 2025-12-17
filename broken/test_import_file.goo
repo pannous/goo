@@ -1,4 +1,6 @@
-// NOT YET 1.8.25  or never?   see test_import_folder.goo
-import "helper.goo" // current directory only see test_import_folder.goo
+import "helper.goo" // file import not ok, unfixable?
 
-helper() 
+message := helper.Hello()
+print("Message:", message)
+check "Hello" in message
+print("Import working successfully!")

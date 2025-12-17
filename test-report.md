@@ -5,10 +5,12 @@ Running all tests in ./goo/ directory...
 ✅ test_and_or.goo
 ✅ test_array_1indexed.goo
 ✅ test_array_like_slice.goo
+✅ test_as_cast_comprehensive.goo
 ✅ test_as_cast_convert.goo
 ✅ test_as_cast.goo
 ✅ test_assert.goo
 ✅ test_auto_return.goo
+✅ test_broken_fixed.goo
 ✅ test_check_reverse.goo
 ✅ test_class_funcs.goo
 ✅ test_class_methods.goo
@@ -23,6 +25,7 @@ Running all tests in ./goo/ directory...
 ✅ test_ellipsis.goo
 ✅ test_enum_string.goo
 ✅ test_enum.goo
+✅ test_exclamation_syntax.goo
 ✅ test_explicit_main.goo
 ✅ test_filter_simple.goo
 ✅ test_filter_synonyms.goo
@@ -34,11 +37,11 @@ Running all tests in ./goo/ directory...
 ✅ test_hash_with_if.goo
 ✅ test_implicit_main.goo
 ✅ test_import_bare_syntax.goo
-❌ test_import_folder.goo
+✅ test_import_folder.goo
 ✅ test_in_operator_auto_import.goo
 ✅ test_in_operator_maps.goo
 ✅ test_in_operator_rune_strings.goo
-❌ test_in_operator_slices.goo
+✅ test_in_operator_slices.goo
 ✅ test_in_operator_strings.goo
 ✅ test_interpolation.goo
 ✅ test_is_operator.goo
@@ -47,14 +50,14 @@ Running all tests in ./goo/ directory...
 ✅ test_iterator_simple.goo
 ✅ test_lambda_arg.goo
 ✅ test_lambda.goo
-❌ test_list_comparison.goo
-❌ test_list_comparison2.goo
-❌ test_list_equality.goo
+✅ test_list_comparison.goo
+✅ test_list_comparison2.goo
+✅ test_list_equality.goo
 ✅ test_list_filter.goo
 ✅ test_list_lambda.goo
 ✅ test_list_map.goo
-❌ test_list_methods_broken.goo
-❌ test_list_methods.goo
+✅ test_list_methods_broken.goo
+✅ test_list_methods.goo
 ✅ test_list_synonyms_only.goo
 ✅ test_list_typed.goo
 ✅ test_list.goo
@@ -65,11 +68,12 @@ Running all tests in ./goo/ directory...
 ✅ test_map_dot_notation.goo
 ✅ test_map_fields.goo
 ✅ test_map_type_inference.goo
-❌ test_map.goo
+✅ test_map.goo
 ✅ test_minimal_conflict.goo
 ✅ test_mixed.goo
 ✅ test_modify.goo
 ✅ test_nil.goo
+✅ test_non_modifying.goo
 ✅ test_not_truthiness.goo
 ✅ test_not.goo
 ✅ test_pipe.goo
@@ -78,8 +82,11 @@ Running all tests in ./goo/ directory...
 ✅ test_printf.goo
 ✅ test_put_no_import.goo
 ✅ test_put.goo
+✅ test_range_exclusive.goo
+✅ test_range_inclusive.goo
 ✅ test_return_void.goo
 ✅ test_shebang.goo
+✅ test_simple_for_range.goo
 ✅ test_simple_hash_check.goo
 ✅ test_simple_printf.goo
 ✅ test_simple.goo
@@ -92,7 +99,7 @@ Running all tests in ./goo/ directory...
 ✅ test_string_format_chain.goo
 ✅ test_string_format_simple.goo
 ✅ test_string_interpolation.goo
-❌ test_string_methods_todo.goo
+✅ test_string_methods_todo.goo
 ✅ test_string_methods.goo
 ✅ test_string_ops_struct.goo
 ✅ test_string_ops.goo
@@ -102,17 +109,17 @@ Running all tests in ./goo/ directory...
 ✅ test_strings_auto_import.goo
 ✅ test_struct.goo
 ✅ test_synonyms_simple.goo
-❌ test_tau_pi_approx.goo
-❌ test_tensors.goo
+✅ test_tau_pi_approx.goo
 ✅ test_transform_synonyms.goo
-❌ test_truthy_and.goo
-❌ test_truthy.goo
+✅ test_truthy_and_working.goo
+✅ test_truthy_and.goo
+✅ test_truthy.goo
 ✅ test_try_assign_context_aware.goo
 ✅ test_try_assign.goo
 ✅ test_try_assignment.goo
 ✅ test_try_catch.goo
 ✅ test_try_propagation.goo
-❌ test_typeof.goo
+✅ test_typeof.goo
 ✅ test_unicode_ops.goo
 ✅ test_unicode.goo
 ✅ test_units.goo
@@ -120,5 +127,5 @@ Running all tests in ./goo/ directory...
 ✅ test_while_loops.goo
 ✅ tests.goo
 ========================================
-Summary: 105/119 passed, 14 failed
-⚠️  Some tests failed
+Summary: 126/126 passed, 0 failed
+🎉 All tests passed!

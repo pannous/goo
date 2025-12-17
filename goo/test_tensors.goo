@@ -1,3 +1,0 @@
-# go get -u github.com/go-python/gopy
-# YIKES gopy bind -o pytorch_example.go -name=pytorch_example pytorch_example.py
-# https://www.codegenes.net/blog/go-pytorch/

@@ -1,3 +1,35 @@
+  1. Add … or .. token to scanner
+  2. Implement range operator transform
+  3. Activate 4 range-related tests
+  4. Potential: +4 more passing tests
+
+  Phase 4: Future Features (as needed)
+
+  - Optional chaining (?)
+  - Null coalescing (?? or ?:)
+  - Try/error improvements
+
+
+
+  🔥 HIGH PRIORITY - Quick Wins
+
+  Hash Indexing Bug (2 tests - ~1 hour fix)
+  - test_lists_methods.goo
+  - test_lists_consolidated.goo
+
+  Issue: numbers#0 transformed incorrectly to [0-1] = [-1]
+  Fix: Debug array_index_transform.go hash indexing logic
+  Value: Unlock 2 more comprehensive list tests
+
+  ---
+  Range Operator (5 tests - ~3 hours implementation)
+  - test_range_syntax.goo
+  - test_range_operator_variations.goo
+  - test_range_final_verification.goo
+  - test_dotdot_scanner.goo
+  - minimal_range.goo
+
+
 pick another random test maybe we can learn some general insights and remember the transformer 
 should usually not be changed because it worked before so it might have been lost was the integration. On the 
 other hand if we can put into Transformers which was previously scattered around even better so 

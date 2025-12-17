@@ -38,16 +38,20 @@ func (v *ellipsisRangeVisitor) Visit(node syntax.Node) syntax.Visitor {
 	}
 
 	// Handle Range operations by replacing them in their parent nodes
+	isRangeOp := func(op *syntax.Operation) bool {
+		return op.Op == syntax.Range || op.Op == syntax.RangeExclusive
+	}
+
 	switch n := node.(type) {
 	case *syntax.ExprStmt:
-		if rangeOp, ok := n.X.(*syntax.Operation); ok && rangeOp.Op == syntax.Range {
+		if rangeOp, ok := n.X.(*syntax.Operation); ok && isRangeOp(rangeOp) {
 			if newExpr := v.transform.convertRangeToArray(rangeOp, v.ctx); newExpr != rangeOp {
 				n.X = newExpr
 				v.changed = true
 			}
 		}
 	case *syntax.AssignStmt:
-		if rangeOp, ok := n.Rhs.(*syntax.Operation); ok && rangeOp.Op == syntax.Range {
+		if rangeOp, ok := n.Rhs.(*syntax.Operation); ok && isRangeOp(rangeOp) {
 			if newExpr := v.transform.convertRangeToArray(rangeOp, v.ctx); newExpr != rangeOp {
 				n.Rhs = newExpr
 				v.changed = true
@@ -55,20 +59,20 @@ func (v *ellipsisRangeVisitor) Visit(node syntax.Node) syntax.Visitor {
 		}
 	case *syntax.Operation:
 		// Handle Range in operation's operands
-		if rangeOp, ok := n.X.(*syntax.Operation); ok && rangeOp.Op == syntax.Range {
+		if rangeOp, ok := n.X.(*syntax.Operation); ok && isRangeOp(rangeOp) {
 			if newExpr := v.transform.convertRangeToArray(rangeOp, v.ctx); newExpr != rangeOp {
 				n.X = newExpr
 				v.changed = true
 			}
 		}
-		if rangeOp, ok := n.Y.(*syntax.Operation); ok && rangeOp.Op == syntax.Range {
+		if rangeOp, ok := n.Y.(*syntax.Operation); ok && isRangeOp(rangeOp) {
 			if newExpr := v.transform.convertRangeToArray(rangeOp, v.ctx); newExpr != rangeOp {
 				n.Y = newExpr
 				v.changed = true
 			}
 		}
 	case *syntax.ParenExpr:
-		if rangeOp, ok := n.X.(*syntax.Operation); ok && rangeOp.Op == syntax.Range {
+		if rangeOp, ok := n.X.(*syntax.Operation); ok && isRangeOp(rangeOp) {
 			if newExpr := v.transform.convertRangeToArray(rangeOp, v.ctx); newExpr != rangeOp {
 				n.X = newExpr
 				v.changed = true

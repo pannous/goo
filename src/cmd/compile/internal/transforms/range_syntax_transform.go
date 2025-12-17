@@ -41,9 +41,9 @@ func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
 	if forStmt, ok := node.(*syntax.ForStmt); ok {
 		if forStmt.Init != nil {
 			if inClause, ok := forStmt.Init.(*syntax.InClause); ok {
-				// Check if the X expression is a range operation
-				if op, ok := inClause.X.(*syntax.Operation); ok && op.Op == syntax.Range {
-					// Convert entire for loop: for i in start…end { } -> for i := start; i <= end; i++ { }
+				// Check if the X expression is a range operation (either .. or ... or …)
+				if op, ok := inClause.X.(*syntax.Operation); ok && (op.Op == syntax.Range || op.Op == syntax.RangeExclusive) {
+					// Convert entire for loop
 					v.transform.convertRangeForLoop(forStmt, inClause, op, v.ctx)
 					v.changed = true
 				}
@@ -52,8 +52,8 @@ func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
 	}
 
 	// Handle Range operations in general expressions (not just for loops)
-	if op, ok := node.(*syntax.Operation); ok && op.Op == syntax.Range {
-		// Transform a…b into array literal [a, a+1, ..., b]
+	if op, ok := node.(*syntax.Operation); ok && (op.Op == syntax.Range || op.Op == syntax.RangeExclusive) {
+		// Transform a..b or a...b into array literal
 		v.transform.convertRangeExpression(op, v.ctx)
 		v.changed = true
 	}
@@ -61,15 +61,17 @@ func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// convertRangeForLoop converts entire for loop: "for i in start…end" to "for i := start; i <= end; i++" (inclusive)
+// convertRangeForLoop converts entire for loop:
+// "for i in start..end" to "for i := start; i < end; i++" (exclusive)
+// "for i in start…end" to "for i := start; i <= end; i++" (inclusive)
 func (t *RangeSyntaxTransform) convertRangeForLoop(forStmt *syntax.ForStmt, inClause *syntax.InClause, rangeOp *syntax.Operation, ctx *TransformContext) {
 	pos := inClause.Pos()
-	
+
 	// Extract the loop variable, start, and end
-	loopVar := inClause.Lhs  
+	loopVar := inClause.Lhs
 	start := rangeOp.X
 	end := rangeOp.Y
-	
+
 	// Create "i := start" initialization
 	initStmt := &syntax.AssignStmt{
 		Op:  syntax.Def, // := operator
@@ -77,12 +79,19 @@ func (t *RangeSyntaxTransform) convertRangeForLoop(forStmt *syntax.ForStmt, inCl
 		Rhs: start,
 	}
 	initStmt.SetPos(pos)
-	
-	// Create "i <= end" condition (inclusive range)
+
+	// Create condition: "i < end" for exclusive (..), "i <= end" for inclusive (... or …)
+	var compareOp syntax.Operator
+	if rangeOp.Op == syntax.RangeExclusive {
+		compareOp = syntax.Lss // < operator (exclusive)
+	} else {
+		compareOp = syntax.Leq // <= operator (inclusive)
+	}
+
 	conditionOp := &syntax.Operation{
-		Op: syntax.Leq, // <= operator (inclusive)
-		X:  loopVar,    // i
-		Y:  end,        // end
+		Op: compareOp,
+		X:  loopVar, // i
+		Y:  end,     // end
 	}
 	conditionOp.SetPos(pos)
 	

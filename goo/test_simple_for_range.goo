@@ -1,7 +1,10 @@
-import "fmt"
-
-func main() {
-	for i in 0…5 {
-		fmt.Println(i)
-	}
+var sum = 0
+// for i in 0...5 {
+// println(i)
+// sum+=i
+// }
+for i in 0…5 {
+println(i)
+sum+=i
 }
+check sum==1+2+3+4+5

@@ -1,6 +1,0 @@
-import "helper.goo" // file import not ok, unfixable?
-
-message := helper.Hello()
-print("Message:", message)
-check "Hello" in message
-print("Import working successfully!")

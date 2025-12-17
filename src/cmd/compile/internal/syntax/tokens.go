@@ -245,9 +245,10 @@ const (
 	Shl       // <<
 	Shr       // >>
 	IS        // is
-	Range     // …
-	
-	// precPower  
+	Range          // … (inclusive range)
+	RangeExclusive // .. (exclusive range)
+
+	// precPower
 	Power     // **
 )
 
@@ -280,11 +281,12 @@ var OperatorNames = [...]string{
 	Rem:    "%",
 	And:    "&",
 	AndNot: "&^",
-	Shl:    "<<",
-	Shr:    ">>",
-	IS:     "is",
-	Range:  "…",
-	Power:  "**",
+	Shl:            "<<",
+	Shr:            ">>",
+	IS:             "is",
+	Range:          "…",
+	RangeExclusive: "..",
+	Power:          "**",
 }
 
 // String returns the string representation of the Operator.
