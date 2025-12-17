@@ -1,7 +1,5 @@
 // Copyright 2025 The Goo Authors. All rights reserved.
 
-//go:build transforms
-
 package transforms
 
 import (
