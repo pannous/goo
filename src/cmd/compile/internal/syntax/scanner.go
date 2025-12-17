@@ -396,6 +396,11 @@ redo:
 			s.tok = _Operator
 			break
 		}
+		if s.ch == '.' {
+			s.nextch()
+			s.tok = _OptChain
+			break
+		}
 		s.errorf("invalid character '?'")
 		goto redo
 

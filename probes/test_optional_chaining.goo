@@ -1,0 +1,26 @@
+// Test optional chaining operator (?.)
+type Person struct {
+	name string
+	addr *Address
+}
+
+type Address struct {
+	city string
+}
+
+// Test with nil receiver
+var p *Person = nil
+var city1 = p?.addr?.city
+check city1 == ""
+
+// Test with non-nil receiver
+var p2 = &Person{name: "Alice", addr: &Address{city: "NYC"}}
+var city2 = p2?.addr?.city
+check city2 == "NYC"
+
+// Test with nil intermediate value
+var p3 = &Person{name: "Bob", addr: nil}
+var city3 = p3?.addr?.city
+check city3 == ""
+
+println("Optional chaining works correctly")

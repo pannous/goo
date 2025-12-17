@@ -1,0 +1,8 @@
+// Simplified optional chaining test
+type Person struct {
+	name string
+}
+
+var p *Person = nil
+var name1 = p?.name
+println(name1)

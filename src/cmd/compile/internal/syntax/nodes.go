@@ -205,8 +205,9 @@ type (
 
 	// X.Sel
 	SelectorExpr struct {
-		X   Expr
-		Sel *Name
+		X        Expr
+		Sel      *Name
+		Optional bool // true if this is optional chaining (?.)
 		expr
 	}
 

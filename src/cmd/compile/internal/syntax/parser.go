@@ -1836,6 +1836,21 @@ loop:
 	for {
 		pos := p.pos()
 		switch p.tok {
+		case _OptChain:
+			// pexpr '?.' sym (optional chaining)
+			p.next()
+			if p.tok == _Name {
+				t := new(SelectorExpr)
+				t.pos = pos
+				t.X = x
+				t.Sel = p.name()
+				t.Optional = true
+				x = t
+			} else {
+				p.syntaxError("expected name after ?.")
+				p.advance(_Semi, _Rparen)
+			}
+
 		case _Dot:
 			p.next()
 			switch p.tok {

@@ -44,6 +44,7 @@ const (
 	_Dot       // .
 	_DotDot    // ..
 	_DotDotDot // ...
+	_OptChain  // ?.
 	// … .. ..? ..<
 
 	// keywords
@@ -143,6 +144,7 @@ var TokenNames = [...]string{
 	_Dot:            ".",
 	_DotDot:         "..",
 	_DotDotDot:      "...",
+	_OptChain:       "?.",
 	_As:             "as",
 	_Break:          "break",
 	_Case:           "case",
