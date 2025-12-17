@@ -37,13 +37,13 @@ func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
 		return nil
 	}
 
-	// Look for InClause with range operations in for loops  
+	// Look for InClause with range operations in for loops
 	if forStmt, ok := node.(*syntax.ForStmt); ok {
 		if forStmt.Init != nil {
 			if inClause, ok := forStmt.Init.(*syntax.InClause); ok {
 				// Check if the X expression is a range operation
 				if op, ok := inClause.X.(*syntax.Operation); ok && op.Op == syntax.Range {
-					// Convert entire for loop: for i in start…end { } -> for i := start; i < end; i++ { }
+					// Convert entire for loop: for i in start…end { } -> for i := start; i <= end; i++ { }
 					v.transform.convertRangeForLoop(forStmt, inClause, op, v.ctx)
 					v.changed = true
 				}
@@ -61,7 +61,7 @@ func (v *rangeSyntaxVisitor) Visit(node syntax.Node) syntax.Visitor {
 	return v
 }
 
-// convertRangeForLoop converts entire for loop: "for i in start…end" to "for i := start; i < end; i++"
+// convertRangeForLoop converts entire for loop: "for i in start…end" to "for i := start; i <= end; i++" (inclusive)
 func (t *RangeSyntaxTransform) convertRangeForLoop(forStmt *syntax.ForStmt, inClause *syntax.InClause, rangeOp *syntax.Operation, ctx *TransformContext) {
 	pos := inClause.Pos()
 	
@@ -78,9 +78,9 @@ func (t *RangeSyntaxTransform) convertRangeForLoop(forStmt *syntax.ForStmt, inCl
 	}
 	initStmt.SetPos(pos)
 	
-	// Create "i < end" condition
+	// Create "i <= end" condition (inclusive range)
 	conditionOp := &syntax.Operation{
-		Op: syntax.Lss, // < operator
+		Op: syntax.Leq, // <= operator (inclusive)
 		X:  loopVar,    // i
 		Y:  end,        // end
 	}
