@@ -222,7 +222,10 @@ fi
 # Bootstrap installs a proper cmd/dist, built with the new toolchain.
 # Throw ours, built with the bootstrap toolchain, away after bootstrap.
 ./cmd/dist/dist bootstrap -a $vflag $GO_DISTFLAGS "$@"
-env GOO_USE_TRANSFORMERS=1 /opt/other/go/bin/go build -tags=transforms -o ./bin/go ./cmd/go
+# Rebuild compiler and go command with transforms tag to include Goo-specific transforms
+env GOO_USE_TRANSFORMERS=1 ../bin/go build -tags=transforms -o ../bin/compile ./cmd/compile
+cp ../bin/compile "$GOTOOLDIR"/compile
+env GOO_USE_TRANSFORMERS=1 ../bin/go build -tags=transforms -o ../bin/go ./cmd/go
 rm -f ./cmd/dist/dist
 
 # DO NOT ADD ANY NEW CODE HERE.
