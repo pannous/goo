@@ -456,7 +456,7 @@ func (u *unwinder) next() {
 		// get everything, so crash loudly.
 		fail := u.flags&(unwindPrintErrors|unwindSilentErrors) == 0
 		doPrint := u.flags&unwindSilentErrors == 0
-		if doPrint && gp.m.incgo && f.funcID == abi.FuncID_sigpanic {
+		if doPrint && gp.m != nil && gp.m.incgo && f.funcID == abi.FuncID_sigpanic {
 			// We can inject sigpanic
 			// calls directly into C code,
 			// in which case we'll see a C
@@ -1271,12 +1271,23 @@ func goroutineheader(gp *g) {
 	if bubble := gp.bubble; bubble != nil {
 		print(", synctest bubble ", bubble.id)
 	}
+	print("]")
 	if gp.labels != nil && debug.tracebacklabels.Load() == 1 {
 		labels := (*label.Set)(gp.labels).List
 		if len(labels) > 0 {
-			print(" labels:{")
+			print(" {")
 			for i, kv := range labels {
-				print(quoted(kv.Key), ": ", quoted(kv.Value))
+				// Try to be nice and only quote the keys/values if one of them has characters that need quoting or escaping.
+				printq := func(s string) {
+					if tracebackStringNeedsQuoting(s) {
+						print(quoted(s))
+					} else {
+						print(s)
+					}
+				}
+				printq(kv.Key)
+				print(": ")
+				printq(kv.Value)
 				if i < len(labels)-1 {
 					print(", ")
 				}
@@ -1284,7 +1295,19 @@ func goroutineheader(gp *g) {
 			print("}")
 		}
 	}
-	print("]:\n")
+	print(":\n")
+}
+
+func tracebackStringNeedsQuoting(s string) bool {
+	for _, r := range s {
+		if !('a' <= r && r <= 'z' ||
+			'A' <= r && r <= 'Z' ||
+			'0' <= r && r <= '9' ||
+			r == '.' || r == '/' || r == '_') {
+			return true
+		}
+	}
+	return false
 }
 
 func tracebackothers(me *g) {

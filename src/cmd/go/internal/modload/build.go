@@ -12,7 +12,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"cmd/go/internal/base"
 	"cmd/go/internal/cfg"
@@ -88,7 +87,16 @@ func ModuleInfo(loaderstate *State, ctx context.Context, path string) *modinfo.M
 		return nil
 	}
 
-	if path, vers, found := strings.Cut(path, "@"); found {
+	path, vers, found, err := ParsePathVersion(path)
+	if err != nil {
+		return &modinfo.ModulePublic{
+			Path: path,
+			Error: &modinfo.ModuleError{
+				Err: err.Error(),
+			},
+		}
+	}
+	if found {
 		m := module.Version{Path: path, Version: vers}
 		return moduleInfo(loaderstate, ctx, nil, m, 0, nil)
 	}
@@ -441,7 +449,7 @@ func moduleInfo(loaderstate *State, ctx context.Context, rs *Requirements, m mod
 // findModule searches for the module that contains the package at path.
 // If the package was loaded, its containing module and true are returned.
 // Otherwise, module.Version{} and false are returned.
-func findModule(ld *loader, path string) (module.Version, bool) {
+func findModule(ld *packageLoader, path string) (module.Version, bool) {
 	if pkg, ok := ld.pkgCache.Get(path); ok {
 		return pkg.mod, pkg.mod != module.Version{}
 	}

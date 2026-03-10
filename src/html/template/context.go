@@ -156,51 +156,13 @@ const (
 	// stateError is an infectious error state outside any valid
 	// HTML/CSS/JS construct.
 	stateError
+	// stateMetaContent occurs inside a HTML meta element content attribute.
+	stateMetaContent
+	// stateMetaContentURL occurs inside a "url=" tag in a HTML meta element content attribute.
+	stateMetaContentURL
 	// stateDead marks unreachable code after a {{break}} or {{continue}}.
 	stateDead
 )
-
-// stateNames provides string representations for state constants, replacing stringer-generated state_string.go
-var stateNames = [...]string{
-	stateText:           "stateText",
-	stateTag:            "stateTag",
-	stateAttrName:       "stateAttrName",
-	stateAfterName:      "stateAfterName",
-	stateBeforeValue:    "stateBeforeValue",
-	stateHTMLCmt:        "stateHTMLCmt",
-	stateRCDATA:         "stateRCDATA",
-	stateAttr:           "stateAttr",
-	stateURL:            "stateURL",
-	stateSrcset:         "stateSrcset",
-	stateJS:             "stateJS",
-	stateJSDqStr:        "stateJSDqStr",
-	stateJSSqStr:        "stateJSSqStr",
-	stateJSTmplLit:      "stateJSTmplLit",
-	stateJSRegexp:       "stateJSRegexp",
-	stateJSBlockCmt:     "stateJSBlockCmt",
-	stateJSLineCmt:      "stateJSLineCmt",
-	stateJSHTMLOpenCmt:  "stateJSHTMLOpenCmt",
-	stateJSHTMLCloseCmt: "stateJSHTMLCloseCmt",
-	stateCSS:            "stateCSS",
-	stateCSSDqStr:       "stateCSSDqStr",
-	stateCSSSqStr:       "stateCSSSqStr",
-	stateCSSDqURL:       "stateCSSDqURL",
-	stateCSSSqURL:       "stateCSSSqURL",
-	stateCSSURL:         "stateCSSURL",
-	stateCSSBlockCmt:    "stateCSSBlockCmt",
-	stateCSSLineCmt:     "stateCSSLineCmt",
-	stateError:          "stateError",
-	stateDead:           "stateDead",
-}
-
-// String returns the string representation of the state.
-// This replaces the stringer-generated String() method.
-func (s state) String() string {
-	if int(s) < len(stateNames) && stateNames[s] != "" {
-		return stateNames[s]
-	}
-	return "state(" + strconv.FormatInt(int64(s), 10) + ")"
-}
 
 // isComment is true for any state that contains content meant for template
 // authors & maintainers, not for end-users or machines.
@@ -355,26 +317,9 @@ const (
 	elementTextarea
 	// elementTitle corresponds to the RCDATA <title> element.
 	elementTitle
+	// elementMeta corresponds to the HTML <meta> element.
+	elementMeta
 )
-
-// elementNames provides string representations for element constants, replacing stringer-generated element_string.go
-var elementNames = [...]string{
-	elementNone:     "elementNone",
-	elementScript:   "elementScript",
-	elementStyle:    "elementStyle",
-	elementTextarea: "elementTextarea",
-	elementTitle:    "elementTitle",
-}
-
-// String returns the string representation of the element.
-// This replaces the stringer-generated String() method.
-func (e element) String() string {
-	if int(e) < len(elementNames) && elementNames[e] != "" {
-		return elementNames[e]
-	}
-	return "element(" + strconv.FormatInt(int64(e), 10) + ")"
-}
-
 
 // attr identifies the current HTML attribute when inside the attribute,
 // that is, starting from stateAttrName until stateTag/stateText (exclusive).
@@ -393,23 +338,7 @@ const (
 	attrURL
 	// attrSrcset corresponds to a srcset attribute.
 	attrSrcset
+	// attrMetaContent corresponds to the content attribute in meta HTML element.
+	attrMetaContent
 )
 
-// attrNames provides string representations for attr constants, replacing stringer-generated attr_string.go
-var attrNames = [...]string{
-	attrNone:       "attrNone",
-	attrScript:     "attrScript",
-	attrScriptType: "attrScriptType",
-	attrStyle:      "attrStyle",
-	attrURL:        "attrURL",
-	attrSrcset:     "attrSrcset",
-}
-
-// String returns the string representation of the attr.
-// This replaces the stringer-generated String() method.
-func (a attr) String() string {
-	if int(a) < len(attrNames) && attrNames[a] != "" {
-		return attrNames[a]
-	}
-	return "attr(" + strconv.FormatInt(int64(a), 10) + ")"
-}

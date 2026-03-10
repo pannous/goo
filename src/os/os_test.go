@@ -767,13 +767,12 @@ func TestReaddirStatFailures(t *testing.T) {
 	}
 
 	var xerr error // error to return for x
-	*LstatP = func(path string) (FileInfo, error) {
+	SetStatHook(t, func(f *File, path string) (FileInfo, error) {
 		if xerr != nil && strings.HasSuffix(path, "x") {
 			return nil, xerr
 		}
-		return Lstat(path)
-	}
-	defer func() { *LstatP = Lstat }()
+		return nil, nil
+	})
 
 	dir := t.TempDir()
 	touch(t, filepath.Join(dir, "good1"))
@@ -3466,6 +3465,34 @@ func TestWriteStringAlloc(t *testing.T) {
 	if allocs != 0 {
 		t.Errorf("expected 0 allocs for File.WriteString, got %v", allocs)
 	}
+}
+
+// Test that it's OK to have parallel I/O and Close on a file.
+func TestFileIOCloseRace(t *testing.T) {
+	t.Parallel()
+	file, err := Create(filepath.Join(t.TempDir(), "test.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		var tmp [100]byte
+		if _, err := file.Write(tmp[:]); err != nil && !errors.Is(err, ErrClosed) {
+			t.Error(err)
+		}
+	})
+	wg.Go(func() {
+		var tmp [100]byte
+		if _, err := file.Read(tmp[:]); err != nil && err != io.EOF && !errors.Is(err, ErrClosed) {
+			t.Error(err)
+		}
+	})
+	wg.Go(func() {
+		if err := file.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	wg.Wait()
 }
 
 // Test that it's OK to have parallel I/O and Close on a pipe.

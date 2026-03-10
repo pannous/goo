@@ -31,17 +31,23 @@
   commutative: false
   documentation: !string |-
     // NAME performs a full permutation of vector x using indices:
-    // result := {x[indices[0]], x[indices[1]], ..., x[indices[n]]}
+    //
+    //   result = {x[indices[0]], x[indices[1]], ..., x[indices[n]]}
+    //
 - go: Permute
   commutative: false
   documentation: !string |-
     // NAME performs a full permutation of vector x using indices:
-    // result := {x[indices[0]], x[indices[1]], ..., x[indices[n]]}
+    //
+    //   result = {x[indices[0]], x[indices[1]], ..., x[indices[n]]}
+    //
 - go: ConcatPermute # ConcatPermute is only available on or after AVX512
   commutative: false
   documentation: !string |-
     // NAME performs a full permutation of vector x, y using indices:
-    // result := {xy[indices[0]], xy[indices[1]], ..., xy[indices[n]]}
+    //
+    //   result = {xy[indices[0]], xy[indices[1]], ..., xy[indices[n]]}
+    //
     // where xy is the concatenation of x (lower half) and y (upper half).
     // Only the needed bits to represent xy's index are used in indices' elements.
 - go: Compress
@@ -63,21 +69,36 @@
   documentation: !string |-
     // NAME performs an expansion on a vector x whose elements are packed to lower parts.
     // The expansion is to distribute elements as indexed by mask, from lower mask elements to upper in order.
-- go: Broadcast128
+- go: Broadcast1To2
   commutative: false
   documentation: !string |-
-    // NAME copies element zero of its (128-bit) input to all elements of
-    // the 128-bit output vector.
-- go: Broadcast256
+    // NAME copies the lowest element of its input to all 2 elements of
+    // the output vector.
+- go: Broadcast1To4
   commutative: false
   documentation: !string |-
-    // NAME copies element zero of its (128-bit) input to all elements of
-    // the 256-bit output vector.
-- go: Broadcast512
+    // NAME copies the lowest element of its input to all 4 elements of
+    // the output vector.
+- go: Broadcast1To8
   commutative: false
   documentation: !string |-
-    // NAME copies element zero of its (128-bit) input to all elements of
-    // the 512-bit output vector.
+    // NAME copies the lowest element of its input to all 8 elements of
+    // the output vector.
+- go: Broadcast1To16
+  commutative: false
+  documentation: !string |-
+    // NAME copies the lowest element of its input to all 16 elements of
+    // the output vector.
+- go: Broadcast1To32
+  commutative: false
+  documentation: !string |-
+    // NAME copies the lowest element of its input to all 32 elements of
+    // the output vector.
+- go: Broadcast1To64
+  commutative: false
+  documentation: !string |-
+    // NAME copies the lowest element of its input to all 64 elements of
+    // the output vector.
 - go: PermuteOrZeroGrouped
   commutative: false
   documentation: !string |- # Detailed documentation will rely on the specific ops.
@@ -236,12 +257,12 @@
 - go: ConcatShiftBytesRight
   commutative: false
   documentation: !string |-
-    // NAME concatenates x and y and shift it right by constant bytes.
+    // NAME concatenates x and y and shift it right by shift bytes.
     // The result vector will be the lower half of the concatenated vector.
 
 - go: ConcatShiftBytesRightGrouped
   commutative: false
   documentation: !string |-
-    // NAME concatenates x and y and shift it right by constant bytes.
+    // NAME concatenates x and y and shift it right by shift bytes.
     // The result vector will be the lower half of the concatenated vector.
     // This operation is performed grouped by each 16 byte.

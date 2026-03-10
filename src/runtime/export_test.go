@@ -273,6 +273,10 @@ func CountPagesInUse() (pagesInUse, counted uintptr) {
 	return
 }
 
+func Blocksampled(cycles, rate int64) bool { return blocksampled(cycles, rate) }
+
+func Cheaprand() uint32         { return cheaprand() }
+func Cheaprand64() int64        { return cheaprand64() }
 func Fastrand() uint32          { return uint32(rand()) }
 func Fastrand64() uint64        { return rand() }
 func Fastrandn(n uint32) uint32 { return randn(n) }
@@ -1469,7 +1473,7 @@ func (c *GCController) Revise(d GCControllerReviseDelta) {
 
 func (c *GCController) EndCycle(bytesMarked uint64, assistTime, elapsed int64, gomaxprocs int) {
 	c.assistTime.Store(assistTime)
-	c.endCycle(elapsed, gomaxprocs, false)
+	c.endCycle(elapsed, gomaxprocs)
 	c.resetLive(bytesMarked)
 	c.commit(false)
 }
@@ -2078,4 +2082,27 @@ func DumpPrintQuoted(s string) string {
 	gp.writebuf = nil
 
 	return string(buf)
+}
+
+// DumpPrint returns the output of print(v).
+func DumpPrint[T any](v T) string {
+	gp := getg()
+	gp.writebuf = make([]byte, 0, 2048)
+	print(v)
+	buf := gp.writebuf
+	gp.writebuf = nil
+
+	return string(buf)
+}
+
+var (
+	Float64Bytes    = float64Bytes
+	Float32Bytes    = float32Bytes
+	Complex128Bytes = complex128Bytes
+	Complex64Bytes  = complex64Bytes
+)
+
+func GetScanAlloc() uintptr {
+	c := getMCache(getg().m)
+	return c.scanAlloc
 }

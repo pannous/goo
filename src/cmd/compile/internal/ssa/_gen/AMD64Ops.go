@@ -798,6 +798,7 @@ func init() {
 		// ROUNDSD instruction is only guaraneteed to be available if GOAMD64>=v2.
 		// For GOAMD64<v2, any use must be preceded by a successful check of runtime.x86HasSSE41.
 		{name: "ROUNDSD", argLength: 1, reg: fp11, aux: "Int8", asm: "ROUNDSD"},
+		{name: "ROUNDSS", argLength: 1, reg: fp11, aux: "Int8", asm: "ROUNDSS"},
 		// See why we need those in issue #71204
 		{name: "LoweredRound32F", argLength: 1, reg: fp11, resultInArg0: true, zeroWidth: true},
 		{name: "LoweredRound64F", argLength: 1, reg: fp11, resultInArg0: true, zeroWidth: true},
@@ -1035,6 +1036,7 @@ func init() {
 		// With a register ABI, the actual register info for these instructions (i.e., what is used in regalloc) is augmented with per-call-site bindings of additional arguments to specific in and out registers.
 		{name: "CALLstatic", argLength: -1, reg: regInfo{clobbers: callerSave}, aux: "CallOff", clobberFlags: true, call: true},                                              // call static function aux.(*obj.LSym).  last arg=mem, auxint=argsize, returns mem
 		{name: "CALLtail", argLength: -1, reg: regInfo{clobbers: callerSave}, aux: "CallOff", clobberFlags: true, call: true, tailCall: true},                                // tail call static function aux.(*obj.LSym).  last arg=mem, auxint=argsize, returns mem
+		{name: "CALLtailinter", argLength: -1, reg: regInfo{inputs: []regMask{gp}, clobbers: callerSave}, aux: "CallOff", clobberFlags: true, call: true, tailCall: true},    // tail call fn by pointer. arg0=codeptr, last arg=mem, auxint=argsize, returns mem
 		{name: "CALLclosure", argLength: -1, reg: regInfo{inputs: []regMask{gpsp, buildReg("DX"), 0}, clobbers: callerSave}, aux: "CallOff", clobberFlags: true, call: true}, // call function via closure.  arg0=codeptr, arg1=closure, last arg=mem, auxint=argsize, returns mem
 		{name: "CALLinter", argLength: -1, reg: regInfo{inputs: []regMask{gp}, clobbers: callerSave}, aux: "CallOff", clobberFlags: true, call: true},                        // call fn by pointer.  arg0=codeptr, last arg=mem, auxint=argsize, returns mem
 
@@ -1368,6 +1370,7 @@ func init() {
 		{name: "VPMASK64load512", argLength: 3, reg: vloadk, asm: "VMOVDQU64", aux: "SymOff", faultOnNilArg0: true, symEffect: "Read"},    // load from arg0+auxint+aux, arg1=k mask, arg2 = mem
 		{name: "VPMASK64store512", argLength: 4, reg: vstorek, asm: "VMOVDQU64", aux: "SymOff", faultOnNilArg0: true, symEffect: "Write"}, // store, *(arg0+auxint+aux) = arg2, arg1=k mask, arg3 = mem
 
+		// AVX512 moves between int-vector and mask registers
 		{name: "VPMOVMToVec8x16", argLength: 1, reg: kv, asm: "VPMOVM2B"},
 		{name: "VPMOVMToVec8x32", argLength: 1, reg: kv, asm: "VPMOVM2B"},
 		{name: "VPMOVMToVec8x64", argLength: 1, reg: kw, asm: "VPMOVM2B"},
@@ -1399,6 +1402,14 @@ func init() {
 		{name: "VPMOVVec64x2ToM", argLength: 1, reg: vk, asm: "VPMOVQ2M"},
 		{name: "VPMOVVec64x4ToM", argLength: 1, reg: vk, asm: "VPMOVQ2M"},
 		{name: "VPMOVVec64x8ToM", argLength: 1, reg: wk, asm: "VPMOVQ2M"},
+
+		// AVX1/2 moves from int-vector to bitmask (extracting sign bits)
+		{name: "VPMOVMSKB128", argLength: 1, reg: vgp, asm: "VPMOVMSKB"},
+		{name: "VPMOVMSKB256", argLength: 1, reg: vgp, asm: "VPMOVMSKB"},
+		{name: "VMOVMSKPS128", argLength: 1, reg: vgp, asm: "VMOVMSKPS"},
+		{name: "VMOVMSKPS256", argLength: 1, reg: vgp, asm: "VMOVMSKPS"},
+		{name: "VMOVMSKPD128", argLength: 1, reg: vgp, asm: "VMOVMSKPD"},
+		{name: "VMOVMSKPD256", argLength: 1, reg: vgp, asm: "VMOVMSKPD"},
 
 		// X15 is the zero register up to 128-bit. For larger values, we zero it on the fly.
 		{name: "Zero128", argLength: 0, reg: x15only, zeroWidth: true, fixedReg: true},

@@ -32,7 +32,6 @@ package sym
 
 import (
 	"cmd/internal/objabi"
-	"strconv"
 )
 
 // A SymKind describes the kind of memory represented by a symbol.
@@ -54,45 +53,36 @@ const (
 	SELFRXSECT     // Executable PLT; PPC64 .glink.
 	SMACHOPLT      // Mach-O PLT.
 
-	// Read-only, non-executable, segment.
-	STYPE            // Type descriptors.
+	// Read-only, non-executable, unrelocated segment.
 	SSTRING          // Used only for XCOFF runtime.rodata symbol?
 	SGOSTRING        // Go string constants.
-	SGOFUNC          // Function descriptors and funcdata symbols.
 	SGCBITS          // GC bit masks and programs.
 	SRODATA          // General read-only data.
 	SRODATAFIPSSTART // Start of FIPS read-only data.
 	SRODATAFIPS      // FIPS read-only data.
 	SRODATAFIPSEND   // End of FIPS read-only data.
 	SRODATAEND       // End of read-only data.
-	SFUNCTAB         // Appears to be unused, except for runtime.etypes.
 	SPCLNTAB         // Pclntab data.
+	STYPELINK        // Type links.
 	SELFROSECT       // ELF read-only data: relocs, dynamic linking info.
 
 	// Read-only, non-executable, dynamically relocatable segment.
 	//
-	// Types STYPE-SFUNCTAB above are written to the .rodata section by default.
-	// When linking a shared object, some conceptually "read only" types need to
-	// be written to by relocations and putting them in a section called
-	// ".rodata" interacts poorly with the system linkers. The GNU linkers
-	// support this situation by arranging for sections of the name
-	// ".data.rel.ro.XXX" to be mprotected read only by the dynamic linker after
-	// relocations have applied, so when the Go linker is creating a shared
-	// object it checks all objects of the above types and bumps any object that
-	// has a relocation to it to the corresponding type below, which are then
-	// written to sections with appropriate magic names.
-	STYPERELRO
-	SSTRINGRELRO
-	SGOSTRINGRELRO
-	SGOFUNCRELRO
-	SGCBITSRELRO
+	// This segment holds read-only data that contains pointers to
+	// other parts of the program. When generating a position
+	// independent executable or a shared library, these sections
+	// are "relro", meaning that they start as writable, and are
+	// changed to be read-only after dynamic relocations are applied.
+	//
+	// When no dynamic relocations are required, as when generating
+	// an executable that is not position independent, this is just
+	// part of the normal read-only segment.
 	SRODATARELRO
-	SFUNCTABRELRO
-
+	STYPE
+	SGOFUNC
 	SELFRELROSECT   // ELF-specific read-only relocatable: PLT, etc.
 	SMACHORELROSECT // Mach-O specific read-only relocatable.
 
-	STYPELINK // Type links.
 	SITABLINK // Itab links.
 
 	// Allocated writable segment.
@@ -187,33 +177,17 @@ var AbiSymKindToSymKind = [...]SymKind{
 	objabi.SSEHUNWINDINFO:          SSEHUNWINDINFO,
 }
 
-// ReadOnly are the symbol kinds that form read-only sections. In some
-// cases, if they will require relocations, they are transformed into
-// rel-ro sections using relROMap.
+// ReadOnly are the symbol kinds that form read-only sections
+// that never require runtime relocations.
 var ReadOnly = []SymKind{
-	STYPE,
 	SSTRING,
 	SGOSTRING,
-	SGOFUNC,
 	SGCBITS,
 	SRODATA,
 	SRODATAFIPSSTART,
 	SRODATAFIPS,
 	SRODATAFIPSEND,
 	SRODATAEND,
-	SFUNCTAB,
-}
-
-// RelROMap describes the transformation of read-only symbols to rel-ro
-// symbols.
-var RelROMap = map[SymKind]SymKind{
-	STYPE:     STYPERELRO,
-	SSTRING:   SSTRINGRELRO,
-	SGOSTRING: SGOSTRINGRELRO,
-	SGOFUNC:   SGOFUNCRELRO,
-	SGCBITS:   SGCBITSRELRO,
-	SRODATA:   SRODATARELRO,
-	SFUNCTAB:  SFUNCTABRELRO,
 }
 
 // IsText returns true if t is a text type.
@@ -245,168 +219,3 @@ func (t SymKind) IsDWARF() bool {
 	return SDWARFSECT <= t && t <= SDWARFADDR
 }
 
-// String returns the string representation of SymKind
-func (s SymKind) String() string {
-	switch s {
-	case Sxxx:
-		return "Sxxx"
-	case STEXT:
-		return "STEXT"
-	case STEXTFIPSSTART:
-		return "STEXTFIPSSTART"
-	case STEXTFIPS:
-		return "STEXTFIPS"
-	case STEXTFIPSEND:
-		return "STEXTFIPSEND"
-	case STEXTEND:
-		return "STEXTEND"
-	case SELFRXSECT:
-		return "SELFRXSECT"
-	case SMACHOPLT:
-		return "SMACHOPLT"
-	case STYPE:
-		return "STYPE"
-	case SSTRING:
-		return "SSTRING"
-	case SGOSTRING:
-		return "SGOSTRING"
-	case SGOFUNC:
-		return "SGOFUNC"
-	case SGCBITS:
-		return "SGCBITS"
-	case SRODATA:
-		return "SRODATA"
-	case SRODATAFIPSSTART:
-		return "SRODATAFIPSSTART"
-	case SRODATAFIPS:
-		return "SRODATAFIPS"
-	case SRODATAFIPSEND:
-		return "SRODATAFIPSEND"
-	case SRODATAEND:
-		return "SRODATAEND"
-	case SFUNCTAB:
-		return "SFUNCTAB"
-	case SELFROSECT:
-		return "SELFROSECT"
-	case STYPERELRO:
-		return "STYPERELRO"
-	case SSTRINGRELRO:
-		return "SSTRINGRELRO"
-	case SGOSTRINGRELRO:
-		return "SGOSTRINGRELRO"
-	case SGOFUNCRELRO:
-		return "SGOFUNCRELRO"
-	case SGCBITSRELRO:
-		return "SGCBITSRELRO"
-	case SRODATARELRO:
-		return "SRODATARELRO"
-	case SFUNCTABRELRO:
-		return "SFUNCTABRELRO"
-	case SELFRELROSECT:
-		return "SELFRELROSECT"
-	case SMACHORELROSECT:
-		return "SMACHORELROSECT"
-	case STYPELINK:
-		return "STYPELINK"
-	case SITABLINK:
-		return "SITABLINK"
-	case SPCLNTAB:
-		return "SPCLNTAB"
-	case SFirstWritable:
-		return "SFirstWritable"
-	case SBUILDINFO:
-		return "SBUILDINFO"
-	case SFIPSINFO:
-		return "SFIPSINFO"
-	case SELFSECT:
-		return "SELFSECT"
-	case SMACHO:
-		return "SMACHO"
-	case SMACHOGOT:
-		return "SMACHOGOT"
-	case SWINDOWS:
-		return "SWINDOWS"
-	case SELFGOT:
-		return "SELFGOT"
-	case SNOPTRDATA:
-		return "SNOPTRDATA"
-	case SNOPTRDATAFIPSSTART:
-		return "SNOPTRDATAFIPSSTART"
-	case SNOPTRDATAFIPS:
-		return "SNOPTRDATAFIPS"
-	case SNOPTRDATAFIPSEND:
-		return "SNOPTRDATAFIPSEND"
-	case SNOPTRDATAEND:
-		return "SNOPTRDATAEND"
-	case SINITARR:
-		return "SINITARR"
-	case SDATA:
-		return "SDATA"
-	case SDATAFIPSSTART:
-		return "SDATAFIPSSTART"
-	case SDATAFIPS:
-		return "SDATAFIPS"
-	case SDATAFIPSEND:
-		return "SDATAFIPSEND"
-	case SDATAEND:
-		return "SDATAEND"
-	case SXCOFFTOC:
-		return "SXCOFFTOC"
-	case SBSS:
-		return "SBSS"
-	case SNOPTRBSS:
-		return "SNOPTRBSS"
-	case SLIBFUZZER_8BIT_COUNTER:
-		return "SLIBFUZZER_8BIT_COUNTER"
-	case SCOVERAGE_COUNTER:
-		return "SCOVERAGE_COUNTER"
-	case SCOVERAGE_AUXVAR:
-		return "SCOVERAGE_AUXVAR"
-	case STLSBSS:
-		return "STLSBSS"
-	case SXREF:
-		return "SXREF"
-	case SMACHOSYMSTR:
-		return "SMACHOSYMSTR"
-	case SMACHOSYMTAB:
-		return "SMACHOSYMTAB"
-	case SMACHOINDIRECTPLT:
-		return "SMACHOINDIRECTPLT"
-	case SMACHOINDIRECTGOT:
-		return "SMACHOINDIRECTGOT"
-	case SDYNIMPORT:
-		return "SDYNIMPORT"
-	case SHOSTOBJ:
-		return "SHOSTOBJ"
-	case SUNDEFEXT:
-		return "SUNDEFEXT"
-	case SDWARFSECT:
-		return "SDWARFSECT"
-	case SDWARFCUINFO:
-		return "SDWARFCUINFO"
-	case SDWARFCONST:
-		return "SDWARFCONST"
-	case SDWARFFCN:
-		return "SDWARFFCN"
-	case SDWARFABSFCN:
-		return "SDWARFABSFCN"
-	case SDWARFTYPE:
-		return "SDWARFTYPE"
-	case SDWARFVAR:
-		return "SDWARFVAR"
-	case SDWARFRANGE:
-		return "SDWARFRANGE"
-	case SDWARFLOC:
-		return "SDWARFLOC"
-	case SDWARFLINES:
-		return "SDWARFLINES"
-	case SDWARFADDR:
-		return "SDWARFADDR"
-	case SSEHUNWINDINFO:
-		return "SSEHUNWINDINFO"
-	case SSEHSECT:
-		return "SSEHSECT"
-	default:
-		return "SymKind(" + strconv.Itoa(int(s)) + ")"
-	}
-}

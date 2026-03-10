@@ -658,6 +658,9 @@ func maybeSwitchForGoInstallVersion(loaderstate *modload.State, minVers string) 
 		}
 
 		if bf, ok := f.Value.(interface{ IsBoolFlag() bool }); !ok || !bf.IsBoolFlag() {
+			if len(args) == 0 {
+				return
+			}
 			// The next arg is the value for this flag. Skip it.
 			args = args[1:]
 			continue
@@ -667,7 +670,10 @@ func maybeSwitchForGoInstallVersion(loaderstate *modload.State, minVers string) 
 	if !strings.Contains(pkgArg, "@") || build.IsLocalImport(pkgArg) || filepath.IsAbs(pkgArg) {
 		return
 	}
-	path, version, _ := strings.Cut(pkgArg, "@")
+	path, version, _, err := modload.ParsePathVersion(pkgArg)
+	if err != nil {
+		base.Fatalf("go: %v", err)
+	}
 	if path == "" || version == "" || gover.IsToolchain(path) {
 		return
 	}
@@ -702,7 +708,7 @@ func maybeSwitchForGoInstallVersion(loaderstate *modload.State, minVers string) 
 		allowed = nil
 	}
 	noneSelected := func(path string) (version string) { return "none" }
-	_, err := modload.QueryPackages(loaderstate, ctx, path, version, noneSelected, allowed)
+	_, err = modload.QueryPackages(loaderstate, ctx, path, version, noneSelected, allowed)
 	if errors.Is(err, gover.ErrTooNew) {
 		// Run early switch, same one go install or go run would eventually do,
 		// if it understood all the command-line flags.

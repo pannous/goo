@@ -101,7 +101,7 @@ func mallocStub(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
 		if goexperiment.RuntimeSecret && gp.secret > 0 {
 			// Mark any object allocated while in secret mode as secret.
 			// This ensures we zero it immediately when freeing it.
-			addSecret(x)
+			addSecret(x, size)
 		}
 	}
 
@@ -572,10 +572,12 @@ func writeHeapBitsSmallStub(span *mspan, x, dataSize uintptr, typ *_type) uintpt
 	const elemsize = elemsize_
 
 	// Create repetitions of the bitmap if we have a small slice backing store.
-	scanSize := typ.PtrBytes
+	var scanSize uintptr
 	src := src0
 	if typ.Size_ == goarch.PtrSize {
 		src = (1 << (dataSize / goarch.PtrSize)) - 1
+		// This object is all pointers, so scanSize is just dataSize.
+		scanSize = dataSize
 	} else {
 		// N.B. We rely on dataSize being an exact multiple of the type size.
 		// The alternative is to be defensive and mask out src to the length
@@ -583,6 +585,7 @@ func writeHeapBitsSmallStub(span *mspan, x, dataSize uintptr, typ *_type) uintpt
 		if doubleCheckHeapSetType && !asanenabled && dataSize%typ.Size_ != 0 {
 			throw("runtime: (*mspan).writeHeapBitsSmall: dataSize is not a multiple of typ.Size_")
 		}
+		scanSize = typ.PtrBytes
 		for i := typ.Size_; i < dataSize; i += typ.Size_ {
 			src |= src0 << (i / goarch.PtrSize)
 			scanSize += typ.Size_

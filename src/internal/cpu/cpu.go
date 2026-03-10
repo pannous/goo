@@ -56,6 +56,7 @@ var X86 struct {
 	HasSSSE3            bool
 	HasSSE41            bool
 	HasSSE42            bool
+	HasVAES             bool
 	_                   CacheLinePad
 }
 
@@ -83,6 +84,7 @@ var ARM64 struct {
 	HasATOMICS bool
 	HasCPUID   bool
 	HasDIT     bool
+	HasSB      bool
 	IsNeoverse bool
 	_          CacheLinePad
 }

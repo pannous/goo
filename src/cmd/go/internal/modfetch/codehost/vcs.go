@@ -88,6 +88,9 @@ type vcsRepo struct {
 
 	repoSumOnce sync.Once
 	repoSum     string
+
+	statCache     par.ErrCache[string, *RevInfo]  // cache key is revision
+	readFileCache par.ErrCache[[2]string, []byte] // cache key is revision and file path
 }
 
 func newVCSRepo(ctx context.Context, vcs, remote string, local bool) (Repo, error) {
@@ -188,6 +191,7 @@ var vcsCmds = map[string]*vcsCmd{
 				"hg",
 				"--config=extensions.goreposum=" + filepath.Join(cfg.GOROOT, "lib/hg/goreposum.py"),
 				"goreposum",
+				"--",
 				remote,
 			}
 		},
@@ -196,6 +200,7 @@ var vcsCmds = map[string]*vcsCmd{
 				"hg",
 				"--config=extensions.goreposum=" + filepath.Join(cfg.GOROOT, "lib/hg/goreposum.py"),
 				"golookup",
+				"--",
 				remote,
 				ref,
 			}
@@ -216,26 +221,26 @@ var vcsCmds = map[string]*vcsCmd{
 		branchRE:           re(`(?m)^[^\n]+$`),
 		badLocalRevRE:      re(`(?m)^(tip)$`),
 		statLocal: func(rev, remote string) []string {
-			return []string{"hg", "log", "-l1", "-r", rev, "--template", "{node} {date|hgdate} {tags}"}
+			return []string{"hg", "log", "-l1", fmt.Sprintf("--rev=%s", rev), "--template", "{node} {date|hgdate} {tags}"}
 		},
 		parseStat: hgParseStat,
 		fetch:     []string{"hg", "pull", "-f"},
 		latest:    "tip",
 		descendsFrom: func(rev, tag string) []string {
-			return []string{"hg", "log", "-r", "ancestors(" + rev + ") and " + tag}
+			return []string{"hg", "log", "--rev=ancestors(" + rev + ") and " + tag}
 		},
 		recentTags: func(rev string) []string {
-			return []string{"hg", "log", "-r", "ancestors(" + rev + ") and tag()", "--template", "{tags}\n"}
+			return []string{"hg", "log", "--rev=ancestors(" + rev + ") and tag()", "--template", "{tags}\n"}
 		},
 		readFile: func(rev, file, remote string) []string {
-			return []string{"hg", "cat", "-r", rev, file}
+			return []string{"hg", "cat", fmt.Sprintf("--rev=%s", rev), "--", file}
 		},
 		readZip: func(rev, subdir, remote, target string) []string {
 			pattern := []string{}
 			if subdir != "" {
-				pattern = []string{"-I", subdir + "/**"}
+				pattern = []string{fmt.Sprintf("--include=%s", subdir+"/**")}
 			}
-			return str.StringList("hg", "archive", "-t", "zip", "--no-decode", "-r", rev, "--prefix=prefix/", pattern, "--", target)
+			return str.StringList("hg", "archive", "-t", "zip", "--no-decode", fmt.Sprintf("--rev=%s", rev), "--prefix=prefix/", pattern, "--", target)
 		},
 	},
 
@@ -275,19 +280,19 @@ var vcsCmds = map[string]*vcsCmd{
 		tagRE:         re(`(?m)^\S+`),
 		badLocalRevRE: re(`^revno:-`),
 		statLocal: func(rev, remote string) []string {
-			return []string{"bzr", "log", "-l1", "--long", "--show-ids", "-r", rev}
+			return []string{"bzr", "log", "-l1", "--long", "--show-ids", fmt.Sprintf("--revision=%s", rev)}
 		},
 		parseStat: bzrParseStat,
 		latest:    "revno:-1",
 		readFile: func(rev, file, remote string) []string {
-			return []string{"bzr", "cat", "-r", rev, file}
+			return []string{"bzr", "cat", fmt.Sprintf("--revision=%s", rev), "--", file}
 		},
 		readZip: func(rev, subdir, remote, target string) []string {
 			extra := []string{}
 			if subdir != "" {
 				extra = []string{"./" + subdir}
 			}
-			return str.StringList("bzr", "export", "--format=zip", "-r", rev, "--root=prefix/", "--", target, extra)
+			return str.StringList("bzr", "export", "--format=zip", fmt.Sprintf("--revision=%s", rev), "--root=prefix/", "--", target, extra)
 		},
 	},
 
@@ -302,17 +307,17 @@ var vcsCmds = map[string]*vcsCmd{
 		},
 		tagRE: re(`XXXTODO`),
 		statLocal: func(rev, remote string) []string {
-			return []string{"fossil", "info", "-R", ".fossil", rev}
+			return []string{"fossil", "info", "-R", ".fossil", "--", rev}
 		},
 		parseStat: fossilParseStat,
 		latest:    "trunk",
 		readFile: func(rev, file, remote string) []string {
-			return []string{"fossil", "cat", "-R", ".fossil", "-r", rev, file}
+			return []string{"fossil", "cat", "-R", ".fossil", fmt.Sprintf("-r=%s", rev), "--", file}
 		},
 		readZip: func(rev, subdir, remote, target string) []string {
 			extra := []string{}
 			if subdir != "" && !strings.ContainsAny(subdir, "*?[],") {
-				extra = []string{"--include", subdir}
+				extra = []string{fmt.Sprintf("--include=%s", subdir)}
 			}
 			// Note that vcsRepo.ReadZip below rewrites this command
 			// to run in a different directory, to work around a fossil bug.
@@ -469,40 +474,42 @@ func (r *vcsRepo) Tags(ctx context.Context, prefix string) (*Tags, error) {
 }
 
 func (r *vcsRepo) Stat(ctx context.Context, rev string) (*RevInfo, error) {
-	unlock, err := r.mu.Lock()
-	if err != nil {
-		return nil, err
-	}
-	defer unlock()
-
-	if rev == "latest" {
-		rev = r.cmd.latest
-	}
-	r.branchesOnce.Do(func() { r.loadBranches(ctx) })
-	if r.local {
-		// Ignore the badLocalRevRE precondition in local only mode.
-		// We cannot fetch latest upstream changes so only serve what's in the local cache.
-		return r.statLocal(ctx, rev)
-	}
-	revOK := (r.cmd.badLocalRevRE == nil || !r.cmd.badLocalRevRE.MatchString(rev)) && !r.branches[rev]
-	if revOK {
-		if info, err := r.statLocal(ctx, rev); err == nil {
-			return info, nil
+	return r.statCache.Do(rev, func() (*RevInfo, error) {
+		unlock, err := r.mu.Lock()
+		if err != nil {
+			return nil, err
 		}
-	}
+		defer unlock()
 
-	r.fetchOnce.Do(func() { r.fetch(ctx) })
-	if r.fetchErr != nil {
-		return nil, r.fetchErr
-	}
-	info, err := r.statLocal(ctx, rev)
-	if err != nil {
-		return info, err
-	}
-	if !revOK {
-		info.Version = info.Name
-	}
-	return info, nil
+		if rev == "latest" {
+			rev = r.cmd.latest
+		}
+		r.branchesOnce.Do(func() { r.loadBranches(ctx) })
+		if r.local {
+			// Ignore the badLocalRevRE precondition in local only mode.
+			// We cannot fetch latest upstream changes so only serve what's in the local cache.
+			return r.statLocal(ctx, rev)
+		}
+		revOK := (r.cmd.badLocalRevRE == nil || !r.cmd.badLocalRevRE.MatchString(rev)) && !r.branches[rev]
+		if revOK {
+			if info, err := r.statLocal(ctx, rev); err == nil {
+				return info, nil
+			}
+		}
+
+		r.fetchOnce.Do(func() { r.fetch(ctx) })
+		if r.fetchErr != nil {
+			return nil, r.fetchErr
+		}
+		info, err := r.statLocal(ctx, rev)
+		if err != nil {
+			return info, err
+		}
+		if !revOK {
+			info.Version = info.Name
+		}
+		return info, nil
+	})
 }
 
 func (r *vcsRepo) fetch(ctx context.Context) {
@@ -545,26 +552,28 @@ func (r *vcsRepo) Latest(ctx context.Context) (*RevInfo, error) {
 }
 
 func (r *vcsRepo) ReadFile(ctx context.Context, rev, file string, maxSize int64) ([]byte, error) {
-	if rev == "latest" {
-		rev = r.cmd.latest
-	}
-	_, err := r.Stat(ctx, rev) // download rev into local repo
-	if err != nil {
-		return nil, err
-	}
+	return r.readFileCache.Do([2]string{rev, file}, func() ([]byte, error) {
+		if rev == "latest" {
+			rev = r.cmd.latest
+		}
+		_, err := r.Stat(ctx, rev) // download rev into local repo
+		if err != nil {
+			return nil, err
+		}
 
-	// r.Stat acquires r.mu, so lock after that.
-	unlock, err := r.mu.Lock()
-	if err != nil {
-		return nil, err
-	}
-	defer unlock()
+		// r.Stat acquires r.mu, so lock after that.
+		unlock, err := r.mu.Lock()
+		if err != nil {
+			return nil, err
+		}
+		defer unlock()
 
-	out, err := Run(ctx, r.dir, r.cmd.readFile(rev, file, r.remote))
-	if err != nil {
-		return nil, fs.ErrNotExist
-	}
-	return out, nil
+		out, err := Run(ctx, r.dir, r.cmd.readFile(rev, file, r.remote))
+		if err != nil {
+			return nil, fs.ErrNotExist
+		}
+		return out, nil
+	})
 }
 
 func (r *vcsRepo) RecentTag(ctx context.Context, rev, prefix string, allowed func(string) bool) (tag string, err error) {

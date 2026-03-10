@@ -43,6 +43,10 @@ func ssaMarkMoves(s *ssagen.State, b *ssa.Block) {
 	}
 }
 
+func isGPReg(r int16) bool {
+	return x86.REG_AL <= r && r <= x86.REG_R15
+}
+
 func isFPReg(r int16) bool {
 	return x86.REG_X0 <= r && r <= x86.REG_Z31
 }
@@ -1225,14 +1229,23 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		if v.Type.IsMemory() {
 			return
 		}
-		x := v.Args[0].Reg()
+		arg := v.Args[0]
+		x := arg.Reg()
 		y := v.Reg()
 		if v.Type.IsSIMD() {
-			x = simdOrMaskReg(v.Args[0])
+			x = simdOrMaskReg(arg)
 			y = simdOrMaskReg(v)
 		}
 		if x != y {
-			opregreg(s, moveByRegsWidth(y, x, v.Type.Size()), y, x)
+			width := v.Type.Size()
+			if width == 8 && isGPReg(y) && ssa.ZeroUpper32Bits(arg, 3) {
+				// The source was naturally zext-ed from 32 to 64 bits,
+				// but we are asked to do a full 64-bit copy.
+				// Save the REX prefix byte in I-CACHE by using a 32-bit move,
+				// since it zeroes the upper 32 bits anyway.
+				width = 4
+			}
+			opregreg(s, moveByRegsWidth(y, x, width), y, x)
 		}
 	case ssa.OpLoadReg:
 		if v.Type.IsFlags() {
@@ -1293,14 +1306,14 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		}
 		r := v.Reg()
 		getgFromTLS(s, r)
-	case ssa.OpAMD64CALLstatic, ssa.OpAMD64CALLtail:
+	case ssa.OpAMD64CALLstatic, ssa.OpAMD64CALLtail, ssa.OpAMD64CALLtailinter:
 		if s.ABI == obj.ABI0 && v.Aux.(*ssa.AuxCall).Fn.ABI() == obj.ABIInternal {
 			// zeroing X15 when entering ABIInternal from ABI0
 			zeroX15(s)
 			// set G register from TLS
 			getgFromTLS(s, x86.REG_R14)
 		}
-		if v.Op == ssa.OpAMD64CALLtail {
+		if v.Op == ssa.OpAMD64CALLtail || v.Op == ssa.OpAMD64CALLtailinter {
 			s.TailCall(v)
 			break
 		}
@@ -1478,7 +1491,7 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		}
 	case ssa.OpAMD64LoweredRound32F, ssa.OpAMD64LoweredRound64F:
 		// input is already rounded
-	case ssa.OpAMD64ROUNDSD:
+	case ssa.OpAMD64ROUNDSD, ssa.OpAMD64ROUNDSS:
 		p := s.Prog(v.Op.Asm())
 		val := v.AuxInt
 		// 0 means math.RoundToEven, 1 Floor, 2 Ceil, 3 Trunc
@@ -1845,7 +1858,13 @@ func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 		ssa.OpAMD64VPMOVVec32x16ToM,
 		ssa.OpAMD64VPMOVVec64x2ToM,
 		ssa.OpAMD64VPMOVVec64x4ToM,
-		ssa.OpAMD64VPMOVVec64x8ToM:
+		ssa.OpAMD64VPMOVVec64x8ToM,
+		ssa.OpAMD64VPMOVMSKB128,
+		ssa.OpAMD64VPMOVMSKB256,
+		ssa.OpAMD64VMOVMSKPS128,
+		ssa.OpAMD64VMOVMSKPS256,
+		ssa.OpAMD64VMOVMSKPD128,
+		ssa.OpAMD64VMOVMSKPD256:
 		p := s.Prog(v.Op.Asm())
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = simdReg(v.Args[0])

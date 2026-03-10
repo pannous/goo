@@ -362,6 +362,7 @@ func (v Value) CanSet() bool {
 // type of the function's corresponding input parameter.
 // If v is a variadic function, Call creates the variadic slice parameter
 // itself, copying in the corresponding values.
+// It panics if the Value was obtained by accessing unexported struct fields.
 func (v Value) Call(in []Value) []Value {
 	v.mustBe(Func)
 	v.mustBeExported()
@@ -375,6 +376,7 @@ func (v Value) Call(in []Value) []Value {
 // It returns the output results as Values.
 // As in Go, each input argument must be assignable to the
 // type of the function's corresponding input parameter.
+// It panics if the Value was obtained by accessing unexported struct fields.
 func (v Value) CallSlice(in []Value) []Value {
 	v.mustBe(Func)
 	v.mustBeExported()
@@ -1286,9 +1288,10 @@ func (v Value) Field(i int) Value {
 		// bunch of zero-sized fields. We must return the zero-sized
 		// fields indirectly, as only ptr-shaped things can be direct.
 		// See issue 74935.
-		// We use nil instead of v.ptr as it doesn't matter and
+		// We use &zeroVal[0] instead of v.ptr as it doesn't matter and
 		// we can avoid pinning a possibly now-unused object.
-		return Value{typ, nil, fl | flagIndir}
+		// Don't use nil, see issue 77779.
+		return Value{typ, unsafe.Pointer(&zeroVal[0]), fl | flagIndir}
 	}
 
 	// Either flagIndir is set and v.ptr points at struct,
@@ -2920,6 +2923,10 @@ type SelectCase struct {
 	Send Value     // value to send (for send)
 }
 
+// stackAllocSelectCases represents the length of a slice that we
+// pre-allocate in [Select] to avoid heap allocations.
+const stackAllocSelectCases = 4
+
 // Select executes a select operation described by the list of cases.
 // Like the Go select statement, it blocks until at least one of the cases
 // can proceed, makes a uniform pseudo-random choice,
@@ -2929,22 +2936,42 @@ type SelectCase struct {
 // (as opposed to a zero value received because the channel is closed).
 // Select supports a maximum of 65536 cases.
 func Select(cases []SelectCase) (chosen int, recv Value, recvOK bool) {
+	// This function is specially designed to be inlined, such that when called as:
+	//
+	// Select([]SelectCase{})
+	//
+	// With a slice, that has a compile known length, the runcases slice
+	// will end up being stack allocated, since the compiler can infer
+	// the len([]SelectCase{}).
+	//
+	// We additionaly want to optimize Select(cases) for cases where len(cases)
+	// cannot be infered at compile-time, thus in [select0] we allocate a
+	// [stackAllocSelectCases]-length slice, which will avoid memory allocations
+	// when the len(cases) <= stackAllocSelectCases and len(cases) is not compile-known.
+
+	var runcases []runtimeSelect
+	if len(cases) > stackAllocSelectCases {
+		runcases = make([]runtimeSelect, len(cases))
+	}
+	chosen, recv, recvOK = select0(cases, runcases)
+	return
+}
+
+func select0(cases []SelectCase, runcases []runtimeSelect) (chosen int, recv Value, recvOK bool) {
 	if len(cases) > 65536 {
 		panic("reflect.Select: too many cases (max 65536)")
 	}
-	// NOTE: Do not trust that caller is not modifying cases data underfoot.
-	// The range is safe because the caller cannot modify our copy of the len
-	// and each iteration makes its own copy of the value c.
-	var runcases []runtimeSelect
-	if len(cases) > 4 {
-		// Slice is heap allocated due to runtime dependent capacity.
-		runcases = make([]runtimeSelect, len(cases))
-	} else {
-		// Slice can be stack allocated due to constant capacity.
-		runcases = make([]runtimeSelect, len(cases), 4)
+
+	// See [Select] for more details on this.
+	if runcases == nil {
+		runcases = make([]runtimeSelect, len(cases), stackAllocSelectCases)
 	}
 
 	haveDefault := false
+
+	// NOTE: Do not trust that caller is not modifying cases data underfoot.
+	// The range is safe because the caller cannot modify our copy of the len
+	// and each iteration makes its own copy of the value c.
 	for i, c := range cases {
 		rc := &runcases[i]
 		rc.dir = c.Dir
@@ -3402,7 +3429,7 @@ func convertOp(dst, src *abi.Type) func(Value, Type) Value {
 		}
 
 	case String:
-		if dst.Kind() == abi.Slice && pkgPathFor(dst.Elem()) == "" {
+		if dst.Kind() == abi.Slice {
 			switch Kind(dst.Elem().Kind()) {
 			case Uint8:
 				return cvtStringBytes
@@ -3412,7 +3439,7 @@ func convertOp(dst, src *abi.Type) func(Value, Type) Value {
 		}
 
 	case Slice:
-		if dst.Kind() == abi.String && pkgPathFor(src.Elem()) == "" {
+		if dst.Kind() == abi.String {
 			switch Kind(src.Elem().Kind()) {
 			case Uint8:
 				return cvtBytesString

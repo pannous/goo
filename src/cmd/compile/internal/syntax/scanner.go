@@ -580,25 +580,27 @@ func (s *scanner) ident() {
 		return
 	}
 
-	// special case for '¬' as !
-	if string(lit) == "¬" {
-		s.op, s.prec = Not, 0
-		s.tok = _Operator
-		return
-	}
+	if s.transformsEnabled() {
+		// special case for '¬' as !
+		if string(lit) == "¬" {
+			s.op, s.prec = Not, 0
+			s.tok = _Operator
+			return
+		}
 
-	// special case for 'and' as &&
-	if string(lit) == "and" {
-		s.op, s.prec = AndAnd, precAndAnd
-		s.tok = _Operator
-		return
-	}
+		// special case for 'and' as &&
+		if string(lit) == "and" {
+			s.op, s.prec = AndAnd, precAndAnd
+			s.tok = _Operator
+			return
+		}
 
-	// special case for 'or' as ||
-	if string(lit) == "or" {
-		s.op, s.prec = OrOr, precOrOr
-		s.tok = _Operator
-		return
+		// special case for 'or' as ||
+		if string(lit) == "or" {
+			s.op, s.prec = OrOr, precOrOr
+			s.tok = _Operator
+			return
+		}
 	}
 
 	// special case for 'isa' as type assertion operator

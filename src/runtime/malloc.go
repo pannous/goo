@@ -1213,7 +1213,7 @@ func mallocgc(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
 	if goexperiment.RuntimeSecret && gp.secret > 0 {
 		// Mark any object allocated while in secret mode as secret.
 		// This ensures we zero it immediately when freeing it.
-		addSecret(x)
+		addSecret(x, size)
 	}
 
 	// Notify sanitizers, if enabled.
@@ -2200,6 +2200,15 @@ func memclrNoHeapPointersChunked(size uintptr, x unsafe.Pointer) {
 		}
 		memclrNoHeapPointers(unsafe.Pointer(voff), n)
 	}
+}
+
+// memclrNoHeapPointersPreemptible is the compiler-callable entry point
+// for clearing large buffers with preemption support. It has the same
+// signature as memclrNoHeapPointers so the compiler can emit calls to it
+// directly. It delegates to memclrNoHeapPointersChunked which splits the
+// work into 256KB chunks with preemption checks between them.
+func memclrNoHeapPointersPreemptible(ptr unsafe.Pointer, n uintptr) {
+	memclrNoHeapPointersChunked(n, ptr)
 }
 
 // implementation of new builtin

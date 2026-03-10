@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate bundle -o=h2_bundle.go -prefix=http2 -tags=!nethttpomithttp2 -import=golang.org/x/net/internal/httpcommon=net/http/internal/httpcommon golang.org/x/net/http2
+//go:generate bundle -o=h2_bundle.go -prefix=http2 -tags=!nethttpomithttp2 -import=golang.org/x/net/internal/httpcommon=net/http/internal/httpcommon -import=golang.org/x/net/internal/httpsfv=net/http/internal/httpsfv golang.org/x/net/http2
 
 package http
 
@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+	_ "unsafe"
 
 	"golang.org/x/net/http/httpguts"
 )
@@ -35,6 +36,7 @@ const (
 	protoHTTP1 = 1 << iota
 	protoHTTP2
 	protoUnencryptedHTTP2
+	protoHTTP3
 )
 
 // HTTP1 reports whether p includes HTTP/1.
@@ -55,12 +57,26 @@ func (p Protocols) UnencryptedHTTP2() bool { return p.bits&protoUnencryptedHTTP2
 // SetUnencryptedHTTP2 adds or removes unencrypted HTTP/2 from p.
 func (p *Protocols) SetUnencryptedHTTP2(ok bool) { p.setBit(protoUnencryptedHTTP2, ok) }
 
+// http3 reports whether p includes HTTP/3.
+func (p Protocols) http3() bool { return p.bits&protoHTTP3 != 0 }
+
+// setHTTP3 adds or removes HTTP/3 from p.
+func (p *Protocols) setHTTP3(ok bool) { p.setBit(protoHTTP3, ok) }
+
+//go:linkname protocolSetHTTP3 golang.org/x/net/internal/http3_test.protocolSetHTTP3
+func protocolSetHTTP3(p *Protocols) { p.setHTTP3(true) }
+
 func (p *Protocols) setBit(bit uint8, ok bool) {
 	if ok {
 		p.bits |= bit
 	} else {
 		p.bits &^= bit
 	}
+}
+
+// empty returns true if p has no protocol set at all.
+func (p Protocols) empty() bool {
+	return p.bits == 0
 }
 
 func (p Protocols) String() string {
@@ -106,15 +122,15 @@ type contextKey struct {
 
 func (k *contextKey) String() string { return "net/http context value " + k.name }
 
-// Given a string of the form "host", "host:port", or "[ipv6::address]:port",
-// return true if the string includes a port.
-func hasPort(s string) bool { return strings.LastIndex(s, ":") > strings.LastIndex(s, "]") }
-
-// removeEmptyPort strips the empty port in ":port" to ""
-// as mandated by RFC 3986 Section 6.2.3.
-func removeEmptyPort(host string) string {
-	if hasPort(host) {
-		return strings.TrimSuffix(host, ":")
+// removePort strips the port while correclty handling IPv6.
+func removePort(host string) string {
+	for i := len(host) - 1; i >= 0; i-- {
+		switch host[i] {
+		case ':':
+			return host[:i]
+		case ']':
+			return host
+		}
 	}
 	return host
 }
